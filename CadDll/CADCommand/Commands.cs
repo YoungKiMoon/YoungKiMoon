@@ -14,6 +14,8 @@ namespace CadDll.CADCommand
 {
     public class Commands
     {
+
+        #region testdll
         [CommandMethod("testdll")]
         public void NestedTransactions()
         {
@@ -145,5 +147,9 @@ namespace CadDll.CADCommand
                 ent.ColorIndex = col;
             }
         }
+
+        #endregion
+
+
     }
 }
