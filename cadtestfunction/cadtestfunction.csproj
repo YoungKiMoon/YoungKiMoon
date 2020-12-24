@@ -4,4 +4,20 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="accoremgd">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2021\accoremgd.dll</HintPath>
+    </Reference>
+    <Reference Include="Acdbmgd">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2021\acdbmgd.dll</HintPath>
+    </Reference>
+    <Reference Include="Acmgd">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2021\acmgd.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
