@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WpfCadCon"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
+    <Grid PreviewMouseLeftButtonUp="Grid_PreviewMouseLeftButtonUp">
+        <Button Content="test" Width="100" Height="100"/>
     </Grid>
 </Window>

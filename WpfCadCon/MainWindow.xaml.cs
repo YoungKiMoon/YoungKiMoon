@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfCadCon.Services;
 
 namespace WpfCadCon
 {
@@ -22,6 +23,13 @@ namespace WpfCadCon
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Grid_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            CADConService cadCon = new CADConService();
+            cadCon.RunProgram();
+
         }
     }
 }
