@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows;
 using Autodesk.AutoCAD.Interop;
+
 
 namespace WpfCadCon.Services
 {
@@ -62,8 +64,23 @@ namespace WpfCadCon.Services
             if (CADApp == null)
                 return false;
 
-            dynamic cc = CADApp.ActiveDocument;
-            cc.SendCommand("STP" +"\r");
+
+            MessageBox.Show("Now running " + CADApp.Name +" version " + CADApp.Version);
+
+            string comSpace = " ";
+            char comEquivalent = (char)34;  //Quotation Marks
+
+            dynamic CADDoc = CADApp.ActiveDocument;
+
+            string dllPath = "C:\\Users\\tree\\source\\cadProject\\Wpfcad\\bin\\Debug\\";
+            string dllName = "Wpf.dll";
+            dllPath = dllPath.Replace("\\", "/");
+            dllPath = "C:/ASUS/";
+            CADDoc.SendCommand("(command " + comEquivalent + "_NETLOAD" + comEquivalent + " " +
+                                    comEquivalent + dllPath +dllName + comEquivalent + ") ");
+
+
+            CADDoc.SendCommand("STP" + comSpace);
 
             return true;
         }

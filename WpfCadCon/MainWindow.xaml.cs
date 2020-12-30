@@ -25,11 +25,21 @@ namespace WpfCadCon
             InitializeComponent();
         }
 
-        private void Grid_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        
+
+        private void btnRun_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             CADConService cadCon = new CADConService();
             cadCon.RunProgram();
+        }
 
+        private void btnReg_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            
+            CADRegistryService.runReg();
+            MessageBox.Show("등록완료");
+            
+            
         }
     }
 }

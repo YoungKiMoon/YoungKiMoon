@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:WpfCadCon"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid PreviewMouseLeftButtonUp="Grid_PreviewMouseLeftButtonUp">
-        <Button Content="test" Width="100" Height="100"/>
+    <Grid>
+        <Button x:Name="btnRun" Content="캐드 외부 실행" Width="100" Height="100" PreviewMouseLeftButtonUp="btnRun_PreviewMouseLeftButtonUp"/>
+        <Button x:Name="btnReg" Content="레지스트리 등록" HorizontalAlignment="Left" Width="100" Height="100" PreviewMouseLeftButtonUp="btnReg_PreviewMouseLeftButtonUp"/>
     </Grid>
 </Window>
