@@ -33,7 +33,7 @@ namespace WpfCadCon.Services
             var obj = Activator.CreateInstance(t, true);
             // No need for casting with dynamics
             //CADApp = obj as AcadApplication;
-            CADApp = obj;
+            CADApp = null;
         }
 
         private static void EnsureAutoCadIsRunning()
