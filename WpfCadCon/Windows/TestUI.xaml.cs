@@ -34,7 +34,7 @@ namespace WpfCadCon.Windows
 
             Ellipse currentItem = sender as Ellipse;
             int currentIndex = Grid.GetColumn(currentItem.Parent as Grid);
-2020
+
             ChangeProcess(currentIndex);
 
         }

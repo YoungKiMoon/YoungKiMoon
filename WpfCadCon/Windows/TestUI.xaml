@@ -74,43 +74,43 @@
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
                     <Ellipse Width="30" Height="30" Fill="{StaticResource ProcessColor}" Cursor="Hand" PreviewMouseLeftButtonUp="Ellipse_PreviewMouseLeftButtonUp" />
-                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <Ellipse Width="10" Height="10" Fill="White" />
+                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
+                    <Ellipse Width="10" Height="10" Fill="White" IsHitTestVisible="False"/>
                 </Grid>
                 <Grid Grid.Column="1">
                     <Ellipse Width="30" Height="30" Fill="{StaticResource ProcessColor}" Cursor="Hand" PreviewMouseLeftButtonUp="Ellipse_PreviewMouseLeftButtonUp" />
-                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <Ellipse Width="10" Height="10" Fill="White" />
+                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
+                    <Ellipse Width="10" Height="10" Fill="White" IsHitTestVisible="False"/>
                 </Grid>
                 <Grid Grid.Column="2">
                     <Ellipse Width="30" Height="30" Fill="{StaticResource ProcessColor}" Cursor="Hand" PreviewMouseLeftButtonUp="Ellipse_PreviewMouseLeftButtonUp" />
-                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <Ellipse Width="10" Height="10" Fill="White" />
+                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
+                    <Ellipse Width="10" Height="10" Fill="White" IsHitTestVisible="False"/>
                 </Grid>
                 <Grid Grid.Column="3">
                     <Ellipse Width="30" Height="30" Fill="{StaticResource ProcessColor}" Cursor="Hand" PreviewMouseLeftButtonUp="Ellipse_PreviewMouseLeftButtonUp" />
-                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <Ellipse Width="10" Height="10" Fill="White" />
+                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
+                    <Ellipse Width="10" Height="10" Fill="White" IsHitTestVisible="False"/>
                 </Grid>
                 <Grid Grid.Column="4">
                     <Ellipse Width="30" Height="30" Fill="{StaticResource ProcessColor}" Cursor="Hand" PreviewMouseLeftButtonUp="Ellipse_PreviewMouseLeftButtonUp" />
-                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <Ellipse Width="10" Height="10" Fill="White" />
+                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
+                    <Ellipse Width="10" Height="10" Fill="White" IsHitTestVisible="False"/>
                 </Grid>
                 <Grid Grid.Column="5">
                     <Ellipse Width="30" Height="30" Fill="{StaticResource ProcessColor}" Cursor="Hand" PreviewMouseLeftButtonUp="Ellipse_PreviewMouseLeftButtonUp" />
-                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <Ellipse Width="10" Height="10" Fill="White" />
+                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
+                    <Ellipse Width="10" Height="10" Fill="White" IsHitTestVisible="False"/>
                 </Grid>
                 <Grid Grid.Column="6">
                     <Ellipse Width="30" Height="30" Fill="{StaticResource ProcessColor}" Cursor="Hand" PreviewMouseLeftButtonUp="Ellipse_PreviewMouseLeftButtonUp" />
-                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <Ellipse Width="10" Height="10" Fill="White" />
+                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
+                    <Ellipse Width="10" Height="10" Fill="White" IsHitTestVisible="False"/>
                 </Grid>
                 <Grid Grid.Column="7">
                     <Ellipse Width="30" Height="30" Fill="{StaticResource ProcessColor}" Cursor="Hand" PreviewMouseLeftButtonUp="Ellipse_PreviewMouseLeftButtonUp" />
-                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <Ellipse Width="10" Height="10" Fill="White" />
+                    <Polygon Points="2,6 6,10 16,0 18,2 6,14 0,8" Fill="{StaticResource ProcessCheck}"  VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
+                    <Ellipse Width="10" Height="10" Fill="White" IsHitTestVisible="False"/>
                 </Grid>
             </Grid>
             <Grid x:Name="gridProcessText" Height="30" Margin="40,0,40,30" VerticalAlignment="Bottom">
