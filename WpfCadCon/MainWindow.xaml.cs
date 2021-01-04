@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WpfCadCon.Services;
+using WpfCadCon.Windows;
 
 namespace WpfCadCon
 {
@@ -46,6 +47,12 @@ namespace WpfCadCon
         {
             CADRegistryService.runRegDelete();
             MessageBox.Show("삭제완료");
+        }
+
+        private void btnReg3_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            TestUI cc = new TestUI();
+            cc.Show();
         }
     }
 }
