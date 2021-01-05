@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using ExcelWork.Panes;
 using Microsoft.Office.Tools.Excel;
 using Microsoft.VisualStudio.Tools.Applications.Runtime;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -14,6 +15,9 @@ namespace ExcelWork
 {
     public partial class ThisWorkbook
     {
+
+        public ProcessPane processActionPane;
+
         private void ThisWorkbook_Startup(object sender, System.EventArgs e)
         {
         }
@@ -36,5 +40,23 @@ namespace ExcelWork
 
         #endregion
 
+
+        #region Task Pane
+        public void ShowTaskPane()
+        {
+
+            this.ActionsPane.Clear();
+            processActionPane = new ProcessPane();
+            this.ActionsPane.Controls.Add(processActionPane);
+            this.ActionsPane.Controls[0].Text = "Design Process";
+            this.ActionsPane.Controls[0].Name = "Tank Process";
+            this.Application.CommandBars["Tank Process"].Position = Office.MsoBarPosition.msoBarTop;
+            this.Application.CommandBars["Tank Process"].accName = "aaa";
+
+
+
+
+        }
+        #endregion
     }
 }
