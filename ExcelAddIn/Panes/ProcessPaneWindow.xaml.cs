@@ -12,6 +12,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using ExcelAddIn.ExcelServices;
+using ExcelAddIn.Commons;
+
 namespace ExcelAddIn.Panes
 {
     /// <summary>
@@ -29,16 +32,11 @@ namespace ExcelAddIn.Panes
         private void Ellipse_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
 
-            SolidColorBrush activeColor = new SolidColorBrush(Color.FromRgb(110, 128, 147));
-            SolidColorBrush deactiveColor = new SolidColorBrush(Color.FromRgb(202, 209, 216));
-            SolidColorBrush currentColor = new SolidColorBrush(Color.FromRgb(26, 202, 142));
-
-
             Ellipse currentItem = sender as Ellipse;
             int currentIndex = Grid.GetColumn(currentItem.Parent as Grid);
 
             ChangeProcess(currentIndex);
-
+            ChangeSheet(currentIndex);
         }
 
         private void ChangeProcess(int currentIndex)
@@ -129,6 +127,27 @@ namespace ExcelAddIn.Panes
             }
         }
 
+        private void ChangeSheet(int currentIndex)
+        {
+            switch (currentIndex)
+            {
+                case 0:
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_BASIC);
+                    break;
+                case 1:
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_SHEEL);
+                    break;
+                case 2:
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_ROOF);
+                    break;
+                case 3:
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_BOTTOM);
+                    break;
 
+                default:
+                    break;
+            }
+            
+        }
     }
 }

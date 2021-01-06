@@ -180,6 +180,8 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="Commons\CommonBase.cs" />
+    <Compile Include="ExcelServices\ExcelService.cs" />
     <Compile Include="Panes\InputPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -235,6 +237,7 @@
     <Compile Include="Ribbons\Ribbon1.Designer.cs">
       <DependentUpon>Ribbon1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Service\PaneWindowService.cs" />
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>

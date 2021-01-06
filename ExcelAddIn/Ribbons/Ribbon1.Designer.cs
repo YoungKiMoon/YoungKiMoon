@@ -37,8 +37,8 @@ namespace ExcelAddIn
         {
             this.tab1 = this.Factory.CreateRibbonTab();
             this.group1 = this.Factory.CreateRibbonGroup();
-            this.separator1 = this.Factory.CreateRibbonSeparator();
             this.separator2 = this.Factory.CreateRibbonSeparator();
+            this.separator1 = this.Factory.CreateRibbonSeparator();
             this.button2 = this.Factory.CreateRibbonButton();
             this.button4 = this.Factory.CreateRibbonButton();
             this.button10 = this.Factory.CreateRibbonButton();
@@ -75,13 +75,13 @@ namespace ExcelAddIn
             this.group1.Label = "Tank Basic Automation System";
             this.group1.Name = "group1";
             // 
-            // separator1
-            // 
-            this.separator1.Name = "separator1";
-            // 
             // separator2
             // 
             this.separator2.Name = "separator2";
+            // 
+            // separator1
+            // 
+            this.separator1.Name = "separator1";
             // 
             // button2
             // 
@@ -139,9 +139,10 @@ namespace ExcelAddIn
             // 
             this.button13.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
             this.button13.Image = global::ExcelAddIn.Properties.Resources.play;
-            this.button13.Label = "TEMP";
+            this.button13.Label = "MAIN";
             this.button13.Name = "button13";
             this.button13.ShowImage = true;
+            this.button13.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.button13_Click);
             // 
             // button9
             // 

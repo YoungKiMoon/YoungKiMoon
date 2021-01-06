@@ -29,5 +29,13 @@ namespace ExcelAddIn
             Globals.ThisAddIn.ShowInputPane();
             
         }
+
+        private void button13_Click(object sender, RibbonControlEventArgs e)
+        {
+            Service.PaneWindowService paneService = new Service.PaneWindowService();
+            paneService.VisiblePane(Commons.CUSTOMPANE_LIST.NotSet, false, true);
+            ExcelServices.ExcelService.ChangeSheet(Commons.EXCELSHEET_LIST.SHEET_MAIN);
+
+        }
     }
 }

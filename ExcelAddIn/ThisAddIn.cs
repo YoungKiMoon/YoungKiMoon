@@ -7,11 +7,15 @@ using Excel = Microsoft.Office.Interop.Excel;
 using Office = Microsoft.Office.Core;
 using Microsoft.Office.Tools.Excel;
 using ExcelAddIn.Panes;
+using ExcelAddIn.Service;
+using ExcelAddIn.Commons;
 
 namespace ExcelAddIn
 {
     public partial class ThisAddIn
     {
+
+        private PaneWindowService paneService = new PaneWindowService();
 
         private Microsoft.Office.Tools.CustomTaskPane customProcessTaskPane;
         public ProcessPane customProcessPane;
@@ -43,57 +47,38 @@ namespace ExcelAddIn
 
         public void ShowProcessPane()
         {
-            if (customProcessPane != null)
+
+            if (paneService.CheckCreatePane(CUSTOMPANE_LIST.PROCESS))
             {
-                if (customProcessTaskPane.Visible)
-                {
-                    customProcessTaskPane.Visible = false;
-                }
-                else
-                {
-                    customProcessTaskPane.Visible = true;
-                }
-                
-                return;
+                string processName = paneService.GetPaneTitleName(CUSTOMPANE_LIST.PROCESS);
+
+                customProcessPane = new ProcessPane();
+                customProcessTaskPane = this.CustomTaskPanes.Add(customProcessPane, processName);
+
+                customProcessTaskPane.DockPosition = Office.MsoCTPDockPosition.msoCTPDockPositionTop;
+                customProcessTaskPane.Height = 160;
+
+                customProcessTaskPane.Visible = true;
             }
-                
 
-            string processName = "Design Process";
-            customProcessPane = new ProcessPane();
-            customProcessTaskPane = this.CustomTaskPanes.Add(customProcessPane,processName);
 
-            customProcessTaskPane.DockPosition = Office.MsoCTPDockPosition.msoCTPDockPositionTop;
-            customProcessTaskPane.Height = 160;
-
-            customProcessTaskPane.Visible = true;
 
         }
 
         public void ShowInputPane()
         {
-            if (customInputPane != null)
+            if (paneService.CheckCreatePane(CUSTOMPANE_LIST.INPUT))
             {
-                if (customInputTaskPane.Visible)
-                {
-                    customInputTaskPane.Visible = false;
-                }
-                else
-                {
-                    customInputTaskPane.Visible = true;
-                }
 
-                return;
+                string processName = paneService.GetPaneTitleName(CUSTOMPANE_LIST.INPUT);
+                customInputPane = new InputPane();
+                customInputTaskPane = this.CustomTaskPanes.Add(customInputPane, processName);
+
+                customInputTaskPane.DockPosition = Office.MsoCTPDockPosition.msoCTPDockPositionRight;
+                customInputTaskPane.Width = 320;
+
+                customInputTaskPane.Visible = true;
             }
-
-
-            string processName = "Input";
-            customInputPane = new InputPane();
-            customInputTaskPane = this.CustomTaskPanes.Add(customInputPane, processName);
-
-            customInputTaskPane.DockPosition = Office.MsoCTPDockPosition.msoCTPDockPositionRight;
-            customInputTaskPane.Width = 320;
-
-            customInputTaskPane.Visible = true;
 
         }
 
