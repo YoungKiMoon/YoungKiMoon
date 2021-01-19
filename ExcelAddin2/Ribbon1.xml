@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<customUI onLoad="Ribbon_Load" xmlns="http://schemas.microsoft.com/office/2009/07/customui">
+    <ribbon>
+        <tabs>
+            <tab id="cuCAD01" getLabel="GetCustomLabel">
+                <group id="cuGroup01" getLabel="GetCustomLabel">
+                    <button id="cuGroupButton01" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />
+                    <button id="cuArrow01" enabled="true" label=" " getImage="GetCustomImage"  size="large" />
+                    <button id="cuGroupButton02" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />
+                    <button id="cuArrow02" enabled="true" label=" " getImage="GetCustomImage"  size="large" />
+                    <button id="cuGroupButton03" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />
+                    <button id="cuArrow03" enabled="true" label=" " getImage="GetCustomImage"  size="large" />
+                    <button id="cuGroupButton04" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />
+                    <separator id="separator02" />
+                    <button id="cuGroupButton05" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />
+                    <separator id="separator01" />
+                    <button id="cuGroupButton06" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />
+                </group>
+            </tab>
+        </tabs>
+    </ribbon>
+</customUI>

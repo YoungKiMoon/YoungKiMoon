@@ -149,5 +149,10 @@ namespace ExcelAddIn.Panes
             }
             
         }
+
+        private void sese_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            MessageBox.Show(Globals.Ribbons.Count().ToString());
+        }
     }
 }

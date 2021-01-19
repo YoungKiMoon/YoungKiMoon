@@ -12,10 +12,12 @@
         <SolidColorBrush x:Key="ProcessCheck" Color="White"/>
     </UserControl.Resources>
     <Grid>
+        
         <Grid x:Name="gridProcess" Height="160">
             <Grid x:Name="gridProcessHeader" Height="30" Margin="40,0,40,0" VerticalAlignment="Top">
                 <TextBlock Text="Tank Design Process" FontSize="20" FontWeight="Bold" Foreground="#FF485563" HorizontalAlignment="Center"/>
             </Grid>
+            
             <Grid x:Name="gridProcessLine" Height="30" Margin="40,0,40,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.5*"/>
@@ -118,14 +120,14 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Basic" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
-                <TextBlock Grid.Column="1" Text="Shell" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
-                <TextBlock Grid.Column="2" Text="Roof" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
+                <TextBlock Grid.Column="0" Text="Design Data" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
+                <TextBlock Grid.Column="1" Text="Roof" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
+                <TextBlock Grid.Column="2" Text="Shell" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
                 <TextBlock Grid.Column="3" Text="Bottom" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
                 <TextBlock Grid.Column="4" Text="Structure" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
                 <TextBlock Grid.Column="5" Text="Nozzle" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
-                <TextBlock Grid.Column="6" Text="Etc" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
-                <TextBlock Grid.Column="7" Text="Paper" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
+                <TextBlock Grid.Column="6" Text="Access" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
+                <TextBlock Grid.Column="7" Text="Appurtenances" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
             </Grid>
 
 

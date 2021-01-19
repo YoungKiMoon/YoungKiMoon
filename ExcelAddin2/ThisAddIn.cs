@@ -24,6 +24,15 @@ namespace ExcelAddIn
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            string processName = paneService.GetPaneTitleName(CUSTOMPANE_LIST.PROCESS);
+
+            customProcessPane = new ProcessPane();
+            customProcessTaskPane = this.CustomTaskPanes.Add(customProcessPane, processName);
+
+            customProcessTaskPane.DockPosition = Office.MsoCTPDockPosition.msoCTPDockPositionTop;
+            customProcessTaskPane.Height = 160;
+
+            customProcessTaskPane.Visible = true;
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
@@ -42,8 +51,16 @@ namespace ExcelAddIn
             this.Startup += new System.EventHandler(ThisAddIn_Startup);
             this.Shutdown += new System.EventHandler(ThisAddIn_Shutdown);
         }
-        
+
         #endregion
+
+        #region Ribbon
+        protected override Office.IRibbonExtensibility CreateRibbonExtensibilityObject()
+        {
+            return new Ribbon1();
+        }
+        #endregion
+
 
         public void ShowProcessPane()
         {

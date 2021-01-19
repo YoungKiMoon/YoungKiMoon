@@ -28,6 +28,7 @@
     <AssemblyName>ExcelAddIn</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <DefineConstants>VSTO40</DefineConstants>
+    <IsWebBootstrapper>False</IsWebBootstrapper>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <PublishUrl>게시\</PublishUrl>
     <InstallUrl />
@@ -37,7 +38,6 @@
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
     <UpdateIntervalUnits>days</UpdateIntervalUnits>
-    <IsWebBootstrapper>False</IsWebBootstrapper>
     <ProductName>ExcelAddIn</ProductName>
     <PublisherName />
     <SupportUrl />
@@ -88,6 +88,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <!--
     This section defines properties that are set when the "Release" configuration is selected.
@@ -203,6 +204,7 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utils\VersionData.cs" />
     <EmbeddedResource Include="Panes\InputPane.resx">
       <DependentUpon>InputPane.cs</DependentUpon>
     </EmbeddedResource>
@@ -219,9 +221,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="Ribbons\Ribbon1.resx">
-      <DependentUpon>Ribbon1.cs</DependentUpon>
-    </EmbeddedResource>
+    <None Include="ExcelAddIn_1_TemporaryKey.pfx" />
     <None Include="ExcelAddIn_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -231,11 +231,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Ribbons\Ribbon1.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Ribbons\Ribbon1.Designer.cs">
-      <DependentUpon>Ribbon1.cs</DependentUpon>
+    <Compile Include="Ribbon1.cs">
+      <XmlRibbon>true</XmlRibbon>
     </Compile>
     <Compile Include="Service\PaneWindowService.cs" />
     <Compile Include="ThisAddIn.cs">
@@ -253,6 +250,7 @@
     <Resource Include="Resources\iTank2.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Ribbons\" />
     <Folder Include="ViewModel\" />
   </ItemGroup>
   <ItemGroup>
@@ -280,6 +278,9 @@
   <ItemGroup>
     <Resource Include="Resources\right-arrowSmall.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ribbon1.xml" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -288,10 +289,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>ExcelAddIn_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>ExcelAddIn_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>0FB7236DB68C0EF78AAF8EE3DA699EDA41F4332F</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>7A92223A675A7772A6BD9F0D13F87C5B9009686A</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
