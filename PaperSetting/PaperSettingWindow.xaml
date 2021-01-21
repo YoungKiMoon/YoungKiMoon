@@ -1,0 +1,28 @@
+﻿<Window x:Class="PaperSetting.PaperSettingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PaperSetting"
+        xmlns:vm="clr-namespace:PaperSetting.ViewModel"
+        
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <vm:PaperSettingViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <GridSplitter Grid.Column="1" ShowsPreview="True" Width="4" Background="#FF529999" ResizeDirection="Columns" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        
+        <!--#region Paper List-->
+        <DataGrid>
+            
+        </DataGrid>
+        <!--#endregion-->
+    </Grid>
+</Window>
