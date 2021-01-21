@@ -21,6 +21,7 @@ namespace PaperSetting
     {
         public PaperSettingWindow()
         {
+            Console.WriteLine("aa");
             InitializeComponent();
         }
     }

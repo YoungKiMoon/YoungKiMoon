@@ -68,7 +68,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Models\PaperDWGModel.cs" />
+    <Compile Include="Models\IBaseModel.cs" />
+    <Compile Include="Models\PointModel.cs" />
+    <Compile Include="Models\PaperBasicModel.cs" />
+    <Compile Include="Models\PaperDwgModel.cs" />
+    <Compile Include="Models\PaperNoteModel.cs" />
+    <Compile Include="Models\PaperRevisionModel.cs" />
+    <Compile Include="Models\PaperTableModel.cs" />
+    <Compile Include="Models\PaperViewportModel.cs" />
+    <Compile Include="Models\ScaleModel.cs" />
+    <Compile Include="Models\SizeModel.cs" />
+    <Compile Include="Models\ViewPortModel.cs" />
     <Compile Include="Utils\Notifier.cs" />
     <Compile Include="ViewModel\PaperSettingViewModel.cs" />
     <Page Include="PaperSettingWindow.xaml">
