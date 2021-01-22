@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PaperSetting.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,11 @@ namespace PaperSetting
         {
             Console.WriteLine("aa");
             InitializeComponent();
+        }
+
+        private void TabItem_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            PaperSettingViewModel selView=this.DataContext as PaperSettingViewModel;
         }
     }
 }

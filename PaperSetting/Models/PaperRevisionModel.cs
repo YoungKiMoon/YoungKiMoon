@@ -11,6 +11,7 @@ namespace PaperSetting.Models
         public PaperRevisionModel()
         {
             No = "";
+            RevString = "";
             DateString = "";
             Description = "";
             PreparedName = "";
@@ -22,6 +23,7 @@ namespace PaperSetting.Models
         {
             PaperRevisionModel newModel = new PaperRevisionModel();
             newModel.No = No;
+            newModel.RevString = RevString;
             newModel.DateString = DateString;
             newModel.Description = Description;
             newModel.PreparedName = PreparedName;
@@ -39,6 +41,17 @@ namespace PaperSetting.Models
             {
                 _No = value;
                 OnPropertyChanged(nameof(No));
+            }
+        }
+
+        private string _RevString;
+        public string RevString
+        {
+            get { return _RevString; }
+            set
+            {
+                _RevString = value;
+                OnPropertyChanged(nameof(RevString));
             }
         }
 

@@ -51,6 +51,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -68,6 +69,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CustomControl\CustomDataGrid.cs" />
     <Compile Include="Models\IBaseModel.cs" />
     <Compile Include="Models\PointModel.cs" />
     <Compile Include="Models\PaperBasicModel.cs" />
@@ -79,6 +81,7 @@
     <Compile Include="Models\ScaleModel.cs" />
     <Compile Include="Models\SizeModel.cs" />
     <Compile Include="Models\ViewPortModel.cs" />
+    <Compile Include="Services\SampleService.cs" />
     <Compile Include="Utils\Notifier.cs" />
     <Compile Include="ViewModel\PaperSettingViewModel.cs" />
     <Page Include="PaperSettingWindow.xaml">
@@ -123,6 +126,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\papericon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

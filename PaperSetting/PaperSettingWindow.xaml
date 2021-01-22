@@ -4,25 +4,303 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PaperSetting"
+        
         xmlns:vm="clr-namespace:PaperSetting.ViewModel"
         
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="600" Width="1100">
     <Window.DataContext>
         <vm:PaperSettingViewModel/>
     </Window.DataContext>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
-        <GridSplitter Grid.Column="1" ShowsPreview="True" Width="4" Background="#FF529999" ResizeDirection="Columns" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-        
-        <!--#region Paper List-->
-        <DataGrid>
-            
-        </DataGrid>
-        <!--#endregion-->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Background="#FFDFE9F2">
+            <StackPanel Orientation="Horizontal" >
+                <Image Source="Resources/papericon.png" Stretch="Fill" Height="16" Margin="6,0,0,0" />
+                <TextBlock Text="도면 설정" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#FF3F5072" FontWeight="Bold" Padding="6,0,0,0"/>
+            </StackPanel>
+
+        </Border>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <GridSplitter Grid.Column="1" ShowsPreview="True" Width="4" Background="#FFDFE9F2" ResizeDirection="Columns" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Cursor="SizeWE"/>
+
+            <!--#region Paper List-->
+            <Grid>
+
+                <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                      ItemsSource="{Binding PaperList}" SelectedItem="{Binding PaperListSelection,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                      HorizontalScrollBarVisibility="Visible"
+                      VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24" CanUserDeleteRows="False" CanUserResizeRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="No" Width="30" Binding="{Binding Basic.No}"/>
+                        <DataGridTextColumn Header="TITLE" Width="100" Binding="{Binding Basic.Title}"/>
+                        <DataGridTextColumn Header="DWG. No." Width="200" Binding="{Binding Basic.DwgNo}"/>
+                        <DataGridTextColumn Header="STAMP" Width="100" Binding="{Binding Basic.StampName}"/>
+                        <DataGridTextColumn Header="R" Binding="{Binding Revisions.Count}"/>
+                        <DataGridTextColumn Header="V" Binding="{Binding ViewPorts.Count}"/>
+                        <DataGridTextColumn Header="T" Binding="{Binding Tables.Count}"/>
+                        <DataGridTextColumn Header="N" Binding="{Binding Notes.Count}"/>
+                    </DataGrid.Columns>
+                    <!--
+                <DataGrid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource self}, Path=Text}"/>
+                    </Style>
+                </DataGrid.Resources>
+                -->
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow">
+                            <Style.Resources>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF0078D7"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FF0078D7"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="White"/>
+                                <!-- 4.0 later
+                            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Blue"/>
+                            -->
+                            </Style.Resources>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Padding" Value="2,2,0,0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                        <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.CellStyle>
+                </DataGrid>
+            </Grid>
+            <!--#endregion-->
+
+            <!--#region Paper Detail List-->
+            <Border Grid.Row="0" Grid.Column="2"   Background="#FFDFE9F2"/>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="24"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <DataGrid Grid.Row="0" Padding="0,0,0,0" HeadersVisibility="None" IsEnabled="False" IsReadOnly="True" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF28B0DF" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                      ItemsSource="{Binding PaperListSelectionColl}" 
+                      VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" RowHeight="24" Background="#FFDFE9F2" HorizontalScrollBarVisibility="Hidden">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="No" Width="30" Binding="{Binding Basic.No}"/>
+                        <DataGridTextColumn Header="TITLE" Width="200" Binding="{Binding Basic.Title}"/>
+                        <DataGridTextColumn Header="DWG. No." Width="200" Binding="{Binding Basic.DwgNo}"/>
+                        <DataGridTextColumn Header="STAMP" Width="100" Binding="{Binding Basic.StampName}"/>
+                        <DataGridTextColumn Header="R" Binding="{Binding Revisions.Count}"/>
+                        <DataGridTextColumn Header="V" Binding="{Binding ViewPorts.Count}"/>
+                        <DataGridTextColumn Header="T" Binding="{Binding Tables.Count}"/>
+                        <DataGridTextColumn Header="N" Binding="{Binding Notes.Count}"/>
+                    </DataGrid.Columns>
+
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Padding" Value="2,2,0,0"/>
+                            <Setter Property="Foreground" Value="#FF28B0DF"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                        <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.CellStyle>
+                </DataGrid>
+
+                <TabControl Grid.Row="1" BorderThickness="0" Padding="0" >
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Padding" Value="4"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TabItem">
+                                        <Border Name="Border" BorderBrush="#FFC3C3C3" CornerRadius="12,12,0,0" Margin="2,2,2,0" Background="#FFCECED6" BorderThickness="0" Height="22" Cursor="Hand">
+                                            <TextBlock  x:Name="TabItemContent"
+                                                        Text="{TemplateBinding Header}"
+                                                        FontSize="13" FontWeight="Bold" 
+                                                        Foreground="White"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center"
+                                                        Margin="10,2"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="#28b0df" />
+                                                <Setter TargetName="TabItemContent" Property="Foreground" Value="#FFFFFF"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="False">
+                                                <Setter TargetName="Border" Property="Background" Value="#89d4ed" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
+                    <TabItem Header="REVISION" MinWidth="100" BorderThickness="0" PreviewMouseLeftButtonUp="TabItem_PreviewMouseLeftButtonUp">
+                        <Grid>
+                            <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                      ItemsSource="{Binding PaperListSelection.Revisions}" HorizontalScrollBarVisibility="Visible"
+                      VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="REV." Width="100" Binding="{Binding RevString }"/>
+                                    <DataGridTextColumn Header="DATE" Width="100" Binding="{Binding DateString}"/>
+                                    <DataGridTextColumn Header="DESCRIPTION" Width="100" Binding="{Binding Description}"/>
+                                    <DataGridTextColumn Header="PREPARED" Width="100" Binding="{Binding PreparedName}"/>
+                                    <DataGridTextColumn Header="CHECKED" Width="100" Binding="{Binding CheckedName}"/>
+                                    <DataGridTextColumn Header="APPROVED" Width="100" Binding="{Binding ApprovedName}"/>
+
+                                </DataGrid.Columns>
+
+                                <DataGrid.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="Padding" Value="2,2,0,0"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                    <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </DataGrid.CellStyle>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="VIEWPORT" MinWidth="100" BorderThickness="0" >
+                        <Grid>
+                            <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                      ItemsSource="{Binding PaperListSelection.ViewPorts}" HorizontalScrollBarVisibility="Visible"
+                      VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="No" Width="30" Binding="{Binding No}"/>
+                                    <DataGridTextColumn Header="NAME" Width="100" Binding="{Binding Name }"/>
+                                    <DataGridTextColumn Header="ASSEMBLY" Width="100" Binding="{Binding AssemblySelection}"/>
+                                    <DataGridTextColumn Header="X" Width="50" Binding="{Binding ViewPort.Location.X}"/>
+                                    <DataGridTextColumn Header="Y" Width="50" Binding="{Binding ViewPort.Location.Y}"/>
+                                    <DataGridTextColumn Header="W" Width="50" Binding="{Binding ViewPort.Size.Width}"/>
+                                    <DataGridTextColumn Header="H" Width="50" Binding="{Binding ViewPort.Size.Height}"/>
+                                    <DataGridTextColumn Header="SCALE" Width="100" Binding="{Binding ViewPort.Scale.ValueName}"/>
+
+
+                                </DataGrid.Columns>
+
+                                <DataGrid.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="Padding" Value="2,2,0,0"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                    <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </DataGrid.CellStyle>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="TABLE" MinWidth ="100" BorderThickness="0">
+                        <Grid>
+                            <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                      ItemsSource="{Binding PaperListSelection.Tables}" HorizontalScrollBarVisibility="Visible"
+                      VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="No" Width="30" Binding="{Binding No}"/>
+                                    <DataGridTextColumn Header="NAME" Width="100" Binding="{Binding Name }"/>
+                                    <DataGridTextColumn Header="TABLE" Width="100" Binding="{Binding TableSelection}"/>
+                                    <DataGridTextColumn Header="X" Width="50" Binding="{Binding Location.X}"/>
+                                    <DataGridTextColumn Header="Y" Width="50" Binding="{Binding Location.Y}"/>
+                                    <DataGridTextColumn Header="W" Width="50" Binding="{Binding Size.Width}"/>
+                                    <DataGridTextColumn Header="H" Width="50" Binding="{Binding Size.Height}"/>
+
+
+
+                                </DataGrid.Columns>
+
+                                <DataGrid.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="Padding" Value="2,2,0,0"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                    <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </DataGrid.CellStyle>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="NOTE" MinWidth="100" BorderThickness="0" >
+                        <Grid>
+                            <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                      ItemsSource="{Binding PaperListSelection.Tables}" HorizontalScrollBarVisibility="Visible"
+                      VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="No" Width="30" Binding="{Binding No}"/>
+                                    <DataGridTextColumn Header="NAME" Width="100" Binding="{Binding Name }"/>
+                                    <DataGridTextColumn Header="TABLE" Width="100" Binding="{Binding TableSelection}"/>
+                                    <DataGridTextColumn Header="X" Width="50" Binding="{Binding Location.X}"/>
+                                    <DataGridTextColumn Header="Y" Width="50" Binding="{Binding Location.Y}"/>
+                                    <DataGridTextColumn Header="W" Width="50" Binding="{Binding Size.Width}"/>
+                                    <DataGridTextColumn Header="H" Width="50" Binding="{Binding Size.Height}"/>
+
+
+
+                                </DataGrid.Columns>
+
+                                <DataGrid.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="Padding" Value="2,2,0,0"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                    <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </DataGrid.CellStyle>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="*PREVIEW*" MinWidth="100" BorderThickness="0" >
+                    </TabItem>
+                </TabControl>
+            </Grid>
+
+            <!--#endregion-->
+        </Grid>
     </Grid>
 </Window>
