@@ -5,6 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PaperSetting"
         
+        xmlns:ddes="http://schemas.devdept.com/winfx/2008/xaml/control" 
+        xmlns:ddgr="http://schemas.devdept.com/winfx/2008/xaml/graphics"
+        
         xmlns:vm="clr-namespace:PaperSetting.ViewModel"
         
         mc:Ignorable="d"
@@ -63,8 +66,9 @@
                                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF0078D7"/>
                                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
                                 <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FF0078D7"/>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="White"/>
+                                
                                 <!-- 4.0 later
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="White"/>
                             <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Blue"/>
                             -->
                             </Style.Resources>
@@ -296,6 +300,50 @@
                         </Grid>
                     </TabItem>
                     <TabItem Header="*PREVIEW*" MinWidth="100" BorderThickness="0" >
+                        <ddes:Drawings x:Name="testDraw"></ddes:Drawings>
+                    </TabItem>
+                    <TabItem Header="*TEMPMODEL*" MinWidth="100" BorderThickness="0" >
+                        <ddes:Model x:Name="testModel">
+                            <ddes:Model.ProgressBar>
+                                <ddes:ProgressBar Lighting="False"/>
+                            </ddes:Model.ProgressBar>
+                            <ddes:Model.Viewports>
+                                <ddes:Viewport DisplayMode="Wireframe" InitialView="Other">
+                                    <ddes:Viewport.Background>
+                                        <ddgr:BackgroundSettings BottomColor="#FF00BFFF" StyleMode="Solid" TopColor="#FFDCDCDC"/>
+                                    </ddes:Viewport.Background>
+                                    <ddes:Viewport.CoordinateSystemIcon>
+                                        <ddes:CoordinateSystemIcon Lighting="False"/>
+                                    </ddes:Viewport.CoordinateSystemIcon>
+                                    <ddes:Viewport.Camera>
+                                        <ddes:Camera Distance="97.257904648780823" ProjectionMode="Orthographic" Rotation="0.5, 0.5, 0.5, 0.5" Target="0, 2, 47" ZoomFactor="0.23763337665493928"/>
+                                    </ddes:Viewport.Camera>
+                                    <ddes:Viewport.Grids>
+                                        <ddes:Grid Lighting="False" Visible="False"/>
+                                    </ddes:Viewport.Grids>
+                                    <ddes:Viewport.OriginSymbols>
+                                        <ddes:OriginSymbol Lighting="False"/>
+                                    </ddes:Viewport.OriginSymbols>
+                                    <ddes:Viewport.Rotate>
+                                        <ddes:RotateSettings Enabled="False"/>
+                                    </ddes:Viewport.Rotate>
+                                    <ddes:Viewport.ToolBars>
+                                        <ddes:ToolBar>
+                                            <ddes:ToolBar.Buttons>
+                                                <ddes:MagnifyingGlassToolBarButton/>
+                                                <ddes:ZoomWindowToolBarButton/>
+                                                <ddes:ZoomToolBarButton/>
+                                                <ddes:PanToolBarButton/>
+                                                <ddes:ZoomFitToolBarButton/>
+                                            </ddes:ToolBar.Buttons>
+                                        </ddes:ToolBar>
+                                    </ddes:Viewport.ToolBars>
+                                    <ddes:Viewport.ViewCubeIcon>
+                                        <ddes:ViewCubeIcon Lighting="False" Visible="False"/>
+                                    </ddes:Viewport.ViewCubeIcon>
+                                </ddes:Viewport>
+                            </ddes:Model.Viewports>
+                        </ddes:Model>
                     </TabItem>
                 </TabControl>
             </Grid>
