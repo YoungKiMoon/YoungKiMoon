@@ -11,6 +11,7 @@ namespace PaperSetting.Models
     {
         public PaperDwgModel()
         {
+            SheetSize = new SizeModel();
             Basic = new PaperBasicModel();
             Revisions = new ObservableCollection<PaperRevisionModel>();
             Tables = new ObservableCollection<PaperTableModel>();
@@ -21,11 +22,25 @@ namespace PaperSetting.Models
         public object Clone()
         {
             PaperDwgModel newModel = new PaperDwgModel();
+            newModel.SheetSize = SheetSize;
             newModel.Basic = Basic;
             newModel.Revisions = Revisions;
+            newModel.Tables = Tables;
+            newModel.Notes = Notes;
+            newModel.ViewPorts = ViewPorts;
             return newModel;
         }
 
+        private SizeModel _SheetSize;
+        public SizeModel SheetSize
+        {
+            get { return _SheetSize; }
+            set
+            {
+                _SheetSize = value;
+                OnPropertyChanged(nameof(SheetSize));
+            }
+        }
 
         private PaperBasicModel _Basic;
         public PaperBasicModel Basic

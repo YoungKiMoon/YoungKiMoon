@@ -24,6 +24,7 @@
             <StackPanel Orientation="Horizontal" >
                 <Image Source="Resources/papericon.png" Stretch="Fill" Height="16" Margin="6,0,0,0" />
                 <TextBlock Text="도면 설정" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#FF3F5072" FontWeight="Bold" Padding="6,0,0,0"/>
+                <Button Content="Create" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp"/>
             </StackPanel>
 
         </Border>
@@ -132,7 +133,7 @@
                     </DataGrid.CellStyle>
                 </DataGrid>
 
-                <TabControl Grid.Row="1" BorderThickness="0" Padding="0" >
+                <TabControl Grid.Row="1" BorderThickness="0" Padding="0" SelectionChanged="TabControl_SelectionChanged" >
                     <TabControl.Resources>
                         <Style TargetType="TabItem">
                             <Setter Property="Padding" Value="4"/>
@@ -162,7 +163,7 @@
                             </Setter>
                         </Style>
                     </TabControl.Resources>
-                    <TabItem Header="REVISION" MinWidth="100" BorderThickness="0" PreviewMouseLeftButtonUp="TabItem_PreviewMouseLeftButtonUp">
+                    <TabItem Header="REVISION" MinWidth="100" BorderThickness="0" >
                         <Grid>
                             <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
                       ItemsSource="{Binding PaperListSelection.Revisions}" HorizontalScrollBarVisibility="Visible"

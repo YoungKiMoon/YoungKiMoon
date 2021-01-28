@@ -90,7 +90,8 @@
     </ApplicationDefinition>
     <Compile Include="Commons\Common.cs" />
     <Compile Include="CustomControl\CustomDataGrid.cs" />
-    <Compile Include="EYEServices\PaperService.cs" />
+    <Compile Include="EYEServices\ModelDrawService.cs" />
+    <Compile Include="EYEServices\PaperDrawService.cs" />
     <Compile Include="Models\IBaseModel.cs" />
     <Compile Include="Models\PointModel.cs" />
     <Compile Include="Models\PaperBasicModel.cs" />

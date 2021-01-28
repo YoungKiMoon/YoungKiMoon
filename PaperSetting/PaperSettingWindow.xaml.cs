@@ -1,4 +1,6 @@
 ﻿using PaperSetting.ViewModel;
+using PaperSetting.EYEServices;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,11 +26,49 @@ namespace PaperSetting
         {
             Console.WriteLine("aa");
             InitializeComponent();
+            ModelDrawService modelService = new ModelDrawService(this.testModel);
+            modelService.CreateSample();
         }
 
-        private void TabItem_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            PaperSettingViewModel selView=this.DataContext as PaperSettingViewModel;
+            
+            if(e.Source is TabControl)
+            {
+                int tabIndex = (sender as TabControl).SelectedIndex;
+                TabSelectionEvent(tabIndex);
+            }
+        }
+        private void TabSelectionEvent(int tabIndex)
+        {
+            switch (tabIndex)
+            {
+                case 0:
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    //PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+                    //PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
+                    //paperService.CreatePaperDraw(selView.PaperListSelectionColl);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+
+        private void Button_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+            PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
+            paperService.CreatePaperDraw(selView.PaperListSelectionColl);
         }
     }
 }

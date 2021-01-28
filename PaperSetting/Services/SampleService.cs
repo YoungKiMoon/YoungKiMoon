@@ -20,6 +20,10 @@ namespace PaperSetting.Services
                 paperNo++;
                 PaperDwgModel newPaper = new PaperDwgModel();
 
+                // SheetSize
+                newPaper.SheetSize.Width = 420;
+                newPaper.SheetSize.Height = 297;
+
                 // Basic
                 newPaper.Basic.No = paperNo.ToString();
                 newPaper.Basic.Title = eachDwg;
@@ -51,6 +55,7 @@ namespace PaperSetting.Services
                     newViewport.No = i.ToString();
                     newViewport.Name = "ViewPort" + i.ToString("00");
                     newViewport.AssemblySelection = "CustomAssembly" + i.ToString("00");
+                    ViewPortCustom(newViewport,i);
                     newPaper.ViewPorts.Add(newViewport);
 
                     // Note
@@ -58,14 +63,90 @@ namespace PaperSetting.Services
                     newNote.No = i.ToString();
                     newNote.Name = "Note" + i.ToString("00");
                     newNote.Note = "CustomNote" + i.ToString("00");
+                    NoteCustom(newNote, i);
                     newPaper.Notes.Add(newNote);
                 }
+
+
 
                 newModel.Add(newPaper);
             }
             return newModel;
         }
+        public static void ViewPortCustom(PaperViewportModel newViewPort,int selCount)
+        {
+            switch (selCount)
+            {
+                case 1:
+                    newViewPort.ViewPort.Location.X = 40;
+                    newViewPort.ViewPort.Location.Y = 40;
+                    newViewPort.ViewPort.Size.Width = 60;
+                    newViewPort.ViewPort.Size.Height = 30;
+                    break;
+                case 2:
+                    newViewPort.ViewPort.Location.X = 80;
+                    newViewPort.ViewPort.Location.Y = 80;
+                    newViewPort.ViewPort.Size.Width = 60;
+                    newViewPort.ViewPort.Size.Height = 30;
+                    break;
+                case 3:
+                    newViewPort.ViewPort.Location.X = 120;
+                    newViewPort.ViewPort.Location.Y = 120;
+                    newViewPort.ViewPort.Size.Width = 60;
+                    newViewPort.ViewPort.Size.Height = 30;
+                    break;
+                case 4:
+                    newViewPort.ViewPort.Location.X = 160;
+                    newViewPort.ViewPort.Location.Y = 160;
+                    newViewPort.ViewPort.Size.Width = 60;
+                    newViewPort.ViewPort.Size.Height = 30;
+                    break;
+            }
+        }
+        public static void NoteCustom(PaperNoteModel newNote,int selCount)
+        {
+            switch (selCount)
+            {
+                case 1:
+                    newNote.Location.X = 40;
+                    newNote.Location.Y = 40;
+                    newNote.Size.Width = 60;
+                    newNote.Size.Height = 30;
+                    break;
+                case 2:
+                    newNote.Location.X = 80;
+                    newNote.Location.Y = 80;
+                    newNote.Size.Width = 60;
+                    newNote.Size.Height = 30;
+                    break;
+                case 3:
+                    newNote.Location.X = 120;
+                    newNote.Location.Y = 120;
+                    newNote.Size.Width = 60;
+                    newNote.Size.Height = 30;
+                    break;
+                case 4:
+                    newNote.Location.X = 160;
+                    newNote.Location.Y = 160;
+                    newNote.Size.Width = 60;
+                    newNote.Size.Height = 30;
+                    break;
+            }
 
+                    newNote.Note = "NOTE " + selCount +"." + "\n";
+            newNote.Note += "1. ALL DIMENSIONS ARE IN MM UNLESS OTHERWISE NOTED." +"\n";
+            newNote.Note += "2. DIMENSION \"H\" FOR SHELL NOZZLES IS MEASURED FROM UNDERSIDE OF BASE TO CENTER LINE OF NOZZLE." + "\n";
+            newNote.Note += "3. DESIGN PRESSURE : FULL OF WATER + 200 / -50 mmH20" + "\n";
+            newNote.Note += "4. PAINTING" + "\n";
+            newNote.Note += "   - EXTERNAL (SHELL, ROOF)" + "\n";
+            newNote.Note += "     SURFACE PREPARATION : SSPC-SP-10" + "\n";
+            newNote.Note += "   - INTERNAL : NONE" + "\n";
+            newNote.Note += "20. GASKET" + "\n";
+            newNote.Note += "   1) FOR STANDARD FLANGED" + "\n";
+            newNote.Note += "      - SPIRAL WOUND GASKET" + "\n";
+            newNote.Note += "      - FILLER : GRAPHITE" + "\n";
+            newNote.Note += "      - OUTER RING : C.S" + "\n";
+        }
         public static List<string> GetDWGList()
         {
 
