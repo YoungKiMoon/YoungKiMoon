@@ -38,9 +38,9 @@ namespace PaperSetting.Services
                     newRevision.RevString = i.ToString();
                     newRevision.DateString = "JAN." + i.ToString("00") + ".2021";
                     newRevision.Description = "FOR INFORMATION";
-                    newRevision.PreparedName = "-";
-                    newRevision.CheckedName = "-";
-                    newRevision.ApprovedName = "-";
+                    newRevision.PreparedName = "J.Y.HAM";
+                    newRevision.CheckedName = "S.Y.PARK";
+                    newRevision.ApprovedName = "M.G.JEONG";
                     newPaper.Revisions.Add(newRevision);
 
                     // Table
@@ -48,6 +48,7 @@ namespace PaperSetting.Services
                     newTable.No = i.ToString();
                     newTable.Name = "Table" + i.ToString("00");
                     newTable.TableSelection = "CustomTable" + i.ToString("00");
+                    TableCustom(newTable, i);
                     newPaper.Tables.Add(newTable);
 
                     // Viewport
@@ -58,7 +59,7 @@ namespace PaperSetting.Services
                     ViewPortCustom(newViewport,i);
                     newPaper.ViewPorts.Add(newViewport);
 
-                    // Note
+                    // Note 
                     PaperNoteModel newNote = new PaperNoteModel();
                     newNote.No = i.ToString();
                     newNote.Name = "Note" + i.ToString("00");
@@ -146,6 +147,46 @@ namespace PaperSetting.Services
             newNote.Note += "      - SPIRAL WOUND GASKET" + "\n";
             newNote.Note += "      - FILLER : GRAPHITE" + "\n";
             newNote.Note += "      - OUTER RING : C.S" + "\n";
+        }
+        public static void TableCustom(PaperTableModel newTable, int selCount)
+        {
+
+            for(int i = 0; i < 10; i++)
+            {
+                string[] newRow = new string[2];
+                for (int j = 0; j < newRow.Length; j++)
+                    newRow[j] = "Table R:" + i + " C:" + j;
+                newTable.TableList.Add(newRow);
+            }
+            switch (selCount)
+            {
+                case 1:
+                    newTable.Location.X = 40;
+                    newTable.Location.Y = 40;
+                    newTable.Size.Width = 60;
+                    newTable.Size.Height = 30;
+                    break;
+                case 2:
+                    newTable.Location.X = 80;
+                    newTable.Location.Y = 80;
+                    newTable.Size.Width = 60;
+                    newTable.Size.Height = 30;
+                    break;
+                case 3:
+                    newTable.Location.X = 120;
+                    newTable.Location.Y = 120;
+                    newTable.Size.Width = 60;
+                    newTable.Size.Height = 30;
+                    break;
+                case 4:
+                    newTable.Location.X = 160;
+                    newTable.Location.Y = 160;
+                    newTable.Size.Width = 60;
+                    newTable.Size.Height = 30;
+                    break;
+            }
+
+
         }
         public static List<string> GetDWGList()
         {

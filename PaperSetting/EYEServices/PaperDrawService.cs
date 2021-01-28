@@ -241,21 +241,22 @@ namespace PaperSetting.EYEServices
 
             string[] noteArray = selNote.Note.Split('\n');
             int lineCount = noteArray.Length;
-            int fontHeight = 3;
-            int lineGap = 1;
-            int blockPadding = 2;
-            int textPositionY = (lineGap+fontHeight)*(lineCount-1);
+            double fontHeight = 2;
+            double lineGap = 0.6;
+            double blockPadding = 1;
+            double textPositionY = (lineGap+fontHeight)*(lineCount-1);
 
-            Block newBl = new Block("PAPER_FRAME");
+            Block newBl = new Block("PAPER_NOTE" + selNote.No);
 
             for(int i = 0; i < lineCount; i++)
             {
                 Text newText = new Text(0, textPositionY, 0, noteArray[i], fontHeight);
                 newBl.Entities.Add(newText);
+                textPositionY -= (lineGap + fontHeight);
             }
 
 
-            BlockReference newBR = new BlockReference(200, 100, 0, "PAPER_FRAME", 1, 1, 1, 0);
+            BlockReference newBR = new BlockReference(selNote.Location.X, selNote.Location.Y, 0, "PAPER_NOTE" + selNote.No, 1, 1, 1, 0);
 
             selBlock = newBl;
             return newBR;

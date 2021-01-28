@@ -13,6 +13,7 @@ namespace PaperSetting.Models
             No = "";
             Name = "";
             TableSelection = "";
+            TableList = new List<string[]>();
             Location = new PointModel();
             Size = new SizeModel();
         }
@@ -23,6 +24,7 @@ namespace PaperSetting.Models
             newModel.No = No;
             newModel.Name = Name;
             newModel.TableSelection = TableSelection;
+            newModel.TableList = TableList;
             newModel.Location = Location;
             newModel.Size = Size;
 
@@ -60,6 +62,17 @@ namespace PaperSetting.Models
             {
                 _TableSelection = value;
                 OnPropertyChanged(nameof(TableSelection));
+            }
+        }
+
+        private List<string[]> _TableList;
+        public List<string[]> TableList
+        {
+            get { return _TableList; }
+            set
+            {
+                _TableList = value;
+                OnPropertyChanged(nameof(TableList));
             }
         }
 
