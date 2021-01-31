@@ -92,6 +92,7 @@
     <Compile Include="CustomControl\CustomDataGrid.cs" />
     <Compile Include="EYEServices\ModelDrawService.cs" />
     <Compile Include="EYEServices\PaperDrawService.cs" />
+    <Compile Include="Models\DockModel.cs" />
     <Compile Include="Models\IBaseModel.cs" />
     <Compile Include="Models\PointModel.cs" />
     <Compile Include="Models\PaperBasicModel.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Models\ScaleModel.cs" />
     <Compile Include="Models\SizeModel.cs" />
     <Compile Include="Models\ViewPortModel.cs" />
+    <Compile Include="Services\PaperDockService.cs" />
     <Compile Include="Services\SampleService.cs" />
     <Compile Include="Utils\Notifier.cs" />
     <Compile Include="ViewModel\PaperSettingViewModel.cs" />

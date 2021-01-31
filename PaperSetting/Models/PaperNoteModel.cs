@@ -15,6 +15,7 @@ namespace PaperSetting.Models
             Note = "";
             Location = new PointModel();
             Size = new SizeModel();
+            Dock = new DockModel();
         }
 
         public object Clone()
@@ -25,7 +26,8 @@ namespace PaperSetting.Models
             newModel.Note = Note;
             newModel.Location = Location;
             newModel.Size = Size;
-            
+            newModel.Dock = Dock;
+
             return newModel;
         }
 
@@ -82,6 +84,17 @@ namespace PaperSetting.Models
             {
                 _Size = value;
                 OnPropertyChanged(nameof(Size));
+            }
+        }
+
+        private DockModel _Dock;
+        public DockModel Dock
+        {
+            get { return _Dock; }
+            set
+            {
+                _Dock = value;
+                OnPropertyChanged(nameof(Dock));
             }
         }
     }

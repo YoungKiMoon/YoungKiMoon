@@ -1,4 +1,5 @@
-﻿using PaperSetting.Models;
+﻿using PaperSetting.Commons;
+using PaperSetting.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,7 +31,7 @@ namespace PaperSetting.Services
                 newPaper.Basic.DwgNo = "VP-210220-MF-" + paperNo.ToString("000");
                 newPaper.Basic.StampName = "AS BUILT";
 
-                int subCount = 4;
+                int subCount = 2;
                 for(int i = 1; i <= subCount; i++)
                 {
                     // Revision
@@ -83,12 +84,16 @@ namespace PaperSetting.Services
                     newViewPort.ViewPort.Location.Y = 40;
                     newViewPort.ViewPort.Size.Width = 60;
                     newViewPort.ViewPort.Size.Height = 30;
+
+                    newViewPort.Dock.DockPosition = DOCKPOSITION_TYPE.RIGHT;
+                    newViewPort.Dock.VerticalAlignment = VERTICALALIGNMENT_TYPE.TOP;
+                    newViewPort.Dock.DockPriority = 3;
                     break;
                 case 2:
-                    newViewPort.ViewPort.Location.X = 80;
-                    newViewPort.ViewPort.Location.Y = 80;
-                    newViewPort.ViewPort.Size.Width = 60;
-                    newViewPort.ViewPort.Size.Height = 30;
+                    newViewPort.ViewPort.Location.X = 15+15+110;
+                    newViewPort.ViewPort.Location.Y = 297-15-15-80;
+                    newViewPort.ViewPort.Size.Width = 190;
+                    newViewPort.ViewPort.Size.Height = 140;
                     break;
                 case 3:
                     newViewPort.ViewPort.Location.X = 120;
@@ -113,12 +118,20 @@ namespace PaperSetting.Services
                     newNote.Location.Y = 40;
                     newNote.Size.Width = 60;
                     newNote.Size.Height = 30;
+
+                    newNote.Dock.DockPosition = DOCKPOSITION_TYPE.BOTTOM;
+                    newNote.Dock.HorizontalAlignment = HORIZONTALALIGNMENT_TYPE.LEFT;
+                    newNote.Dock.DockPriority = 2;
                     break;
                 case 2:
                     newNote.Location.X = 80;
                     newNote.Location.Y = 80;
                     newNote.Size.Width = 60;
                     newNote.Size.Height = 30;
+
+                    newNote.Dock.DockPosition = DOCKPOSITION_TYPE.RIGHT;
+                    newNote.Dock.VerticalAlignment = VERTICALALIGNMENT_TYPE.TOP;
+                    newNote.Dock.DockPriority = 2;
                     break;
                 case 3:
                     newNote.Location.X = 120;
@@ -134,7 +147,7 @@ namespace PaperSetting.Services
                     break;
             }
 
-                    newNote.Note = "NOTE " + selCount +"." + "\n";
+            newNote.Note = "NOTE " + selCount +"." + "\n";
             newNote.Note += "1. ALL DIMENSIONS ARE IN MM UNLESS OTHERWISE NOTED." +"\n";
             newNote.Note += "2. DIMENSION \"H\" FOR SHELL NOZZLES IS MEASURED FROM UNDERSIDE OF BASE TO CENTER LINE OF NOZZLE." + "\n";
             newNote.Note += "3. DESIGN PRESSURE : FULL OF WATER + 200 / -50 mmH20" + "\n";
@@ -153,7 +166,7 @@ namespace PaperSetting.Services
 
             for(int i = 0; i < 10; i++)
             {
-                string[] newRow = new string[2];
+                string[] newRow = new string[4];
                 for (int j = 0; j < newRow.Length; j++)
                     newRow[j] = "Table R:" + i + " C:" + j;
                 newTable.TableList.Add(newRow);
@@ -163,19 +176,27 @@ namespace PaperSetting.Services
                 case 1:
                     newTable.Location.X = 40;
                     newTable.Location.Y = 40;
-                    newTable.Size.Width = 60;
+                    newTable.Size.Width = 80;
                     newTable.Size.Height = 30;
+
+                    newTable.Dock.DockPosition = DOCKPOSITION_TYPE.BOTTOM;
+                    newTable.Dock.HorizontalAlignment = HORIZONTALALIGNMENT_TYPE.LEFT;
+                    newTable.Dock.DockPriority = 1;
                     break;
                 case 2:
                     newTable.Location.X = 80;
                     newTable.Location.Y = 80;
-                    newTable.Size.Width = 60;
+                    newTable.Size.Width = 140;
                     newTable.Size.Height = 30;
+
+                    newTable.Dock.DockPosition = DOCKPOSITION_TYPE.RIGHT;
+                    newTable.Dock.VerticalAlignment = VERTICALALIGNMENT_TYPE.TOP;
+                    newTable.Dock.DockPriority = 1;
                     break;
                 case 3:
                     newTable.Location.X = 120;
                     newTable.Location.Y = 120;
-                    newTable.Size.Width = 60;
+                    newTable.Size.Width = 100;
                     newTable.Size.Height = 30;
                     break;
                 case 4:

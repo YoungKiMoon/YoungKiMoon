@@ -14,6 +14,7 @@ namespace PaperSetting.Models
             Name = "";
             AssemblySelection = "";
             ViewPort = new ViewPortModel();
+            Dock = new DockModel();
         }
 
         public object Clone()
@@ -23,6 +24,7 @@ namespace PaperSetting.Models
             newModel.Name = Name;
             newModel.AssemblySelection = AssemblySelection;
             newModel.ViewPort = ViewPort;
+            newModel.Dock = Dock;
 
             return newModel;
         }
@@ -72,6 +74,15 @@ namespace PaperSetting.Models
             }
         }
 
-        
+        private DockModel _Dock;
+        public DockModel Dock
+        {
+            get { return _Dock; }
+            set
+            {
+                _Dock = value;
+                OnPropertyChanged(nameof(Dock));
+            }
+        }
     }
 }
