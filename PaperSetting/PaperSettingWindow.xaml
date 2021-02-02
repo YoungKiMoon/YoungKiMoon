@@ -11,7 +11,7 @@
         xmlns:vm="clr-namespace:PaperSetting.ViewModel"
         
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1100">
+        Title="PAPER SETTING" Height="600" Width="1100">
     <Window.DataContext>
         <vm:PaperSettingViewModel/>
     </Window.DataContext>
@@ -41,10 +41,10 @@
             <!--#region Paper List-->
             <Grid>
 
-                <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                <DataGrid x:Name="dataPaperList" Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
                       ItemsSource="{Binding PaperList}" SelectedItem="{Binding PaperListSelection,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                       HorizontalScrollBarVisibility="Visible"
-                      VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24" CanUserDeleteRows="False" CanUserResizeRows="False">
+                      VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24" CanUserDeleteRows="False" CanUserResizeRows="False" SelectionChanged="DataGrid_SelectionChanged">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="No" Width="30" Binding="{Binding Basic.No}"/>
                         <DataGridTextColumn Header="TITLE" Width="100" Binding="{Binding Basic.Title}"/>
@@ -135,7 +135,7 @@
                     </DataGrid.CellStyle>
                 </DataGrid>
 
-                <TabControl Grid.Row="1" BorderThickness="0" Padding="0" SelectionChanged="TabControl_SelectionChanged" >
+                <TabControl x:Name="tabDetail" Grid.Row="1" BorderThickness="0" Padding="0" SelectionChanged="TabControl_SelectionChanged" >
                     <TabControl.Resources>
                         <Style TargetType="TabItem">
                             <Setter Property="Padding" Value="4"/>

@@ -54,6 +54,12 @@ namespace PaperSetting.EYEServices
             singleModel.Entities.Add(cusR);
 
 
+            LinearPath rectBoxSmall = new LinearPath(20, 16);
+            rectBoxSmall.Translate(180, 0);
+            rectBoxSmall.ColorMethod = colorMethodType.byEntity;
+            rectBoxSmall.Color = Color.Red;
+            singleModel.Entities.Add(rectBoxSmall);
+
             //Line cusH = new Line(-500, 0, 500, 0);
             //Line cusV = new Line(0, -500, 0, 500);
             //Line cusHV = new Line(-500, -500, 500, 500);
@@ -62,7 +68,7 @@ namespace PaperSetting.EYEServices
             //singleModel.Entities.Add(cusHV, LayerDashDot);
 
             singleModel.Entities.Regen();
-            //singleModel.ZoomFit();
+            
             //singleModel.SetView(viewType.Top, true, false);
         
         }

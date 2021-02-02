@@ -18,6 +18,7 @@ using PaperSetting.Models;
 using PaperSetting.Commons;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Media;
 
 namespace PaperSetting.EYEServices
 {
@@ -42,18 +43,24 @@ namespace PaperSetting.EYEServices
 
 
         #region Create : Paper : Draw
-        public void CreatePaperDraw( ObservableCollection<PaperDwgModel> selPaperCol)
+        public void CreatePaperDraw( ObservableCollection<PaperDwgModel> selPaperCol,bool selOneSheet=true)
         {
-            singleDraw.Sheets.Clear();
-            singleDraw.Blocks.Clear();
+            
+            if (selOneSheet)
+            {
+                singleDraw.Clear();
+            }
 
             Sheet firstSheet = null;
 
-            
+            int sheetIndex = 0;
             foreach (PaperDwgModel eachPaper in selPaperCol)
             {
                 // Sheet
+                oneSheetBlock = new Dictionary<string, DockModel>();
+
                 Sheet newSheet = CreateSheet(eachPaper);
+                
                 if (firstSheet == null)
                     firstSheet = newSheet;
 
@@ -62,25 +69,40 @@ namespace PaperSetting.EYEServices
                 CreateRevisionBlock(eachPaper, newSheet);
 
                 foreach (PaperNoteModel eachModel in eachPaper.Notes)
-                    CreateNoteBlock(eachModel, newSheet);
+                    CreateNoteBlock(eachModel, newSheet,eachPaper.Basic.No);
                 foreach (PaperViewportModel eachView in eachPaper.ViewPorts)
-                    CreateVectorView(newSheet, eachView, eachView.Name);
+                {
+                    if(sheetIndex==0)
+                        CreateVectorView(newSheet, eachView, eachView.Name);
+                    else
+                        CreateVectorView2(newSheet, eachView, eachView.Name + sheetIndex.ToString() + eachView.No);
+                }
+                    
                 foreach (PaperTableModel eachModel in eachPaper.Tables)
-                    CreateTableBlock(eachModel,newSheet);
+                    CreateTableBlock(eachModel,newSheet,eachPaper.Basic.No);
 
 
+                singleDraw.Invalidate();
+                singleDraw.ActiveSheet = singleDraw.Sheets[sheetIndex];
+                singleModel.UpdateBoundingBox();
+                AutomaticAlignmentOfDock(sheetIndex);
+                singleDraw.Invalidate();
+                sheetIndex++;
             }
 
 
-            singleDraw.ActiveSheet = firstSheet;
+            //if (!singleDraw.ActiveSheet.Name.Equals(firstSheet.Name))
+                singleDraw.ActiveSheet = singleDraw.Sheets[0];
             singleDraw.ZoomFit();
-            singleDraw.Invalidate();
+            //singleDraw.Invalidate();
             singleDraw.ActionMode = actionType.SelectByPick;
+            
 
+            //AutomaticAlignmentOfDock();
 
-            AutomaticAlignmentOfDock();
-
-
+            //SolidColorBrush newColor = Brushes.Red;
+            //singleDraw.Background.IntermediateColor = newColor;
+            //singleDraw.Invalidate();
             singleDraw.Rebuild(singleModel);
 
 
@@ -89,6 +111,8 @@ namespace PaperSetting.EYEServices
         private Sheet CreateSheet(PaperDwgModel selPaper)
         {
             Sheet newSheet = new Sheet(linearUnitsType.Millimeters, selPaper.SheetSize.Width, selPaper.SheetSize.Height, selPaper.Basic.Title);
+            
+            
             // Add : Sheet
             singleDraw.Sheets.Add(newSheet);
 
@@ -97,6 +121,8 @@ namespace PaperSetting.EYEServices
         private void CreateFrameBlock(PaperDwgModel selPaper, Sheet selSheet)
         {
             BlockReference newBr = BuildPaperFRAME(out Block frameBlock);
+            newBr.BlockName += selPaper.Basic.No.ToString();
+            frameBlock.Name += selPaper.Basic.No.ToString();
             // Add : just one
             singleDraw.Blocks.Add(frameBlock);
             selSheet.Entities.Add(newBr);
@@ -108,6 +134,9 @@ namespace PaperSetting.EYEServices
             newBr.Attributes["PROJECT"] = new AttributeReference("TAnk Basic Automation System");
             newBr.Attributes["TITLE"] = new AttributeReference(selPaper.Basic.Title);
             newBr.Attributes["DWG. NO."] = new AttributeReference(selPaper.Basic.DwgNo);
+
+            newBr.BlockName += selPaper.Basic.No.ToString();
+            titleBlock.Name += selPaper.Basic.No.ToString();
             // Add : Just One
             singleDraw.Blocks.Add(titleBlock);
             selSheet.Entities.Add(newBr);
@@ -115,23 +144,29 @@ namespace PaperSetting.EYEServices
         private void CreateRevisionBlock(PaperDwgModel selPaper, Sheet selSheet)
         {
             BlockReference newBr = BuildPaperRevision(selPaper, out Block revisionBlock);
+            newBr.BlockName += selPaper.Basic.No.ToString();
+            revisionBlock.Name+= selPaper.Basic.No.ToString();
             // Add : Just One
             singleDraw.Blocks.Add(revisionBlock);
             selSheet.Entities.Add(newBr);
         }
-        private void CreateNoteBlock(PaperNoteModel selNote,Sheet selSheet)
+        private void CreateNoteBlock(PaperNoteModel selNote,Sheet selSheet,string bName)
         {
             BlockReference newBr = BuildPaperNote(selNote, out Block noteBlock);
-            
+            newBr.BlockName += bName;
+            noteBlock.Name += bName;
+
             singleDraw.Blocks.Add(noteBlock);
             selSheet.Entities.Add(newBr);
             oneSheetBlock.Add(newBr.BlockName, selNote.Dock);
         }
-        private void CreateTableBlock(PaperTableModel selTable, Sheet selSheet)
+        private void CreateTableBlock(PaperTableModel selTable, Sheet selSheet,string bName)
         {
-            BlockReference newBr = BuildPaperTable(selTable, out Block noteBlock);
+            BlockReference newBr = BuildPaperTable(selTable, out Block tableBlock);
+            newBr.BlockName += bName;
+            tableBlock.Name += bName;
 
-            singleDraw.Blocks.Add(noteBlock);
+            singleDraw.Blocks.Add(tableBlock);
             selSheet.Entities.Add(newBr);
             oneSheetBlock.Add(newBr.BlockName, selTable.Dock);
         }
@@ -173,6 +208,49 @@ namespace PaperSetting.EYEServices
                                                 selViewPort.Size.Width,
                                                 selViewPort.Size.Height){ CenterlinesExtensionAmount = extensionAmount };// 형상 높이 폭
             
+            selSheet.AddViewPlaceHolder(newView, singleModel, singleDraw, viewName + "PlaceHolder");
+
+            oneSheetBlock.Add(newView.BlockName, selView.Dock);
+        }
+        private void CreateVectorView2(Sheet selSheet, PaperViewportModel selView, string viewName)
+        {
+            //VectorView ve2 = new VectorView(10, 10, cCa, 0.001, "View2", printRect2);
+            //VectorView ve2 = new VectorView(20, 0, viewType.Top, 0.001, "View2");
+            //Camera cc = ve2.Camera;
+
+            //dd.ZoomFactor
+            //dd.Distance = 0.000001;
+            //dd.Location.X = 0;
+            //dd.Location.Y = 0;
+            //dd.Location.Z = 0;
+
+            ViewPortModel selViewPort = selView.ViewPort;
+
+            Camera newCamera = new Camera();
+
+            newCamera.FocalLength = 0;
+            newCamera.ProjectionMode = projectionType.Orthographic;
+
+            newCamera.Rotation.X = 0.5;
+            newCamera.Rotation.Y = 0.5;
+            newCamera.Rotation.Z = 0.5;
+            newCamera.Rotation.W = 0.5;
+
+            newCamera.Target.X = 190; // 표적
+            newCamera.Target.Y = 10; // 표적
+            newCamera.Target.Z = 0;
+
+            double extensionAmount = Math.Min(selSheet.Width, selSheet.Height) / 400;
+
+            VectorView newView = new VectorView(selViewPort.Location.X,
+                                                selViewPort.Location.Y,
+                                                newCamera,
+                                                0.001,
+                                                viewName,
+                                                selViewPort.Size.Width,
+                                                selViewPort.Size.Height)
+            { CenterlinesExtensionAmount = extensionAmount };// 형상 높이 폭
+
             selSheet.AddViewPlaceHolder(newView, singleModel, singleDraw, viewName + "PlaceHolder");
 
             oneSheetBlock.Add(newView.BlockName, selView.Dock);
@@ -457,7 +535,7 @@ namespace PaperSetting.EYEServices
         #endregion
 
         #region Automatic Alignment
-        private void AutomaticAlignmentOfDock()
+        private void AutomaticAlignmentOfDock(int selIndex)
         {
             // ActiveSheet
 
@@ -501,7 +579,7 @@ namespace PaperSetting.EYEServices
 
             foreach (string eachName in rightDicOrderby.Keys)
             {
-                foreach (Entity eachEntity in singleDraw.Entities)
+                foreach (Entity eachEntity in singleDraw.Sheets[selIndex].Entities)
                 {
                     string eachType = eachEntity.GetType().Name;
                     if (eachType.Contains("BlockReference"))
@@ -541,7 +619,7 @@ namespace PaperSetting.EYEServices
 
             foreach (string eachName in bottomDicOrderby.Keys)
             {
-                foreach (Entity eachEntity in singleDraw.Entities)
+                foreach (Entity eachEntity in singleDraw.Sheets[selIndex].Entities)
                 {
                     string eachType = eachEntity.GetType().Name;
                     if (eachType.Contains("BlockReference"))

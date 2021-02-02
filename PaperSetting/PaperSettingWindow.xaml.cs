@@ -32,6 +32,9 @@ namespace PaperSetting
 
             ModelDrawService modelService = new ModelDrawService(this.testModel);
             modelService.CreateSample();
+
+
+
         }
 
 
@@ -41,7 +44,7 @@ namespace PaperSetting
             if(e.Source is TabControl)
             {
                 int tabIndex = (sender as TabControl).SelectedIndex;
-                TabSelectionEvent(tabIndex);
+                //TabSelectionEvent(tabIndex);
             }
         }
         private void TabSelectionEvent(int tabIndex)
@@ -57,9 +60,9 @@ namespace PaperSetting
                 case 3:
                     break;
                 case 4:
-                    //PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
-                    //PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
-                    //paperService.CreatePaperDraw(selView.PaperListSelectionColl);
+                    PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+                    PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
+                    paperService.CreatePaperDraw(selView.PaperListSelectionColl);
                     break;
                 default:
                     break;
@@ -70,15 +73,41 @@ namespace PaperSetting
 
         private void Button_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
-            PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
-            paperService.CreatePaperDraw(selView.PaperListSelectionColl);
+            AutoDraw();
         }
 
+        public void AutoDraw()
+        {
+            PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+            PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
+            paperService.CreatePaperDraw(selView.PaperList);
+            //paperService.CreatePaperDraw(selView.PaperListSelectionColl);
+        }
         private void btnExport_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            
+            //testDraw.Blocks.Clear();
+            //testDraw.Sheets.Clear();
+            //PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+            //PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
+            //paperService.CreatePaperDraw(selView.PaperList,false);
+
             EYECADService newExport = new EYECADService();
             newExport.TestExport(this.testModel, this.testDraw);
+        }
+
+        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (dataPaperList.SelectedIndex >= 0)
+            {
+                if (testDraw.Sheets.Count > 0)
+                {
+                    testDraw.ActiveSheet = testDraw.Sheets[dataPaperList.SelectedIndex];
+                    testDraw.ZoomFit();
+                    testDraw.Invalidate();
+                }
+            }
+                
         }
     }
 }

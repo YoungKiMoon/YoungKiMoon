@@ -3,6 +3,7 @@ using PaperSetting.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -14,6 +15,9 @@ namespace PaperSetting.Services
         {
             ObservableCollection<PaperDwgModel> newModel = new ObservableCollection<PaperDwgModel>();
             List<string> dwgList = GetDWGList();
+
+            Random r = new Random();
+            double tempX = 0;
 
             int paperNo = 0;
             foreach(string eachDwg in dwgList)
@@ -30,6 +34,7 @@ namespace PaperSetting.Services
                 newPaper.Basic.Title = eachDwg;
                 newPaper.Basic.DwgNo = "VP-210220-MF-" + paperNo.ToString("000");
                 newPaper.Basic.StampName = "AS BUILT";
+
 
                 int subCount = 2;
                 for(int i = 1; i <= subCount; i++)
@@ -52,14 +57,7 @@ namespace PaperSetting.Services
                     TableCustom(newTable, i);
                     newPaper.Tables.Add(newTable);
 
-                    // Viewport
-                    PaperViewportModel newViewport = new PaperViewportModel();
-                    newViewport.No = i.ToString();
-                    newViewport.Name = "ViewPort" + i.ToString("00");
-                    newViewport.AssemblySelection = "CustomAssembly" + i.ToString("00");
-                    ViewPortCustom(newViewport,i);
-                    if(i<2)
-                        newPaper.ViewPorts.Add(newViewport);
+
 
                     // Note 
                     PaperNoteModel newNote = new PaperNoteModel();
@@ -70,42 +68,76 @@ namespace PaperSetting.Services
                     newPaper.Notes.Add(newNote);
                 }
 
+                subCount = 4;
+                for (int i = 1; i <= subCount; i++)
+                {
+                    // Viewport
+                    PaperViewportModel newViewport = new PaperViewportModel();
+                    newViewport.No = i.ToString();
+                    newViewport.Name = "ViewPort" + i.ToString("00");
+                    newViewport.AssemblySelection = "CustomAssembly" + i.ToString("00");
+
+                    tempX = r.Next(0, 140);
+                    tempX += 80;
+                    Debug.WriteLine(tempX.ToString());
+
+                    if (paperNo == 1)
+                    {
+                        if (i < 2)
+                        {
+                            ViewPortCustom(newViewport, 0, tempX);
+                            newPaper.ViewPorts.Add(newViewport);
+                        }
+                    }
+                    else
+                    {
+                        ViewPortCustom(newViewport, i, tempX);
+                        newPaper.ViewPorts.Add(newViewport);
+                    }
+                }
 
 
                 newModel.Add(newPaper);
             }
             return newModel;
         }
-        public static void ViewPortCustom(PaperViewportModel newViewPort,int selCount)
+        public static void ViewPortCustom(PaperViewportModel newViewPort,int selCount,double tempX)
         {
+
             switch (selCount)
             {
-                case 2:
-                    newViewPort.ViewPort.Location.X = 40;
-                    newViewPort.ViewPort.Location.Y = 40;
-                    newViewPort.ViewPort.Size.Width = 60;
-                    newViewPort.ViewPort.Size.Height = 30;
-
-                    newViewPort.Dock.DockPosition = DOCKPOSITION_TYPE.RIGHT;
-                    newViewPort.Dock.VerticalAlignment = VERTICALALIGNMENT_TYPE.TOP;
-                    newViewPort.Dock.DockPriority = 3;
-                    break;
-                case 1:
-                    newViewPort.ViewPort.Location.X = 15+15+110;
-                    newViewPort.ViewPort.Location.Y = 297-15-15-80;
+                case 0:
+                    newViewPort.ViewPort.Location.X = 15 + 15 + 110;
+                    newViewPort.ViewPort.Location.Y = 297 - 15 - 15 - 80;
                     newViewPort.ViewPort.Size.Width = 190;
                     newViewPort.ViewPort.Size.Height = 140;
                     break;
+                case 1:
+                    newViewPort.ViewPort.Location.X = tempX;
+                    newViewPort.ViewPort.Location.Y = 100;
+                    newViewPort.ViewPort.Size.Width = 30;
+                    newViewPort.ViewPort.Size.Height = 30;
+                    break;
+                case 2:
+                    newViewPort.ViewPort.Location.X = tempX;
+                    newViewPort.ViewPort.Location.Y = 140;
+                    newViewPort.ViewPort.Size.Width = 30;
+                    newViewPort.ViewPort.Size.Height = 30;
+
+                    //newViewPort.Dock.DockPosition = DOCKPOSITION_TYPE.RIGHT;
+                    //newViewPort.Dock.VerticalAlignment = VERTICALALIGNMENT_TYPE.TOP;
+                    //newViewPort.Dock.DockPriority = 3;
+                    break;
                 case 3:
-                    newViewPort.ViewPort.Location.X = 120;
-                    newViewPort.ViewPort.Location.Y = 120;
-                    newViewPort.ViewPort.Size.Width = 60;
+                    newViewPort.ViewPort.Location.X = tempX;
+                    newViewPort.ViewPort.Location.Y = 180;
+                    newViewPort.ViewPort.Size.Width = 30;
                     newViewPort.ViewPort.Size.Height = 30;
                     break;
                 case 4:
-                    newViewPort.ViewPort.Location.X = 160;
-                    newViewPort.ViewPort.Location.Y = 160;
-                    newViewPort.ViewPort.Size.Width = 60;
+                    newViewPort.ViewPort.Location.X = tempX;
+                    newViewPort.ViewPort.Location.Y = 240;
+                    newViewPort.ViewPort.Size.Width = 30;
                     newViewPort.ViewPort.Size.Height = 30;
                     break;
             }
