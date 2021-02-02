@@ -7,6 +7,23 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-            
+        <Grid x:Name="imageArea" Visibility="Collapsed">
+            <Border Background="White"></Border>
+            <Image x:Name="imageAreaimgItem" Stretch="None" OpacityMask="White" VerticalAlignment="Top"/>
+        </Grid>
+        <Grid x:Name="listArea" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Border Background="White"/>
+            <Image Grid.Row="0" x:Name="listAreaimgItem" Stretch="None" OpacityMask="White"/>
+            <Image Grid.Row="1" x:Name="listAreaListHedaerItem" Stretch="None" HorizontalAlignment="Left"/>
+            <ScrollViewer Grid.Row="2" HorizontalAlignment="Left">
+                <Image x:Name="listAreaListItem" Stretch="None"/>
+            </ScrollViewer>
+        </Grid>
+        
     </Grid>
 </UserControl>

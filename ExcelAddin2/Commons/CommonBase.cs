@@ -8,12 +8,15 @@ namespace ExcelAddIn.Commons
     public enum EXCELSHEET_LIST
     {
         NotSet = 0,
-        SHEET_MAIN = 1,
-        SHEET_BASIC = 2,
+        SHEET_INFORMATION = 1,
+        SHEET_GENERAL = 2,
         SHEET_SHEEL = 3,
         SHEET_ROOF = 4,
         SHEET_BOTTOM = 5,
-        SHEET_ANGLE = 6,
+        SHEET_STRUCTURE = 6,
+        SHEET_NOZZLE = 7,
+        SHEET_ACCESS = 8,
+        SHEET_APPURTENANCES = 9,
     }
 
     public enum CUSTOMPANE_LIST

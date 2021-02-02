@@ -182,6 +182,7 @@
   -->
   <ItemGroup>
     <Compile Include="Commons\CommonBase.cs" />
+    <Compile Include="ExcelModels\ExcelWorkSheetModel.cs" />
     <Compile Include="ExcelServices\ExcelService.cs" />
     <Compile Include="Panes\InputPane.cs">
       <SubType>UserControl</SubType>
@@ -204,6 +205,8 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Service\FileBaseService.cs" />
+    <Compile Include="Utils\Notifier.cs" />
     <Compile Include="Utils\VersionData.cs" />
     <EmbeddedResource Include="Panes\InputPane.resx">
       <DependentUpon>InputPane.cs</DependentUpon>
@@ -280,6 +283,27 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Ribbon1.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\angle_header.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\angle_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\angle_list.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\roof_a.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\roof_bc.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\roof_de.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\roof_k.png" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

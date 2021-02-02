@@ -31,7 +31,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -55,6 +55,9 @@
     <Reference Include="devDept.Eyeshot.Control.Wpf.v2020, Version=2020.3.428.0, Culture=neutral, PublicKeyToken=5385d83d2fb4d7d9, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\devDept.Eyeshot.Control.Wpf.v2020.dll</HintPath>
+    </Reference>
+    <Reference Include="devDept.Eyeshot.Control.x86.Wpf.v2020">
+      <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\x86\devDept.Eyeshot.Control.x86.Wpf.v2020.dll</HintPath>
     </Reference>
     <Reference Include="devDept.Geometry.v2020, Version=2020.3.428.0, Culture=neutral, PublicKeyToken=9440825e8b4733bc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -90,6 +93,7 @@
     </ApplicationDefinition>
     <Compile Include="Commons\Common.cs" />
     <Compile Include="CustomControl\CustomDataGrid.cs" />
+    <Compile Include="EYEServices\EYECADService.cs" />
     <Compile Include="EYEServices\ModelDrawService.cs" />
     <Compile Include="EYEServices\PaperDrawService.cs" />
     <Compile Include="Models\DockModel.cs" />

@@ -25,7 +25,7 @@ namespace ExcelAddIn.Service
                     titleName = "Design Process";
                     break;
                 case CUSTOMPANE_LIST.INPUT:
-                    titleName = "Input Window";
+                    titleName = "Information Window";
                     break;
 
                 default:

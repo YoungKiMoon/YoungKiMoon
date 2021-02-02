@@ -159,8 +159,8 @@ namespace PaperSetting.EYEServices
             newCamera.Rotation.Z = 0.5;
             newCamera.Rotation.W = 0.5;
 
-            newCamera.Target.X = 0; // 표적
-            newCamera.Target.Y = 0; // 표적
+            newCamera.Target.X = 80; // 표적
+            newCamera.Target.Y = 60; // 표적
             newCamera.Target.Z = 0;
 
             double extensionAmount = Math.Min(selSheet.Width, selSheet.Height) / 400;

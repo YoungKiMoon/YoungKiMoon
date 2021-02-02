@@ -1,5 +1,6 @@
 ﻿
 using ExcelAddIn.Properties;
+using ExcelAddIn.Service;
 using ExcelAddIn.Utils;
 using Microsoft.Office.Core;
 
@@ -57,6 +58,8 @@ namespace ExcelAddIn
         public void Ribbon_Load(Office.IRibbonUI ribbonUI)
         {
             this.ribbon = ribbonUI;
+
+            
         }
 
         #endregion
@@ -72,31 +75,31 @@ namespace ExcelAddIn
             }
             else if (control.Id == "cuGroup01")
             {
-                return "Tank Basic Automation System";
+                return "TAnk Basic Automation System";
             }
             else if (control.Id == "cuGroupButton01")
             {
-                return "PROCESS";
+                return "계산서 INFROM";
             }
             else if (control.Id == "cuGroupButton02")
             {
-                return "TEMP BUTTON";
+                return "타공정 INFROM";
             }
             else if (control.Id == "cuGroupButton03")
             {
-                return "TEMP BUTTOM";
+                return "DESIGN PROCESS";
             }
             else if (control.Id == "cuGroupButton04")
             {
-                return "MAIN";
+                return "PAPER SETTING";
             }
             else if (control.Id == "cuGroupButton05")
             {
-                return "INPUT";
+                return "TANK CREATE";
             }
             else if (control.Id == "cuGroupButton06")
             {
-                return "CREATE";
+                return "INFO";
             }
             else
             {
@@ -110,15 +113,15 @@ namespace ExcelAddIn
         {
             if (control.Id == "cuGroupButton01")
             {
-                return Resources.process;
+                return Resources.list;
             }
             else if (control.Id == "cuGroupButton02")
             {
-                return Resources.play;
+                return Resources.list;
             }
             else if (control.Id == "cuGroupButton03")
             {
-                return Resources.play;
+                return Resources.process;
             }
             else if (control.Id == "cuGroupButton04")
             {
@@ -126,11 +129,11 @@ namespace ExcelAddIn
             }
             else if (control.Id == "cuGroupButton05")
             {
-                return Resources.list;
+                return Resources.iTank2;
             }
             else if (control.Id == "cuGroupButton06")
             {
-                return Resources.iTank2;
+                return Resources.list;
             }
             else
             {
@@ -144,41 +147,41 @@ namespace ExcelAddIn
         {
             if (control.Id == "cuGroupButton01")
             {
-                Globals.ThisAddIn.ShowProcessPane();
-                //TaskPaneConn.TaskPaneRun = true;
-                //MainWindow cc = new MainWindow();
-                //cc.Show();
+                FileBaseService newFile = new FileBaseService();
+                newFile.SelectFileOfCal();
             }
             else if (control.Id == "cuGroupButton02")
             {
+                FileBaseService newFile = new FileBaseService();
+                newFile.SelectFileOfOther();
                 //Globals.ThisAddIn.ShowPaneRomData();
             }
             else if (control.Id == "cuGroupButton03")
             {
+                Globals.ThisAddIn.ShowProcessPane();
                 //Globals.ThisAddIn.ShowPaneRomDataList();
             }
             else if (control.Id == "cuGroupButton04")
             {
-                Service.PaneWindowService paneService = new Service.PaneWindowService();
-                paneService.VisiblePane(Commons.CUSTOMPANE_LIST.NotSet, false, true);
-                ExcelServices.ExcelService.ChangeSheet(Commons.EXCELSHEET_LIST.SHEET_MAIN);
+                //Service.PaneWindowService paneService = new Service.PaneWindowService();
+                //paneService.VisiblePane(Commons.CUSTOMPANE_LIST.NotSet, false, true);
+                //ExcelServices.ExcelService.ChangeSheet(Commons.EXCELSHEET_LIST.SHEET_MAIN);
 
             }
             else if (control.Id == "cuGroupButton05")
             {
-                Globals.ThisAddIn.ShowInputPane();
+                //Globals.ThisAddIn.ShowInputPane();
                 //Globals.ThisAddIn.ShowPaneRomWWW();
                 //PaneWindowsService newService = new PaneWindowsService();
                 //UserControl1 selCon= newService.GetWWWPane();
                 //UserControl2 selWpf = newService.GetWWWPaneWPF();
             }
-            else if (control.Id == "cuGroupButton05")
+            else if (control.Id == "cuGroupButton06")
             {
                 Globals.ThisAddIn.ShowInputPane();
-                //Globals.ThisAddIn.ShowPaneRomWWW();
-                //PaneWindowsService newService = new PaneWindowsService();
-                //UserControl1 selCon= newService.GetWWWPane();
-                //UserControl2 selWpf = newService.GetWWWPaneWPF();
+                //Service.PaneWindowService paneService = new Service.PaneWindowService();
+                //paneService.VisiblePane(Commons.CUSTOMPANE_LIST.NotSet, false, true);
+                //ExcelServices.ExcelService.ChangeSheet(Commons.EXCELSHEET_LIST.SHEET_MAIN);
             }
         }
 

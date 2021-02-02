@@ -118,6 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="angle_header" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\angle_header.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="angle_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\angle_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="angle_list" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\angle_list.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="iTank2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\iTank2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -135,5 +144,17 @@
   </data>
   <data name="right_arrowSmall" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\right-arrowSmall.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="roof_a" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\roof_a.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="roof_bc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\roof_bc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="roof_de" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\roof_de.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="roof_k" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\roof_k.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

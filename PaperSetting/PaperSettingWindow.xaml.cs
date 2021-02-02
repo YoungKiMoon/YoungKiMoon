@@ -24,8 +24,12 @@ namespace PaperSetting
     {
         public PaperSettingWindow()
         {
-            Console.WriteLine("aa");
+            
+
             InitializeComponent();
+            testDraw.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
+            testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
+
             ModelDrawService modelService = new ModelDrawService(this.testModel);
             modelService.CreateSample();
         }
@@ -69,6 +73,12 @@ namespace PaperSetting
             PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
             PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
             paperService.CreatePaperDraw(selView.PaperListSelectionColl);
+        }
+
+        private void btnExport_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            EYECADService newExport = new EYECADService();
+            newExport.TestExport(this.testModel, this.testDraw);
         }
     }
 }

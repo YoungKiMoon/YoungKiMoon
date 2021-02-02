@@ -9,6 +9,7 @@ using Microsoft.Office.Tools.Excel;
 using ExcelAddIn.Panes;
 using ExcelAddIn.Service;
 using ExcelAddIn.Commons;
+using ExcelAddIn.ExcelModels;
 
 namespace ExcelAddIn
 {
@@ -17,10 +18,14 @@ namespace ExcelAddIn
 
         private PaneWindowService paneService = new PaneWindowService();
 
+        // TaskPane
         private Microsoft.Office.Tools.CustomTaskPane customProcessTaskPane;
         public ProcessPane customProcessPane;
         private Microsoft.Office.Tools.CustomTaskPane customInputTaskPane;
         public InputPane customInputPane;
+
+        // Excel : WorkSheet
+        public ExcelWorkSheetModel roofSheet;
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
@@ -33,6 +38,8 @@ namespace ExcelAddIn
             customProcessTaskPane.Height = 160;
 
             customProcessTaskPane.Visible = true;
+
+            roofSheet = null;
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)

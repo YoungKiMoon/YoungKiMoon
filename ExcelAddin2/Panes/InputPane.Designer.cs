@@ -41,7 +41,7 @@ namespace ExcelAddIn.Panes
             this.elementHost1.Size = new System.Drawing.Size(150, 150);
             this.elementHost1.TabIndex = 0;
             this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = null;
+            this.elementHost1.Child = elementHost1WPF;
             // 
             // InputPane
             // 

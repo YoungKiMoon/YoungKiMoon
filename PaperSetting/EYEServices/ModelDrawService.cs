@@ -43,12 +43,23 @@ namespace PaperSetting.EYEServices
             singleModel.LineTypes.Add(LayerDashDot, new float[] { 5, -1, 1, -1 });
             singleModel.Layers[LayerDashDot].LineTypeName = LayerDashDot;
 
-            Line cusH = new Line(-500, 0, 500, 0);
-            Line cusV = new Line(0, -500, 0, 500);
-            Line cusHV = new Line(-500, -500, 500, 500);
-            singleModel.Entities.Add(cusH, LayerDashDot);
-            singleModel.Entities.Add(cusV, LayerDashDot);
-            singleModel.Entities.Add(cusHV, LayerDashDot);
+            LinearPath rectBox = new LinearPath(140, 100);
+            rectBox.ColorMethod = colorMethodType.byEntity;
+            rectBox.Color = Color.Green;
+            singleModel.Entities.Add(rectBox);
+
+            Line cusL = new Line(0, 100, 70, 120);
+            singleModel.Entities.Add(cusL);
+            Line cusR = new Line(70, 120, 140, 100);
+            singleModel.Entities.Add(cusR);
+
+
+            //Line cusH = new Line(-500, 0, 500, 0);
+            //Line cusV = new Line(0, -500, 0, 500);
+            //Line cusHV = new Line(-500, -500, 500, 500);
+            //singleModel.Entities.Add(cusH, LayerDashDot);
+            //singleModel.Entities.Add(cusV, LayerDashDot);
+            //singleModel.Entities.Add(cusHV, LayerDashDot);
 
             singleModel.Entities.Regen();
             //singleModel.ZoomFit();

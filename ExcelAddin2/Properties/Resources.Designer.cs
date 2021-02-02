@@ -63,6 +63,36 @@ namespace ExcelAddIn.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
+        internal static System.Drawing.Bitmap angle_header {
+            get {
+                object obj = ResourceManager.GetObject("angle_header", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        internal static System.Drawing.Bitmap angle_image {
+            get {
+                object obj = ResourceManager.GetObject("angle_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        internal static System.Drawing.Bitmap angle_list {
+            get {
+                object obj = ResourceManager.GetObject("angle_list", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
         internal static System.Drawing.Bitmap iTank2 {
             get {
                 object obj = ResourceManager.GetObject("iTank2", resourceCulture);
@@ -116,6 +146,46 @@ namespace ExcelAddIn.Properties {
         internal static System.Drawing.Bitmap right_arrowSmall {
             get {
                 object obj = ResourceManager.GetObject("right_arrowSmall", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        internal static System.Drawing.Bitmap roof_a {
+            get {
+                object obj = ResourceManager.GetObject("roof_a", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        internal static System.Drawing.Bitmap roof_bc {
+            get {
+                object obj = ResourceManager.GetObject("roof_bc", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        internal static System.Drawing.Bitmap roof_de {
+            get {
+                object obj = ResourceManager.GetObject("roof_de", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        internal static System.Drawing.Bitmap roof_k {
+            get {
+                object obj = ResourceManager.GetObject("roof_k", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

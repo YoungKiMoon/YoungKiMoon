@@ -132,7 +132,7 @@ namespace ExcelAddIn.Panes
             switch (currentIndex)
             {
                 case 0:
-                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_BASIC);
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_GENERAL);
                     break;
                 case 1:
                     ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_SHEEL);

@@ -58,7 +58,8 @@ namespace PaperSetting.Services
                     newViewport.Name = "ViewPort" + i.ToString("00");
                     newViewport.AssemblySelection = "CustomAssembly" + i.ToString("00");
                     ViewPortCustom(newViewport,i);
-                    newPaper.ViewPorts.Add(newViewport);
+                    if(i<2)
+                        newPaper.ViewPorts.Add(newViewport);
 
                     // Note 
                     PaperNoteModel newNote = new PaperNoteModel();
@@ -79,7 +80,7 @@ namespace PaperSetting.Services
         {
             switch (selCount)
             {
-                case 1:
+                case 2:
                     newViewPort.ViewPort.Location.X = 40;
                     newViewPort.ViewPort.Location.Y = 40;
                     newViewPort.ViewPort.Size.Width = 60;
@@ -89,7 +90,7 @@ namespace PaperSetting.Services
                     newViewPort.Dock.VerticalAlignment = VERTICALALIGNMENT_TYPE.TOP;
                     newViewPort.Dock.DockPriority = 3;
                     break;
-                case 2:
+                case 1:
                     newViewPort.ViewPort.Location.X = 15+15+110;
                     newViewPort.ViewPort.Location.Y = 297-15-15-80;
                     newViewPort.ViewPort.Size.Width = 190;

@@ -24,10 +24,12 @@
             <StackPanel Orientation="Horizontal" >
                 <Image Source="Resources/papericon.png" Stretch="Fill" Height="16" Margin="6,0,0,0" />
                 <TextBlock Text="도면 설정" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#FF3F5072" FontWeight="Bold" Padding="6,0,0,0"/>
-                <Button Content="Create" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp"/>
             </StackPanel>
-
         </Border>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Preview Rebuild" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Padding="10,0" Background="#FF90E0F1"/>
+            <Button x:Name="btnExport" Content="Create Sample File : DWG" Margin="10,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnExport_PreviewMouseLeftButtonUp"/>
+        </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="400"/>
@@ -165,7 +167,7 @@
                     </TabControl.Resources>
                     <TabItem Header="REVISION" MinWidth="100" BorderThickness="0" >
                         <Grid>
-                            <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                            <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="True" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
                       ItemsSource="{Binding PaperListSelection.Revisions}" HorizontalScrollBarVisibility="Visible"
                       VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24">
                                 <DataGrid.Columns>
