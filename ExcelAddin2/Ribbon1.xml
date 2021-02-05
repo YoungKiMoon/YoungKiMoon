@@ -11,7 +11,7 @@
                     <button id="cuGroupButton03" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />
                     <button id="cuArrow03" enabled="true" label=" " getImage="GetCustomImage"  size="large" />
                     <button id="cuGroupButton04" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />
-                    <separator id="separator02" />
+                    <button id="cuArrow04" enabled="true" label=" " getImage="GetCustomImage"  size="large" />
                     <button id="cuGroupButton05" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />
                     <separator id="separator01" />
                     <button id="cuGroupButton06" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />

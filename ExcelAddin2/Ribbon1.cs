@@ -3,9 +3,10 @@ using ExcelAddIn.Properties;
 using ExcelAddIn.Service;
 using ExcelAddIn.Utils;
 using Microsoft.Office.Core;
-
+using PaperSetting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -166,6 +167,8 @@ namespace ExcelAddIn
                 //Service.PaneWindowService paneService = new Service.PaneWindowService();
                 //paneService.VisiblePane(Commons.CUSTOMPANE_LIST.NotSet, false, true);
                 //ExcelServices.ExcelService.ChangeSheet(Commons.EXCELSHEET_LIST.SHEET_MAIN);
+                PaperSettingWindow cc = new PaperSettingWindow();
+                cc.ShowDialog();
 
             }
             else if (control.Id == "cuGroupButton05")
@@ -175,6 +178,9 @@ namespace ExcelAddIn
                 //PaneWindowsService newService = new PaneWindowsService();
                 //UserControl1 selCon= newService.GetWWWPane();
                 //UserControl2 selWpf = newService.GetWWWPaneWPF();
+                FileBaseService newFile = new FileBaseService();
+                string selFile=newFile.CreateFile();
+                Process.Start(selFile);
             }
             else if (control.Id == "cuGroupButton06")
             {

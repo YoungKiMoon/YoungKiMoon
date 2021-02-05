@@ -34,7 +34,24 @@ namespace ExcelAddIn.Service
         {
             return SelectFileBase("타공정 INFORM", "CSV File|*.CSV|All Files|*.*;");
         }
+
         #endregion
+
+        public string CreateFile()
+        {
+            string downloadPath = "";
+            SaveFileDialog newFiledialog = new SaveFileDialog();
+            newFiledialog.Title = "TAnk (*.DWG) 파일 저장";
+            //newFiledialog.InitialDirectory = selPath;
+            newFiledialog.FileName = "TAnkDraw_" + DateTime.Now.ToString("yyyyMMdd") +".DWG";
+            newFiledialog.Filter = "AutoCAD File|*.DWG";
+
+            if (newFiledialog.ShowDialog() == true)
+                downloadPath = newFiledialog.FileName;
+
+           
+                return downloadPath;
+        }
 
     }
 }

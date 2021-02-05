@@ -135,10 +135,10 @@ namespace ExcelAddIn.Panes
                     ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_GENERAL);
                     break;
                 case 1:
-                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_SHEEL);
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_ROOF);
                     break;
                 case 2:
-                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_ROOF);
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_SHEEL);
                     break;
                 case 3:
                     ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_BOTTOM);
