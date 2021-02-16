@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DrawWork.SampleData;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,20 @@ namespace DrawWork
         public MainWindow()
         {
             InitializeComponent();
+
+            this.testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
+            this.testModel.ActionMode = devDept.Eyeshot.actionType.SelectByPick;
+
+        }
+        private void CreateSample()
+        {
+            ModelDataSample newSample = new ModelDataSample(this.testModel);
+            newSample.CreateSample();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            CreateSample();
         }
     }
 }
