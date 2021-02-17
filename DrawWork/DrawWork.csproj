@@ -59,7 +59,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CommandModels\BasicCommandModel.cs" />
+    <Compile Include="CommandModels\CommandLineModel.cs" />
+    <Compile Include="CommandServices\CommandBasicService.cs" />
+    <Compile Include="CommandServices\TranslateService.cs" />
+    <Compile Include="DrawServices\DataCoverterService.cs" />
+    <Compile Include="DrawServices\DrawCommandDataService.cs" />
+    <Compile Include="DrawServices\DrawCommandService.cs" />
+    <Compile Include="DrawServices\DrawObjectLogicService.cs" />
+    <Compile Include="DrawServices\DrawObjectService.cs" />
+    <Compile Include="Models\CommandModel.cs" />
     <Compile Include="SampleData\ModelDataSample.cs" />
+    <Compile Include="Utils\Notifier.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
