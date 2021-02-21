@@ -1,5 +1,4 @@
-﻿using DrawWork.SampleData;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+
+using DrawWork.SampleData;
+using DrawWork.ViewModels;
 
 namespace DrawWork
 {
@@ -37,6 +39,7 @@ namespace DrawWork
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            MainWindowViewModel selView = this.DataContext as MainWindowViewModel;
             CreateSample();
         }
     }

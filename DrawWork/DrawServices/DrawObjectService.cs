@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DrawWork.DrawModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,17 @@ namespace DrawWork.DrawServices
 {
     public class DrawObjectService
     {
-        private void DrawObject_RefPoint(string[] eachCmd)
+        private DrawService DrawService;
+        private DataCoverterService ConverterService;
+
+        public DrawObjectService()
+        {
+            DrawService = new DrawService();
+            ConverterService = new DataCoverterService();
+        }
+
+
+        private void DrawObject_RefPoint(string[] eachCmd,ref CDPoint refPoint,ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -22,17 +33,17 @@ namespace DrawWork.DrawServices
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
                         {
-                            CAD_Point newPoint = GetDrawPoint(eachCmd[j + 1]);
-                            referencePoint = newPoint;
-                            currentPoint.x = referencePoint.x;
-                            currentPoint.y = referencePoint.y;
+                            CDPoint newPoint = DrawService.GetDrawPoint(eachCmd[j + 1]);
+                            refPoint = newPoint;
+                            curPoint.X = refPoint.X;
+                            curPoint.Y = refPoint.Y;
                         }
                         break;
                 }
             }
 
         }
-        private void DrawObject_Point(string[] eachCmd)
+        private void DrawObject_Point(string[] eachCmd, ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -46,8 +57,8 @@ namespace DrawWork.DrawServices
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
                         {
-                            CAD_Point newPoint = GetDrawPoint(eachCmd[j + 1]);
-                            currentPoint = newPoint;
+                            CDPoint newPoint = DrawService.GetDrawPoint(eachCmd[j + 1]);
+                            curPoint = newPoint;
                         }
                         break;
                 }
@@ -55,7 +66,7 @@ namespace DrawWork.DrawServices
 
         }
 
-        private void DrawObject_Line(string[] eachCmd)
+        private void DrawObject_Line(string[] eachCmd, ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -63,9 +74,9 @@ namespace DrawWork.DrawServices
             int refIndex = 1;
 
 
-            CAD_Point newPoint1 = new CAD_Point();
-            CAD_Point newPoint2 = new CAD_Point();
-            CAD_Point newSetPoint = new CAD_Point();
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
@@ -73,30 +84,30 @@ namespace DrawWork.DrawServices
                 {
                     case "xy1":
                         if (j + 1 <= eachCmd.Length)
-                            newPoint1 = GetDrawPoint(eachCmd[j + 1]);
+                            newPoint1 = DrawService.GetDrawPoint(eachCmd[j + 1]);
                         break;
 
                     case "xy2":
                         if (j + 1 <= eachCmd.Length)
-                            newPoint2 = GetDrawPoint(eachCmd[j + 1]);
+                            newPoint2 = DrawService.GetDrawPoint(eachCmd[j + 1]);
                         break;
 
                     case "sp":
                         if (j + 1 <= eachCmd.Length)
                         {
-                            newSetPoint = GetDrawPoint(eachCmd[j + 1]);
-                            currentPoint.x = newSetPoint.x;
-                            currentPoint.y = newSetPoint.y;
+                            newSetPoint = DrawService.GetDrawPoint(eachCmd[j + 1]);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
                         }
                         break;
                 }
             }
 
             // Create Line
-            Draw_Line(newPoint1, newPoint2);
+            DrawService.Draw_Line(newPoint1, newPoint2);
 
         }
-        private void DrawObject_Rectangle(string[] eachCmd)
+        private void DrawObject_Rectangle(string[] eachCmd,ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -105,10 +116,10 @@ namespace DrawWork.DrawServices
 
 
 
-            CAD_Point newPoint1 = new CAD_Point();
+            CDPoint newPoint1 = new CDPoint();
             double newWidth = 0;
             double newHeight = 0;
-            CAD_Point newSetPoint = new CAD_Point();
+            CDPoint newSetPoint = new CDPoint();
 
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
@@ -117,25 +128,25 @@ namespace DrawWork.DrawServices
                 {
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
-                            newPoint1 = GetDrawPoint(eachCmd[j + 1]);
+                            newPoint1 = DrawService.GetDrawPoint(eachCmd[j + 1]);
                         break;
 
                     case "w":
                         if (j + 1 <= eachCmd.Length)
-                            newWidth = Evaluate(eachCmd[j + 1]);
+                            newWidth = ConverterService.Evaluate(eachCmd[j + 1]);
                         break;
 
                     case "h":
                         if (j + 1 <= eachCmd.Length)
-                            newHeight = Evaluate(eachCmd[j + 1]);
+                            newHeight = ConverterService.Evaluate(eachCmd[j + 1]);
                         break;
 
                     case "sp":
                         if (j + 1 <= eachCmd.Length)
                         {
-                            newSetPoint = GetDrawPoint(eachCmd[j + 1]);
-                            currentPoint.x = newSetPoint.x;
-                            currentPoint.y = newSetPoint.y;
+                            newSetPoint = DrawService.GetDrawPoint(eachCmd[j + 1]);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
                         }
                         break;
                 }
@@ -143,10 +154,10 @@ namespace DrawWork.DrawServices
             }
 
             // Create Line
-            Draw_Rectangle(newPoint1, newWidth, newHeight);
+            DrawService.Draw_Rectangle(newPoint1, newWidth, newHeight);
 
         }
-        private void DrawObject_RectangleBox(string[] eachCmd)
+        private void DrawObject_RectangleBox(string[] eachCmd, ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -155,10 +166,10 @@ namespace DrawWork.DrawServices
 
 
 
-            CAD_Point newPoint1 = new CAD_Point();
+            CDPoint newPoint1 = new CDPoint();
             double newWidth = 0;
             double newHeight = 0;
-            CAD_Point newSetPoint = new CAD_Point();
+            CDPoint newSetPoint = new CDPoint();
             double newRotate = 0;
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
@@ -167,30 +178,30 @@ namespace DrawWork.DrawServices
                 {
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
-                            newPoint1 = GetDrawPoint(eachCmd[j + 1]);
+                            newPoint1 = DrawService.GetDrawPoint(eachCmd[j + 1]);
                         break;
 
                     case "w":
                         if (j + 1 <= eachCmd.Length)
-                            newWidth = Evaluate(eachCmd[j + 1]);
+                            newWidth = ConverterService.Evaluate(eachCmd[j + 1]);
                         break;
 
                     case "h":
                         if (j + 1 <= eachCmd.Length)
-                            newHeight = Evaluate(eachCmd[j + 1]);
+                            newHeight = ConverterService.Evaluate(eachCmd[j + 1]);
                         break;
 
                     case "r":
                         if (j + 1 <= eachCmd.Length)
-                            newRotate = Evaluate(eachCmd[j + 1]);
+                            newRotate = ConverterService.Evaluate(eachCmd[j + 1]);
                         break;
 
                     case "sp":
                         if (j + 1 <= eachCmd.Length)
                         {
-                            newSetPoint = GetDrawPoint(eachCmd[j + 1]);
-                            currentPoint.x = newSetPoint.x;
-                            currentPoint.y = newSetPoint.y;
+                            newSetPoint = DrawService.GetDrawPoint(eachCmd[j + 1]);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
                         }
                         break;
                 }
@@ -198,11 +209,11 @@ namespace DrawWork.DrawServices
             }
 
             // Create Line
-            Draw_RectangleBox(newPoint1, newWidth, newHeight, newRotate);
+            DrawService.Draw_RectangleBox(newPoint1, newWidth, newHeight, newRotate);
 
         }
 
-        private void DrawObject_Text(string[] eachCmd)
+        private void DrawObject_Text(string[] eachCmd, ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -211,10 +222,10 @@ namespace DrawWork.DrawServices
 
 
 
-            CAD_Point newPoint1 = new CAD_Point();
+            CDPoint newPoint1 = new CDPoint();
             string newText = "";
             double newHeight = 0;
-            CAD_Point newSetPoint = new CAD_Point();
+            CDPoint newSetPoint = new CDPoint();
             string newAlign = "lb";
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
@@ -223,7 +234,7 @@ namespace DrawWork.DrawServices
                 {
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
-                            newPoint1 = GetDrawPoint(eachCmd[j + 1]);
+                            newPoint1 = DrawService.GetDrawPoint(eachCmd[j + 1]);
                         break;
 
                     case "t":
@@ -233,7 +244,7 @@ namespace DrawWork.DrawServices
 
                     case "h":
                         if (j + 1 <= eachCmd.Length)
-                            newHeight = Evaluate(eachCmd[j + 1]);
+                            newHeight = ConverterService.Evaluate(eachCmd[j + 1]);
                         break;
 
                     case "a":
@@ -244,9 +255,9 @@ namespace DrawWork.DrawServices
                     case "sp":
                         if (j + 1 <= eachCmd.Length)
                         {
-                            newSetPoint = GetDrawPoint(eachCmd[j + 1]);
-                            currentPoint.x = newSetPoint.x;
-                            currentPoint.y = newSetPoint.y;
+                            newSetPoint = DrawService.GetDrawPoint(eachCmd[j + 1]);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
                         }
                         break;
                 }
@@ -255,11 +266,11 @@ namespace DrawWork.DrawServices
             }
 
             // Create Line
-            Draw_Text(newPoint1, newText, newHeight, newAlign);
+            DrawService.Draw_Text(newPoint1, newText, newHeight, newAlign);
 
         }
 
-        private void DrawObject_Dimension(string[] eachCmd)
+        private void DrawObject_Dimension(string[] eachCmd, ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -267,10 +278,10 @@ namespace DrawWork.DrawServices
             int refIndex = 1;
 
 
-            CAD_Point newPoint1 = new CAD_Point();
-            CAD_Point newPoint2 = new CAD_Point();
-            CAD_Point newPoint3 = new CAD_Point();
-            CAD_Point newSetPoint = new CAD_Point();
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
             double newTextHeight = -1;
             double newTextGap = -1;
             double newArrowSize = -1;
@@ -281,46 +292,46 @@ namespace DrawWork.DrawServices
                 {
                     case "xy1":
                         if (j + 1 <= eachCmd.Length)
-                            newPoint1 = GetDrawPoint(eachCmd[j + 1]);
+                            newPoint1 = DrawService.GetDrawPoint(eachCmd[j + 1]);
                         break;
 
                     case "xy2":
                         if (j + 1 <= eachCmd.Length)
-                            newPoint2 = GetDrawPoint(eachCmd[j + 1]);
+                            newPoint2 = DrawService.GetDrawPoint(eachCmd[j + 1]);
                         break;
 
                     case "xyh":
                         if (j + 1 <= eachCmd.Length)
-                            newPoint3 = GetDrawPoint(eachCmd[j + 1]);
+                            newPoint3 = DrawService.GetDrawPoint(eachCmd[j + 1]);
                         break;
 
                     case "th":
                         if (j + 1 <= eachCmd.Length)
-                            newTextHeight = Evaluate(eachCmd[j + 1]);
+                            newTextHeight = ConverterService.Evaluate(eachCmd[j + 1]);
                         break;
 
                     case "tg":
                         if (j + 1 <= eachCmd.Length)
-                            newTextGap = Evaluate(eachCmd[j + 1]);
+                            newTextGap = ConverterService.Evaluate(eachCmd[j + 1]);
                         break;
 
                     case "ah":
                         if (j + 1 <= eachCmd.Length)
-                            newArrowSize = Evaluate(eachCmd[j + 1]);
+                            newArrowSize = ConverterService.Evaluate(eachCmd[j + 1]);
                         break;
 
                     case "sp":
                         if (j + 1 <= eachCmd.Length)
                         {
-                            newSetPoint = GetDrawPoint(eachCmd[j + 1]);
-                            currentPoint.x = newSetPoint.x;
-                            currentPoint.y = newSetPoint.y;
+                            newSetPoint = DrawService.GetDrawPoint(eachCmd[j + 1]);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
                         }
                         break;
                 }
             }
 
-            Draw_Dimension(newPoint1, newPoint2, newPoint3, newTextHeight, newTextGap, newArrowSize, 0);
+            DrawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newTextHeight, newTextGap, newArrowSize, 0);
 
         }
     }

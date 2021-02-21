@@ -14,13 +14,21 @@ using devDept.Serialization;
 using MColor = System.Windows.Media.Color;
 //using Color = System.Drawing.Color;
 
+using DrawWork.DrawModels;
+
 
 namespace DrawWork.DrawServices
 {
     public class DrawService
     {
+        private DataCoverterService DataConverter;
 
-        private void Draw_Dimension(CAD_Point selPoint1, CAD_Point selPoint2, CAD_Point selPoint3, double selTextHeight, double selTextGap, double selArrowSize, double selRotate)
+        public DrawService()
+        {
+            DataConverter = new DataCoverterService();
+        }
+
+        public void Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3, double selTextHeight, double selTextGap, double selArrowSize, double selRotate)
         {
             double[] point1 = new double[3] { selPoint1.x, selPoint1.y, 0 };
             double[] point2 = new double[3] { selPoint2.x, selPoint2.y, 0 };
@@ -36,13 +44,13 @@ namespace DrawWork.DrawServices
             dimline.Update();
         }
 
-        private void Draw_Line(CAD_Point selPoint1, CAD_Point selPoint2)
+        public void Draw_Line(CDPoint selPoint1, CDPoint selPoint2)
         {
             double[] point1 = new double[3] { selPoint1.x, selPoint1.y, 0 };
             double[] point2 = new double[3] { selPoint2.x, selPoint2.y, 0 };
             currentDocument.ModelSpace.AddLine(point1, point2).Update();
         }
-        private void Draw_Rectangle(CAD_Point selPoint1, double selWidth, double selHeight)
+        public void Draw_Rectangle(CDPoint selPoint1, double selWidth, double selHeight)
         {
 
             double[] point1 = new double[3] { selPoint1.x, selPoint1.y, 0 };
@@ -56,7 +64,7 @@ namespace DrawWork.DrawServices
             currentDocument.ModelSpace.AddLine(point4, point1).Update();
         }
 
-        private void Draw_RectangleBox(CAD_Point selPoint1, double selWidth, double selHeight, double selRotate)
+        public void Draw_RectangleBox(CDPoint selPoint1, double selWidth, double selHeight, double selRotate)
         {
 
             double[] point1 = new double[3] { selPoint1.x, selPoint1.y, 0 };
@@ -79,7 +87,7 @@ namespace DrawWork.DrawServices
 
         }
 
-        private void Draw_Text(CAD_Point selPoint1, string selText, double selHeight, string selAlign)
+        public void Draw_Text(CDPoint selPoint1, string selText, double selHeight, string selAlign)
         {
 
             double[] point1 = new double[3] { selPoint1.x, selPoint1.y, 0 };
@@ -94,21 +102,21 @@ namespace DrawWork.DrawServices
             newText.Update();
         }
 
-        private CAD_Point GetDrawPoint(string selData)
+        public CDPoint GetDrawPoint(string selData)
         {
-            CAD_Point newPoint = new CAD_Point();
+            CDPoint newPoint = new CDPoint();
 
             if (selData.Contains(","))
             {
                 string[] dataArray = selData.Split(',');
 
-                // Y
+                // X
                 string selX = GetPointDataCal(dataArray[0], "x");
-                newPoint.x = GetDoubleValue(selX);
+                newPoint.X = DataConverter.GetDoubleValue(selX);
 
                 // Y
                 string selY = GetPointDataCal(dataArray[1], "y");
-                newPoint.y = GetDoubleValue(selY);
+                newPoint.Y = DataConverter.GetDoubleValue(selY);
 
 
 
@@ -117,7 +125,7 @@ namespace DrawWork.DrawServices
 
             return newPoint;
         }
-        private string GetPointDataCal(string selCmd, string selXY)
+        public string GetPointDataCal(string selCmd, string selXY)
         {
             string calStr = "";
             string newStr = "";
@@ -162,12 +170,12 @@ namespace DrawWork.DrawServices
 
 
 
-            double doubleValue = Evaluate(newValue);
+            double doubleValue = DataConverter.Evaluate(newValue);
             return doubleValue.ToString();
 
 
         }
-        private string GetPointDataCalAlpha(string selPoint, string selXY)
+        public string GetPointDataCalAlpha(string selPoint, string selXY)
         {
             string newValue = "";
             string newPoint = selPoint.Replace("@", "");
@@ -198,7 +206,7 @@ namespace DrawWork.DrawServices
             return newValue;
         }
 
-        private int DrawMethod_Repeat(string[] eachCmd)
+        public int DrawMethod_Repeat(string[] eachCmd)
         {
             // 0 : Object
             // 1 : Command
@@ -215,7 +223,7 @@ namespace DrawWork.DrawServices
                     case "repeat":
                         if (j + 1 <= eachCmd.Length)
                         {
-                            double calDouble = Evaluate(eachCmd[j + 1]);
+                            double calDouble = DataConverter.Evaluate(eachCmd[j + 1]);
                             result = Convert.ToInt32(calDouble);
                         }
                         break;

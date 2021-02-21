@@ -8,7 +8,7 @@ namespace DrawWork.DrawServices
 {
     public class DataCoverterService
     {
-        private int GetIntValue(string selValue)
+        public int GetIntValue(string selValue)
         {
             // Default Value
             int intValue = 0;
@@ -17,7 +17,7 @@ namespace DrawWork.DrawServices
                 intValue = 0;
             return intValue;
         }
-        private double GetDoubleValue(string selValue)
+        public double GetDoubleValue(string selValue)
         {
             // Default Value
             double doubleValue = 0;

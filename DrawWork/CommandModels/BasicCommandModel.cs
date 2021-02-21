@@ -13,8 +13,7 @@ namespace DrawWork.CommandModels
         {
             commandList = new List<CommandLineModel>();
             commandListTrans = new List<string[]>();
-            currentPoint = new CDPoint();
-            referencePoint = new CDPoint();
+            drawPoint = new DrawPointModel();
         }
 
         public object Clone()
@@ -22,8 +21,7 @@ namespace DrawWork.CommandModels
             BasicCommandModel newModel = new BasicCommandModel();
             newModel.commandList = commandList;
             newModel.commandListTrans = commandListTrans;
-            newModel.currentPoint = currentPoint;
-            newModel.referencePoint = referencePoint;
+            newModel.drawPoint = drawPoint.Clone() as DrawPointModel;
             return newModel;
         }
 
@@ -41,19 +39,13 @@ namespace DrawWork.CommandModels
             set { _commandListTrans = value; }
         }
 
-        private CDPoint _currentPoint;
-        public CDPoint currentPoint
+        private DrawPointModel _drawPoint;
+        public DrawPointModel drawPoint
         {
-            get { return _currentPoint; }
-            set { _currentPoint = value; }
+            get { return _drawPoint; }
+            set { _drawPoint = value; }
         }
 
-        private CDPoint _referencePoint;
-        public CDPoint referencePoint
-        {
-            get { return _referencePoint; }
-            set { _referencePoint = value; }
-        }
 
     }
 }

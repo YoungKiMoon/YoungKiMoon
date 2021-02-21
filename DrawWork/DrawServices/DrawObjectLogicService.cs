@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DrawWork.DrawModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,13 @@ namespace DrawWork.DrawServices
 {
     public class DrawObjectLogicService
     {
-        public void DrawObjectLogic(string[] eachCmd)
+        private DrawObjectService drawObject;
+
+        public DrawObjectService()
+        {
+            drawObject = new DrawObjectService();
+        }
+        public void DrawObjectLogic(string[] eachCmd,ref CDPoint refPoint, ref CDPoint curPoint)
         {
 
             string cmdObject = eachCmd[0].ToLower();
