@@ -71,9 +71,14 @@
     <Compile Include="AssemblyModels\ShellInputModel.cs" />
     <Compile Include="AssemblyModels\ShellOutputModel.cs" />
     <Compile Include="FileServices\TextFileService.cs" />
+    <Compile Include="Models\TreeNodeModel.cs" />
     <Compile Include="Utils\Notifier.cs" />
     <Compile Include="ValueServices\ValueService.cs" />
+    <Compile Include="ViewModels\AssemblyWindowViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="Windows\AssemblyWindow.xaml.cs">
+      <DependentUpon>AssemblyWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -88,6 +93,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Windows\AssemblyWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

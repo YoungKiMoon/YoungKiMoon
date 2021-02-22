@@ -135,8 +135,12 @@ namespace ExcelAddIn.ExcelServices
 
         private static void InformationWindowReset()
         {
-            Globals.ThisAddIn.customInputPane.elementHost1WPF.imageArea.Visibility = System.Windows.Visibility.Collapsed;
-            Globals.ThisAddIn.customInputPane.elementHost1WPF.listArea.Visibility = System.Windows.Visibility.Collapsed;
+            if (Globals.ThisAddIn.customInputPane != null)
+            {
+                Globals.ThisAddIn.customInputPane.elementHost1WPF.imageArea.Visibility = System.Windows.Visibility.Collapsed;
+                Globals.ThisAddIn.customInputPane.elementHost1WPF.listArea.Visibility = System.Windows.Visibility.Collapsed;
+            }
+
 
         }
         private static void ExcelSheet_SelectionChange(Excel.Range Target)

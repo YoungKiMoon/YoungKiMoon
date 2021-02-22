@@ -19,6 +19,7 @@ using DrawWork.AssemblyModels;
 using DrawWork.DrawServices;
 using DrawWork.CommandModels;
 using DrawWork.FileServices;
+using DrawWork.Windows;
 
 namespace DrawWork
 {
@@ -72,6 +73,15 @@ namespace DrawWork
             testModel.Entities.Clear();
             testModel.StartWork(testBuilder);
             MessageBox.Show("완료");
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            MainWindowViewModel selView = this.DataContext as MainWindowViewModel;
+
+            AssemblyWindow cc = new AssemblyWindow();
+            cc.SetAssembly(selView.TankData);
+            cc.Show();
         }
     }
 }

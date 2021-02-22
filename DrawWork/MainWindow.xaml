@@ -10,7 +10,7 @@
         xmlns:ddes="http://schemas.devdept.com/winfx/2008/xaml/control" xmlns:ddgr="http://schemas.devdept.com/winfx/2008/xaml/graphics" x:Class="DrawWork.MainWindow"
     
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+        Title="Draw Logic Preview" Height="450" Width="800" WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
@@ -22,8 +22,11 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <StackPanel Orientation="Horizontal">
-                <Button Content="Create Sample" Width="100" Click="Button_Click"/>
+                <Button Content="Assembly Model" Width="100" Click="Button_Click_2" />
                 <Button Content="Create Logic"  Width="100" Click="Button_Click_1"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Create Sample" Width="100" Click="Button_Click"/>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1">
