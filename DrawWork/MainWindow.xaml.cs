@@ -15,6 +15,8 @@ using System.Windows.Shapes;
 
 using DrawWork.SampleData;
 using DrawWork.ViewModels;
+using DrawWork.DrawBuilders;
+using DrawWork.AssemblyModels;
 
 namespace DrawWork
 {
@@ -41,6 +43,20 @@ namespace DrawWork
         {
             MainWindowViewModel selView = this.DataContext as MainWindowViewModel;
             CreateSample();
+
+            CreateSampleModel();
+
+        }
+
+        private void CreateSampleModel()
+        {
+            MainWindowViewModel selView = this.DataContext as MainWindowViewModel;
+
+            LogicBuilder testBuilder = selView.GetLogicBuilder();
+
+            // remove old block
+            testModel.Entities.Clear();
+            testModel.StartWork(testBuilder);
         }
     }
 }

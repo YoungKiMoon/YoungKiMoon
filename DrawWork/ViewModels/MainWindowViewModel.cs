@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using DrawWork.AssemblyModels;
 using DrawWork.CommandModels;
 using DrawWork.CommandServices;
+using DrawWork.DrawBuilders;
 
 namespace DrawWork.ViewModels
 {
@@ -209,6 +210,14 @@ namespace DrawWork.ViewModels
         private void CreateModel()
         {
             commandService.ExecuteCommand();   
+            
+        }
+
+        public LogicBuilder GetLogicBuilder()
+        {
+            LogicBuilder logicB = new LogicBuilder(TankData);
+
+            return logicB;
         }
     }
 }

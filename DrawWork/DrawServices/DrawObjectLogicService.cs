@@ -11,10 +11,13 @@ namespace DrawWork.DrawServices
     {
         private DrawObjectService drawObject;
 
-        public DrawObjectService()
+        #region CONSTRUCTOR
+        public DrawObjectLogicService()
         {
             drawObject = new DrawObjectService();
         }
+        #endregion
+
         public void DrawObjectLogic(string[] eachCmd,ref CDPoint refPoint, ref CDPoint curPoint)
         {
 
@@ -24,32 +27,32 @@ namespace DrawWork.DrawServices
             {
 
                 case "refpoint":
-                    DrawObject_RefPoint(eachCmd);
+                    drawObject.DoRefPoint(eachCmd,ref refPoint, ref curPoint);
                     break;
 
                 case "point":
-                    DrawObject_Point(eachCmd);
+                    drawObject.DoPoint(eachCmd, ref refPoint, ref curPoint);
                     break;
 
                 case "line":
-                    DrawObject_Line(eachCmd);
+                    drawObject.DoLine(eachCmd, ref refPoint, ref curPoint);
                     break;
 
                 case "text":
-                    DrawObject_Text(eachCmd);
+                    drawObject.DoText(eachCmd, ref refPoint, ref curPoint);
                     break;
 
                 case "rec":
-                    DrawObject_Rectangle(eachCmd);
+                    drawObject.DoRectangle(eachCmd, ref refPoint, ref curPoint);
                     break;
 
                 case "rectangle":
-                    DrawObject_RectangleBox(eachCmd);
+                    drawObject.DoRectangle(eachCmd, ref refPoint, ref curPoint);
                     break;
 
                 case "dim":
                 case "dimline":
-                    DrawObject_Dimension(eachCmd);
+                    drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint);
                     break;
 
             }

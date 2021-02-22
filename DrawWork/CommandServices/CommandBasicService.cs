@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using DrawWork.AssemblyModels;
 using DrawWork.CommandModels;
+using DrawWork.DrawModels;
+using DrawWork.DrawServices;
 
 namespace DrawWork.CommandServices
 {
@@ -15,6 +17,7 @@ namespace DrawWork.CommandServices
         public BasicCommandModel commandData;
 
         public TranslateDataService commandTranslate;
+        public DrawObjectLogicService drawLogicService;
 
         #region CONSTRUCTOR
         public CommandBasicService()
@@ -22,6 +25,7 @@ namespace DrawWork.CommandServices
             assemblyData = new AssemblyModel();
             commandData = new BasicCommandModel();
             commandTranslate = new TranslateDataService();
+            drawLogicService = new DrawObjectLogicService();
         }
 
         public CommandBasicService(List<CommandLineModel> selCommandList,AssemblyModel selAssembly)
@@ -31,6 +35,7 @@ namespace DrawWork.CommandServices
             SetCommandData(selCommandList);
             SetAssemblyData(selAssembly);
             commandTranslate = new TranslateDataService(selAssembly);
+            drawLogicService = new DrawObjectLogicService();
 
         }
         #endregion
@@ -56,19 +61,23 @@ namespace DrawWork.CommandServices
 
             commandTranslate.TranslateModelData(commandData.commandListTrans);
 
+            CDPoint refPoint = commandData.drawPoint.referencePoint;
+            CDPoint curPoint = commandData.drawPoint.currentPoint;
 
             foreach (string[] eachCmd in commandData.commandListTrans)
             {
-                int dmRepeatCount = DrawMethod_Repeat(eachCmd);
+                int dmRepeatCount = commandTranslate.DrawMethod_Repeat(eachCmd);
                 dmRepeatCount++;
                 for (int dmCount = 1; dmCount <= dmRepeatCount; dmCount++)
                 {
                     if (eachCmd != null)
                     {
-                        DrawObjectLogic(eachCmd);
+                        drawLogicService.DrawObjectLogic(eachCmd,ref refPoint, ref curPoint);
                     }
                 }
             }
+            commandData.drawPoint.referencePoint = refPoint;
+            commandData.drawPoint.currentPoint = curPoint;
         }
         #endregion
     }

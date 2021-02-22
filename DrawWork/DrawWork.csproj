@@ -63,10 +63,8 @@
     <Compile Include="CommandModels\CommandLineModel.cs" />
     <Compile Include="CommandServices\CommandBasicService.cs" />
     <Compile Include="CommandServices\TranslateDataService.cs" />
+    <Compile Include="DrawBuilders\LogicBuilder.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
-    <Compile Include="DrawServices\DataCoverterService.cs" />
-    <Compile Include="DrawServices\DrawCommandDataService.cs" />
-    <Compile Include="DrawServices\DrawCommandService.cs" />
     <Compile Include="DrawServices\DrawObjectLogicService.cs" />
     <Compile Include="DrawServices\DrawObjectService.cs" />
     <Compile Include="SampleData\ModelDataSample.cs" />
@@ -74,6 +72,7 @@
     <Compile Include="AssemblyModels\ShellInputModel.cs" />
     <Compile Include="AssemblyModels\ShellOutputModel.cs" />
     <Compile Include="Utils\Notifier.cs" />
+    <Compile Include="ValueServices\ValueService.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -4,10 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DrawWork.DrawServices
+namespace DrawWork.ValueServices
 {
-    public class DataCoverterService
+    public class ValueService
     {
+        public ValueService()
+        {
+
+        }
         public int GetIntValue(string selValue)
         {
             // Default Value

@@ -7,21 +7,25 @@ using System.Threading.Tasks;
 
 using DrawWork.AssemblyModels;
 using DrawWork.CommandModels;
+using DrawWork.ValueServices;
 
 namespace DrawWork.CommandServices
 {
     public class TranslateDataService
     {
         public AssemblyModel assemblyData;
+        private ValueService valueService;
 
         #region CONSTRUCTOR
         public TranslateDataService()
         {
             assemblyData = new AssemblyModel();
+            valueService = new ValueService();
         }
         public TranslateDataService(AssemblyModel selAssembly)
         {
             assemblyData = new AssemblyModel();
+            valueService = new ValueService();
             SetAssemblyData(selAssembly);
         }
         #endregion
@@ -228,6 +232,36 @@ namespace DrawWork.CommandServices
             if (!int.TryParse(selIndex, out intValue))
                 intValue = 1;
             return intValue - 1;
+        }
+
+        public int DrawMethod_Repeat(string[] eachCmd)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+            int result = 0;
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j])
+                {
+                    case "rep":
+                    case "repeat":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            double calDouble = valueService.Evaluate(eachCmd[j + 1]);
+                            result = Convert.ToInt32(calDouble);
+                        }
+                        break;
+
+                }
+
+            }
+
+            return result;
+
         }
     }
 }
