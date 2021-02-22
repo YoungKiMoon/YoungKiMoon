@@ -14,22 +14,15 @@ using MColor = System.Windows.Media.Color;
 using Color = System.Drawing.Color;
 using System.Collections.ObjectModel;
 
-namespace DrawWork.SampleData
+namespace DrawWork.DrawServices
 {
-    public class ModelDataSample
+    public class DrawSettingService
     {
-        #region Property
-        private Model singleModel = null;
-        #endregion
-
-        #region CONSTRUCTOR
-        public ModelDataSample(Model selModel)
+        public DrawSettingService()
         {
-            singleModel = selModel;
-        }
-        #endregion
 
-        public void CreateSample()
+        }
+        public void SetModelSpace(Model singleModel)
         {
             singleModel.Invalidate();
 
@@ -40,6 +33,11 @@ namespace DrawWork.SampleData
 
             singleModel.LineTypes.Add(LayerDashDot, new float[] { 5, -1, 1, -1 });
             singleModel.Layers[LayerDashDot].LineTypeName = LayerDashDot;
+        }
+
+        public void CreateModelSpaceSample(Model singleModel)
+        {
+            singleModel.Entities.Clear();
 
             LinearPath rectBox = new LinearPath(140, 100);
             rectBox.ColorMethod = colorMethodType.byEntity;
@@ -67,8 +65,7 @@ namespace DrawWork.SampleData
 
             singleModel.Entities.Regen();
             singleModel.ZoomFit();
-            
-            //singleModel.SetView(viewType.Top, true, false);
+
 
         }
     }

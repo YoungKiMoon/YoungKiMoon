@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using devDept.Eyeshot;
+using devDept.Graphics;
+using devDept.Eyeshot.Entities;
+
 using DrawWork.AssemblyModels;
 using DrawWork.CommandModels;
 using DrawWork.DrawModels;
@@ -17,7 +21,9 @@ namespace DrawWork.CommandServices
         public BasicCommandModel commandData;
 
         public TranslateDataService commandTranslate;
-        public DrawObjectLogicService drawLogicService;
+        public DrawObjectService drawObject;
+
+        public List<Entity> commandEntities;
 
         #region CONSTRUCTOR
         public CommandBasicService()
@@ -25,7 +31,8 @@ namespace DrawWork.CommandServices
             assemblyData = new AssemblyModel();
             commandData = new BasicCommandModel();
             commandTranslate = new TranslateDataService();
-            drawLogicService = new DrawObjectLogicService();
+            drawObject = new DrawObjectService();
+            commandEntities = new List<Entity>();
         }
 
         public CommandBasicService(List<CommandLineModel> selCommandList,AssemblyModel selAssembly)
@@ -35,7 +42,8 @@ namespace DrawWork.CommandServices
             SetCommandData(selCommandList);
             SetAssemblyData(selAssembly);
             commandTranslate = new TranslateDataService(selAssembly);
-            drawLogicService = new DrawObjectLogicService();
+            drawObject = new DrawObjectService();
+            commandEntities = new List<Entity>();
 
         }
         #endregion
@@ -72,12 +80,61 @@ namespace DrawWork.CommandServices
                 {
                     if (eachCmd != null)
                     {
-                        drawLogicService.DrawObjectLogic(eachCmd,ref refPoint, ref curPoint);
+                        DrawObjectLogic(eachCmd,ref refPoint, ref curPoint);
                     }
                 }
             }
             commandData.drawPoint.referencePoint = refPoint;
             commandData.drawPoint.currentPoint = curPoint;
+        }
+        #endregion
+
+        #region DrawLogic
+        public void DrawObjectLogic(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+
+
+
+            string cmdObject = eachCmd[0].ToLower();
+
+            switch (cmdObject)
+            {
+
+                case "refpoint":
+                    drawObject.DoRefPoint(eachCmd, ref refPoint, ref curPoint);
+                    break;
+
+                case "point":
+                    drawObject.DoPoint(eachCmd, ref refPoint, ref curPoint);
+                    break;
+
+                case "line":
+                    commandEntities.Add(drawObject.DoLine(eachCmd, ref refPoint, ref curPoint));
+                    break;
+
+                case "text":
+                    //drawObject.DoText(eachCmd, ref refPoint, ref curPoint);
+                    break;
+
+                case "rec":
+                    Entity[] newRec = drawObject.DoRectangle(eachCmd, ref refPoint, ref curPoint);
+                    foreach (Entity eachEntity in newRec)
+                        commandEntities.Add(eachEntity);
+                    break;
+
+                case "rectangle":
+                    Entity[] newRect = drawObject.DoRectangle(eachCmd, ref refPoint, ref curPoint);
+                    foreach (Entity eachEntity in newRect)
+                        commandEntities.Add(eachEntity);
+                    break;
+
+                case "dim":
+                case "dimline":
+                    //drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint);
+                    break;
+
+            }
+
         }
         #endregion
     }

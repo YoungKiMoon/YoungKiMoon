@@ -22,6 +22,7 @@
         <Grid Grid.Row="0">
             <StackPanel Orientation="Horizontal">
                 <Button Content="Create Sample" Click="Button_Click"/>
+                <Button Content="Create Logic" Click="Button_Click_1"/>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1">

@@ -13,10 +13,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-using DrawWork.SampleData;
 using DrawWork.ViewModels;
 using DrawWork.DrawBuilders;
 using DrawWork.AssemblyModels;
+using DrawWork.DrawServices;
 
 namespace DrawWork
 {
@@ -25,6 +25,8 @@ namespace DrawWork
     /// </summary>
     public partial class MainWindow : Window
     {
+        DrawSettingService drawSetting;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -32,23 +34,21 @@ namespace DrawWork
             this.testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
             this.testModel.ActionMode = devDept.Eyeshot.actionType.SelectByPick;
 
+            drawSetting = new DrawSettingService();
+            drawSetting.SetModelSpace(testModel);
+
         }
-        private void CreateSample()
-        {
-            ModelDataSample newSample = new ModelDataSample(this.testModel);
-            newSample.CreateSample();
-        }
+
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MainWindowViewModel selView = this.DataContext as MainWindowViewModel;
-            CreateSample();
-
-            CreateSampleModel();
+            drawSetting.CreateModelSpaceSample(testModel);
 
         }
 
-        private void CreateSampleModel()
+
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             MainWindowViewModel selView = this.DataContext as MainWindowViewModel;
 

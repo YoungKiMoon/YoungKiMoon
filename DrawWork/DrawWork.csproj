@@ -65,9 +65,8 @@
     <Compile Include="CommandServices\TranslateDataService.cs" />
     <Compile Include="DrawBuilders\LogicBuilder.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
-    <Compile Include="DrawServices\DrawObjectLogicService.cs" />
     <Compile Include="DrawServices\DrawObjectService.cs" />
-    <Compile Include="SampleData\ModelDataSample.cs" />
+    <Compile Include="DrawServices\DrawSettingService.cs" />
     <Compile Include="AssemblyModels\AssemblyModel.cs" />
     <Compile Include="AssemblyModels\ShellInputModel.cs" />
     <Compile Include="AssemblyModels\ShellOutputModel.cs" />
@@ -83,7 +82,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DrawModels\CDPoint.cs" />
-    <Compile Include="DrawServices\DrawFunctionTestService.cs" />
     <Compile Include="DrawServices\DrawService.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
