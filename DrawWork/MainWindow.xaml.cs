@@ -17,6 +17,8 @@ using DrawWork.ViewModels;
 using DrawWork.DrawBuilders;
 using DrawWork.AssemblyModels;
 using DrawWork.DrawServices;
+using DrawWork.CommandModels;
+using DrawWork.FileServices;
 
 namespace DrawWork
 {
@@ -37,13 +39,14 @@ namespace DrawWork
             drawSetting = new DrawSettingService();
             drawSetting.SetModelSpace(testModel);
 
+            logicFile.Text = @"C:\Users\tree\Desktop\CAD\tabas\Sample_DrawLogic.txt";
         }
 
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             drawSetting.CreateModelSpaceSample(testModel);
-
+            MessageBox.Show("완료");
         }
 
 
@@ -52,11 +55,23 @@ namespace DrawWork
         {
             MainWindowViewModel selView = this.DataContext as MainWindowViewModel;
 
+            string logicFilePath = logicFile.Text;
+
+            if (logicFilePath != "")
+            {
+                TextFileService newFileService = new TextFileService();
+                string[] newComData = newFileService.GetTextFileArray(logicFile.Text);
+                selView.commandData.commandList = new List<CommandLineModel>();
+                foreach (string eachText in newComData)
+                    selView.commandData.commandList.Add(new CommandLineModel { CommandText = eachText });
+            }
+
             LogicBuilder testBuilder = selView.GetLogicBuilder();
 
             // remove old block
             testModel.Entities.Clear();
             testModel.StartWork(testBuilder);
+            MessageBox.Show("완료");
         }
     }
 }

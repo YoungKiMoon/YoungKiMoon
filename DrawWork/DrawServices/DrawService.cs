@@ -28,23 +28,25 @@ namespace DrawWork.DrawServices
             valueService = new ValueService();
         }
 
-        /*
-        public void Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3, double selTextHeight, double selTextGap, double selArrowSize, double selRotate)
+        
+        public LinearDim Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3, double selTextHeight, double selTextGap, double selArrowSize, double selRotate)
         {
-            double[] point1 = new double[3] { selPoint1.x, selPoint1.y, 0 };
-            double[] point2 = new double[3] { selPoint2.x, selPoint2.y, 0 };
-            double[] point3 = new double[3] { selPoint3.x, selPoint3.y, 0 };
-            var dimline = currentDocument.ModelSpace.AddDimRotated(point1, point2, point3, selRotate);
-            if (selTextHeight > 0)
-                dimline.TextHeight = selTextHeight;
-            if (selTextGap > 0)
-                dimline.TextGap = selTextGap;
-            if (selArrowSize > 0)
-                dimline.ArrowheadSize = selArrowSize;
 
-            dimline.Update();
+            LinearDim newDim = new LinearDim(Plane.XY,
+                                             new Point2D(selPoint1.X,selPoint1.Y),
+                                             new Point2D(selPoint2.X, selPoint2.Y),
+                                             new Point2D(selPoint3.X, selPoint3.Y),selTextHeight);
+            if (selTextGap > 0)
+                newDim.TextGap = selTextGap;
+            if (selArrowSize > 0)
+                newDim.ArrowheadSize = selArrowSize;
+
+            newDim.TextLocation = elementPositionType.Outside;
+            
+            
+            return newDim;
         }
-        */
+        
 
         public Line Draw_Line(CDPoint selPoint1, CDPoint selPoint2)
         {
@@ -84,22 +86,21 @@ namespace DrawWork.DrawServices
 
 
         }
-
-        public void Draw_Text(CDPoint selPoint1, string selText, double selHeight, string selAlign)
+        */
+        public Text Draw_Text(CDPoint selPoint1, string selText, double selHeight, string selAlign)
         {
 
-            double[] point1 = new double[3] { selPoint1.x, selPoint1.y, 0 };
-
-
-            var newText = currentDocument.ModelSpace.AddText(selText, point1, selHeight);
-            if (selAlign == "c")
+            Text newText = new Text(selPoint1.X, selPoint1.Y, 0, selText, selHeight);
+            switch (selAlign)
             {
-                newText.HorizontalAlignment = Autodesk.AutoCAD.Interop.Common.AcHorizontalAlignment.acHorizontalAlignmentMiddle;
-                newText.TextAlignmentPoint = point1;
+                case "c":
+                    newText.Alignment = Text.alignmentType.MiddleCenter;
+                    break;
             }
-            newText.Update();
+
+            return newText;
         }
-        */
+        
         public CDPoint GetDrawPoint(string selData, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             CDPoint newPoint = new CDPoint();
@@ -123,6 +124,7 @@ namespace DrawWork.DrawServices
 
             return newPoint;
         }
+
         public string GetPointDataCal(string selCmd, string selXY, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             string calStr = "";

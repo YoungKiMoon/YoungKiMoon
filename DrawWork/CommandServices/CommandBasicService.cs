@@ -113,7 +113,7 @@ namespace DrawWork.CommandServices
                     break;
 
                 case "text":
-                    //drawObject.DoText(eachCmd, ref refPoint, ref curPoint);
+                    commandEntities.Add(drawObject.DoText(eachCmd, ref refPoint, ref curPoint));
                     break;
 
                 case "rec":
@@ -130,7 +130,7 @@ namespace DrawWork.CommandServices
 
                 case "dim":
                 case "dimline":
-                    //drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint);
+                    commandEntities.Add(drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint));
                     break;
 
             }

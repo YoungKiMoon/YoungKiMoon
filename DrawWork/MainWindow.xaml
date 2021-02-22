@@ -17,15 +17,25 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <StackPanel Orientation="Horizontal">
-                <Button Content="Create Sample" Click="Button_Click"/>
-                <Button Content="Create Logic" Click="Button_Click_1"/>
+                <Button Content="Create Sample" Width="100" Click="Button_Click"/>
+                <Button Content="Create Logic"  Width="100" Click="Button_Click_1"/>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Logic File :" VerticalAlignment="Center" HorizontalAlignment="Center" />
+            <TextBox x:Name="logicFile" Grid.Column="1"  Margin="0,2"/>
+            
+        </Grid>
+        <Grid Grid.Row="2">
             <ddes:Model x:Name="testModel" >
                 <ddes:Model.ProgressBar>
                     <ddes:ProgressBar Lighting="False"/>

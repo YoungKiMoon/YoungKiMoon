@@ -14,8 +14,8 @@ namespace DrawWork.ViewModels
     public class MainWindowViewModel
     {
 
-        private AssemblyModel TankData;
-        private BasicCommandModel commandData;
+        public AssemblyModel TankData;
+        public BasicCommandModel commandData;
         private CommandBasicService commandService;
 
         public MainWindowViewModel()
@@ -33,6 +33,7 @@ namespace DrawWork.ViewModels
         public LogicBuilder GetLogicBuilder()
         {
 
+            commandService = new CommandBasicService(commandData.commandList, TankData);
             commandService.ExecuteCommand();
             LogicBuilder logicB = new LogicBuilder(commandService.commandEntities);
 

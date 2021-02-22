@@ -70,6 +70,7 @@
     <Compile Include="AssemblyModels\AssemblyModel.cs" />
     <Compile Include="AssemblyModels\ShellInputModel.cs" />
     <Compile Include="AssemblyModels\ShellOutputModel.cs" />
+    <Compile Include="FileServices\TextFileService.cs" />
     <Compile Include="Utils\Notifier.cs" />
     <Compile Include="ValueServices\ValueService.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />

@@ -226,7 +226,7 @@ namespace DrawWork.DrawServices
 
         }
         */
-        public void DoText(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        public Text DoText(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -279,11 +279,11 @@ namespace DrawWork.DrawServices
             }
 
             // Create Line
-            //DrawService.Draw_Text(newPoint1, newText, newHeight, newAlign);
+            return drawService.Draw_Text(newPoint1, newText, newHeight, newAlign);
 
         }
 
-        public void DoDimension(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        public LinearDim DoDimension(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -344,7 +344,7 @@ namespace DrawWork.DrawServices
                 }
             }
 
-            //DrawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newTextHeight, newTextGap, newArrowSize, 0);
+            return drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newTextHeight, newTextGap, newArrowSize, 0);
 
         }
     }
