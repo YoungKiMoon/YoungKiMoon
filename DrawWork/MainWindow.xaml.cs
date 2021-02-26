@@ -15,7 +15,6 @@ using System.Windows.Shapes;
 
 using DrawWork.ViewModels;
 using DrawWork.DrawBuilders;
-using DrawWork.AssemblyModels;
 using DrawWork.DrawServices;
 using DrawWork.CommandModels;
 using DrawWork.FileServices;

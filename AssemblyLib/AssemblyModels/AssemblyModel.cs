@@ -1,13 +1,12 @@
-﻿using System;
+﻿using AssemblyLib.Utils;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using DrawWork.Utils;
-
-namespace DrawWork.AssemblyModels
+namespace AssemblyLib.AssemblyModels
 {
     public class AssemblyModel : Notifier
     {

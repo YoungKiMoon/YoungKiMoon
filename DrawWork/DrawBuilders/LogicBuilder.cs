@@ -14,7 +14,9 @@ using devDept.Serialization;
 using eyeEnvironment = devDept.Eyeshot.Environment;
 using MColor = System.Windows.Media.Color;
 using Color = System.Drawing.Color;
-using DrawWork.AssemblyModels;
+
+
+
 
 namespace DrawWork.DrawBuilders
 {

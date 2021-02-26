@@ -8,10 +8,12 @@ using devDept.Eyeshot;
 using devDept.Graphics;
 using devDept.Eyeshot.Entities;
 
-using DrawWork.AssemblyModels;
+
 using DrawWork.CommandModels;
 using DrawWork.DrawModels;
 using DrawWork.DrawServices;
+
+using AssemblyLib.AssemblyModels;
 
 namespace DrawWork.CommandServices
 {

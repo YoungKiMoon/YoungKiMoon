@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using DrawWork.AssemblyModels;
+
 using DrawWork.CommandModels;
 using DrawWork.CommandServices;
 using DrawWork.DrawBuilders;
+
+using AssemblyLib.AssemblyModels;
 
 namespace DrawWork.ViewModels
 {

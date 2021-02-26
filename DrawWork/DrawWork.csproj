@@ -67,9 +67,6 @@
     <Compile Include="DrawModels\DrawPointModel.cs" />
     <Compile Include="DrawServices\DrawObjectService.cs" />
     <Compile Include="DrawServices\DrawSettingService.cs" />
-    <Compile Include="AssemblyModels\AssemblyModel.cs" />
-    <Compile Include="AssemblyModels\ShellInputModel.cs" />
-    <Compile Include="AssemblyModels\ShellOutputModel.cs" />
     <Compile Include="FileServices\TextFileService.cs" />
     <Compile Include="Models\TreeNodeModel.cs" />
     <Compile Include="Utils\Notifier.cs" />
@@ -123,6 +120,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AssemblyLib\AssemblyLib.csproj">
+      <Project>{0e54a176-e260-4436-ad95-d3a4f5c10b10}</Project>
+      <Name>AssemblyLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
