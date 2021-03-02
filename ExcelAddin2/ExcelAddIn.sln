@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelAddIn", "ExcelAddIn.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaperSetting", "..\PaperSetting\PaperSetting.csproj", "{54646763-9077-4586-B318-6A50F28CDA15}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ExcelAddinSetup", "..\ExcelAddinSetup\ExcelAddinSetup.vdproj", "{62F610F0-A4A6-4671-AA65-A6ED6274BB87}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,8 @@ Global
 		{54646763-9077-4586-B318-6A50F28CDA15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54646763-9077-4586-B318-6A50F28CDA15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54646763-9077-4586-B318-6A50F28CDA15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62F610F0-A4A6-4671-AA65-A6ED6274BB87}.Debug|Any CPU.ActiveCfg = Debug
+		{62F610F0-A4A6-4671-AA65-A6ED6274BB87}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
