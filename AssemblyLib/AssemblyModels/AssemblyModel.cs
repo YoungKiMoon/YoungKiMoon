@@ -1,94 +1,1 @@
-﻿using AssemblyLib.Utils;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AssemblyLib.AssemblyModels
-{
-    public class AssemblyModel : Notifier
-    {
-        public AssemblyModel()
-        {
-            ShellInput = new ObservableCollection<ShellInputModel>();
-            ShellOutput = new ObservableCollection<ShellOutputModel>();
-        }
-
-        private ObservableCollection<ShellInputModel> _ShellInput;
-        public ObservableCollection<ShellInputModel> ShellInput
-        {
-            get { return _ShellInput; }
-            set
-            {
-                _ShellInput = value;
-                OnPropertyChanged(nameof(ShellInput));
-            }
-        }
-
-        private ObservableCollection<ShellOutputModel> _ShellOutput;
-        public ObservableCollection<ShellOutputModel> ShellOutput
-        {
-            get { return _ShellOutput; }
-            set
-            {
-                _ShellOutput = value;
-                OnPropertyChanged(nameof(ShellOutput));
-            }
-        }
-
-        #region Sample Data
-        public void CreateSampleAssembly()
-        {
-            // Input Data
-            ShellInputModel newInput = new ShellInputModel();
-            newInput.No = "1";
-            newInput.ID = "48000";
-            newInput.Height = "16400";
-            newInput.PLWidth = "10000";
-            newInput.PLHeight = "2400";
-
-            ShellInput.Add(newInput);
-
-
-            // Output Data
-            List<string[]> newCourseList = new List<string[]>();
-            string[] newCourseStr1 = new string[7] { "1", "1st", "19", "0", "2400", "9432", "16" };
-            string[] newCourseStr2 = new string[7] { "2", "2nd", "17", "3144", "2400", "9432", "16" };
-            string[] newCourseStr3 = new string[7] { "3", "3rd", "15", "6288", "2400", "9432", "16" };
-            string[] newCourseStr4 = new string[7] { "4", "4th", "12", "0", "2400", "9432", "16" };
-            string[] newCourseStr5 = new string[7] { "5", "5th", "10", "3144", "2400", "9432", "16" };
-            string[] newCourseStr6 = new string[7] { "6", "6th", "8", "6288", "2400", "9432", "16" };
-            string[] newCourseStr7 = new string[7] { "7", "7th", "8", "0", "2000", "9432", "16" };
-
-            newCourseList.Add(newCourseStr1);
-            newCourseList.Add(newCourseStr2);
-            newCourseList.Add(newCourseStr3);
-            newCourseList.Add(newCourseStr4);
-            newCourseList.Add(newCourseStr5);
-            newCourseList.Add(newCourseStr6);
-            newCourseList.Add(newCourseStr7);
-
-            foreach (string[] eachStr in newCourseList)
-            {
-                ShellOutputModel newCourse = new ShellOutputModel();
-                newCourse.No = eachStr[0];
-                newCourse.Course = eachStr[1];
-                newCourse.Thickness = eachStr[2];
-                newCourse.StartPoint = eachStr[3];
-                newCourse.OnePLHeight = eachStr[4];
-                newCourse.OnePLWidth = eachStr[5];
-                newCourse.Count = eachStr[6];
-
-                ShellOutput.Add(newCourse);
-            }
-
-        }
-        #endregion
-
-
-
-
-    }
-}
+﻿using AssemblyLib.Utils;using System;using System.Collections.Generic;using System.Collections.ObjectModel;using System.Linq;using System.Text;using System.Threading.Tasks;namespace AssemblyLib.AssemblyModels{	public class AssemblyModel : Notifier	{		public AssemblyModel()		{					GeneralDesignData = new GeneralDesignDataModel();			GeneralCapacityWeight = new ObservableCollection<GeneralCapacityWeightModel>();			GeneralMomentAndShearForceAtBase = new ObservableCollection<GeneralMomentAndShearForceAtBaseModel>();			GeneralMaterialSpecs = new ObservableCollection<GeneralMaterialSpecsModel>();			GeneralCorrosionAllowance = new ObservableCollection<GeneralCorrosionAllowanceModel>();			GeneralEarquake = new ObservableCollection<GeneralEarthquakeModel>();			ShellInput = new ObservableCollection<ShellInputModel>();			ShellOuput = new ObservableCollection<ShellOutputModel>();			RoofInput = new ObservableCollection<RoofInputModel>();			RoofOutput = new ObservableCollection<RoofOutputModel>();			BottomInput = new ObservableCollection<BottomInputModel>();			BottomOutput = new ObservableCollection<BottomOutputModel>();			NozzleInputModel = new ObservableCollection<NozzleInputModel>();			WindGirderInput = new ObservableCollection<WindGirderInputModel>();			WindGirderOutput = new ObservableCollection<WindGirderOutputModel>();			InsulationInput = new ObservableCollection<InsulationInputModel>();			AngleInput = new ObservableCollection<EqualAngleSizeModel>();		}				private GeneralDesignDataModel _GeneralDesignData;		public GeneralDesignDataModel GeneralDesignData			{				get { return _GeneralDesignData; }				set				{					_GeneralDesignData = value;					OnPropertyChanged(nameof(GeneralDesignData));				}			}				private ObservableCollection<GeneralCapacityWeightModel> _GeneralCapacityWeight;		public ObservableCollection<GeneralCapacityWeightModel> GeneralCapacityWeight			{				get { return _GeneralCapacityWeight; }				set				{					_GeneralCapacityWeight = value;					OnPropertyChanged(nameof(GeneralCapacityWeight));				}			}				private ObservableCollection<GeneralMomentAndShearForceAtBaseModel> _GeneralMomentAndShearForceAtBase;		public ObservableCollection<GeneralMomentAndShearForceAtBaseModel> GeneralMomentAndShearForceAtBase			{				get { return _GeneralMomentAndShearForceAtBase; }				set				{					_GeneralMomentAndShearForceAtBase = value;					OnPropertyChanged(nameof(GeneralMomentAndShearForceAtBase));				}			}				private ObservableCollection<GeneralMaterialSpecsModel> _GeneralMaterialSpecs;		public ObservableCollection<GeneralMaterialSpecsModel> GeneralMaterialSpecs			{				get { return _GeneralMaterialSpecs; }				set				{					_GeneralMaterialSpecs = value;					OnPropertyChanged(nameof(GeneralMaterialSpecs));				}			}				private ObservableCollection<GeneralCorrosionAllowanceModel> _GeneralCorrosionAllowance;		public ObservableCollection<GeneralCorrosionAllowanceModel> GeneralCorrosionAllowance			{				get { return _GeneralCorrosionAllowance; }				set				{					_GeneralCorrosionAllowance = value;					OnPropertyChanged(nameof(GeneralCorrosionAllowance));				}			}				private ObservableCollection<GeneralEarthquakeModel> _GeneralEarquake;		public ObservableCollection<GeneralEarthquakeModel> GeneralEarquake			{				get { return _GeneralEarquake; }				set				{					_GeneralEarquake = value;					OnPropertyChanged(nameof(GeneralEarquake));				}			}				private ObservableCollection<ShellInputModel> _ShellInput;		public ObservableCollection<ShellInputModel> ShellInput			{				get { return _ShellInput; }				set				{					_ShellInput = value;					OnPropertyChanged(nameof(ShellInput));				}			}				private ObservableCollection<ShellOutputModel> _ShellOuput;		public ObservableCollection<ShellOutputModel> ShellOuput			{				get { return _ShellOuput; }				set				{					_ShellOuput = value;					OnPropertyChanged(nameof(ShellOuput));				}			}				private ObservableCollection<RoofInputModel> _RoofInput;		public ObservableCollection<RoofInputModel> RoofInput			{				get { return _RoofInput; }				set				{					_RoofInput = value;					OnPropertyChanged(nameof(RoofInput));				}			}				private ObservableCollection<RoofOutputModel> _RoofOutput;		public ObservableCollection<RoofOutputModel> RoofOutput			{				get { return _RoofOutput; }				set				{					_RoofOutput = value;					OnPropertyChanged(nameof(RoofOutput));				}			}				private ObservableCollection<BottomInputModel> _BottomInput;		public ObservableCollection<BottomInputModel> BottomInput			{				get { return _BottomInput; }				set				{					_BottomInput = value;					OnPropertyChanged(nameof(BottomInput));				}			}				private ObservableCollection<BottomOutputModel> _BottomOutput;		public ObservableCollection<BottomOutputModel> BottomOutput			{				get { return _BottomOutput; }				set				{					_BottomOutput = value;					OnPropertyChanged(nameof(BottomOutput));				}			}				private ObservableCollection<NozzleInputModel> _NozzleInputModel;		public ObservableCollection<NozzleInputModel> NozzleInputModel			{				get { return _NozzleInputModel; }				set				{					_NozzleInputModel = value;					OnPropertyChanged(nameof(NozzleInputModel));				}			}				private ObservableCollection<WindGirderInputModel> _WindGirderInput;		public ObservableCollection<WindGirderInputModel> WindGirderInput			{				get { return _WindGirderInput; }				set				{					_WindGirderInput = value;					OnPropertyChanged(nameof(WindGirderInput));				}			}				private ObservableCollection<WindGirderOutputModel> _WindGirderOutput;		public ObservableCollection<WindGirderOutputModel> WindGirderOutput			{				get { return _WindGirderOutput; }				set				{					_WindGirderOutput = value;					OnPropertyChanged(nameof(WindGirderOutput));				}			}				private ObservableCollection<InsulationInputModel> _InsulationInput;		public ObservableCollection<InsulationInputModel> InsulationInput			{				get { return _InsulationInput; }				set				{					_InsulationInput = value;					OnPropertyChanged(nameof(InsulationInput));				}			}				private ObservableCollection<EqualAngleSizeModel> _AngleInput;		public ObservableCollection<EqualAngleSizeModel> AngleInput			{				get { return _AngleInput; }				set				{					_AngleInput = value;					OnPropertyChanged(nameof(AngleInput));				}			}			}}

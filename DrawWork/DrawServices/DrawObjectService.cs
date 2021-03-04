@@ -169,63 +169,6 @@ namespace DrawWork.DrawServices
 
         }
 
-        /*
-        public void DoRectangleBox(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
-        {
-            // 0 : Object
-            // 1 : Command
-            // 2 : Data
-            int refIndex = 1;
-
-
-
-            CDPoint newPoint1 = new CDPoint();
-            double newWidth = 0;
-            double newHeight = 0;
-            CDPoint newSetPoint = new CDPoint();
-            double newRotate = 0;
-
-            for (int j = refIndex; j < eachCmd.Length; j += 2)
-            {
-                switch (eachCmd[j].ToLower())
-                {
-                    case "xy":
-                        if (j + 1 <= eachCmd.Length)
-                            newPoint1 = DrawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                        break;
-
-                    case "w":
-                        if (j + 1 <= eachCmd.Length)
-                            newWidth = ConverterService.Evaluate(eachCmd[j + 1]);
-                        break;
-
-                    case "h":
-                        if (j + 1 <= eachCmd.Length)
-                            newHeight = ConverterService.Evaluate(eachCmd[j + 1]);
-                        break;
-
-                    case "r":
-                        if (j + 1 <= eachCmd.Length)
-                            newRotate = ConverterService.Evaluate(eachCmd[j + 1]);
-                        break;
-
-                    case "sp":
-                        if (j + 1 <= eachCmd.Length)
-                        {
-                            newSetPoint = DrawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                            curPoint.X = newSetPoint.X;
-                            curPoint.Y = newSetPoint.Y;
-                        }
-                        break;
-                }
-
-            }
-
-            // Create Line
-            DrawService.Draw_RectangleBox(newPoint1, newWidth, newHeight, newRotate);
-
-        }
-        */
         public Text DoText(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             // 0 : Object

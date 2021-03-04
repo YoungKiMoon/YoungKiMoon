@@ -42,12 +42,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyModels\AssemblyModel.cs" />
+    <Compile Include="AssemblyModels\BottomInputModel.cs" />
+    <Compile Include="AssemblyModels\BottomOutputModel.cs" />
+    <Compile Include="AssemblyModels\EqualAngleSizeModel.cs" />
     <Compile Include="AssemblyModels\GeneralCapacityWeightModel.cs" />
+    <Compile Include="AssemblyModels\GeneralCorrosionAllowanceModel.cs" />
     <Compile Include="AssemblyModels\GeneralDesignDataModel.cs" />
-    <Compile Include="AssemblyModels\GeneralModel.cs" />
-    <Compile Include="AssemblyModels\SampleClass.cs" />
-    <Compile Include="AssemblyModels\SheelOutputModel.cs" />
+    <Compile Include="AssemblyModels\GeneralEarthquakeModel.cs" />
+    <Compile Include="AssemblyModels\GeneralMaterialSpecsModel.cs" />
+    <Compile Include="AssemblyModels\GeneralMomentAndShearForceAtBaseModel.cs" />
+    <Compile Include="AssemblyModels\InsulationInputModel.cs" />
+    <Compile Include="AssemblyModels\NozzleInputModel.cs" />
+    <Compile Include="AssemblyModels\RoofInputModel.cs" />
+    <Compile Include="AssemblyModels\RoofOutputModel.cs" />
     <Compile Include="AssemblyModels\ShellInputModel.cs" />
+    <Compile Include="AssemblyModels\ShellOutputModel.cs" />
+    <Compile Include="AssemblyModels\WindGirderInputModel.cs" />
+    <Compile Include="AssemblyModels\WindGirderOutputModel.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Notifier.cs" />
