@@ -62,6 +62,7 @@
     <Compile Include="CommandModels\BasicCommandModel.cs" />
     <Compile Include="CommandModels\CommandLineModel.cs" />
     <Compile Include="CommandServices\CommandBasicService.cs" />
+    <Compile Include="CommandServices\TranslateDataModelService.cs" />
     <Compile Include="CommandServices\TranslateDataService.cs" />
     <Compile Include="DrawBuilders\LogicBuilder.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />

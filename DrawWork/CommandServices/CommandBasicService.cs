@@ -68,14 +68,18 @@ namespace DrawWork.CommandServices
         public void ExecuteCommand()
         {
             commandData.commandListTrans = commandTranslate.TranslateCommand(commandData.commandList);
-
-            commandTranslate.TranslateModelData(commandData.commandListTrans);
+            commandTranslate.TranslateUsing(commandData.commandListTrans);
+            commandData.commandListTransFunciton = commandTranslate.TranslateCommandFunction(commandData.commandListTrans);
+            commandTranslate.TranslateModelData(commandData.commandListTransFunciton);
 
             CDPoint refPoint = commandData.drawPoint.referencePoint;
             CDPoint curPoint = commandData.drawPoint.currentPoint;
 
-            foreach (string[] eachCmd in commandData.commandListTrans)
+            foreach (string[] eachCmd in commandData.commandListTransFunciton)
             {
+                if (eachCmd == null)
+                    continue;
+
                 int dmRepeatCount = commandTranslate.DrawMethod_Repeat(eachCmd);
                 dmRepeatCount++;
                 for (int dmCount = 1; dmCount <= dmRepeatCount; dmCount++)

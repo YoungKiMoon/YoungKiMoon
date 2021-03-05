@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DrawWork.ValueServices
 {
@@ -10,6 +11,27 @@ namespace DrawWork.ValueServices
     {
         public ValueService()
         {
+
+        }
+        public bool CheckIntValue(string selValue)
+        {
+            try
+            {
+                int intValue = 0;
+                if (int.TryParse(selValue, out intValue))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+
 
         }
         public int GetIntValue(string selValue)
@@ -32,8 +54,18 @@ namespace DrawWork.ValueServices
         }
         public double Evaluate(string expression)
         {
-            System.Data.DataTable table = new System.Data.DataTable();
-            return Convert.ToDouble(table.Compute(expression, String.Empty));
+            try
+            {
+                System.Data.DataTable table = new System.Data.DataTable();
+                return Convert.ToDouble(table.Compute(expression, String.Empty));
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(expression ,"계산 오류" );
+                return 0;
+            }
+
+
         }
     }
 }
