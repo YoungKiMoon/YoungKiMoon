@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ namespace DrawWork.ValueServices
             }
             catch(Exception ex)
             {
+                Debug.WriteLine(ex.Message);
                 return false;
             }
 
@@ -61,6 +63,7 @@ namespace DrawWork.ValueServices
             }
             catch(Exception ex)
             {
+                Debug.WriteLine(ex.Message);
                 MessageBox.Show(expression ,"계산 오류" );
                 return 0;
             }
