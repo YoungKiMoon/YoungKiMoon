@@ -63,30 +63,12 @@ namespace DrawWork.DrawServices
             return newLine;
         }
 
-        /*
-        public void Draw_RectangleBox(CDPoint selPoint1, double selWidth, double selHeight, double selRotate)
+
+        public Arc Draw_Arc(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3)
         {
-
-            double[] point1 = new double[3] { selPoint1.x, selPoint1.y, 0 };
-            double[] point2 = new double[3] { selPoint1.x + selWidth, selPoint1.y, 0 };
-            double[] point3 = new double[3] { selPoint1.x + selWidth, selPoint1.y + selHeight, 0 };
-            double[] point4 = new double[3] { selPoint1.x, selPoint1.y + selHeight, 0 };
-
-            double rotateAngle = selRotate * 3.141592 / 180;
-
-            var cc = currentDocument.ModelSpace.AddLightWeightPolyline((object)new double[8]
-                {   point1[0],point1[1],
-                    point2[0],point2[1],
-                    point3[0],point3[1],
-                    point4[0],point4[1]
-                });
-            cc.Closed = true;
-            cc.Rotate(point2, rotateAngle);
-            cc.Update();
-
-
+            Arc newArc = new Arc(new Point3D(selPoint1.X, selPoint1.Y,0), new Point3D(selPoint2.X, selPoint2.Y, 0), new Point3D(selPoint3.X, selPoint3.Y, 0));
+            return newArc;
         }
-        */
         public Text Draw_Text(CDPoint selPoint1, string selText, double selHeight, string selAlign)
         {
 

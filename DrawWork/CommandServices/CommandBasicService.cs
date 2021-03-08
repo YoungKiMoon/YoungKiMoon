@@ -118,6 +118,10 @@ namespace DrawWork.CommandServices
                     commandEntities.Add(drawObject.DoLine(eachCmd, ref refPoint, ref curPoint));
                     break;
 
+                case "arc":
+                    commandEntities.Add(drawObject.DoArc(eachCmd, ref refPoint, ref curPoint));
+                    break;
+
                 case "text":
                     commandEntities.Add(drawObject.DoText(eachCmd, ref refPoint, ref curPoint));
                     break;
@@ -138,6 +142,16 @@ namespace DrawWork.CommandServices
                 case "dimline":
                     commandEntities.Add(drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint));
                     break;
+
+                // Block
+                case "blocktopangle":
+                case "topangle":
+                    Entity[] newTopAngle = drawObject.DoBlockTopAngle(eachCmd, ref refPoint, ref curPoint, assemblyData.AngleInput);
+                    foreach (Entity eachEntity in newTopAngle)
+                        commandEntities.Add(eachEntity);
+                    break;
+
+
 
             }
 

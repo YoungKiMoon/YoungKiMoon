@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,16 +15,20 @@ using devDept.Serialization;
 using DrawWork.DrawModels;
 using DrawWork.ValueServices;
 
+using AssemblyLib.AssemblyModels;
+
 namespace DrawWork.DrawServices
 {
     public class DrawObjectService
     {
         private DrawService drawService;
+        private DrawBlockService drawBlockService;
         private ValueService valueService;
 
         public DrawObjectService()
         {
             drawService = new DrawService();
+            drawBlockService = new DrawBlockService();
             valueService = new ValueService();
         }
 
@@ -169,6 +174,54 @@ namespace DrawWork.DrawServices
 
         }
 
+        public Arc DoArc(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "xy1":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "xy2":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint2 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "xy3":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint3 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            // Create Line
+            return drawService.Draw_Arc(newPoint1, newPoint2,newPoint3);
+
+        }
+
         public Text DoText(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             // 0 : Object
@@ -289,6 +342,76 @@ namespace DrawWork.DrawServices
 
             return drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newTextHeight, newTextGap, newArrowSize, 0);
 
+        }
+
+
+
+        public Entity[] DoBlockTopAngle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, ObservableCollection<EqualAngleSizeModel> selAngleSize)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            string newAngleType = "";
+            string newAngleSize = "";
+            EqualAngleSizeModel newAngle = new EqualAngleSizeModel();
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "xy":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "type":
+                        if (j + 1 <= eachCmd.Length)
+                            newAngleType = eachCmd[j + 1];
+                        break;
+
+                    case "size":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newAngleSize = eachCmd[j + 1];
+                            foreach(EqualAngleSizeModel eachAngle in selAngleSize)
+                            {
+                                if (eachAngle.Size == newAngleSize)
+                                {
+                                    newAngle = eachAngle;
+                                }
+                            }
+                        }
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            // Create Line
+            if(newAngleType!="" && newAngleSize != "")
+            {
+                return drawBlockService.DrawBlock_TopAngle(newPoint1, newAngleType, newAngle);
+            }
+            else
+            {
+                return null;
+            }
+            
         }
     }
 }
