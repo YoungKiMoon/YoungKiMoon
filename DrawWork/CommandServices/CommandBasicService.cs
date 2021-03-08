@@ -118,6 +118,10 @@ namespace DrawWork.CommandServices
                     commandEntities.Add(drawObject.DoLine(eachCmd, ref refPoint, ref curPoint));
                     break;
 
+                case "linedgree":
+                    commandEntities.Add(drawObject.DoLineDgree(eachCmd, ref refPoint, ref curPoint));
+                    break;
+
                 case "arc":
                     commandEntities.Add(drawObject.DoArc(eachCmd, ref refPoint, ref curPoint));
                     break;
@@ -151,6 +155,12 @@ namespace DrawWork.CommandServices
                         commandEntities.Add(eachEntity);
                     break;
 
+                // Contact Point
+                case "cp":
+                case "cpoint":
+                case "contactpoint":
+                    drawObject.DoContactPoint(eachCmd, ref refPoint, ref curPoint,assemblyData);
+                    break;
 
 
             }

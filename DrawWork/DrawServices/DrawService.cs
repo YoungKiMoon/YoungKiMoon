@@ -53,6 +53,17 @@ namespace DrawWork.DrawServices
             Line newLine = new Line(selPoint1.X, selPoint1.Y, selPoint2.X, selPoint2.Y);
             return newLine;
         }
+        public Line Draw_Line(CDPoint selPoint1, CDPoint selPoint2, double selDegree)
+        {
+            // arctan // X: 1로 고정
+            double calDegree = Math.Atan2(1,selDegree);
+
+            double tempWidth = Point3D.Distance(new Point3D(selPoint1.X,selPoint1.Y,selPoint1.Z), new Point3D(selPoint2.X, selPoint2.Y, selPoint2.Z));
+            double tempHeight = tempWidth * calDegree;
+            Line newLine = new Line(selPoint1.X, selPoint1.Y, selPoint2.X, selPoint1.Y + tempHeight);
+            return newLine;
+        }
+
         public Line[] Draw_Rectangle(CDPoint selPoint1, double selWidth, double selHeight)
         {
             Line[] newLine = new Line[4];

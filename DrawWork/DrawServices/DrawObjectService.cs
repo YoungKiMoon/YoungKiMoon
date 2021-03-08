@@ -16,6 +16,7 @@ using DrawWork.DrawModels;
 using DrawWork.ValueServices;
 
 using AssemblyLib.AssemblyModels;
+using System.Diagnostics;
 
 namespace DrawWork.DrawServices
 {
@@ -23,12 +24,16 @@ namespace DrawWork.DrawServices
     {
         private DrawService drawService;
         private DrawBlockService drawBlockService;
+        private DrawContactPointService cpService;
+
         private ValueService valueService;
 
         public DrawObjectService()
         {
             drawService = new DrawService();
             drawBlockService = new DrawBlockService();
+            cpService = new DrawContactPointService();
+
             valueService = new ValueService();
         }
 
@@ -120,6 +125,84 @@ namespace DrawWork.DrawServices
 
             // Create Line
             return drawService.Draw_Line(newPoint1, newPoint2);
+
+        }
+        public Line DoLineDgree(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+            double newDgree = 0;
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "xy1":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "xy2":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint2 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "degree":
+                        if (j + 1 <= eachCmd.Length)
+                            newDgree = valueService.GetDoubleValue(eachCmd[j + 1]);
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            Line returnEntity= drawService.Draw_Line(newPoint1, newPoint2, newDgree);
+            // Mirror
+            if (returnEntity != null)
+            {
+                for (int j = refIndex; j < eachCmd.Length; j += 2)
+                {
+                    switch (eachCmd[j].ToLower())
+                    {
+                        case "mirror":
+                            if (j + 1 <= eachCmd.Length)
+                            {
+                                switch (eachCmd[j + 1].ToLower())
+                                {
+                                    case "right":
+
+                                        Plane pl1 = Plane.YZ;
+                                        pl1.Origin.X = newPoint2.X;
+                                        pl1.Origin.Y = newPoint2.Y;
+                                        Mirror customMirror = new Mirror(pl1);
+                                        returnEntity.TransformBy(customMirror);
+                                        break;
+                                }
+                            }
+
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            break;
+
+
+                    }
+                }
+            }
+
+            return returnEntity;
 
         }
 
@@ -402,16 +485,73 @@ namespace DrawWork.DrawServices
                 }
             }
 
+            Entity[] returnEntity = null; 
             // Create Line
-            if(newAngleType!="" && newAngleSize != "")
+            if (newAngleType!="" && newAngleSize != "")
+                returnEntity= drawBlockService.DrawBlock_TopAngle(newPoint1, newAngleType, newAngle);
+
+
+
+            // Mirror
+            if (returnEntity != null)
             {
-                return drawBlockService.DrawBlock_TopAngle(newPoint1, newAngleType, newAngle);
+                for (int j = refIndex; j < eachCmd.Length; j += 2)
+                {
+                    switch (eachCmd[j].ToLower())
+                    {
+                        case "mirror":
+                            if (j + 1 <= eachCmd.Length)
+                            {
+                                switch (eachCmd[j + 1].ToLower())
+                                {
+                                    case "right":
+                                        
+                                        Plane pl1 = Plane.YZ;
+                                        pl1.Origin.X = newPoint1.X;
+                                        pl1.Origin.Y = newPoint1.Y;
+                                        Mirror customMirror = new Mirror(pl1);
+                                        foreach (Entity eachEntity in returnEntity)
+                                        {
+                                            eachEntity.TransformBy(customMirror);
+                                        }
+                                        break;
+                                }
+                            }
+
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            break;
+
+
+                    }
+                }
             }
-            else
+            return returnEntity;
+        }
+
+        // Contact Point
+        public void DoContactPoint(string[] eachCmd,ref CDPoint refPoint, ref CDPoint curPoint, AssemblyModel selAssembly)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                return null;
+                newPoint1 = cpService.ContactPoint(eachCmd[j].ToLower(), ref refPoint, ref curPoint, selAssembly);
+                if (newPoint1 != null)
+                {
+                    curPoint = (CDPoint)newPoint1.Clone();
+
+                }
+                    
             }
-            
+
         }
     }
 }

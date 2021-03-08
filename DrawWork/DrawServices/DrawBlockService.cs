@@ -47,6 +47,7 @@ namespace DrawWork.DrawServices
             switch (selAngleType){
                 case "b":
                     drawPoint = GetSumPoint(drawPoint, -AB, -AB);
+                    
                     break;
 
             }
