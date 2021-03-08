@@ -155,6 +155,11 @@ namespace DrawWork.CommandServices
                         commandEntities.Add(eachEntity);
                     break;
 
+                // Nozzle
+                case "nozzle":
+                    Entity[] newNozzle = drawObject.DoNozzle(eachCmd, ref refPoint, ref curPoint, assemblyData);
+                    break;
+
                 // Contact Point
                 case "cp":
                 case "cpoint":

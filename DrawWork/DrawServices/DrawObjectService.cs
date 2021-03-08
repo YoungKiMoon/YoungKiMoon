@@ -24,6 +24,8 @@ namespace DrawWork.DrawServices
     {
         private DrawService drawService;
         private DrawBlockService drawBlockService;
+        private DrawNozzleService drawNozzleService;
+
         private DrawContactPointService cpService;
 
         private ValueService valueService;
@@ -32,6 +34,8 @@ namespace DrawWork.DrawServices
         {
             drawService = new DrawService();
             drawBlockService = new DrawBlockService();
+            drawNozzleService = new DrawNozzleService();
+
             cpService = new DrawContactPointService();
 
             valueService = new ValueService();
@@ -428,7 +432,7 @@ namespace DrawWork.DrawServices
         }
 
 
-
+        // Block
         public Entity[] DoBlockTopAngle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, ObservableCollection<EqualAngleSizeModel> selAngleSize)
         {
             // 0 : Object
@@ -528,8 +532,60 @@ namespace DrawWork.DrawServices
             return returnEntity;
         }
 
+        // Nozzle
+        public Entity[] DoNozzle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, AssemblyModel selAssembly)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            string newNozzleType = "";
+            string newNozzlePosition = "";
+            NozzleInputModel newNozzle = new NozzleInputModel();
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+
+                    case "type":
+                        if (j + 1 <= eachCmd.Length)
+                            newNozzleType = eachCmd[j + 1];
+                        break;
+
+                    case "position":
+                        if (j + 1 <= eachCmd.Length)
+                            newNozzlePosition = eachCmd[j + 1];
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            Entity[] returnEntity = null;
+            // Create Line
+            if (newNozzleType != "" && newNozzlePosition != "")
+                returnEntity = drawNozzleService.DrawNozzle_GA(ref refPoint,newNozzleType,newNozzlePosition, selAssembly);
+
+            return returnEntity;
+        }
+
         // Contact Point
-        public void DoContactPoint(string[] eachCmd,ref CDPoint refPoint, ref CDPoint curPoint, AssemblyModel selAssembly)
+        public void DoContactPoint(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, AssemblyModel selAssembly)
         {
             // 0 : Object
             // 1 : Command
@@ -549,9 +605,11 @@ namespace DrawWork.DrawServices
                     curPoint = (CDPoint)newPoint1.Clone();
 
                 }
-                    
+
             }
 
         }
+
+
     }
 }

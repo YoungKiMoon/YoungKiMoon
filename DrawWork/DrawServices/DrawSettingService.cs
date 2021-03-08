@@ -213,46 +213,78 @@ namespace DrawWork.DrawServices
 
                 }
                 #endregion
+
+                #region Angle
+                if (false)
+                {
+                    // Current Test
+                    double AB = 50;
+                    double t = 6;
+                    double R1 = 6.5;
+                    double R2 = 4.5;
+                    double CD = 14.4;
+                    double E = 10;
+
+                    Point3D drawPoint = new Point3D(0, 0, 0);
+
+                    Line lineA = new Line(new Point3D(0, AB, 0), new Point3D(AB, AB, 0));
+                    Line lineAa = new Line(new Point3D(0, AB - t, 0), new Point3D(AB - t, AB - t, 0));
+                    Line lineAt = new Line(new Point3D(0, AB, 0), new Point3D(0, AB - t, 0));
+                    Line lineB = new Line(new Point3D(AB, AB, 0), new Point3D(AB, 0, 0));
+                    Line lineBb = new Line(new Point3D(AB - t, AB - t, 0), new Point3D(AB - t, 0, 0));
+                    Line lineBt = new Line(new Point3D(AB - t, 0, 0), new Point3D(AB, 0, 0));
+
+
+                    //singleModel.Entities.Add(lineB, Color.Red);
+                    //singleModel.Entities.Add(lineBb, Color.Green);
+
+                    Arc arcFillet1;
+                    if (Curve.Fillet(lineAt, lineAa, R2, false, false, true, true, out arcFillet1))
+                        singleModel.Entities.Add(arcFillet1, Color.Blue);
+                    Arc arcFillet2;
+                    if (Curve.Fillet(lineBb, lineBt, R2, false, false, true, true, out arcFillet2))
+                        singleModel.Entities.Add(arcFillet2, Color.Blue);
+                    Arc arcFillet3;
+                    if (Curve.Fillet(lineAa, lineBb, R1, false, false, true, true, out arcFillet3))
+                        singleModel.Entities.Add(arcFillet3, Color.Blue);
+
+                    singleModel.Entities.Add(lineA, Color.Red);
+                    singleModel.Entities.Add(lineAa, Color.Green);
+                    singleModel.Entities.Add(lineAt, Color.Blue);
+                    singleModel.Entities.Add(lineB, Color.Red);
+                    singleModel.Entities.Add(lineBb, Color.Green);
+                    singleModel.Entities.Add(lineBt, Color.Blue);
+                }
+                #endregion
             }
             else
             {
                 // Current Test
-                double AB = 50;
-                double t = 6;
-                double R1 = 6.5;
-                double R2 = 4.5;
-                double CD = 14.4;
-                double E = 10;
+                double flangeFaceWidth = 10;
+                double flangeFaceHeight = 80;
+                double flangeFaceInnerWidth = 10;
+                double flangePipeWidth = 24;
+                double flangePipeHeight = flangeFaceHeight-(flangeFaceInnerWidth * 2);
+                double flangePipeInnerWidth = 14;
+                double pipeHeight = flangePipeHeight-(flangePipeInnerWidth * 2);
+                double pipeWidth = 40;
+                double fullWidth = flangeFaceWidth + flangePipeWidth + pipeWidth;
 
                 Point3D drawPoint = new Point3D(0, 0, 0);
 
-                Line lineA = new Line(new Point3D(0, AB, 0), new Point3D(AB, AB, 0));
-                Line lineAa = new Line(new Point3D(0, AB - t, 0), new Point3D(AB - t, AB - t, 0));
-                Line lineAt = new Line(new Point3D(0, AB, 0), new Point3D(0, AB - t, 0));
-                Line lineB = new Line(new Point3D(AB, AB, 0), new Point3D(AB, 0, 0));
-                Line lineBb = new Line(new Point3D(AB - t, AB - t, 0), new Point3D(AB - t, 0, 0));
-                Line lineBt = new Line(new Point3D(AB - t, 0, 0), new Point3D(AB, 0, 0));
+                Line lineFFa = new Line(new Point3D(0, 0, 0), new Point3D(0, flangeFaceHeight, 0));
+                Line lineFFb = new Line(new Point3D(flangeFaceWidth, 0, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
+                Line lineFFc = new Line(new Point3D(0, 0, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
+                Line lineFFd = new Line(new Point3D(flangeFaceWidth, flangeFaceHeight, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
 
+                Line lineFPa = new Line(new Point3D(flangeFaceWidth, flangeFaceInnerWidth + flangePipeHeight, 0), new Point3D(flangeFaceWidth+ flangePipeWidth, flangePipeInnerWidth+pipeHeight, 0));
+                Line lineFPb = new Line(new Point3D(flangeFaceWidth, flangeFaceInnerWidth , 0), new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0));
+                Line lineFPc = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth + pipeHeight, 0), new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0));
 
-                //singleModel.Entities.Add(lineB, Color.Red);
-                //singleModel.Entities.Add(lineBb, Color.Green);
+                Line linePa = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, 0, 0), new Point3D(flangeFaceWidth + flangePipeWidth + pipeWidth, 0, 0));
+                Line linePb = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth + pipeHeight, 0), new Point3D(flangeFaceWidth + flangePipeWidth + pipeWidth, flangePipeInnerWidth + pipeHeight, 0));
 
-                Arc arcFillet1;
-                if (Curve.Fillet(lineAt, lineAa, R2, false, false, true, true, out arcFillet1))
-                    singleModel.Entities.Add(arcFillet1, Color.Blue);
-                Arc arcFillet2;
-                if (Curve.Fillet(lineBb, lineBt, R2, false, false, true, true, out arcFillet2))
-                    singleModel.Entities.Add(arcFillet2, Color.Blue);
-                Arc arcFillet3;
-                if (Curve.Fillet(lineAa, lineBb, R1, false, false, true, true, out arcFillet3))
-                    singleModel.Entities.Add(arcFillet3, Color.Blue);
-
-                singleModel.Entities.Add(lineA, Color.Red);
-                singleModel.Entities.Add(lineAa, Color.Green);
-                singleModel.Entities.Add(lineAt, Color.Blue);
-                singleModel.Entities.Add(lineB, Color.Red);
-                singleModel.Entities.Add(lineBb, Color.Green);
-                singleModel.Entities.Add(lineBt, Color.Blue);
+                singleModel.Entities.AddRange(new Entity[]{ lineFFa,lineFFb,lineFFc, lineFFd, lineFPa, lineFPb,lineFPc, linePa,linePb});
 
             }
 

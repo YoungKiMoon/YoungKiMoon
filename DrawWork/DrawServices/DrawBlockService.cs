@@ -1,9 +1,4 @@
-﻿using AssemblyLib.AssemblyModels;
-
-using DrawWork.ValueServices;
-using DrawWork.DrawModels;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,8 +12,12 @@ using devDept.Geometry;
 using devDept.Serialization;
 using MColor = System.Windows.Media.Color;
 
-
 //using Color = System.Drawing.Color;
+
+using AssemblyLib.AssemblyModels;
+
+using DrawWork.ValueServices;
+using DrawWork.DrawModels;
 
 namespace DrawWork.DrawServices
 {

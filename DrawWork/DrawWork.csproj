@@ -68,6 +68,7 @@
     <Compile Include="DrawModels\DrawPointModel.cs" />
     <Compile Include="DrawServices\DrawBlockService.cs" />
     <Compile Include="DrawServices\DrawContactPointService.cs" />
+    <Compile Include="DrawServices\DrawNozzleService.cs" />
     <Compile Include="DrawServices\DrawObjectService.cs" />
     <Compile Include="DrawServices\DrawSettingService.cs" />
     <Compile Include="FileServices\TextFileService.cs" />
