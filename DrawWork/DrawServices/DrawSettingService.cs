@@ -265,8 +265,8 @@ namespace DrawWork.DrawServices
                 double flangeFaceInnerWidth = 10;
                 double flangePipeWidth = 24;
                 double flangePipeHeight = flangeFaceHeight-(flangeFaceInnerWidth * 2);
-                double flangePipeInnerWidth = 14;
-                double pipeHeight = flangePipeHeight-(flangePipeInnerWidth * 2);
+                double flangePipeInnerWidth = 18;
+                double pipeHeight = flangeFaceHeight - (flangePipeInnerWidth * 2);
                 double pipeWidth = 40;
                 double fullWidth = flangeFaceWidth + flangePipeWidth + pipeWidth;
 
@@ -274,14 +274,14 @@ namespace DrawWork.DrawServices
 
                 Line lineFFa = new Line(new Point3D(0, 0, 0), new Point3D(0, flangeFaceHeight, 0));
                 Line lineFFb = new Line(new Point3D(flangeFaceWidth, 0, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
-                Line lineFFc = new Line(new Point3D(0, 0, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
-                Line lineFFd = new Line(new Point3D(flangeFaceWidth, flangeFaceHeight, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
+                Line lineFFc = new Line(new Point3D(0, 0, 0), new Point3D(flangeFaceWidth, 0, 0));
+                Line lineFFd = new Line(new Point3D(0, flangeFaceHeight, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
 
                 Line lineFPa = new Line(new Point3D(flangeFaceWidth, flangeFaceInnerWidth + flangePipeHeight, 0), new Point3D(flangeFaceWidth+ flangePipeWidth, flangePipeInnerWidth+pipeHeight, 0));
                 Line lineFPb = new Line(new Point3D(flangeFaceWidth, flangeFaceInnerWidth , 0), new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0));
                 Line lineFPc = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth + pipeHeight, 0), new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0));
 
-                Line linePa = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, 0, 0), new Point3D(flangeFaceWidth + flangePipeWidth + pipeWidth, 0, 0));
+                Line linePa = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0), new Point3D(flangeFaceWidth + flangePipeWidth + pipeWidth, flangePipeInnerWidth, 0));
                 Line linePb = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth + pipeHeight, 0), new Point3D(flangeFaceWidth + flangePipeWidth + pipeWidth, flangePipeInnerWidth + pipeHeight, 0));
 
                 singleModel.Entities.AddRange(new Entity[]{ lineFFa,lineFFb,lineFFc, lineFFd, lineFPa, lineFPb,lineFPc, linePa,linePb});

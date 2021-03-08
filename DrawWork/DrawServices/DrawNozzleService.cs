@@ -57,23 +57,57 @@ namespace DrawWork.DrawServices
 
             }
 
-            foreach(NozzleInputModel eachNozzle in selAssembly.NozzleInputModel)
+
+
+            // Model
+            double flangeFaceWidth = 10;
+            double flangeFaceHeight = 80;
+            double flangeFaceInnerWidth = 10;
+            double flangePipeWidth = 24;
+            double flangePipeHeight = flangeFaceHeight - (flangeFaceInnerWidth * 2);
+            double flangePipeInnerWidth = 18;
+            double pipeHeight = flangeFaceHeight - (flangePipeInnerWidth * 2);
+            double pipeWidth = 40;
+            double fullWidth = flangeFaceWidth + flangePipeWidth + pipeWidth;
+
+            foreach (NozzleInputModel eachNozzle in selAssembly.NozzleInputModel)
             {
                 if (eachNozzle.Position.ToLower() == selNozzlePosition)
                 {
-
+                    Point3D drawPoint = new Point3D(0, 0, 0);
                 }
             }
+
+
+            Line lineFFa = new Line(new Point3D(0, 0, 0), new Point3D(0, flangeFaceHeight, 0));
+            Line lineFFb = new Line(new Point3D(flangeFaceWidth, 0, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
+            Line lineFFc = new Line(new Point3D(0, 0, 0), new Point3D(flangeFaceWidth, 0, 0));
+            Line lineFFd = new Line(new Point3D(0, flangeFaceHeight, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
+
+            Line lineFPa = new Line(new Point3D(flangeFaceWidth, flangeFaceInnerWidth + flangePipeHeight, 0), new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth + pipeHeight, 0));
+            Line lineFPb = new Line(new Point3D(flangeFaceWidth, flangeFaceInnerWidth, 0), new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0));
+            Line lineFPc = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth + pipeHeight, 0), new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0));
+
+            Line linePa = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0), new Point3D(flangeFaceWidth + flangePipeWidth + pipeWidth, flangePipeInnerWidth, 0));
+            Line linePb = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth + pipeHeight, 0), new Point3D(flangeFaceWidth + flangePipeWidth + pipeWidth, flangePipeInnerWidth + pipeHeight, 0));
+
 
             // Line
             // Circle
 
 
-
+            // Entity
             List<Entity> customBlockList = new List<Entity>();
+            customBlockList.Add(lineFFa);
+            customBlockList.Add(lineFFb);
+            customBlockList.Add(lineFFc);
+            customBlockList.Add(lineFFd);
+            customBlockList.Add(lineFPa);
+            customBlockList.Add(lineFPb);
+            customBlockList.Add(lineFPc);
+            customBlockList.Add(linePa);
+            customBlockList.Add(linePb);
 
-
-            //customBlockList.Add(lineA);
 
             return customBlockList.ToArray();
         }
