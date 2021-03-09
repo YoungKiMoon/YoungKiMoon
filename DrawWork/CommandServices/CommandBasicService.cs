@@ -158,6 +158,8 @@ namespace DrawWork.CommandServices
                 // Nozzle
                 case "nozzle":
                     Entity[] newNozzle = drawObject.DoNozzle(eachCmd, ref refPoint, ref curPoint, assemblyData);
+                    foreach (Entity eachEntity in newNozzle)
+                        commandEntities.Add(eachEntity);
                     break;
 
                 // Contact Point

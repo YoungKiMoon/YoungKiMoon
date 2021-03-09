@@ -256,35 +256,64 @@ namespace DrawWork.DrawServices
                     singleModel.Entities.Add(lineBt, Color.Blue);
                 }
                 #endregion
+
+                #region Nozzle
+                if (false)
+                {
+                    // Current Test
+                    double flangeFaceWidth = 10;
+                    double flangeFaceHeight = 80;
+                    double flangeFaceInnerWidth = 10;
+                    double flangePipeWidth = 24;
+                    double flangePipeHeight = flangeFaceHeight - (flangeFaceInnerWidth * 2);
+                    double flangePipeInnerWidth = 18;
+                    double pipeHeight = flangeFaceHeight - (flangePipeInnerWidth * 2);
+                    double pipeWidth = 40;
+                    double fullWidth = flangeFaceWidth + flangePipeWidth + pipeWidth;
+
+                    Point3D drawPoint = new Point3D(0, 0, 0);
+
+                    Line lineFFa = new Line(new Point3D(0, 0, 0), new Point3D(0, flangeFaceHeight, 0));
+                    Line lineFFb = new Line(new Point3D(flangeFaceWidth, 0, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
+                    Line lineFFc = new Line(new Point3D(0, 0, 0), new Point3D(flangeFaceWidth, 0, 0));
+                    Line lineFFd = new Line(new Point3D(0, flangeFaceHeight, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
+
+                    Line lineFPa = new Line(new Point3D(flangeFaceWidth, flangeFaceInnerWidth + flangePipeHeight, 0), new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth + pipeHeight, 0));
+                    Line lineFPb = new Line(new Point3D(flangeFaceWidth, flangeFaceInnerWidth, 0), new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0));
+                    Line lineFPc = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth + pipeHeight, 0), new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0));
+
+                    Line linePa = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0), new Point3D(flangeFaceWidth + flangePipeWidth + pipeWidth, flangePipeInnerWidth, 0));
+                    Line linePb = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth + pipeHeight, 0), new Point3D(flangeFaceWidth + flangePipeWidth + pipeWidth, flangePipeInnerWidth + pipeHeight, 0));
+
+                    singleModel.Entities.AddRange(new Entity[] { lineFFa, lineFFb, lineFFc, lineFFd, lineFPa, lineFPb, lineFPc, linePa, linePb });
+                }
+                #endregion
+
             }
             else
             {
                 // Current Test
-                double flangeFaceWidth = 10;
-                double flangeFaceHeight = 80;
-                double flangeFaceInnerWidth = 10;
-                double flangePipeWidth = 24;
-                double flangePipeHeight = flangeFaceHeight-(flangeFaceInnerWidth * 2);
-                double flangePipeInnerWidth = 18;
-                double pipeHeight = flangeFaceHeight - (flangePipeInnerWidth * 2);
-                double pipeWidth = 40;
-                double fullWidth = flangeFaceWidth + flangePipeWidth + pipeWidth;
-
+                double cirRadius = 100;
+                double cirDiameter = cirRadius * 2;
+                double cirTextSize = 30;
+                string textUpperStr = "asdf";
+                string textLowerStr = "dadsf";
                 Point3D drawPoint = new Point3D(0, 0, 0);
 
-                Line lineFFa = new Line(new Point3D(0, 0, 0), new Point3D(0, flangeFaceHeight, 0));
-                Line lineFFb = new Line(new Point3D(flangeFaceWidth, 0, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
-                Line lineFFc = new Line(new Point3D(0, 0, 0), new Point3D(flangeFaceWidth, 0, 0));
-                Line lineFFd = new Line(new Point3D(0, flangeFaceHeight, 0), new Point3D(flangeFaceWidth, flangeFaceHeight, 0));
-
-                Line lineFPa = new Line(new Point3D(flangeFaceWidth, flangeFaceInnerWidth + flangePipeHeight, 0), new Point3D(flangeFaceWidth+ flangePipeWidth, flangePipeInnerWidth+pipeHeight, 0));
-                Line lineFPb = new Line(new Point3D(flangeFaceWidth, flangeFaceInnerWidth , 0), new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0));
-                Line lineFPc = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth + pipeHeight, 0), new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0));
-
-                Line linePa = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth, 0), new Point3D(flangeFaceWidth + flangePipeWidth + pipeWidth, flangePipeInnerWidth, 0));
-                Line linePb = new Line(new Point3D(flangeFaceWidth + flangePipeWidth, flangePipeInnerWidth + pipeHeight, 0), new Point3D(flangeFaceWidth + flangePipeWidth + pipeWidth, flangePipeInnerWidth + pipeHeight, 0));
-
-                singleModel.Entities.AddRange(new Entity[]{ lineFFa,lineFFb,lineFFc, lineFFd, lineFPa, lineFPb,lineFPc, linePa,linePb});
+                Circle circleCenter = new Circle(cirRadius, cirRadius,0, cirRadius);
+                Line lineCenter = new Line(new Point3D(0, cirRadius, 0), new Point3D(cirDiameter, cirRadius, 0));
+                Line lineCenter3 = new Line(new Point3D(0, cirRadius, 0), new Point3D(cirDiameter, cirRadius - 20, 0));
+                Line lineCenter2 = new Line(new Point3D(0, cirRadius, 0), new Point3D(cirDiameter, cirRadius+20, 0));
+                Vector3D ssPlane = new Vector3D();
+                ssPlane.Y = 200;
+                Line lineCenter4 =(Line)lineCenter2.Offset(500,ssPlane);
+                Line lineCenter5 = (Line)lineCenter3.Offset(-500, Vector3D.AxisZ);
+                Text textUpper = new Text(cirRadius, cirRadius+(cirRadius/2), 0,textUpperStr, cirTextSize);
+                textUpper.Alignment= Text.alignmentType.MiddleCenter; 
+                Text textLower = new Text(cirRadius, (cirRadius / 2), 0, textUpperStr, cirTextSize);
+                textLower.Alignment = Text.alignmentType.MiddleCenter;
+                
+                singleModel.Entities.AddRange(new Entity[]{ circleCenter,lineCenter, lineCenter2, lineCenter3, lineCenter4, lineCenter5,textUpper, textLower});
 
             }
 

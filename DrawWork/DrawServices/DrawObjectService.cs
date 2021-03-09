@@ -101,6 +101,7 @@ namespace DrawWork.DrawServices
             CDPoint newPoint1 = new CDPoint();
             CDPoint newPoint2 = new CDPoint();
             CDPoint newSetPoint = new CDPoint();
+            CDPoint newOffsetPoint = new CDPoint();
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
@@ -128,8 +129,26 @@ namespace DrawWork.DrawServices
             }
 
             // Create Line
-            return drawService.Draw_Line(newPoint1, newPoint2);
+            Line customLine= drawService.Draw_Line(newPoint1, newPoint2);
 
+            // Method
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "offset":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newOffsetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            
+                        }
+                            
+                        break;
+
+                }
+            }
+
+            return customLine;
         }
         public Line DoLineDgree(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
         {
@@ -546,8 +565,12 @@ namespace DrawWork.DrawServices
             CDPoint newPoint3 = new CDPoint();
             CDPoint newSetPoint = new CDPoint();
 
+            string newPosition = "";
             string newNozzleType = "";
             string newNozzlePosition = "";
+            string newNozzleFontSize = "";
+            string newReaderCircleSize = "";
+            string newMultiColumn = "";
             NozzleInputModel newNozzle = new NozzleInputModel();
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
@@ -562,7 +585,27 @@ namespace DrawWork.DrawServices
 
                     case "position":
                         if (j + 1 <= eachCmd.Length)
+                            newPosition = eachCmd[j + 1];
+                        break;
+
+                    case "nozzleposition":
+                        if (j + 1 <= eachCmd.Length)
                             newNozzlePosition = eachCmd[j + 1];
+                        break;
+
+                    case "fontsize":
+                        if (j + 1 <= eachCmd.Length)
+                            newNozzleFontSize = eachCmd[j + 1];
+                        break;
+
+                    case "leadercirclesize":
+                        if (j + 1 <= eachCmd.Length)
+                            newReaderCircleSize = eachCmd[j + 1];
+                        break;
+
+                    case "multicolumn":
+                        if (j + 1 <= eachCmd.Length)
+                            newMultiColumn = eachCmd[j + 1];
                         break;
 
                     case "sp":
@@ -579,7 +622,7 @@ namespace DrawWork.DrawServices
             Entity[] returnEntity = null;
             // Create Line
             if (newNozzleType != "" && newNozzlePosition != "")
-                returnEntity = drawNozzleService.DrawNozzle_GA(ref refPoint,newNozzleType,newNozzlePosition, selAssembly);
+                returnEntity = drawNozzleService.DrawNozzle_GA(ref refPoint, newPosition,newNozzleType, newNozzlePosition, newNozzleFontSize, newReaderCircleSize,newMultiColumn, selAssembly);
 
             return returnEntity;
         }
