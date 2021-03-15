@@ -385,71 +385,6 @@ namespace DrawWork.DrawServices
 
         }
 
-        public LinearDim DoDimension(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
-        {
-            // 0 : Object
-            // 1 : Command
-            // 2 : Data
-            int refIndex = 1;
-
-
-            CDPoint newPoint1 = new CDPoint();
-            CDPoint newPoint2 = new CDPoint();
-            CDPoint newPoint3 = new CDPoint();
-            CDPoint newSetPoint = new CDPoint();
-            double newTextHeight = -1;
-            double newTextGap = -1;
-            double newArrowSize = -1;
-
-            for (int j = refIndex; j < eachCmd.Length; j += 2)
-            {
-                switch (eachCmd[j].ToLower())
-                {
-                    case "xy1":
-                        if (j + 1 <= eachCmd.Length)
-                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                        break;
-
-                    case "xy2":
-                        if (j + 1 <= eachCmd.Length)
-                            newPoint2 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                        break;
-
-                    case "xyh":
-                        if (j + 1 <= eachCmd.Length)
-                            newPoint3 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                        break;
-
-                    case "th":
-                        if (j + 1 <= eachCmd.Length)
-                            newTextHeight = valueService.Evaluate(eachCmd[j + 1]);
-                        break;
-
-                    case "tg":
-                        if (j + 1 <= eachCmd.Length)
-                            newTextGap = valueService.Evaluate(eachCmd[j + 1]);
-                        break;
-
-                    case "ah":
-                        if (j + 1 <= eachCmd.Length)
-                            newArrowSize = valueService.Evaluate(eachCmd[j + 1]);
-                        break;
-
-                    case "sp":
-                        if (j + 1 <= eachCmd.Length)
-                        {
-                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                            curPoint.X = newSetPoint.X;
-                            curPoint.Y = newSetPoint.Y;
-                        }
-                        break;
-                }
-            }
-
-            return drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newTextHeight, newTextGap, newArrowSize, 0);
-
-        }
-
 
         // Block
         public Entity[] DoBlockTopAngle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, ObservableCollection<EqualAngleSizeModel> selAngleSize)
@@ -653,6 +588,91 @@ namespace DrawWork.DrawServices
 
         }
 
+        // Dimension
+        public Entity[] DoDimension(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            string newPosition = "top";
+            double newDimHeight = 100;
+            double newTextHeight = -1;
+            double newTextGap = 1;
+            double newArrowSize = 2.5;
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "xy1":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "xy2":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint2 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "xyh":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint3 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "position":
+                        if (j + 1 <= eachCmd.Length)
+                            newPosition = eachCmd[j + 1];
+                        break;
+
+                    case "dh":
+                    case "dimheight":
+                        if (j + 1 <= eachCmd.Length)
+                            newDimHeight = valueService.Evaluate(eachCmd[j + 1]);
+                        break;
+
+                    case "th":
+                    case "textheight":
+                        if (j + 1 <= eachCmd.Length)
+                            newTextHeight = valueService.Evaluate(eachCmd[j + 1]);
+                        break;
+
+                    case "tg":
+                    case "textgap":
+                        if (j + 1 <= eachCmd.Length)
+                            newTextGap = valueService.Evaluate(eachCmd[j + 1]);
+                        break;
+
+                    case "as":
+                    case "arrowsize":
+                        if (j + 1 <= eachCmd.Length)
+                            newArrowSize = valueService.Evaluate(eachCmd[j + 1]);
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            Entity[] returnEntity = null;
+
+            returnEntity =drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newPosition,newDimHeight, newTextHeight, newTextGap, newArrowSize, 0);
+
+            return returnEntity;
+        }
 
     }
 }

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawWork", "DrawWork.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyLib", "..\AssemblyLib\AssemblyLib.csproj", "{0E54A176-E260-4436-AD95-D3A4F5C10B10}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawSettingLib", "..\DrawSettingLib\DrawSettingLib.csproj", "{09AF4A28-824A-4EA4-B217-98A964D4B112}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{0E54A176-E260-4436-AD95-D3A4F5C10B10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E54A176-E260-4436-AD95-D3A4F5C10B10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E54A176-E260-4436-AD95-D3A4F5C10B10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09AF4A28-824A-4EA4-B217-98A964D4B112}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09AF4A28-824A-4EA4-B217-98A964D4B112}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09AF4A28-824A-4EA4-B217-98A964D4B112}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09AF4A28-824A-4EA4-B217-98A964D4B112}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

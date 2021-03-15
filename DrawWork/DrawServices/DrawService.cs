@@ -29,24 +29,7 @@ namespace DrawWork.DrawServices
         }
 
         
-        public LinearDim Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3, double selTextHeight, double selTextGap, double selArrowSize, double selRotate)
-        {
 
-            LinearDim newDim = new LinearDim(Plane.XY,
-                                             new Point2D(selPoint1.X,selPoint1.Y),
-                                             new Point2D(selPoint2.X, selPoint2.Y),
-                                             new Point2D(selPoint3.X, selPoint3.Y),selTextHeight);
-            if (selTextGap > 0)
-                newDim.TextGap = selTextGap;
-            if (selArrowSize > 0)
-                newDim.ArrowheadSize = selArrowSize;
-
-            newDim.TextLocation = elementPositionType.Outside;
-            
-            
-            return newDim;
-        }
-        
 
         public Line Draw_Line(CDPoint selPoint1, CDPoint selPoint2)
         {
@@ -198,5 +181,71 @@ namespace DrawWork.DrawServices
             }
             return newValue;
         }
+
+
+        public Entity[] Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3, string selPosition, double selDimHeight, double selTextHeight, double selTextGap, double selArrowSize, double selRotate)
+        {
+            List<Entity> customEntityList = new List<Entity>();
+
+            // selPoint3 : 쓰지 않음
+
+            // Text Center
+            CDPoint textCenter = new CDPoint();
+            LinearDim newDim = null;
+            switch (selPosition)
+            {
+                case "top":
+                    textCenter.X = (selPoint2.X - selPoint1.X) / 2;
+                    textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) + selDimHeight;
+                    Plane planeTop = Plane.XY;
+                    newDim = new LinearDim(planeTop,
+                                            new Point2D(selPoint1.X, selPoint1.Y),
+                                            new Point2D(selPoint2.X, selPoint2.Y),
+                                            new Point2D(textCenter.X, textCenter.Y), selTextHeight);
+                    break;
+
+                case "left":
+                    textCenter.X = (selPoint2.Y - selPoint1.Y) / 2 + selPoint1.Y;
+                    textCenter.Y = Math.Max(selPoint1.X, selPoint2.X) + selDimHeight;
+                    Plane planeLeft = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
+                    newDim = new LinearDim(planeLeft,
+                                            new Point2D(selPoint1.Y, selPoint1.X),
+                                            new Point2D(selPoint2.Y, selPoint2.X),
+                                            new Point2D(textCenter.X, textCenter.Y), selTextHeight);
+                    break;
+
+                case "right":
+                    textCenter.X = (selPoint2.Y - selPoint1.Y) / 2 + selPoint1.Y;
+                    textCenter.Y = Math.Max(selPoint1.X, selPoint2.X) + selDimHeight;
+                    Plane planeRight = new Plane(new Point3D(selPoint2.X - selPoint2.X, selPoint2.Y), -1 * Vector3D.AxisY, Vector3D.AxisX);
+                    newDim = new LinearDim(planeRight,
+                                            new Point2D(-selPoint1.Y, selPoint1.X),
+                                            new Point2D(-selPoint2.Y, selPoint2.X),
+                                            new Point2D(-textCenter.X, textCenter.Y), selTextHeight);
+                    break;
+
+                case "bottom":
+                    textCenter.X = (selPoint2.X - selPoint1.X) / 2;
+                    textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) - selDimHeight;
+                    newDim = new LinearDim(Plane.XY,
+                                            new Point2D(selPoint1.X, selPoint1.Y),
+                                            new Point2D(selPoint2.X, selPoint2.Y),
+                                            new Point2D(textCenter.X, textCenter.Y), selTextHeight);
+                    break;
+            }
+
+
+            if (selTextGap > 0)
+                //newDim.TextGap = selTextGap;
+                if (selArrowSize > 0)
+                    newDim.ArrowheadSize = selArrowSize;
+
+            newDim.TextLocation = elementPositionType.Inside;
+
+            customEntityList.Add(newDim);
+
+            return customEntityList.ToArray();
+        }
+
     }
 }

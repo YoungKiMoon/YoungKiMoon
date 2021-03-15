@@ -16,6 +16,7 @@ using AssemblyLib.AssemblyModels;
 
 using DrawWork.ValueServices;
 using DrawWork.DrawModels;
+using DrawWork.Common;
 
 namespace DrawWork.DrawServices
 {
@@ -39,13 +40,13 @@ namespace DrawWork.DrawServices
         {
 
             // Shell Spacing
-            double shellSpacingLeft = 4000;
+            double shellSpacingLeft = valueService.GetDoubleValue(SingletonData.GADrawArea.Dimension);
             double shellSpacingRight = 400;
             double shellSpacingTop = 400;
             double shellSpacingBottom = 400;
 
             // Nozzle Area
-            double lowerAreaLeft = refPoint.Y;
+            double lowerAreaLeft = refPoint.X- shellSpacingLeft;
             double upperAreaLeft = valueService.GetDoubleValue(selAssembly.GeneralDesignData.SizeTankHeight);
             double lowerAreaRight = 400;
             double upperAreaRight = 400;

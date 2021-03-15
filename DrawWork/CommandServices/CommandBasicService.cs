@@ -142,9 +142,12 @@ namespace DrawWork.CommandServices
                         commandEntities.Add(eachEntity);
                     break;
 
+                // Dimension
                 case "dim":
                 case "dimline":
-                    commandEntities.Add(drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint));
+                    Entity[] newDim = drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint);
+                    foreach (Entity eachEntity in newDim)
+                        commandEntities.Add(eachEntity);
                     break;
 
                 // Block

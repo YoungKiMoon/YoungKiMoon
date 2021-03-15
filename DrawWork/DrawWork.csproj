@@ -64,6 +64,7 @@
     <Compile Include="CommandServices\CommandBasicService.cs" />
     <Compile Include="CommandServices\TranslateDataModelService.cs" />
     <Compile Include="CommandServices\TranslateDataService.cs" />
+    <Compile Include="Common\SingletonData.cs" />
     <Compile Include="DrawBuilders\LogicBuilder.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
     <Compile Include="DrawServices\DrawBlockService.cs" />
@@ -129,6 +130,10 @@
     <ProjectReference Include="..\AssemblyLib\AssemblyLib.csproj">
       <Project>{0e54a176-e260-4436-ad95-d3a4f5c10b10}</Project>
       <Name>AssemblyLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DrawSettingLib\DrawSettingLib.csproj">
+      <Project>{09af4a28-824a-4ea4-b217-98a964d4b112}</Project>
+      <Name>DrawSettingLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

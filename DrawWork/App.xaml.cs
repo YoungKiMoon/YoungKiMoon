@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DrawWork.Common;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,5 +14,16 @@ namespace DrawWork
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            SetDrawSettingInformation();
+        }
+
+        private void SetDrawSettingInformation()
+        {
+            SingletonData.GADrawArea.Dimension = "5000";
+            SingletonData.GADrawArea.NozzleLeader = "5000";
+            SingletonData.GADrawArea.ShellCourse = "5000";
+        }
     }
 }

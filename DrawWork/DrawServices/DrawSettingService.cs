@@ -87,16 +87,16 @@ namespace DrawWork.DrawServices
                     //Line line2 = new Line(55, 49, 55, 113); //error
                     Line line2 = new Line(-40, 49, 15, 49);
                     line2.Rotate(Utility.DegToRad(30), Vector3D.AxisZ, new Point3D(-45, 49));
-                    singleModel.Entities.Add((Line)line2.Clone(),Color.Blue);
+                    singleModel.Entities.Add((Line)line2.Clone(), Color.Blue);
 
-                    singleModel.Entities.Add((Line)line1.Clone(),Color.Green);
+                    singleModel.Entities.Add((Line)line1.Clone(), Color.Green);
 
                     Arc arcFillet1, arcFillet2, arcFillet3;
                     Curve.Fillet(arc, line1, 9.5, false, false, true, true, out arcFillet1);
                     Curve.Fillet(arc, line2, 9.5, false, false, true, true, out arcFillet2);
                     Curve.Fillet(line1, line2, 9.5, false, false, true, true, out arcFillet3);
 
-                    singleModel.Entities.Add(arcFillet3,Color.Red);
+                    singleModel.Entities.Add(arcFillet3, Color.Red);
                     //CompositeCurve compositeCurve = new CompositeCurve(arc, line1, line2, arcFillet1, arcFillet2, arcFillet3);
                     //singleModel.Entities.Add(compositeCurve);
 
@@ -289,37 +289,188 @@ namespace DrawWork.DrawServices
                 }
                 #endregion
 
+                #region Nozzle Leader
+                if (false)
+                {
+                    // Current Test
+                    double cirRadius = 100;
+                    double cirDiameter = cirRadius * 2;
+                    double cirTextSize = 30;
+                    string textUpperStr = "asdf";
+                    string textLowerStr = "dadsf";
+                    Point3D drawPoint = new Point3D(0, 0, 0);
+
+                    Circle circleCenter = new Circle(cirRadius, cirRadius, 0, cirRadius);
+                    Line lineCenter = new Line(new Point3D(0, cirRadius, 0), new Point3D(cirDiameter, cirRadius, 0));
+                    Line lineCenter3 = new Line(new Point3D(0, cirRadius, 0), new Point3D(cirDiameter, cirRadius - 20, 0));
+                    Line lineCenter2 = new Line(new Point3D(0, cirRadius, 0), new Point3D(cirDiameter, cirRadius + 20, 0));
+                    Vector3D ssPlane = new Vector3D();
+                    ssPlane.Y = 200;
+                    Line lineCenter4 = (Line)lineCenter2.Offset(500, ssPlane);
+                    Line lineCenter5 = (Line)lineCenter3.Offset(-500, Vector3D.AxisZ);
+                    Text textUpper = new Text(cirRadius, cirRadius + (cirRadius / 2), 0, textUpperStr, cirTextSize);
+                    textUpper.Alignment = Text.alignmentType.MiddleCenter;
+                    Text textLower = new Text(cirRadius, (cirRadius / 2), 0, textUpperStr, cirTextSize);
+                    textLower.Alignment = Text.alignmentType.MiddleCenter;
+
+                    singleModel.Entities.AddRange(new Entity[] { circleCenter, lineCenter, lineCenter2, lineCenter3, lineCenter4, lineCenter5, textUpper, textLower });
+                }
+                #endregion
+
+                #region Dimension
+                if (false) 
+                { 
+                
+                    // Y axis
+                    Line axisY = new Line(0, -45, 0, 45)
+                    {
+                        LineTypeMethod = colorMethodType.byEntity,
+                    };
+
+
+                    Mirror m = new Mirror(Plane.ZY);
+
+                    // Building geometry - External Outline
+
+                    Line lT1 = new Line(34.8, 30.2, 34.8, 44.6);
+                    Line lT2 = new Line(28.8, 30.2, 28.8, 44.6);
+                    Line lT3 = new Line(25.6, 32.6, 0.0, 32.6);
+                    Circle c = new Circle(Plane.XY, new Point3D(31.8, 28, 0), 13.2);
+                    Circle c_mir = (Circle)c.Clone();
+                    c_mir.TransformBy(m);
+                    Point3D int1 = Curve.Intersection(c, lT1)[0];
+                    Point3D int2 = Curve.Intersection(c, lT2)[0];
+                    Point3D int3 = Curve.Intersection(c, lT3)[0];
+
+                    singleModel.Entities.AddRange(new Entity[] { axisY, lT1, lT2, lT3, c, c_mir });
+                    // External outline
+                    Line eo1 = new Line(0.0, -36, 17.8, -36);
+                    Line eo2 = new Line(17.8, -36, 17.8, -42);
+                    Line eo3 = new Line(17.8, -42, 51, -42);
+                    Line eo4 = new Line(51, -42, 51, -12.6);
+                    Line eo5 = new Line(51, -12.6, 43.8, -12.6);
+                    Line eo7 = new Line(43.8, 0.6, 51, 0.6);
+                    Arc eo6 = new Arc(Plane.XY, new Point3D(43.8, -6.0, 0.0), 6.6, eo5.EndPoint, eo7.StartPoint, true);
+                    Line eo8 = new Line(51, 0.6, 51, 22.6);
+                    Line eo9 = new Line(51, 22.6, 45, 22.6);
+                    Line eo10 = new Line(45, 22.6, 45, 28);
+                    Arc eo11 = new Arc(Plane.XY, new Point3D(31.8, 28, 0), 13.2, eo10.EndPoint, int1, false);
+                    Line eo12 = new Line(int1.X, int1.Y, 34.8, 44.6);
+                    Line eo13 = new Line(34.8, 44.6, 28.8, 44.6);
+                    Line eo14 = new Line(28.8, 44.6, int2.X, int2.Y);
+                    Arc eo15 = new Arc(Plane.XY, new Point3D(31.8, 28, 0), 13.2, int2, int3, false);
+                    Line eo16 = new Line(int3.X, int3.Y, 0, int3.Y);
+
+
+                    singleModel.Entities.AddRange(new Entity[] { eo1, eo2, eo3, eo4, eo5, eo6, eo7, eo8, eo9, eo10, eo11, eo12, eo13, eo14, eo15, eo16 });
+
+                    // Holes
+                    Circle c1 = new Circle(Plane.XY, new Point3D(31.8, 28, 0), 6);
+                    Circle c2 = (Circle)c1.Clone();
+                    c2.TransformBy(m);
+                    CompositeCurve h1 = CompositeCurve.CreateHexagon(31.8, 28, 6);
+                    //h1.Rotate(Math.PI / 6, Vector3D.AxisZ, new Point3D(31.8, 28, 0));
+                    h1.TransformBy(m);
+
+                    singleModel.Entities.AddRange(new Entity[] { h1 });
+
+
+
+
+                    float txtH = 2.0f;
+                    DiametricDim ddd1 = new DiametricDim(c1, new Point3D(20.0, 20.0, 0.0), txtH)
+                    {
+                        ArrowsLocation = elementPositionType.Outside,
+                        TextPrefix = "2-Ø"
+                    };
+
+                    singleModel.Entities.AddRange(new Entity[] { ddd1 });
+
+
+                    Plane left = new Plane(Point3D.Origin, Vector3D.AxisY, -1 * Vector3D.AxisX); // plane.XY, vertical writing;
+                    Plane right = new Plane(Point3D.Origin, Vector3D.AxisY, -1 * Vector3D.AxisX); // plane.XY, vertical writing;
+
+                    LinearDim dd1 = new LinearDim(Plane.XY, new Point2D(-28.8, -10), new Point2D(-34.8, -10), new Point2D(-38.0, 49.6), txtH)
+                    {
+                        ArrowsLocation = elementPositionType.Outside
+                    };
+
+                    LinearDim dd2 = new LinearDim(Plane.XY, new Point2D(-28, -10), new Point2D(-34, -10), new Point2D(-38.0, 30), txtH)
+                    {
+                        ArrowsLocation = elementPositionType.Outside
+                    };
+
+                    LinearDim dd3 = new LinearDim(Plane.XY, new Point2D(-28, -10), new Point2D(-34, -10), new Point2D(0, 30), txtH)
+                    {
+                        ArrowsLocation = elementPositionType.Inside
+                    };
+
+
+                    LinearDim dd4 = new LinearDim(left, new Point2D(-36.0, -4.0), new Point2D(-15.57, -22.9), new Point2D(-25.79, -4.0), txtH)
+                    {
+                        ArrowsLocation = elementPositionType.Inside
+                    };
+
+                    LinearDim dd5 = new LinearDim(Plane.XY, new Point2D(-36.0, -4.0), new Point2D(-15.57, -22.9), new Point2D(-25.79, -4.0), txtH)
+                    {
+                        ArrowsLocation = elementPositionType.Inside
+                    };
+
+                    LinearDim dd6 = new LinearDim(Plane.YX, new Point2D(43.8, -6.0), new Point2D(51.0, -20.0), new Point2D(54.0, -20.0), txtH)
+                    {
+                        ArrowsLocation = elementPositionType.Outside
+                    };
+
+                    //LinearDim dimTop = new LinearDim(Plane.XY, new Point2D(0, 19300), new Point2D(32400, 19300), new Point2D(16200,23300), 1000)
+                    LinearDim dimTop = new LinearDim(Plane.XY, new Point2D(-10, 20), new Point2D(50, 20), new Point2D(25, 30), txtH)
+                    {
+                        ArrowsLocation = elementPositionType.Inside
+                    };
+                    Plane ccleft = new Plane(new Point3D(0, 0), Vector3D.AxisY, -1 * Vector3D.AxisX); // plane.XY, vertical writing;
+                    // 0,10  0,50  -10, 25
+                    LinearDim dd8 = new LinearDim(ccleft, new Point2D(10, 0), new Point2D(50, 0), new Point2D(25, 10), txtH)
+                    {
+                        ArrowsLocation = elementPositionType.Inside
+                    };
+                    Plane ccright = new Plane(new Point3D(0, 0), -1 * Vector3D.AxisY, Vector3D.AxisX); // plane.XY, vertical writing;
+                    // 20,10  20,-50  30, -25
+                    LinearDim dd9 = new LinearDim(ccright, new Point2D(-10, 20), new Point2D(50, 20), new Point2D(25, 30), txtH)
+                    {
+                        ArrowsLocation = elementPositionType.Inside
+                    };
+
+                    Plane ccbottom = new Plane(new Point3D(0, 0), -1 * Vector3D.AxisY, Vector3D.AxisX); // plane.XY, vertical writing;
+                    // 20,10  20,-50  30, -25
+                    LinearDim dd10 = new LinearDim(ccbottom, new Point2D(-10, 20), new Point2D(50, 20), new Point2D(25, 30), txtH)
+                    {
+                        ArrowsLocation = elementPositionType.Inside
+                    };
+
+                    singleModel.Entities.Add(dd1, Color.Red);
+                    singleModel.Entities.Add(dd2, Color.Green);
+                    singleModel.Entities.Add(dd3, Color.Blue);
+                    singleModel.Entities.Add(dd4, Color.Yellow);
+                    singleModel.Entities.Add(dd5, Color.YellowGreen);
+                    singleModel.Entities.Add(dd6, Color.Orange);
+
+                    singleModel.Entities.Add(dimTop, Color.SkyBlue);
+                    singleModel.Entities.Add(dd8, Color.OrangeRed);
+                    singleModel.Entities.Add(dd9, Color.LightSeaGreen);
+                    singleModel.Entities.Add(dd10, Color.Red);
+                        //singleModel.Entities.AddRange(new Entity[] { dd1,dd2,dd3,dd4,dd5,dd6 });
+
+                }
+                #endregion
+
             }
             else
             {
-                // Current Test
-                double cirRadius = 100;
-                double cirDiameter = cirRadius * 2;
-                double cirTextSize = 30;
-                string textUpperStr = "asdf";
-                string textLowerStr = "dadsf";
-                Point3D drawPoint = new Point3D(0, 0, 0);
+                Leader leader1 = new Leader(Plane.XY, new Point3D(0, 0, 0));
+                singleModel.Entities.Add(leader1, Color.Red);
 
-                Circle circleCenter = new Circle(cirRadius, cirRadius,0, cirRadius);
-                Line lineCenter = new Line(new Point3D(0, cirRadius, 0), new Point3D(cirDiameter, cirRadius, 0));
-                Line lineCenter3 = new Line(new Point3D(0, cirRadius, 0), new Point3D(cirDiameter, cirRadius - 20, 0));
-                Line lineCenter2 = new Line(new Point3D(0, cirRadius, 0), new Point3D(cirDiameter, cirRadius+20, 0));
-                Vector3D ssPlane = new Vector3D();
-                ssPlane.Y = 200;
-                Line lineCenter4 =(Line)lineCenter2.Offset(500,ssPlane);
-                Line lineCenter5 = (Line)lineCenter3.Offset(-500, Vector3D.AxisZ);
-                Text textUpper = new Text(cirRadius, cirRadius+(cirRadius/2), 0,textUpperStr, cirTextSize);
-                textUpper.Alignment= Text.alignmentType.MiddleCenter; 
-                Text textLower = new Text(cirRadius, (cirRadius / 2), 0, textUpperStr, cirTextSize);
-                textLower.Alignment = Text.alignmentType.MiddleCenter;
-                
-                singleModel.Entities.AddRange(new Entity[]{ circleCenter,lineCenter, lineCenter2, lineCenter3, lineCenter4, lineCenter5,textUpper, textLower});
-
+                singleModel.Entities.Regen();
+                singleModel.ZoomFit();
             }
-
-            singleModel.Entities.Regen();
-            singleModel.ZoomFit();
-
 
         }
     }
