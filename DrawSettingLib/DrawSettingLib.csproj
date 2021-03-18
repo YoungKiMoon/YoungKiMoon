@@ -43,7 +43,9 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SettingModels\GADrawAreaModel.cs" />
+    <Compile Include="SettingModels\AreaBoxModel.cs" />
+    <Compile Include="SettingModels\AreaMarginModel.cs" />
+    <Compile Include="SettingModels\GAAreaModel.cs" />
     <Compile Include="Utils\Notifier.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

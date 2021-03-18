@@ -13,6 +13,7 @@ using devDept.Serialization;
 using MColor = System.Windows.Media.Color;
 using Color = System.Drawing.Color;
 using System.Collections.ObjectModel;
+using DrawWork.DrawModels;
 
 namespace DrawWork.DrawServices
 {
@@ -75,7 +76,7 @@ namespace DrawWork.DrawServices
                 #endregion
 
                 #region Composite curve
-                if (true)
+                if (false)
                 {
 
 
@@ -454,10 +455,17 @@ namespace DrawWork.DrawServices
                     singleModel.Entities.Add(dd6, Color.Orange);
 
                     singleModel.Entities.Add(dimTop, Color.SkyBlue);
-                    singleModel.Entities.Add(dd8, Color.OrangeRed);
+                    //singleModel.Entities.Add(dd8, Color.OrangeRed);
                     singleModel.Entities.Add(dd9, Color.LightSeaGreen);
                     singleModel.Entities.Add(dd10, Color.Red);
-                        //singleModel.Entities.AddRange(new Entity[] { dd1,dd2,dd3,dd4,dd5,dd6 });
+
+                    LinearDim dimTop2 = new LinearDim(Plane.XY, new Point2D(-10, 20), new Point2D(50, 20), new Point2D(25, 30), txtH)
+                    {
+                        ArrowsLocation = elementPositionType.Inside
+                    };
+                    dimTop2.ScaleOverall = 3;
+                    singleModel.Entities.Add(dimTop2, Color.Red);
+                    //singleModel.Entities.AddRange(new Entity[] { dd1,dd2,dd3,dd4,dd5,dd6 });
 
                 }
                 #endregion
@@ -465,8 +473,129 @@ namespace DrawWork.DrawServices
             }
             else
             {
-                Leader leader1 = new Leader(Plane.XY, new Point3D(0, 0, 0));
+                Point3D leaderPoint = new Point3D(0, 0, 0);
+                double leaderLength = 15;
+                double leaderTriShort = leaderLength / 2;
+                double leaderTriLong = Math.Tan(UtilityEx.DegToRad(60)) * leaderTriShort;
+                double leaderCenterX = leaderPoint.X+leaderTriShort;
+                double leaderCenterY = leaderPoint.Y + leaderTriLong;
+
+                List<Point3D> leaderPoints = new List<Point3D>();
+                leaderPoints.Add(leaderPoint);
+                leaderPoints.Add(new Point3D(leaderCenterX,leaderCenterY, 0));
+                leaderPoints.Add(new Point3D(leaderCenterX+40, leaderCenterY, 0));
+                Leader leader1 = new Leader(Plane.XY, leaderPoints);
                 singleModel.Entities.Add(leader1, Color.Red);
+
+                //leader1.Scale = 30;
+                //leader1.LineTypeScale = 30;
+                Text newText = new Text(leaderCenterX+1, leaderCenterY, 0, "LAaBbCc", 2.5);
+                newText.Alignment = Text.alignmentType.BaselineLeft;
+                //singleModel.FontFamily.FamilyNames= "ROMANS";
+
+                Text newText2 = new Text(leaderCenterX + 1, leaderCenterY+1, 0, "LAaBbCc", 2.5);
+                newText2.Alignment = Text.alignmentType.BaselineLeft;
+
+                singleModel.Entities.Add(newText, Color.Blue);
+                singleModel.Entities.Add(newText2, Color.Red);
+
+
+                Point3D textCenter = new Point3D();
+                LinearDim newDimRight;
+                LinearDim newDimLeft;
+                LinearDim newDimTop;
+
+                LinearDim newDimBottom;
+
+                CDPoint selPoint1 = new CDPoint();
+                CDPoint selPoint2 = new CDPoint();
+                CDPoint selPoint3 = new CDPoint();
+
+
+                // Top
+                selPoint1.X = 110;
+                selPoint1.Y = 200;
+                selPoint2.X = 160;
+                selPoint2.Y = 220;
+                double selDimHeight = 34;
+                double selTextHeight = 2.5;
+
+                textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X)/2;
+                textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) + selDimHeight;
+                newDimTop = new LinearDim(Plane.XY,new Point3D(selPoint1.X, selPoint1.Y),
+                                        new Point3D(selPoint2.X, selPoint2.Y),
+                                        new Point3D(textCenter.X, textCenter.Y), selTextHeight);
+
+                newDimTop.ArrowsLocation = elementPositionType.Inside;
+
+                // Text Gap
+                newDimTop.TextGap = 1;
+                newDimTop.ExtLineOffset = 1;
+                newDimTop.ExtLineExt = 1;
+                newDimTop.ArrowheadSize = 2.5;
+                newDimTop.ScaleOverall = 1;
+                newDimTop.LinearScale = 1;
+                
+
+                // Left
+                selPoint1.X = 110;
+                selPoint1.Y = 200;
+                selPoint2.X = 90;
+                selPoint2.Y = 250;
+
+                selPoint1.X = -10;
+                selPoint1.Y = 200;
+                selPoint2.X = 10;
+                selPoint2.Y = 250;
+
+                textCenter.X = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+                textCenter.Y = Math.Min(selPoint1.X, selPoint2.X) - selDimHeight;
+                Plane planeLeft = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
+                newDimLeft = new LinearDim(planeLeft, new Point3D(selPoint1.X, selPoint1.Y),
+                                        new Point3D(selPoint2.X, selPoint2.Y),
+                                        new Point3D(textCenter.Y, textCenter.X), selTextHeight);
+
+                newDimLeft.ArrowsLocation = elementPositionType.Inside;
+
+
+                // right
+                selPoint1.X = 110;
+                selPoint1.Y = 200;
+                selPoint2.X = 90;
+                selPoint2.Y = 250;
+
+                textCenter.X = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+                textCenter.Y = Math.Max(selPoint1.X, selPoint2.X) + selDimHeight;
+                Plane planeRight = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
+                newDimRight = new LinearDim(planeRight, new Point3D(selPoint1.X, selPoint1.Y),
+                                        new Point3D(selPoint2.X, selPoint2.Y),
+                                        new Point3D(textCenter.Y, textCenter.X), selTextHeight);
+
+                newDimLeft.ArrowsLocation = elementPositionType.Inside;
+
+
+                // bottom
+                selPoint1.X = 110;
+                selPoint1.Y = 200;
+                selPoint2.X = 160;
+                selPoint2.Y = 220;
+
+                textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
+                textCenter.Y = Math.Min(selPoint1.Y, selPoint2.Y) - selDimHeight;
+                newDimBottom = new LinearDim(Plane.XY, new Point3D(selPoint1.X, selPoint1.Y),
+                                        new Point3D(selPoint2.X, selPoint2.Y),
+                                        new Point3D(textCenter.X, textCenter.Y), selTextHeight);
+
+                newDimBottom.ArrowsLocation = elementPositionType.Inside;
+
+                singleModel.Entities.Add(newDimTop, Color.Red);
+                singleModel.Entities.Add(newDimBottom, Color.Gray);
+
+                singleModel.Entities.Add(newDimRight, Color.Blue);
+                singleModel.Entities.Add(newDimLeft, Color.Green);
+
+
+
 
                 singleModel.Entities.Regen();
                 singleModel.ZoomFit();

@@ -66,6 +66,7 @@
     <Compile Include="CommandServices\TranslateDataService.cs" />
     <Compile Include="Common\SingletonData.cs" />
     <Compile Include="DrawBuilders\LogicBuilder.cs" />
+    <Compile Include="DrawModels\DrawDimStyle.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
     <Compile Include="DrawServices\DrawBlockService.cs" />
     <Compile Include="DrawServices\DrawContactPointService.cs" />

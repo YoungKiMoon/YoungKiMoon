@@ -189,58 +189,67 @@ namespace DrawWork.DrawServices
 
             // selPoint3 : 쓰지 않음
 
+            // Style
+            DrawDimStyle newDimStyle = new DrawDimStyle();
+
             // Text Center
             CDPoint textCenter = new CDPoint();
             LinearDim newDim = null;
+
+
             switch (selPosition)
             {
                 case "top":
-                    textCenter.X = (selPoint2.X - selPoint1.X) / 2;
+                    textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
                     textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) + selDimHeight;
-                    Plane planeTop = Plane.XY;
-                    newDim = new LinearDim(planeTop,
-                                            new Point2D(selPoint1.X, selPoint1.Y),
-                                            new Point2D(selPoint2.X, selPoint2.Y),
-                                            new Point2D(textCenter.X, textCenter.Y), selTextHeight);
+                    newDim = new LinearDim(Plane.XY, new Point3D(selPoint1.X, selPoint1.Y),
+                                            new Point3D(selPoint2.X, selPoint2.Y),
+                                            new Point3D(textCenter.X, textCenter.Y), selTextHeight);
                     break;
 
                 case "left":
-                    textCenter.X = (selPoint2.Y - selPoint1.Y) / 2 + selPoint1.Y;
-                    textCenter.Y = Math.Max(selPoint1.X, selPoint2.X) + selDimHeight;
+                    textCenter.X = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+                    textCenter.Y = Math.Min(selPoint1.X, selPoint2.X) - selDimHeight;
                     Plane planeLeft = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
-                    newDim = new LinearDim(planeLeft,
-                                            new Point2D(selPoint1.Y, selPoint1.X),
-                                            new Point2D(selPoint2.Y, selPoint2.X),
-                                            new Point2D(textCenter.X, textCenter.Y), selTextHeight);
+                    newDim = new LinearDim(planeLeft, new Point3D(selPoint1.X, selPoint1.Y),
+                                            new Point3D(selPoint2.X, selPoint2.Y),
+                                            new Point3D(textCenter.Y, textCenter.X), selTextHeight);
                     break;
 
                 case "right":
-                    textCenter.X = (selPoint2.Y - selPoint1.Y) / 2 + selPoint1.Y;
+                    textCenter.X = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
                     textCenter.Y = Math.Max(selPoint1.X, selPoint2.X) + selDimHeight;
-                    Plane planeRight = new Plane(new Point3D(selPoint2.X - selPoint2.X, selPoint2.Y), -1 * Vector3D.AxisY, Vector3D.AxisX);
-                    newDim = new LinearDim(planeRight,
-                                            new Point2D(-selPoint1.Y, selPoint1.X),
-                                            new Point2D(-selPoint2.Y, selPoint2.X),
-                                            new Point2D(-textCenter.X, textCenter.Y), selTextHeight);
+                    Plane planeRight = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
+                    newDim = new LinearDim(planeRight, new Point3D(selPoint1.X, selPoint1.Y),
+                                            new Point3D(selPoint2.X, selPoint2.Y),
+                                            new Point3D(textCenter.Y, textCenter.X), selTextHeight);
+
                     break;
 
                 case "bottom":
-                    textCenter.X = (selPoint2.X - selPoint1.X) / 2;
-                    textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) - selDimHeight;
-                    newDim = new LinearDim(Plane.XY,
-                                            new Point2D(selPoint1.X, selPoint1.Y),
-                                            new Point2D(selPoint2.X, selPoint2.Y),
-                                            new Point2D(textCenter.X, textCenter.Y), selTextHeight);
+                    textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
+                    textCenter.Y = Math.Min(selPoint1.Y, selPoint2.Y) - selDimHeight;
+                    newDim = new LinearDim(Plane.XY, new Point3D(selPoint1.X, selPoint1.Y),
+                                            new Point3D(selPoint2.X, selPoint2.Y),
+                                            new Point3D(textCenter.X, textCenter.Y), selTextHeight);
                     break;
             }
 
 
+            // Set Default
+            newDim.ArrowsLocation = elementPositionType.Inside;
+            newDim.TextLocation = elementPositionType.Inside;
+
+            newDim.TextGap = newDimStyle.textGap;
+            newDim.ExtLineExt = newDimStyle.extensionLine;
+            newDim.ExtLineOffset = newDimStyle.extensionLinesOffset;
+            newDim.ArrowheadSize = newDimStyle.arrowheadSize;
             if (selTextGap > 0)
                 //newDim.TextGap = selTextGap;
                 if (selArrowSize > 0)
                     newDim.ArrowheadSize = selArrowSize;
 
-            newDim.TextLocation = elementPositionType.Inside;
+
 
             customEntityList.Add(newDim);
 

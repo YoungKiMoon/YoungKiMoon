@@ -40,7 +40,7 @@ namespace DrawWork.DrawServices
         {
 
             // Shell Spacing
-            double shellSpacingLeft = valueService.GetDoubleValue(SingletonData.GADrawArea.Dimension);
+            double shellSpacingLeft = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length);
             double shellSpacingRight = 400;
             double shellSpacingTop = 400;
             double shellSpacingBottom = 400;

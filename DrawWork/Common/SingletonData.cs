@@ -15,11 +15,11 @@ namespace DrawWork.Common
 
         }
 
-        private static GADrawAreaModel _GADrawArea = new GADrawAreaModel();
-        public static GADrawAreaModel GADrawArea
+        private static GAAreaModel _GAArea = new GAAreaModel();
+        public static GAAreaModel GAArea
         {
-            get { return _GADrawArea; }
-            set { _GADrawArea = value; }
+            get { return _GAArea; }
+            set { _GAArea = value; }
         }
     }
 }
