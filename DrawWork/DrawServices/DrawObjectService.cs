@@ -14,6 +14,7 @@ using devDept.Serialization;
 
 using DrawWork.DrawModels;
 using DrawWork.ValueServices;
+using DrawWork.CommandModels;
 
 using AssemblyLib.AssemblyModels;
 using System.Diagnostics;
@@ -61,6 +62,9 @@ namespace DrawWork.DrawServices
                             curPoint.X = refPoint.X;
                             curPoint.Y = refPoint.Y;
                         }
+                        goto case "always";
+
+                    case "always":
                         break;
                 }
             }
@@ -589,7 +593,7 @@ namespace DrawWork.DrawServices
         }
 
         // Dimension
-        public Entity[] DoDimension(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        public Entity[] DoDimension(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,out List<CommandPropertiyModel> selCmdFunctionList)
         {
             // 0 : Object
             // 1 : Command
@@ -608,68 +612,89 @@ namespace DrawWork.DrawServices
             double newTextGap = 1;
             double newArrowSize = 2.5;
 
+            string newPrefix = "";
+            string newSuffix = "";
+            string newText = "";
+
+            List<CommandPropertiyModel> newCmdFunctionList = new List<CommandPropertiyModel>();
+
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                string newName = "";
+                string newValue = "";
+                newName = eachCmd[j].ToLower();
+                if (j + 1 <= eachCmd.Length)
+                    newValue = eachCmd[j + 1];
+                
+                switch (newName)
                 {
                     case "xy1":
-                        if (j + 1 <= eachCmd.Length)
-                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                        break;
+                        newPoint1 = drawService.GetDrawPoint(newValue, ref refPoint, ref curPoint);
+                        goto case "always";
 
                     case "xy2":
-                        if (j + 1 <= eachCmd.Length)
-                            newPoint2 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                        break;
+                        newPoint2 = drawService.GetDrawPoint(newValue, ref refPoint, ref curPoint);
+                        goto case "always";
 
                     case "xyh":
-                        if (j + 1 <= eachCmd.Length)
-                            newPoint3 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                        break;
+                        newPoint3 = drawService.GetDrawPoint(newValue, ref refPoint, ref curPoint);
+                        goto case "always";
 
                     case "position":
-                        if (j + 1 <= eachCmd.Length)
-                            newPosition = eachCmd[j + 1];
-                        break;
+                        newPosition = newValue;
+                        goto case "always";
 
                     case "dh":
                     case "dimheight":
-                        if (j + 1 <= eachCmd.Length)
-                            newDimHeight = valueService.Evaluate(eachCmd[j + 1]);
-                        break;
+                        newDimHeight = valueService.Evaluate(newValue);
+                        goto case "always";
 
                     case "th":
                     case "textheight":
-                        if (j + 1 <= eachCmd.Length)
-                            newTextHeight = valueService.Evaluate(eachCmd[j + 1]);
-                        break;
+                        newTextHeight = valueService.Evaluate(newValue);
+                        goto case "always";
 
                     case "tg":
                     case "textgap":
-                        if (j + 1 <= eachCmd.Length)
-                            newTextGap = valueService.Evaluate(eachCmd[j + 1]);
+                        newTextGap = valueService.Evaluate(newValue);
                         break;
 
                     case "as":
                     case "arrowsize":
-                        if (j + 1 <= eachCmd.Length)
-                            newArrowSize = valueService.Evaluate(eachCmd[j + 1]);
-                        break;
+                        newArrowSize = valueService.Evaluate(newValue);
+                        goto case "always";
+
+                    case "pretext":
+                    case "prefix":
+                        newPrefix = newValue;
+                        goto case "always";
+
+                    case "suftext":
+                    case "suffix":
+                        newSuffix = newValue;
+                        goto case "always";
+
+                    case "text":
+                        newText = newValue;
+                        goto case "always";
 
                     case "sp":
-                        if (j + 1 <= eachCmd.Length)
-                        {
-                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                            curPoint.X = newSetPoint.X;
-                            curPoint.Y = newSetPoint.Y;
-                        }
+                        newSetPoint = drawService.GetDrawPoint(newValue, ref refPoint, ref curPoint);
+                        curPoint.X = newSetPoint.X;
+                        curPoint.Y = newSetPoint.Y;
+                        goto case "always";
+
+                    case "always":
+                        newCmdFunctionList.Add(new CommandPropertiyModel() { Name = newName,Value=newValue });
                         break;
                 }
             }
 
+            selCmdFunctionList= newCmdFunctionList;
+
             Entity[] returnEntity = null;
 
-            returnEntity =drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newPosition,newDimHeight, newTextHeight, newTextGap, newArrowSize, 0);
+            returnEntity =drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newPosition,newDimHeight, newTextHeight, newTextGap, newArrowSize,newPrefix,newSuffix,newText, 0);
 
             return returnEntity;
         }

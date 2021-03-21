@@ -12,6 +12,7 @@ using devDept.Geometry;
 using devDept.Serialization;
 using MColor = System.Windows.Media.Color;
 using Color = System.Drawing.Color;
+using Environment = devDept.Eyeshot.Environment;
 using System.Collections.ObjectModel;
 using DrawWork.DrawModels;
 
@@ -41,7 +42,7 @@ namespace DrawWork.DrawServices
             singleModel.Entities.Clear();
 
 
-            if (false)
+            if (true)
             {
 
                 #region 샘플 라인 테스트
@@ -319,9 +320,9 @@ namespace DrawWork.DrawServices
                 #endregion
 
                 #region Dimension
-                if (false) 
-                { 
-                
+                if (false)
+                {
+
                     // Y axis
                     Line axisY = new Line(0, -45, 0, 45)
                     {
@@ -470,131 +471,267 @@ namespace DrawWork.DrawServices
                 }
                 #endregion
 
+                #region Dimensino 2
+                if (true)
+                {
+
+
+                    Point3D leaderPoint = new Point3D(0, 0, 0);
+                    double leaderLength = 15;
+                    double leaderTriShort = leaderLength / 2;
+                    double leaderTriLong = Math.Tan(UtilityEx.DegToRad(60)) * leaderTriShort;
+                    double leaderCenterX = leaderPoint.X + leaderTriShort;
+                    double leaderCenterY = leaderPoint.Y + leaderTriLong;
+
+                    List<Point3D> leaderPoints = new List<Point3D>();
+                    leaderPoints.Add(leaderPoint);
+                    leaderPoints.Add(new Point3D(leaderCenterX, leaderCenterY, 0));
+                    leaderPoints.Add(new Point3D(leaderCenterX + 40, leaderCenterY, 0));
+                    Leader leader1 = new Leader(Plane.XY, leaderPoints);
+                    singleModel.Entities.Add(leader1, Color.Red);
+
+                    //leader1.Scale = 30;
+                    //leader1.LineTypeScale = 30;
+                    Text newText = new Text(leaderCenterX + 1, leaderCenterY, 0, "LAaBbCc", 2.5);
+                    newText.Alignment = Text.alignmentType.BaselineLeft;
+                    //singleModel.FontFamily.FamilyNames= "ROMANS";
+
+                    Text newText2 = new Text(leaderCenterX + 1, leaderCenterY + 1, 0, "LAaBbCc", 2.5);
+                    newText2.Alignment = Text.alignmentType.BaselineLeft;
+
+                    singleModel.Entities.Add(newText, Color.Blue);
+                    singleModel.Entities.Add(newText2, Color.Red);
+
+
+                    Point3D textCenter = new Point3D();
+                    LinearDim newDimRight;
+                    LinearDim newDimLeft;
+                    LinearDim newDimTop;
+
+                    LinearDim newDimBottom;
+
+                    CDPoint selPoint1 = new CDPoint();
+                    CDPoint selPoint2 = new CDPoint();
+                    CDPoint selPoint3 = new CDPoint();
+
+
+                    // Top
+                    selPoint1.X = 110;
+                    selPoint1.Y = 200;
+                    selPoint2.X = 160;
+                    selPoint2.Y = 220;
+                    double selDimHeight = 34;
+                    double selTextHeight = 2.5;
+
+                    textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
+                    textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) + selDimHeight;
+                    newDimTop = new LinearDim(Plane.XY, new Point3D(selPoint1.X, selPoint1.Y),
+                                            new Point3D(selPoint2.X, selPoint2.Y),
+                                            new Point3D(textCenter.X, textCenter.Y), selTextHeight);
+
+                    newDimTop.ArrowsLocation = elementPositionType.Inside;
+                    newDimTop.TextPrefix = "t";
+                    newDimTop.TextSuffix = "s";
+                    newDimTop.TextOverride = "asdfads";
+
+                    // Text Gap
+                    newDimTop.TextGap = 1;
+                    newDimTop.ExtLineOffset = 1;
+                    newDimTop.ExtLineExt = 1;
+                    newDimTop.ArrowheadSize = 2.5;
+                    newDimTop.ScaleOverall = 1;
+                    newDimTop.LinearScale = 1;
+
+                    
+                    newDimTop.Regen(new RegenParams(0, singleModel));
+                    //Mesh[] ss1 = newDimTop.ConvertToMesh(singleModel);
+                    ICurve[] ss2 = newDimTop.ConvertToCurves(singleModel);
+                    LinearPath[] ss3 = newDimTop.ConvertToLinearPaths(0,singleModel); // 외곽
+                    Region[] ss4 = newDimTop.ConvertToRegions(singleModel);
+                    Surface[] ss5 = newDimTop.ConvertToSurfaces(singleModel);
+
+                    //singleModel.Entities.AddRange(ss5);
+                    foreach (ICurve each in ss2)
+                        singleModel.Entities.Add(each as Entity);
+
+                    
+                    newDimTop.
+                    
+                    // Left
+                    selPoint1.X = 110;
+                    selPoint1.Y = 200;
+                    selPoint2.X = 90;
+                    selPoint2.Y = 250;
+
+                    selPoint1.X = -10;
+                    selPoint1.Y = 200;
+                    selPoint2.X = 10;
+                    selPoint2.Y = 250;
+
+                    textCenter.X = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+                    textCenter.Y = Math.Min(selPoint1.X, selPoint2.X) - selDimHeight;
+                    Plane planeLeft = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
+                    newDimLeft = new LinearDim(planeLeft, new Point3D(selPoint1.X, selPoint1.Y),
+                                            new Point3D(selPoint2.X, selPoint2.Y),
+                                            new Point3D(textCenter.Y, textCenter.X), selTextHeight);
+
+                    newDimLeft.ArrowsLocation = elementPositionType.Inside;
+
+
+                    // right
+                    selPoint1.X = 110;
+                    selPoint1.Y = 200;
+                    selPoint2.X = 90;
+                    selPoint2.Y = 250;
+
+                    textCenter.X = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+                    textCenter.Y = Math.Max(selPoint1.X, selPoint2.X) + selDimHeight;
+                    Plane planeRight = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
+                    newDimRight = new LinearDim(planeRight, new Point3D(selPoint1.X, selPoint1.Y),
+                                            new Point3D(selPoint2.X, selPoint2.Y),
+                                            new Point3D(textCenter.Y, textCenter.X), selTextHeight);
+
+                    newDimLeft.ArrowsLocation = elementPositionType.Inside;
+
+
+                    // bottom
+                    selPoint1.X = 110;
+                    selPoint1.Y = 200;
+                    selPoint2.X = 160;
+                    selPoint2.Y = 220;
+
+                    textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
+                    textCenter.Y = Math.Min(selPoint1.Y, selPoint2.Y) - selDimHeight;
+                    newDimBottom = new LinearDim(Plane.XY, new Point3D(selPoint1.X, selPoint1.Y),
+                                            new Point3D(selPoint2.X, selPoint2.Y),
+                                            new Point3D(textCenter.X, textCenter.Y), selTextHeight);
+
+                    newDimBottom.ArrowsLocation = elementPositionType.Inside;
+
+                    //singleModel.Entities.Add(newDimTop, Color.Red);
+                    singleModel.Entities.Add(newDimBottom, Color.Gray);
+
+                    singleModel.Entities.Add(newDimRight, Color.Blue);
+                    singleModel.Entities.Add(newDimLeft, Color.Green);
+                }
+                #endregion
+
+                #region Line Break
+                if (false)
+                {
+
+
+                    List<Entity> verticalLineNew = new List<Entity>();
+                    List<Entity> verticalLineAdd = new List<Entity>();
+
+
+                    Text newText = new Text(new Point3D(10, -30), "asdfasasdfasdfdf", 10);
+                    Line newLine = new Line(new Point3D(20, 10), new Point3D(40, -40));
+
+                    //Point3D[] eachTextArray = newLine.IntersectWith(newText.);
+
+                    newText.Regen(new RegenParams(0, singleModel));
+                    Point3D[] textBoxSize = newText.Vertices;
+                    LinearPath newRec = new LinearPath(textBoxSize);
+
+                    Point3D[] eachTextArray = newLine.IntersectWith(newRec);
+
+                    if (eachTextArray.Length > 0)
+                    {
+                        List<Point3D> splitPoint = new List<Point3D>();
+                        foreach (Point3D eachPoint in eachTextArray)
+                        {
+                            Circle newCircle = new Circle(eachPoint, 1);
+                            Point3D[] circlePoint = Curve.Intersection(newCircle, newLine);
+                            splitPoint.AddRange(circlePoint);
+                        }
+
+                        ICurve[] lineSplit;
+                        if (newLine.SplitBy(splitPoint, out lineSplit))
+                        {
+                            for (int cirCount = 0; cirCount < lineSplit.Length; cirCount += 4)
+                            {
+                                //if(lineSplit[cirCount])
+                                verticalLineAdd.Add(lineSplit[cirCount] as Entity);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        verticalLineNew.Add(newLine as Entity);
+                    }
+
+
+
+
+
+                    // Line 
+                    Line centerLine = new Line(new Point3D(0, 10, 0), new Point3D(100, 10, 0));
+                    List<ICurve> verticalLine = new List<ICurve>();
+
+                    for (int i = 0; i < 20; i++)
+                    {
+                        Line eachVertical = new Line(new Point3D(i * 10, 0, 0), new Point3D(i * 10, 30, 0));
+                        verticalLine.Add(eachVertical);
+                        //singleModel.Entities.Add(eachVertical, Color.Gray);
+                    }
+
+                    Arc testArc = new Arc(new Point3D(50, 0), 30, 40);
+                    verticalLine.Add(testArc);
+
+                    foreach (ICurve eachLine in verticalLine)
+                    {
+                        Point3D[] eachPointArray = centerLine.IntersectWith(eachLine);
+                        if (eachPointArray.Length > 0)
+                        {
+                            List<Point3D> splitPoint = new List<Point3D>();
+                            foreach (Point3D eachPoint in eachPointArray)
+                            {
+                                Circle newCircle = new Circle(eachPoint, 1);
+                                Point3D[] circlePoint = Curve.Intersection(newCircle, eachLine);
+                                splitPoint.AddRange(circlePoint);
+                            }
+
+                            ICurve[] lineSplit;
+                            if (eachLine.SplitBy(splitPoint, out lineSplit))
+                            {
+                                for (int cirCount = 0; cirCount < lineSplit.Length; cirCount += 2)
+                                {
+                                    //if(lineSplit[cirCount])
+                                    verticalLineAdd.Add(lineSplit[cirCount] as Entity);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            verticalLineNew.Add(eachLine as Entity);
+                        }
+
+
+                    }
+
+
+
+
+
+                    //singleModel.Entities.Add(centerLine2, Color.Red);
+                    //singleModel.Entities.Add((Line)aaSplits[0], Color.Blue);
+                    //singleModel.Entities.Add((Line)aaSplits[2], Color.Blue);
+
+
+
+                    singleModel.Entities.Add(newText, Color.Red);
+                    //singleModel.Entities.Add(newLine, Color.Blue);
+
+                    singleModel.Entities.AddRange(verticalLineAdd, Color.Gray);
+                    singleModel.Entities.AddRange(verticalLineNew, Color.Blue);
+                    singleModel.Entities.Add(centerLine, Color.Red);
+
+                }
+                #endregion
             }
             else
             {
-                Point3D leaderPoint = new Point3D(0, 0, 0);
-                double leaderLength = 15;
-                double leaderTriShort = leaderLength / 2;
-                double leaderTriLong = Math.Tan(UtilityEx.DegToRad(60)) * leaderTriShort;
-                double leaderCenterX = leaderPoint.X+leaderTriShort;
-                double leaderCenterY = leaderPoint.Y + leaderTriLong;
-
-                List<Point3D> leaderPoints = new List<Point3D>();
-                leaderPoints.Add(leaderPoint);
-                leaderPoints.Add(new Point3D(leaderCenterX,leaderCenterY, 0));
-                leaderPoints.Add(new Point3D(leaderCenterX+40, leaderCenterY, 0));
-                Leader leader1 = new Leader(Plane.XY, leaderPoints);
-                singleModel.Entities.Add(leader1, Color.Red);
-
-                //leader1.Scale = 30;
-                //leader1.LineTypeScale = 30;
-                Text newText = new Text(leaderCenterX+1, leaderCenterY, 0, "LAaBbCc", 2.5);
-                newText.Alignment = Text.alignmentType.BaselineLeft;
-                //singleModel.FontFamily.FamilyNames= "ROMANS";
-
-                Text newText2 = new Text(leaderCenterX + 1, leaderCenterY+1, 0, "LAaBbCc", 2.5);
-                newText2.Alignment = Text.alignmentType.BaselineLeft;
-
-                singleModel.Entities.Add(newText, Color.Blue);
-                singleModel.Entities.Add(newText2, Color.Red);
-
-
-                Point3D textCenter = new Point3D();
-                LinearDim newDimRight;
-                LinearDim newDimLeft;
-                LinearDim newDimTop;
-
-                LinearDim newDimBottom;
-
-                CDPoint selPoint1 = new CDPoint();
-                CDPoint selPoint2 = new CDPoint();
-                CDPoint selPoint3 = new CDPoint();
-
-
-                // Top
-                selPoint1.X = 110;
-                selPoint1.Y = 200;
-                selPoint2.X = 160;
-                selPoint2.Y = 220;
-                double selDimHeight = 34;
-                double selTextHeight = 2.5;
-
-                textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X)/2;
-                textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) + selDimHeight;
-                newDimTop = new LinearDim(Plane.XY,new Point3D(selPoint1.X, selPoint1.Y),
-                                        new Point3D(selPoint2.X, selPoint2.Y),
-                                        new Point3D(textCenter.X, textCenter.Y), selTextHeight);
-
-                newDimTop.ArrowsLocation = elementPositionType.Inside;
-
-                // Text Gap
-                newDimTop.TextGap = 1;
-                newDimTop.ExtLineOffset = 1;
-                newDimTop.ExtLineExt = 1;
-                newDimTop.ArrowheadSize = 2.5;
-                newDimTop.ScaleOverall = 1;
-                newDimTop.LinearScale = 1;
-                
-
-                // Left
-                selPoint1.X = 110;
-                selPoint1.Y = 200;
-                selPoint2.X = 90;
-                selPoint2.Y = 250;
-
-                selPoint1.X = -10;
-                selPoint1.Y = 200;
-                selPoint2.X = 10;
-                selPoint2.Y = 250;
-
-                textCenter.X = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
-                textCenter.Y = Math.Min(selPoint1.X, selPoint2.X) - selDimHeight;
-                Plane planeLeft = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
-                newDimLeft = new LinearDim(planeLeft, new Point3D(selPoint1.X, selPoint1.Y),
-                                        new Point3D(selPoint2.X, selPoint2.Y),
-                                        new Point3D(textCenter.Y, textCenter.X), selTextHeight);
-
-                newDimLeft.ArrowsLocation = elementPositionType.Inside;
-
-
-                // right
-                selPoint1.X = 110;
-                selPoint1.Y = 200;
-                selPoint2.X = 90;
-                selPoint2.Y = 250;
-
-                textCenter.X = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
-                textCenter.Y = Math.Max(selPoint1.X, selPoint2.X) + selDimHeight;
-                Plane planeRight = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
-                newDimRight = new LinearDim(planeRight, new Point3D(selPoint1.X, selPoint1.Y),
-                                        new Point3D(selPoint2.X, selPoint2.Y),
-                                        new Point3D(textCenter.Y, textCenter.X), selTextHeight);
-
-                newDimLeft.ArrowsLocation = elementPositionType.Inside;
-
-
-                // bottom
-                selPoint1.X = 110;
-                selPoint1.Y = 200;
-                selPoint2.X = 160;
-                selPoint2.Y = 220;
-
-                textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
-                textCenter.Y = Math.Min(selPoint1.Y, selPoint2.Y) - selDimHeight;
-                newDimBottom = new LinearDim(Plane.XY, new Point3D(selPoint1.X, selPoint1.Y),
-                                        new Point3D(selPoint2.X, selPoint2.Y),
-                                        new Point3D(textCenter.X, textCenter.Y), selTextHeight);
-
-                newDimBottom.ArrowsLocation = elementPositionType.Inside;
-
-                singleModel.Entities.Add(newDimTop, Color.Red);
-                singleModel.Entities.Add(newDimBottom, Color.Gray);
-
-                singleModel.Entities.Add(newDimRight, Color.Blue);
-                singleModel.Entities.Add(newDimLeft, Color.Green);
-
-
 
 
                 singleModel.Entities.Regen();

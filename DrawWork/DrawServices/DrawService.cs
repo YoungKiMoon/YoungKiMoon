@@ -183,7 +183,10 @@ namespace DrawWork.DrawServices
         }
 
 
-        public Entity[] Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3, string selPosition, double selDimHeight, double selTextHeight, double selTextGap, double selArrowSize, double selRotate)
+        public Entity[] Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3, 
+                                    string selPosition, double selDimHeight, double selTextHeight, double selTextGap, double selArrowSize, 
+                                    string selTextPrefix, string selTextSuffix, string selTextUserInput, 
+                                    double selRotate)
         {
             List<Entity> customEntityList = new List<Entity>();
 
@@ -250,6 +253,10 @@ namespace DrawWork.DrawServices
                     newDim.ArrowheadSize = selArrowSize;
 
 
+            newDim.TextPrefix = selTextPrefix;
+            newDim.TextSuffix = selTextSuffix;
+            if(selTextUserInput!="")
+                newDim.TextOverride = selTextUserInput;
 
             customEntityList.Add(newDim);
 

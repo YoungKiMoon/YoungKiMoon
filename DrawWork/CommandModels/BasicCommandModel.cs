@@ -14,6 +14,9 @@ namespace DrawWork.CommandModels
             commandList = new List<CommandLineModel>();
             commandListTrans = new List<string[]>();
             commandListTransFunciton = new List<string[]>();
+
+            commandListFunction = new List<CommandFunctionModel>();
+
             drawPoint = new DrawPointModel();
         }
 
@@ -23,6 +26,9 @@ namespace DrawWork.CommandModels
             newModel.commandList = commandList;
             newModel.commandListTrans = commandListTrans;
             newModel.commandListTransFunciton = commandListTransFunciton;
+
+            newModel.commandListFunction = commandListFunction;
+
             newModel.drawPoint = drawPoint.Clone() as DrawPointModel;
             return newModel;
         }
@@ -46,6 +52,13 @@ namespace DrawWork.CommandModels
         {
             get { return _commandListTransFunciton; }
             set { _commandListTransFunciton = value; }
+        }
+
+        private List<CommandFunctionModel> _commandListFunction;
+        public List<CommandFunctionModel> commandListFunction
+        {
+            get { return _commandListFunction; }
+            set { _commandListFunction = value; }
         }
 
         private DrawPointModel _drawPoint;
