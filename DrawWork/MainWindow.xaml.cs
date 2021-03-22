@@ -36,6 +36,8 @@ namespace DrawWork
             this.testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
             this.testModel.ActionMode = devDept.Eyeshot.actionType.SelectByPick;
 
+            this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Rendered;
+
             drawSetting = new DrawSettingService();
             drawSetting.SetModelSpace(testModel);
 
@@ -66,7 +68,7 @@ namespace DrawWork
                     selView.commandData.commandList.Add(new CommandLineModel { CommandText = eachText });
             }
 
-            LogicBuilder testBuilder = selView.GetLogicBuilder();
+            LogicBuilder testBuilder = selView.GetLogicBuilder(testModel);
 
             // remove old block
             testModel.Entities.Clear();

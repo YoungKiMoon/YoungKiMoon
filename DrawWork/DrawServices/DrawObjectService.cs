@@ -491,7 +491,7 @@ namespace DrawWork.DrawServices
         }
 
         // Nozzle
-        public Entity[] DoNozzle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, AssemblyModel selAssembly)
+        public Dictionary<string, List<Entity>> DoNozzle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, AssemblyModel selAssembly)
         {
             // 0 : Object
             // 1 : Command
@@ -558,7 +558,7 @@ namespace DrawWork.DrawServices
                 }
             }
 
-            Entity[] returnEntity = null;
+            Dictionary<string, List<Entity>> returnEntity = new Dictionary<string, List<Entity>>(); ;
             // Create Line
             if (newNozzleType != "" && newNozzlePosition != "")
                 returnEntity = drawNozzleService.DrawNozzle_GA(ref refPoint, newPosition,newNozzleType, newNozzlePosition, newNozzleFontSize, newReaderCircleSize,newMultiColumn, selAssembly);
@@ -593,7 +593,7 @@ namespace DrawWork.DrawServices
         }
 
         // Dimension
-        public Entity[] DoDimension(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,out List<CommandPropertiyModel> selCmdFunctionList)
+        public Dictionary<string, List<Entity>> DoDimension(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,out List<CommandPropertiyModel> selCmdFunctionList)
         {
             // 0 : Object
             // 1 : Command
@@ -692,7 +692,7 @@ namespace DrawWork.DrawServices
 
             selCmdFunctionList= newCmdFunctionList;
 
-            Entity[] returnEntity = null;
+            Dictionary<string,List<Entity>> returnEntity = new Dictionary<string, List<Entity>>();
 
             returnEntity =drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newPosition,newDimHeight, newTextHeight, newTextGap, newArrowSize,newPrefix,newSuffix,newText, 0);
 

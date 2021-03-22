@@ -32,11 +32,11 @@ namespace DrawWork.ViewModels
 
         
 
-        public LogicBuilder GetLogicBuilder()
+        public LogicBuilder GetLogicBuilder(Object selModel)
         {
 
             commandService = new CommandBasicService(commandData.commandList, TankData);
-            commandService.ExecuteCommand();
+            commandService.ExecuteCommand(selModel);
             LogicBuilder logicB = new LogicBuilder(commandService.commandEntities);
 
             return logicB;

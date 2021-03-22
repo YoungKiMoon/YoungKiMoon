@@ -16,7 +16,7 @@ using AssemblyLib.AssemblyModels;
 
 using DrawWork.ValueServices;
 using DrawWork.DrawModels;
-using DrawWork.Common;
+using DrawWork.Commons;
 
 namespace DrawWork.DrawServices
 {
@@ -29,7 +29,7 @@ namespace DrawWork.DrawServices
             valueService = new ValueService();
         }
 
-        public Entity[] DrawNozzle_GA(ref CDPoint refPoint,
+        public Dictionary<string, List<Entity>> DrawNozzle_GA(ref CDPoint refPoint,
                                       string selPosition, 
                                       string selNozzleType,
                                       string selNozzlePosition,
@@ -67,10 +67,13 @@ namespace DrawWork.DrawServices
 
             // MutilColumn
             bool multiColumnValue = selMultiColumn == "true" ? true : false;
-            
 
-                // Entity
-                List<Entity> customEntityList = new List<Entity>();
+
+            // Entity
+            List<Entity> nozzleOutlineList = new List<Entity>();
+            List<Entity> nozzlelineList = new List<Entity>();
+            List<Entity> nozzleMarkList = new List<Entity>();
+            List<Entity> nozzleTextList = new List<Entity>();
 
 
             // Nozzle List
@@ -89,10 +92,9 @@ namespace DrawWork.DrawServices
 
                         Point3D drawPoint = new Point3D(refPoint.X, refPoint.Y + eachNozzle.HeightSort, 0);
                         List<Entity> customEntity = CreateNozzleModel(drawPoint);
-                        foreach (Entity eachEntity in customEntity)
-                        {
-                            customEntityList.Add(eachEntity);
-                        }
+
+                        // outline
+                        nozzleOutlineList.AddRange(customEntity);
                     }
                 }
             }
@@ -111,24 +113,26 @@ namespace DrawWork.DrawServices
                 double currentX = leaderArrangementHeight[indexArrange].X;
                 //Point3D drawPoint = new Point3D(refPoint.X - shellSpacingLeft, refPoint.Y + currentHeight, 0);
                 Point3D drawPoint = new Point3D(currentX, refPoint.Y + currentHeight, 0);
-                List < Entity> customEntity = CreateNozzleLeader(drawPoint,eachNozzle.Mark,eachNozzle.Size,selNozzleFontSize, selLeaderCircleSize);
-                foreach (Entity eachEntity in customEntity)
-                {
-                    customEntityList.Add(eachEntity);
-                }
+                Dictionary<string, List<Entity>> customEntity = CreateNozzleLeader(drawPoint,eachNozzle.Mark,eachNozzle.Size,selNozzleFontSize, selLeaderCircleSize);
+                nozzleMarkList.AddRange(customEntity[CommonGlobal.NozzleMark]);
+                nozzleTextList.AddRange(customEntity[CommonGlobal.NozzleText]);
+
             }
 
             // Line
             List<Entity> customLineEntity = CreateNozzleLeaderLine(new Point3D(refPoint.X, refPoint.Y, 0), shellSpacingLeft, drawArrangeNozzle, leaderArrangementHeight);
-            foreach (Entity eachEntity in customLineEntity)
-            {
-                customEntityList.Add(eachEntity);
-            }
+            nozzlelineList.AddRange(customLineEntity);
+
+
+            Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
+            customEntityList.Add(CommonGlobal.OutLine, nozzleOutlineList);
+            customEntityList.Add(CommonGlobal.NozzleLine, nozzlelineList);
+            customEntityList.Add(CommonGlobal.NozzleMark, nozzleMarkList);
+            customEntityList.Add(CommonGlobal.NozzleText, nozzleTextList);
 
 
 
-
-            return customEntityList.ToArray();
+            return customEntityList;
         }
 
         // Width : 10 + 24 + 40 고정 -> 나중에 가변으로 변경해야 함
@@ -179,7 +183,7 @@ namespace DrawWork.DrawServices
             return customEntity;
         }
 
-        private List<Entity> CreateNozzleLeader(Point3D drawPoint,string textUpperStr,string textLowerStr,string fontSize,string circleSize)
+        private Dictionary<string, List<Entity>> CreateNozzleLeader(Point3D drawPoint,string textUpperStr,string textLowerStr,string fontSize,string circleSize)
         {
             // Current Test
             double cirDiameter = valueService.GetDoubleValue(circleSize);
@@ -198,13 +202,17 @@ namespace DrawWork.DrawServices
             textLower.Alignment = Text.alignmentType.MiddleCenter;
 
             // Entity
-            List<Entity> customEntity = new List<Entity>();
-            customEntity.Add(circleCenter);
-            customEntity.Add(lineCenter);
-            customEntity.Add(textUpper);
-            customEntity.Add(textLower);
+            List<Entity> nozzleMarkList = new List<Entity>();
+            nozzleMarkList.Add(circleCenter);
+            nozzleMarkList.Add(lineCenter);
 
+            List<Entity> nozzleTextList = new List<Entity>();
+            nozzleTextList.Add(textUpper);
+            nozzleTextList.Add(textLower);
 
+            Dictionary<string, List<Entity>> customEntity = new Dictionary<string, List<Entity>>();
+            customEntity.Add(CommonGlobal.NozzleMark, nozzleMarkList);
+            customEntity.Add(CommonGlobal.NozzleText, nozzleTextList);
 
             return customEntity;
         }

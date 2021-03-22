@@ -16,6 +16,7 @@ using MColor = System.Windows.Media.Color;
 
 using DrawWork.DrawModels;
 using DrawWork.ValueServices;
+using DrawWork.Commons;
 
 namespace DrawWork.DrawServices
 {
@@ -262,13 +263,11 @@ namespace DrawWork.DrawServices
 
             return customEntityList.ToArray();
         }
-        public Entity[] Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3,
+        public Dictionary<string,List<Entity>> Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3,
                                     string selPosition, double selDimHeight, double selTextHeight, double selTextGap, double selArrowSize,
                                     string selTextPrefix, string selTextSuffix, string selTextUserInput,
                                     double selRotate)
         {
-            List<Entity> customEntityList = new List<Entity>();
-
 
             Point3D textCenter = new Point3D();
 
@@ -305,7 +304,7 @@ namespace DrawWork.DrawServices
                     textCenter.Y = Math.Min(selPoint1.Y, selPoint2.Y) + selDimHeight;
                     selDimtext = Point3D.Distance(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y)).ToString();
 
-                    arrowLine = new Line(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y));
+                    arrowLine = new Line(new Point3D(selPoint1.X +1, textCenter.Y), new Point3D(selPoint2.X -1, textCenter.Y));
                     dimLine1 = new Line(new Point3D(selPoint1.X, selPoint1.Y + pointGapLine1), new Point3D(selPoint1.X, textCenter.Y + extLine1));
                     dimLine2 = new Line(new Point3D(selPoint2.X, selPoint2.Y + pointGapLine2), new Point3D(selPoint2.X, textCenter.Y + extLine2));
                     dimText = new Text(new Point3D(textCenter.X, textCenter.Y + textGap), selDimtext, selTextHeight);
@@ -320,7 +319,7 @@ namespace DrawWork.DrawServices
                     textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) - selDimHeight;
                     selDimtext = Point3D.Distance(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y)).ToString();
 
-                    arrowLine = new Line(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y));
+                    arrowLine = new Line(new Point3D(selPoint1.X+1, textCenter.Y), new Point3D(selPoint2.X -1, textCenter.Y));
                     dimLine1 = new Line(new Point3D(selPoint1.X, selPoint1.Y - pointGapLine1), new Point3D(selPoint1.X, textCenter.Y - extLine1));
                     dimLine2 = new Line(new Point3D(selPoint2.X, selPoint2.Y - pointGapLine2), new Point3D(selPoint2.X, textCenter.Y - extLine2));
                     dimText = new Text(new Point3D(textCenter.X, textCenter.Y + textGap), selDimtext, selTextHeight);
@@ -336,7 +335,7 @@ namespace DrawWork.DrawServices
                     textCenter.Y = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
                     selDimtext = Point3D.Distance(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y)).ToString();
 
-                    arrowLine = new Line(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y));
+                    arrowLine = new Line(new Point3D(textCenter.X, selPoint1.Y+1), new Point3D(textCenter.X, selPoint2.Y-1));
                     dimLine1 = new Line(new Point3D(selPoint1.X - pointGapLine1, selPoint1.Y), new Point3D(textCenter.X - extLine1, selPoint1.Y));
                     dimLine2 = new Line(new Point3D(selPoint2.X - pointGapLine2, selPoint2.Y), new Point3D(textCenter.X - extLine2, selPoint2.Y));
                     Plane planeLeft = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
@@ -353,7 +352,7 @@ namespace DrawWork.DrawServices
                     textCenter.Y = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
                     selDimtext = Point3D.Distance(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y)).ToString();
 
-                    arrowLine = new Line(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y));
+                    arrowLine = new Line(new Point3D(textCenter.X, selPoint1.Y+1), new Point3D(textCenter.X, selPoint2.Y-1));
                     dimLine1 = new Line(new Point3D(selPoint1.X + pointGapLine1, selPoint1.Y), new Point3D(textCenter.X + extLine1, selPoint1.Y));
                     dimLine2 = new Line(new Point3D(selPoint2.X + pointGapLine2, selPoint2.Y), new Point3D(textCenter.X + extLine2, selPoint2.Y));
                     Plane planeLeft2 = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
@@ -379,15 +378,30 @@ namespace DrawWork.DrawServices
 
             dimText.TextString = selDimtext;
 
-            customEntityList.Add(arrowLine);
-            customEntityList.Add(dimLine1);
-            customEntityList.Add(dimLine2);
-            customEntityList.Add(dimText);
-            customEntityList.Add(tri1);
-            customEntityList.Add(tri2);
 
-            return customEntityList.ToArray();
+            
+            List<Entity> dimlineList = new List<Entity>();
+            List<Entity> dimTextList = new List<Entity>();
+            List<Entity> dimlineExtList = new List<Entity>();
+            List<Entity> dimArrowList = new List<Entity>();
+
+            dimlineList.Add(arrowLine);
+            dimArrowList.Add(tri1);
+            dimArrowList.Add(tri2);
+            dimTextList.Add(dimText);
+            dimlineExtList.Add(dimLine1);
+            dimlineExtList.Add(dimLine2);
+
+            Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
+            customEntityList.Add(CommonGlobal.DimLine, dimlineList);
+            customEntityList.Add(CommonGlobal.DimText, dimTextList);
+            customEntityList.Add(CommonGlobal.DimLineExt, dimlineExtList);
+            customEntityList.Add(CommonGlobal.DimArrow, dimArrowList);
+
+
+            return customEntityList;
         }
 
     }
 }
+

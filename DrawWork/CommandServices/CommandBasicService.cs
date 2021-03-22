@@ -15,7 +15,7 @@ using DrawWork.DrawServices;
 using DrawWork.DrawAutomationService;
 
 using AssemblyLib.AssemblyModels;
-
+using DrawWork.Commons;
 
 namespace DrawWork.CommandServices
 {
@@ -27,11 +27,12 @@ namespace DrawWork.CommandServices
         public TranslateDataService commandTranslate;
         public DrawObjectService drawObject;
 
+        public DrawEntityModel drawEntity;
 
         public List<Entity> commandEntities;
 
-        public List<Entity[]> commandDimensionEntities;
-        public List<Entity[]> commandNozzleEntities;
+        //public List<Entity[]> commandDimensionEntities;
+        //public List<Entity[]> commandNozzleEntities;
 
         #region CONSTRUCTOR
         public CommandBasicService()
@@ -40,10 +41,12 @@ namespace DrawWork.CommandServices
             commandData = new BasicCommandModel();
             commandTranslate = new TranslateDataService();
             drawObject = new DrawObjectService();
+
+            drawEntity = new DrawEntityModel();
             commandEntities = new List<Entity>();
 
-            commandDimensionEntities = new List<Entity[]>();
-            commandNozzleEntities = new List<Entity[]>();
+            //commandDimensionEntities = new List<Entity[]>();
+            //commandNozzleEntities = new List<Entity[]>();
         }
 
         public CommandBasicService(List<CommandLineModel> selCommandList,AssemblyModel selAssembly)
@@ -54,10 +57,12 @@ namespace DrawWork.CommandServices
             SetAssemblyData(selAssembly);
             commandTranslate = new TranslateDataService(selAssembly);
             drawObject = new DrawObjectService();
+
+            drawEntity = new DrawEntityModel();
             commandEntities = new List<Entity>();
 
-            commandDimensionEntities = new List<Entity[]>();
-            commandNozzleEntities = new List<Entity[]>();
+            //commandDimensionEntities = new List<Entity[]>();
+            //commandNozzleEntities = new List<Entity[]>();
 
         }
         #endregion
@@ -77,7 +82,7 @@ namespace DrawWork.CommandServices
         #endregion
 
         #region Execute
-        public void ExecuteCommand()
+        public void ExecuteCommand(Object selModel)
         {
             commandData.commandListTrans = commandTranslate.TranslateCommand(commandData.commandList);
             commandTranslate.TranslateUsing(commandData.commandListTrans);
@@ -110,40 +115,15 @@ namespace DrawWork.CommandServices
 
 
             // Adjust : Dimension
-            AutomationService();
-
-            // Sum of Entities
-            SumOfEntities();
-
-
+            AutomationDimensionService autoDimService = new AutomationDimensionService();
+            commandEntities.AddRange(autoDimService.SetLineBreak(selModel as Model, drawEntity));
 
             commandData.drawPoint.referencePoint = refPoint;
             commandData.drawPoint.currentPoint = curPoint;
         }
         #endregion
 
-        private void AutomationService()
-        {
-            AutomationDimensionService autoDimService = new AutomationDimensionService();
-            
-        }
-
-        #region Sum Entities
-        private void SumOfEntities()
-        {
-            // Dimension
-            foreach (Entity[] eachEntityArray in commandDimensionEntities)
-            {
-                commandEntities.AddRange(eachEntityArray);
-            }
-
-            // Nozzle
-            foreach (Entity[] eachEntityArray in commandNozzleEntities)
-            {
-                commandEntities.AddRange(eachEntityArray);
-            }
-        }
-        #endregion
+       
 
 
         #region DrawLogic
@@ -167,56 +147,53 @@ namespace DrawWork.CommandServices
                     goto case "allways";
 
                 case "line":
-                    commandEntities.Add(drawObject.DoLine(eachCmd, ref refPoint, ref curPoint));
+                    drawEntity.outlineList.Add(drawObject.DoLine(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
 
                 case "linedgree":
-                    commandEntities.Add(drawObject.DoLineDgree(eachCmd, ref refPoint, ref curPoint));
+                    drawEntity.outlineList.Add(drawObject.DoLineDgree(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
 
                 case "arc":
-                    commandEntities.Add(drawObject.DoArc(eachCmd, ref refPoint, ref curPoint));
+                    drawEntity.outlineList.Add(drawObject.DoArc(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
 
                 case "text":
-                    commandEntities.Add(drawObject.DoText(eachCmd, ref refPoint, ref curPoint));
+                    drawEntity.outlineList.Add(drawObject.DoText(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
 
                 case "rec":
-                    Entity[] newRec = drawObject.DoRectangle(eachCmd, ref refPoint, ref curPoint);
-                    foreach (Entity eachEntity in newRec)
-                        commandEntities.Add(eachEntity);
+                    drawEntity.outlineList.AddRange(drawObject.DoRectangle(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
 
                 case "rectangle":
-                    Entity[] newRect = drawObject.DoRectangle(eachCmd, ref refPoint, ref curPoint);
-                    foreach (Entity eachEntity in newRect)
-                        commandEntities.Add(eachEntity);
+                    drawEntity.outlineList.AddRange(drawObject.DoRectangle(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
 
                 // Dimension
                 case "dim":
                 case "dimline":
-                    Entity[] newDim = drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint,out newCmdProperty);
-                    commandDimensionEntities.Add(newDim);
-                    //foreach (Entity eachEntity in newDim)
-                    //    commandEntities.Add(eachEntity);
+                    Dictionary<string, List<Entity>> newDim = drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint,out newCmdProperty);
+                    drawEntity.dimlineList.AddRange(newDim[CommonGlobal.DimLine]);
+                    drawEntity.dimTextList.AddRange(newDim[CommonGlobal.DimText]);
+                    drawEntity.dimlineExtList.AddRange(newDim[CommonGlobal.DimLineExt]);
+                    drawEntity.dimArrowList.AddRange(newDim[CommonGlobal.DimArrow]);
+
                     goto case "allways";
 
                 // Block
                 case "blocktopangle":
                 case "topangle":
-                    Entity[] newTopAngle = drawObject.DoBlockTopAngle(eachCmd, ref refPoint, ref curPoint, assemblyData.AngleInput);
-                    foreach (Entity eachEntity in newTopAngle)
-                        commandEntities.Add(eachEntity);
+                    drawEntity.outlineList.AddRange(drawObject.DoBlockTopAngle(eachCmd, ref refPoint, ref curPoint, assemblyData.AngleInput));
                     goto case "allways";
 
                 // Nozzle
                 case "nozzle":
-                    Entity[] newNozzle = drawObject.DoNozzle(eachCmd, ref refPoint, ref curPoint, assemblyData);
-                    commandNozzleEntities.Add(newNozzle);
-                    //foreach (Entity eachEntity in newNozzle)
-                    //    commandEntities.Add(eachEntity);
+                    Dictionary<string, List<Entity>> newNozzle = drawObject.DoNozzle(eachCmd, ref refPoint, ref curPoint, assemblyData);
+                    drawEntity.outlineList.AddRange(newNozzle[CommonGlobal.OutLine]);
+                    drawEntity.nozzlelineList.AddRange(newNozzle[CommonGlobal.NozzleLine]);
+                    drawEntity.nozzleMarkList.AddRange(newNozzle[CommonGlobal.NozzleMark]);
+                    drawEntity.nozzleTextList.AddRange(newNozzle[CommonGlobal.NozzleText]);
                     goto case "allways";
 
                 // Contact Point

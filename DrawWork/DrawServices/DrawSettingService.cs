@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using DrawWork.DrawModels;
 using DrawWork.DrawAutomationService;
 using System.Windows;
+using DrawWork.Commons;
 
 namespace DrawWork.DrawServices
 {
@@ -34,6 +35,7 @@ namespace DrawWork.DrawServices
             singleModel.Layers.Add(new Layer(LayerDashDot, Color.CornflowerBlue));
             singleModel.Layers[LayerDashDot].Color = Color.Red;
             singleModel.Layers[LayerDashDot].LineWeight = 4;
+            
 
             singleModel.LineTypes.Add(LayerDashDot, new float[] { 5, -1, 1, -1 });
             singleModel.Layers[LayerDashDot].LineTypeName = LayerDashDot;
@@ -636,7 +638,7 @@ namespace DrawWork.DrawServices
                 AutomationDimensionService autoDimService = new AutomationDimensionService();
 
                 // Reference Circle
-                double breakRadius = 1;
+                double breakRadius = 10;
 
                 List<Entity> outlineList = new List<Entity>();
                 List<Entity> centerlineList = new List<Entity>();
@@ -753,15 +755,15 @@ namespace DrawWork.DrawServices
 
                 // All list
                 Dictionary<string, List<Entity>> allEntityDic = new Dictionary<string, List<Entity>>();
-                allEntityDic.Add("outline", outlineList);
-                allEntityDic.Add("centerline", centerlineList);
-                allEntityDic.Add("dimline", dimlineList);
-                allEntityDic.Add("dimtext", dimTextLinearPathList); // text 대신 leader path
-                allEntityDic.Add("dimlineext", dimlineExtList);
-                allEntityDic.Add("leaderline", leaderlineList);
-                allEntityDic.Add("leadertext", leaderTextLinearPathList); // text 대신 leader path
-                allEntityDic.Add("nozzleline", nozzlelineList);
-                allEntityDic.Add("nozzlemark", nozzleMarkList);
+                allEntityDic.Add(CommonGlobal.OutLine, outlineList);
+                allEntityDic.Add(CommonGlobal.CenterLine, centerlineList);
+                allEntityDic.Add(CommonGlobal.DimLine, dimlineList);
+                allEntityDic.Add(CommonGlobal.DimText, dimTextLinearPathList); // text 대신 leader path
+                allEntityDic.Add(CommonGlobal.DimLineExt, dimlineExtList);
+                allEntityDic.Add(CommonGlobal.LeaderLine, leaderlineList);
+                allEntityDic.Add(CommonGlobal.LeaderText, leaderTextLinearPathList); // text 대신 leader path
+                allEntityDic.Add(CommonGlobal.NozzleLine, nozzlelineList);
+                allEntityDic.Add(CommonGlobal.NozzleMark, nozzleMarkList);
 
                 // Break
 
@@ -949,7 +951,19 @@ namespace DrawWork.DrawServices
 
 
                 Triangle newTri=new Triangle(new Point3D(20,20), new Point3D(40,0), new Point3D(40,40));
-                //newTri.Color = Color.Blue;
+                newTri.ColorMethod = colorMethodType.byEntity;
+                newTri.Color = Color.Blue;
+                
+                singleModel.Entities.Add(newTri);
+
+                Triangle t = new Triangle(-1, -1, 0, 1, -1, 0, 0, 1, 0);
+
+                t.ColorMethod = colorMethodType.byEntity;
+
+                t.Color = Color.Blue;
+
+                //
+                singleModel.Entities.Add(t);
                 //newTri.Regen(new RegenParams(0, singleModel));
 
                 //Point3D[] ss = new Point3D[3] { new Point3D(20, 20), new Point3D(40, 0), new Point3D(40, 40) };
@@ -976,6 +990,7 @@ namespace DrawWork.DrawServices
                 //singleModel.Entities.Add(newTri);
                 singleModel.Entities.Regen();
                 singleModel.ZoomFit();
+                singleModel.SetView(viewType.Top);
             }
 
 
@@ -1122,8 +1137,8 @@ namespace DrawWork.DrawServices
             }
 
             tri1.Color = Color.Blue;
-            tri1.ColorMethod = colorMethodType.byEntity;
-            tri1.
+            tri1.ColorMethod = colorMethodType.byLayer;
+            
             newList.Add(arrowLine);
             newList.Add(dimLine1);
             newList.Add(dimLine2);

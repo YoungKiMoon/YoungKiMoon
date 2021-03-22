@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using DrawSettingLib.SettingModels;
 
-namespace DrawWork.Common
+namespace DrawWork.Commons
 {
     public class SingletonData
     {

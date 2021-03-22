@@ -66,10 +66,13 @@
     <Compile Include="CommandServices\CommandBasicService.cs" />
     <Compile Include="CommandServices\TranslateDataModelService.cs" />
     <Compile Include="CommandServices\TranslateDataService.cs" />
-    <Compile Include="Common\SingletonData.cs" />
+    <Compile Include="Commons\CommonBase.cs" />
+    <Compile Include="Commons\CommonGlobal.cs" />
+    <Compile Include="Commons\SingletonData.cs" />
     <Compile Include="DrawAutomationService\AutomationDimensionService.cs" />
     <Compile Include="DrawBuilders\LogicBuilder.cs" />
     <Compile Include="DrawModels\DrawDimStyle.cs" />
+    <Compile Include="DrawModels\DrawEntityModel.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
     <Compile Include="DrawServices\DrawBlockService.cs" />
     <Compile Include="DrawServices\DrawContactPointService.cs" />
