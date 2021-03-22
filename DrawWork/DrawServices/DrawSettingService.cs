@@ -949,26 +949,79 @@ namespace DrawWork.DrawServices
 
 
 
-
-                Triangle newTri=new Triangle(new Point3D(20,20), new Point3D(40,0), new Point3D(40,40));
+                double breakRadius1 = 10;
+                //Triangle newTri=new Triangle(new Point3D(20,20), new Point3D(40,40), new Point3D(0,40));
+                Triangle newTri = new Triangle(new Point3D(20, 20), new Point3D(40, 0), new Point3D(40, 40));
                 newTri.ColorMethod = colorMethodType.byEntity;
                 newTri.Color = Color.Blue;
-                
-                singleModel.Entities.Add(newTri);
 
-                Triangle t = new Triangle(-1, -1, 0, 1, -1, 0, 0, 1, 0);
-
-                t.ColorMethod = colorMethodType.byEntity;
-
-                t.Color = Color.Blue;
-
-                //
-                singleModel.Entities.Add(t);
+                //singleModel.Entities.Add(newTri);
                 //newTri.Regen(new RegenParams(0, singleModel));
 
                 //Point3D[] ss = new Point3D[3] { new Point3D(20, 20), new Point3D(40, 0), new Point3D(40, 40) };
 
+                //newTri.Regen(new RegenParams(0, singleModel));
+                List<Point3D> newTriPath = new List<Point3D>();
+                newTriPath.AddRange(newTri.Vertices);
 
+                Point3D centerPoint = new Point3D();
+
+                if (newTriPath[1].X == newTriPath[2].X)
+                {
+                    // Left Right
+                    double newDistance = Point3D.Distance(newTriPath[1], newTriPath[2]);
+                    double minValue = Math.Min(newTriPath[1].Y, newTriPath[2].Y);
+                    double quotient = Math.Truncate(newDistance / breakRadius1);
+
+                    centerPoint.Y = newTriPath[0].Y;
+                    if (newTriPath[0].X < newTriPath[1].X)
+                    {
+                        centerPoint.X = newTriPath[0].X + 1;
+                    }
+                    else
+                    {
+                        centerPoint.X = newTriPath[0].X - 1;
+                    }
+
+                    for (int i = 1; i <= quotient; i++)
+                    {
+                        Line newLine = new Line(centerPoint, new Point3D(newTriPath[1].X, minValue + breakRadius1 * i));
+                        singleModel.Entities.Add(newLine);
+                    }
+                }
+                else if (newTriPath[1].Y == newTriPath[2].Y)
+                {
+                    // Top Bottom
+                    double newDistance = Point3D.Distance(newTriPath[1], newTriPath[2]);
+                    double minValue = Math.Min(newTriPath[1].X, newTriPath[2].X);
+                    double quotient = Math.Truncate(newDistance / breakRadius1);
+
+                    centerPoint.X = newTriPath[0].X;
+                    if (newTriPath[0].Y < newTriPath[1].Y)
+                    {
+                        centerPoint.Y = newTriPath[0].Y + 1;
+                    }
+                    else
+                    {
+                        centerPoint.Y = newTriPath[0].Y - 1;
+                    }
+
+                    for (int i = 1; i <= quotient; i++)
+                    {
+                        Line newLine = new Line(centerPoint, new Point3D(minValue + breakRadius1 * i, newTriPath[1].Y));
+                        singleModel.Entities.Add(newLine);
+                    }
+                }
+
+                newTriPath = new List<Point3D>();
+                newTriPath.Add(centerPoint);
+                newTriPath.Add(newTri.Vertices[1]);
+                newTriPath.Add(newTri.Vertices[2]);
+                newTriPath.Add(centerPoint);
+                LinearPath newLinearPath = new LinearPath(newTriPath.ToArray());
+                singleModel.Entities.Add(newLinearPath);
+
+                singleModel.Entities.Add(newLinearPath);
 
                 ////Leader newLeader=new Leader()
                 //Line newLine = new Line(new Point3D(20, 40), new Point3D(100, 40));

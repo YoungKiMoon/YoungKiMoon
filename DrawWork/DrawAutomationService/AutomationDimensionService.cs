@@ -47,7 +47,13 @@ namespace DrawWork.DrawAutomationService
                     case "dimlineext":
                         returnValue = false;
                         break;
+                    case "dimarrow":
+                        returnValue = true;
+                        break;
                     case "leaderline":
+                        returnValue = false;
+                        break;
+                    case "leaderarrow":
                         returnValue = false;
                         break;
                     case "leadertext":
@@ -80,11 +86,17 @@ namespace DrawWork.DrawAutomationService
                     case "dimlineext":
                         returnValue = false;
                         break;
+                    case "dimarrow":
+                        returnValue = false;
+                        break;
                     case "leaderline":
                         returnValue = false;
                         break;
                     case "leadertext":
                         returnValue = true;
+                        break;
+                    case "leaderarrow":
+                        returnValue = false;
                         break;
                     case "nozzleline":
                         returnValue = false;
@@ -113,10 +125,55 @@ namespace DrawWork.DrawAutomationService
                     case "dimlineext":
                         returnValue = false;
                         break;
+                    case "dimarrow":
+                        returnValue = false;
+                        break;
                     case "leaderline":
                         returnValue = false;
                         break;
                     case "leadertext":
+                        returnValue = false;
+                        break;
+                    case "leaderarrow":
+                        returnValue = false;
+                        break;
+                    case "nozzleline":
+                        returnValue = false;
+                        break;
+                    case "nozzlemark":
+                        returnValue = false;
+                        break;
+                };
+            }
+            else if (targetLine == "dimarrow")
+            {
+                switch (referenceLine)
+                {
+                    case "outline":
+                        returnValue = false;
+                        break;
+                    case "centerline":
+                        returnValue = false;
+                        break;
+                    case "dimline":
+                        returnValue = false;
+                        break;
+                    case "dimtext":
+                        returnValue = false;
+                        break;
+                    case "dimlineext":
+                        returnValue = false;
+                        break;
+                    case "dimarrow":
+                        returnValue = false;
+                        break;
+                    case "leaderline":
+                        returnValue = false;
+                        break;
+                    case "leadertext":
+                        returnValue = false;
+                        break;
+                    case "leaderarrow":
                         returnValue = false;
                         break;
                     case "nozzleline":
@@ -146,10 +203,16 @@ namespace DrawWork.DrawAutomationService
                     case "dimlineext":
                         returnValue = false;
                         break;
+                    case "dimarrow":
+                        returnValue = false;
+                        break;
                     case "leaderline":
                         returnValue = false;
                         break;
                     case "leadertext":
+                        returnValue = false;
+                        break;
+                    case "leaderarrow":
                         returnValue = false;
                         break;
                     case "nozzleline":
@@ -179,10 +242,16 @@ namespace DrawWork.DrawAutomationService
                     case "dimlineext":
                         returnValue = false;
                         break;
+                    case "dimarrow":
+                        returnValue = true;
+                        break;
                     case "leaderline":
                         returnValue = true;
                         break;
                     case "leadertext":
+                        returnValue = true;
+                        break;
+                    case "leaderarrow":
                         returnValue = true;
                         break;
                     case "nozzleline":
@@ -212,11 +281,56 @@ namespace DrawWork.DrawAutomationService
                     case "dimlineext":
                         returnValue = false;
                         break;
+                    case "dimarrow":
+                        returnValue = true;
+                        break;
                     case "leaderline":
                         returnValue = false;
                         break;
                     case "leadertext":
                         returnValue = true;
+                        break;
+                    case "leaderarrow":
+                        returnValue = false;
+                        break;
+                    case "nozzleline":
+                        returnValue = false;
+                        break;
+                    case "nozzlemark":
+                        returnValue = true;
+                        break;
+                };
+            }
+            else if (targetLine == "leaderarrow")
+            {
+                switch (referenceLine)
+                {
+                    case "outline":
+                        returnValue = false;
+                        break;
+                    case "centerline":
+                        returnValue = false;
+                        break;
+                    case "dimline":
+                        returnValue = true;
+                        break;
+                    case "dimtext":
+                        returnValue = true;
+                        break;
+                    case "dimlineext":
+                        returnValue = false;
+                        break;
+                    case "dimarrow":
+                        returnValue = true;
+                        break;
+                    case "leaderline":
+                        returnValue = false;
+                        break;
+                    case "leadertext":
+                        returnValue = true;
+                        break;
+                    case "leaderarrow":
+                        returnValue = false;
                         break;
                     case "nozzleline":
                         returnValue = false;
@@ -245,10 +359,16 @@ namespace DrawWork.DrawAutomationService
                     case "dimlineext":
                         returnValue = false;
                         break;
+                    case "dimarrow":
+                        returnValue = false;
+                        break;
                     case "leaderline":
                         returnValue = false;
                         break;
                     case "leadertext":
+                        returnValue = false;
+                        break;
+                    case "leaderarrow":
                         returnValue = false;
                         break;
                     case "nozzleline":
@@ -278,10 +398,16 @@ namespace DrawWork.DrawAutomationService
                     case "dimlineext":
                         returnValue = true;
                         break;
+                    case "dimarrow":
+                        returnValue = true;
+                        break;
                     case "leaderline":
                         returnValue = true;
                         break;
                     case "leadertext":
+                        returnValue = true;
+                        break;
+                    case "leaderarrow":
                         returnValue = true;
                         break;
                     case "nozzleline":
@@ -311,10 +437,16 @@ namespace DrawWork.DrawAutomationService
                     case "dimlineext":
                         returnValue = false;
                         break;
+                    case "dimarrow":
+                        returnValue = false;
+                        break;
                     case "leaderline":
                         returnValue = false;
                         break;
                     case "leadertext":
+                        returnValue = false;
+                        break;
+                    case "leaderarrow":
                         returnValue = false;
                         break;
                     case "nozzleline":
@@ -352,6 +484,8 @@ namespace DrawWork.DrawAutomationService
             // Reference Circle
             double breakRadius = 10;
 
+
+            #region Sample Data
             // 세로
             //outlineList.Add(new Line(new Point3D(10, -20, 0), new Point3D(10, 1110, 0)));
             //centerlineList.Add(new Line(new Point3D(110, -20, 0), new Point3D(110, 1110, 0)));
@@ -380,7 +514,7 @@ namespace DrawWork.DrawAutomationService
             //leaderTextList.Add(leaderText02);
             //nozzlelineList.Add(new Line(new Point3D(-20, 710, 0), new Point3D(1110, 710, 0)));
             //nozzleMarkList.Add(new Line(new Point3D(-20, 810, 0), new Point3D(1110, 810, 0)));
-
+            #endregion
 
             // Text to Box : 수정 최소단위 사각형으로
             List<Entity> dimTextLinearPathList = new List<Entity>();
@@ -455,15 +589,149 @@ namespace DrawWork.DrawAutomationService
                 leaderTextLinearPathList.Add(newRec);
             }
 
+            // Arrow : 수정 최소 단위로
+            List<Entity> dimArrowLinearPathList = new List<Entity>();
+            foreach (Entity eachEntity in dimArrowList)
+            {
+                List<Point3D> newTriPath = new List<Point3D>();
+                newTriPath.AddRange(eachEntity.Vertices);
+                
+                Point3D centerPoint = new Point3D();
+
+                if (newTriPath[1].X == newTriPath[2].X)
+                {
+                    // Left Right
+                    double newDistance = Point3D.Distance(newTriPath[1], newTriPath[2]);
+                    double minValue = Math.Min(newTriPath[1].Y, newTriPath[2].Y);
+                    double quotient = Math.Truncate(newDistance / breakRadius);
+
+                    centerPoint.Y = newTriPath[0].Y;
+                    if (newTriPath[0].X < newTriPath[1].X)
+                    {
+                        centerPoint.X = newTriPath[0].X + 1;
+                    }
+                    else
+                    {
+                        centerPoint.X = newTriPath[0].X - 1;
+                    }
+
+                    for (int i = 1; i <= quotient; i++)
+                    {
+                        Line newLine = new Line(centerPoint, new Point3D(newTriPath[1].X, minValue + breakRadius * i));
+                        dimArrowLinearPathList.Add(newLine);
+                    }
+                }
+                else if (newTriPath[1].Y == newTriPath[2].Y)
+                {
+                    // Top Bottom
+                    double newDistance = Point3D.Distance(newTriPath[1], newTriPath[2]);
+                    double minValue = Math.Min(newTriPath[1].X, newTriPath[2].X);
+                    double quotient = Math.Truncate(newDistance / breakRadius);
+
+                    centerPoint.X = newTriPath[0].X;
+                    if (newTriPath[0].Y < newTriPath[1].Y)
+                    {
+                        centerPoint.Y = newTriPath[0].Y + 1;
+                    }
+                    else
+                    {
+                        centerPoint.Y = newTriPath[0].Y - 1;
+                    }
+
+                    for (int i = 1; i <= quotient; i++)
+                    {
+                        Line newLine = new Line(centerPoint, new Point3D(minValue + breakRadius * i, newTriPath[1].Y));
+                        dimArrowLinearPathList.Add(newLine);
+                    }
+                }
+
+                newTriPath = new List<Point3D>();
+                newTriPath.Add(centerPoint);
+                newTriPath.Add(eachEntity.Vertices[1]);
+                newTriPath.Add(eachEntity.Vertices[2]);
+                newTriPath.Add(centerPoint);
+                LinearPath newLinearPath = new LinearPath(newTriPath.ToArray());
+                dimArrowLinearPathList.Add(newLinearPath);
+            }
+            List<Entity> leaderArrowLinearPathList = new List<Entity>();
+            foreach (Entity eachEntity in leaderArrowList)
+            {
+                List<Point3D> newTriPath = new List<Point3D>();
+                newTriPath.AddRange(eachEntity.Vertices);
+
+                Point3D centerPoint = new Point3D();
+
+                if (newTriPath[1].X == newTriPath[2].X)
+                {
+                    // Left Right
+                    double newDistance = Point3D.Distance(newTriPath[1], newTriPath[2]);
+                    double minValue = Math.Min(newTriPath[1].Y, newTriPath[2].Y);
+                    double quotient = Math.Truncate(newDistance / breakRadius);
+
+                    centerPoint.Y = newTriPath[0].Y;
+                    if (newTriPath[0].X < newTriPath[1].X)
+                    {
+                        centerPoint.X = newTriPath[0].X + 1;
+                    }
+                    else
+                    {
+                        centerPoint.X = newTriPath[0].X - 1;
+                    }
+
+                    for (int i = 1; i <= quotient; i++)
+                    {
+                        Line newLine = new Line(newTriPath[0], new Point3D(newTriPath[1].X, minValue + breakRadius * i));
+                        leaderArrowLinearPathList.Add(newLine);
+                    }
+                }
+                else if (newTriPath[1].Y == newTriPath[2].Y)
+                {
+                    // Top Bottom
+                    double newDistance = Point3D.Distance(newTriPath[1], newTriPath[2]);
+                    double minValue = Math.Min(newTriPath[1].X, newTriPath[2].X);
+                    double quotient = Math.Truncate(newDistance / breakRadius);
+
+                    centerPoint.X = newTriPath[0].X;
+                    if (newTriPath[0].Y < newTriPath[1].Y)
+                    {
+                        centerPoint.Y = newTriPath[0].Y + 1;
+                    }
+                    else
+                    {
+                        centerPoint.Y = newTriPath[0].Y - 1;
+                    }
+
+                    for (int i = 1; i <= quotient; i++)
+                    {
+                        Line newLine = new Line(newTriPath[0], new Point3D(minValue + breakRadius * i, newTriPath[1].Y));
+                        leaderArrowLinearPathList.Add(newLine);
+                    }
+                }
+
+                newTriPath = new List<Point3D>();
+                newTriPath.Add(centerPoint);
+                newTriPath.Add(eachEntity.Vertices[1]);
+                newTriPath.Add(eachEntity.Vertices[2]);
+                newTriPath.Add(centerPoint);
+                LinearPath newLinearPath = new LinearPath(newTriPath.ToArray());
+                leaderArrowLinearPathList.Add(newLinearPath);
+            }
+
+
+
+
+
             // All list
             Dictionary<string, List<Entity>> allEntityDic = new Dictionary<string, List<Entity>>();
             allEntityDic.Add(CommonGlobal.OutLine, outlineList);
             allEntityDic.Add(CommonGlobal.CenterLine, centerlineList);
             allEntityDic.Add(CommonGlobal.DimLine, dimlineList);
-            allEntityDic.Add(CommonGlobal.DimText, dimTextLinearPathList); // text 대신 leader path
+            allEntityDic.Add(CommonGlobal.DimText, dimTextLinearPathList); // text 대신 linear path
             allEntityDic.Add(CommonGlobal.DimLineExt, dimlineExtList);
+            allEntityDic.Add(CommonGlobal.DimArrow, dimArrowLinearPathList); // arrow 대신 linear path
             allEntityDic.Add(CommonGlobal.LeaderLine, leaderlineList);
-            allEntityDic.Add(CommonGlobal.LeaderText, leaderTextLinearPathList); // text 대신 leader path
+            allEntityDic.Add(CommonGlobal.LeaderText, leaderTextLinearPathList); // text 대신 linear path
+            allEntityDic.Add(CommonGlobal.LeaderArrow, leaderArrowLinearPathList); // arrow 대신 linear path
             allEntityDic.Add(CommonGlobal.NozzleLine, nozzlelineList);
             allEntityDic.Add(CommonGlobal.NozzleMark, nozzleMarkList);
 
