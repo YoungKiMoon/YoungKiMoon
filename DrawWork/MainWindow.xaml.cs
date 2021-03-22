@@ -46,7 +46,7 @@ namespace DrawWork
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             drawSetting.CreateModelSpaceSample(testModel);
-            MessageBox.Show("완료");
+            //MessageBox.Show("완료");
         }
 
 

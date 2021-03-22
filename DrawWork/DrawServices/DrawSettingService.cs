@@ -15,6 +15,8 @@ using Color = System.Drawing.Color;
 using Environment = devDept.Eyeshot.Environment;
 using System.Collections.ObjectModel;
 using DrawWork.DrawModels;
+using DrawWork.DrawAutomationService;
+using System.Windows;
 
 namespace DrawWork.DrawServices
 {
@@ -42,7 +44,7 @@ namespace DrawWork.DrawServices
             singleModel.Entities.Clear();
 
 
-            if (true)
+            if (false)
             {
 
                 #region 샘플 라인 테스트
@@ -472,7 +474,7 @@ namespace DrawWork.DrawServices
                 #endregion
 
                 #region Dimensino 2
-                if (true)
+                if (false)
                 {
 
 
@@ -555,8 +557,7 @@ namespace DrawWork.DrawServices
                         singleModel.Entities.Add(each as Entity);
 
                     
-                    newDimTop.
-                    
+                                        
                     // Left
                     selPoint1.X = 110;
                     selPoint1.Y = 200;
@@ -621,123 +622,518 @@ namespace DrawWork.DrawServices
                 {
 
 
-                    List<Entity> verticalLineNew = new List<Entity>();
-                    List<Entity> verticalLineAdd = new List<Entity>();
 
-
-                    Text newText = new Text(new Point3D(10, -30), "asdfasasdfasdfdf", 10);
-                    Line newLine = new Line(new Point3D(20, 10), new Point3D(40, -40));
-
-                    //Point3D[] eachTextArray = newLine.IntersectWith(newText.);
-
-                    newText.Regen(new RegenParams(0, singleModel));
-                    Point3D[] textBoxSize = newText.Vertices;
-                    LinearPath newRec = new LinearPath(textBoxSize);
-
-                    Point3D[] eachTextArray = newLine.IntersectWith(newRec);
-
-                    if (eachTextArray.Length > 0)
-                    {
-                        List<Point3D> splitPoint = new List<Point3D>();
-                        foreach (Point3D eachPoint in eachTextArray)
-                        {
-                            Circle newCircle = new Circle(eachPoint, 1);
-                            Point3D[] circlePoint = Curve.Intersection(newCircle, newLine);
-                            splitPoint.AddRange(circlePoint);
-                        }
-
-                        ICurve[] lineSplit;
-                        if (newLine.SplitBy(splitPoint, out lineSplit))
-                        {
-                            for (int cirCount = 0; cirCount < lineSplit.Length; cirCount += 4)
-                            {
-                                //if(lineSplit[cirCount])
-                                verticalLineAdd.Add(lineSplit[cirCount] as Entity);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        verticalLineNew.Add(newLine as Entity);
-                    }
-
-
-
-
-
-                    // Line 
-                    Line centerLine = new Line(new Point3D(0, 10, 0), new Point3D(100, 10, 0));
-                    List<ICurve> verticalLine = new List<ICurve>();
-
-                    for (int i = 0; i < 20; i++)
-                    {
-                        Line eachVertical = new Line(new Point3D(i * 10, 0, 0), new Point3D(i * 10, 30, 0));
-                        verticalLine.Add(eachVertical);
-                        //singleModel.Entities.Add(eachVertical, Color.Gray);
-                    }
-
-                    Arc testArc = new Arc(new Point3D(50, 0), 30, 40);
-                    verticalLine.Add(testArc);
-
-                    foreach (ICurve eachLine in verticalLine)
-                    {
-                        Point3D[] eachPointArray = centerLine.IntersectWith(eachLine);
-                        if (eachPointArray.Length > 0)
-                        {
-                            List<Point3D> splitPoint = new List<Point3D>();
-                            foreach (Point3D eachPoint in eachPointArray)
-                            {
-                                Circle newCircle = new Circle(eachPoint, 1);
-                                Point3D[] circlePoint = Curve.Intersection(newCircle, eachLine);
-                                splitPoint.AddRange(circlePoint);
-                            }
-
-                            ICurve[] lineSplit;
-                            if (eachLine.SplitBy(splitPoint, out lineSplit))
-                            {
-                                for (int cirCount = 0; cirCount < lineSplit.Length; cirCount += 2)
-                                {
-                                    //if(lineSplit[cirCount])
-                                    verticalLineAdd.Add(lineSplit[cirCount] as Entity);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            verticalLineNew.Add(eachLine as Entity);
-                        }
-
-
-                    }
-
-
-
-
-
-                    //singleModel.Entities.Add(centerLine2, Color.Red);
-                    //singleModel.Entities.Add((Line)aaSplits[0], Color.Blue);
-                    //singleModel.Entities.Add((Line)aaSplits[2], Color.Blue);
-
-
-
-                    singleModel.Entities.Add(newText, Color.Red);
-                    //singleModel.Entities.Add(newLine, Color.Blue);
-
-                    singleModel.Entities.AddRange(verticalLineAdd, Color.Gray);
-                    singleModel.Entities.AddRange(verticalLineNew, Color.Blue);
-                    singleModel.Entities.Add(centerLine, Color.Red);
 
                 }
                 #endregion
             }
             else
             {
+                if (false)
+                {
 
 
+                AutomationDimensionService autoDimService = new AutomationDimensionService();
+
+                // Reference Circle
+                double breakRadius = 1;
+
+                List<Entity> outlineList = new List<Entity>();
+                List<Entity> centerlineList = new List<Entity>();
+                List<Entity> dimlineList = new List<Entity>();
+                List<Entity> dimTextList = new List<Entity>();
+                List<Entity> dimlineExtList = new List<Entity>();
+                List<Entity> leaderlineList = new List<Entity>();
+                List<Entity> leaderTextList = new List<Entity>();
+                List<Entity> nozzlelineList = new List<Entity>();
+                List<Entity> nozzleMarkList = new List<Entity>();
+
+                // 세로
+                outlineList.Add(new Line(new Point3D(10, -20, 0), new Point3D(10, 1110, 0)));
+                centerlineList.Add(new Line(new Point3D(110, -20, 0), new Point3D(110, 1110, 0)));
+                dimlineList.Add(new Line(new Point3D(210, -20, 0), new Point3D(210, 1110, 0)));
+                Text dimText01 = new Text(new Point3D(0, -310, 0), "Dimension Line ABCDEFGabcdefg12345", 50);
+                
+                dimText01.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
+                dimTextList.Add(dimText01);
+                dimlineExtList.Add(new Line(new Point3D(410, -20, 0), new Point3D(410, 1110, 0)));
+                leaderlineList.Add(new Line(new Point3D(510, -20, 0), new Point3D(510, 1110, 0)));
+                Text leaderText01=new Text(new Point3D(0,-610, 0), "Leader Line ABCDEFGabcdefg12345",50);
+                leaderText01.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
+                leaderTextList.Add(leaderText01);
+                nozzlelineList.Add(new Line(new Point3D(710, -20, 0), new Point3D(710, 1110, 0)));
+                nozzleMarkList.Add(new Line(new Point3D(810, -20, 0), new Point3D(810, 1110, 0)));
+
+                // 가로
+                outlineList.Add(new Line(new Point3D(-20, 10, 0), new Point3D(1110, 10, 0)));
+                centerlineList.Add(new Line(new Point3D(-20, 110, 0), new Point3D(1110, 110, 0)));
+                dimlineList.Add(new Line(new Point3D(-20, 210, 0), new Point3D(1110, 210, 0)));
+                Text dimText02 = new Text(new Point3D(-20, 310, 0), "Dimension Line ABCDEFGabcdefg12345", 50);
+                dimTextList.Add(dimText02);
+                dimlineExtList.Add(new Line(new Point3D(-20, 410, 0), new Point3D(1110, 410, 0)));
+                leaderlineList.Add(new Line(new Point3D(-20, 510, 0), new Point3D(1110, 510, 0)));
+                Text leaderText02 = new Text(new Point3D(-20, 610, 0), "Leader Line ABCDEFGabcdefg12345", 50);
+                leaderTextList.Add(leaderText02);
+                nozzlelineList.Add(new Line(new Point3D(-20, 710, 0), new Point3D(1110, 710, 0)));
+                nozzleMarkList.Add(new Line(new Point3D(-20, 810, 0), new Point3D(1110, 810, 0)));
+
+
+                // Text to Box : 수정 최소단위 사각형으로
+                List<Entity> dimTextLinearPathList = new List<Entity>();
+                foreach(Entity eachEntity in dimTextList)
+                {
+                    eachEntity.Regen(new RegenParams(0, singleModel));
+                    Point3D[] textBoxSize = eachEntity.Vertices;
+                    LinearPath newRec = new LinearPath(textBoxSize);
+                    newRec.Regen(new RegenParams(0, singleModel));
+
+                    Point3D minPoint = GetMinPointXY(textBoxSize);
+                    Point3D maxPoint = GetMaxPointXY(textBoxSize);
+                    if (newRec.BoxSize.Y> breakRadius)
+                    {
+                        double quotient = Math.Truncate(newRec.BoxSize.Y / breakRadius);
+                        double quotientcc = newRec.BoxSize.Y / quotient;
+                        
+                        for(int i = 1; i <= quotient; i++)
+                        {
+                            Line newHorizontal = new Line(minPoint.X, minPoint.Y + breakRadius*i, maxPoint.X, minPoint.Y + breakRadius*i);
+                            dimTextLinearPathList.Add(newHorizontal);
+                        }
+                    }
+                    if (newRec.BoxSize.X > breakRadius)
+                    {
+                        double quotient = Math.Truncate(newRec.BoxSize.X / breakRadius);
+                        double quotientcc = newRec.BoxSize.X / quotient;
+
+                        for (int i = 1; i <= quotient; i++)
+                        {
+                            Line newVertical = new Line(minPoint.X +breakRadius*i, minPoint.Y , minPoint.X + breakRadius*i, maxPoint.Y );
+                            dimTextLinearPathList.Add(newVertical);
+                        }
+                    }
+
+
+                    dimTextLinearPathList.Add(newRec);
+                }
+                List<Entity> leaderTextLinearPathList = new List<Entity>();
+                foreach (Entity eachEntity in leaderTextList)
+                {
+                    eachEntity.Regen(new RegenParams(0, singleModel));
+                    Point3D[] textBoxSize = eachEntity.Vertices;
+                    LinearPath newRec = new LinearPath(textBoxSize);
+                    newRec.Regen(new RegenParams(0, singleModel));
+
+                    Point3D minPoint = GetMinPointXY(textBoxSize);
+                    Point3D maxPoint = GetMaxPointXY(textBoxSize);
+                    if (newRec.BoxSize.Y > breakRadius)
+                    {
+                        double quotient = Math.Truncate(newRec.BoxSize.Y / breakRadius);
+                        double quotientcc = newRec.BoxSize.Y / quotient;
+
+                        for (int i = 1; i <= quotient; i++)
+                        {
+                            Line newHorizontal = new Line(minPoint.X, minPoint.Y + breakRadius * i, maxPoint.X, minPoint.Y + breakRadius * i);
+                            dimTextLinearPathList.Add(newHorizontal);
+                        }
+                    }
+                    if (newRec.BoxSize.X > breakRadius)
+                    {
+                        double quotient = Math.Truncate(newRec.BoxSize.X / breakRadius);
+                        double quotientcc = newRec.BoxSize.X / quotient;
+
+                        for (int i = 1; i <= quotient; i++)
+                        {
+                            Line newVertical = new Line(minPoint.X + breakRadius * i, minPoint.Y, minPoint.X + breakRadius * i, maxPoint.Y);
+                            dimTextLinearPathList.Add(newVertical);
+                        }
+                    }
+
+                    leaderTextLinearPathList.Add(newRec);
+                }
+
+                // All list
+                Dictionary<string, List<Entity>> allEntityDic = new Dictionary<string, List<Entity>>();
+                allEntityDic.Add("outline", outlineList);
+                allEntityDic.Add("centerline", centerlineList);
+                allEntityDic.Add("dimline", dimlineList);
+                allEntityDic.Add("dimtext", dimTextLinearPathList); // text 대신 leader path
+                allEntityDic.Add("dimlineext", dimlineExtList);
+                allEntityDic.Add("leaderline", leaderlineList);
+                allEntityDic.Add("leadertext", leaderTextLinearPathList); // text 대신 leader path
+                allEntityDic.Add("nozzleline", nozzlelineList);
+                allEntityDic.Add("nozzlemark", nozzleMarkList);
+
+                // Break
+
+
+
+
+
+                Dictionary<string, List<Entity>> allEntityNewDic = new Dictionary<string, List<Entity>>();
+
+                // Line Break
+                List<string> allEntityName = allEntityDic.Keys.ToList();
+                List<List<Entity>> allEntityList = allEntityDic.Values.ToList();
+                for (int i=0;i<allEntityName.Count;i++) 
+                {
+                    string eachTarget = allEntityName[i];
+                    List<Entity> eachTargetList = allEntityList[i];
+                    List<Entity> newEachTargetList = new List<Entity>();
+
+                    // 문자 제외
+                    if (!eachTarget.Contains("text"))
+                    {
+                        foreach (ICurve targetLine in eachTargetList)
+                        {
+                            // 1. 겹치는 점 찾기
+                            Dictionary<Point3D, int> intersectPointDic = new Dictionary<Point3D, int>();
+                            for (int j = 0; j < allEntityName.Count; j++)
+                            {
+                                string eachReference = allEntityName[j];
+                                // 끊기 여부
+                                if (autoDimService.GetDimensionBreak(eachTarget, eachReference))
+                                {
+                                    List<Entity> eachReferenceList = allEntityList[j];
+
+                                    foreach (ICurve refereceLine in eachReferenceList)
+                                    {
+                                        Point3D[] eachPointArray = targetLine.IntersectWith(refereceLine);
+                                        foreach (Point3D eachPoint in eachPointArray)
+                                        {
+                                            if (!intersectPointDic.ContainsKey(eachPoint))
+                                            {
+                                                intersectPointDic.Add(eachPoint, j);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // 2. 겹치는 점에서 원 그리고 겹치는 선 기준으로 나누기
+                            if (intersectPointDic.Count > 0)
+                            {
+                                List<Point3D> splitPointList = new List<Point3D>();
+                                List<Point3D> intersectPointList = intersectPointDic.Keys.ToList();
+                                foreach (Point3D eachPoint in intersectPointList)
+                                {
+                                    Circle newCircle = new Circle(eachPoint, breakRadius);// 반지름 : breakRadius
+                                    Point3D[] intersectCircleArray = Curve.Intersection(newCircle, targetLine);
+                                    splitPointList.AddRange(intersectCircleArray);
+                                    
+                                }
+
+                                // 3. 자르기
+                                if (splitPointList.Count > 0)
+                                {
+                                    ICurve[] splitLine;
+                                    if (targetLine.SplitBy(splitPointList, out splitLine))
+                                    {
+                                        // 3. 원에 가까운 것 버리기
+                                        foreach (ICurve eachICurve in splitLine)
+                                        {
+                                            bool addLine = true;
+                                            Point3D minPoint = Point3D.MidPoint(eachICurve.StartPoint, eachICurve.EndPoint);
+                                            foreach (Point3D eachIntersect in intersectPointList)
+                                            {
+                                                // 3. 버리는 조건
+                                                if (Point3D.Distance(minPoint, eachIntersect) < breakRadius)
+                                                {
+                                                    addLine = false;
+                                                    break;
+                                                }
+                                            }
+
+                                            // 3. 추가
+                                            if (addLine)
+                                            {
+                                                newEachTargetList.Add(eachICurve as Entity);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                newEachTargetList.Add(targetLine as Entity);
+                            }
+                        }
+                        allEntityNewDic.Add(eachTarget, newEachTargetList);
+                    }
+                }
+
+                // 문자 추가
+                singleModel.Entities.AddRange(dimTextList, Color.Blue);
+                singleModel.Entities.AddRange(leaderTextList, Color.Green);
+
+                // Line Break 추가
+                List<string> allEntityNewName = allEntityNewDic.Keys.ToList();
+                List<List<Entity>> allEntityNewList = allEntityNewDic.Values.ToList();
+                for(int i=0;i< allEntityNewName.Count; i++)
+                {
+                    List<Entity> eachEntityList = allEntityNewList[i];
+                    string eachEntityName = allEntityNewName[i];
+                    switch (eachEntityName)
+                    {
+                        case "outline":
+                            singleModel.Entities.AddRange(eachEntityList, Color.Black);
+                            break;
+                        case "centerline":
+                            singleModel.Entities.AddRange(eachEntityList, Color.Red);
+                            break;
+                        case "dimline":
+                            singleModel.Entities.AddRange(eachEntityList, Color.Blue);
+                            break;
+                        case "dimtext":
+                            singleModel.Entities.AddRange(eachEntityList, Color.Blue);
+                            break;
+                        case "dimlineext":
+                            singleModel.Entities.AddRange(eachEntityList, Color.BlueViolet);
+                            break;
+                        case "leaderline":
+                            singleModel.Entities.AddRange(eachEntityList, Color.Green);
+                            break;
+                        case "leadertext":
+                            singleModel.Entities.AddRange(eachEntityList, Color.Green);
+                            break;
+                        case "nozzleline":
+                            singleModel.Entities.AddRange(eachEntityList, Color.Gray);
+                            break;
+                        case "nozzlemark":
+                            singleModel.Entities.AddRange(eachEntityList, Color.Gray);
+                            break;
+                    }
+                    
+                }
+
+                    //singleModel.Entities.AddRange(dimTextLinearPathList, Color.YellowGreen);
+
+
+                    //singleModel.Entities.AddRange(outlineList, Color.Black);
+                    //singleModel.Entities.AddRange(centerlineList, Color.Red);
+                    //singleModel.Entities.AddRange(dimlineList, Color.Blue);
+                    //singleModel.Entities.AddRange(dimTextList, Color.Blue);
+                    //singleModel.Entities.AddRange(dimlineExtList, Color.BlueViolet);
+                    //singleModel.Entities.AddRange(leaderlineList, Color.Green);
+                    //singleModel.Entities.AddRange(leaderTextList, Color.Green);
+                    //singleModel.Entities.AddRange(nozzlelineList, Color.Gray);
+                    //singleModel.Entities.AddRange(nozzleMarkList, Color.Gray);
+
+
+                    //singleModel.Entities.Add(newCircle1, Color.Red);
+                    //singleModel.Entities.Add(newCircle2, Color.Red);
+
+                    //singleModel.Entities.Add( aa1,Color.Blue);
+                    //Text cc = new Text(new Point3D(0, -310, 0), "Dimension Line ABCDEFGabcdefg12345", 50);
+                    //cc.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
+                    //singleModel.Entities.Add( cc, Color.Gray);
+
+                }
+
+
+
+                singleModel.Entities.AddRange(GetDimension(new Point3D(10, 10), new Point3D(100, 50), "TOP", 100));
+                singleModel.Entities.AddRange(GetDimension(new Point3D(10, 10), new Point3D(100, 50), "BOTTOM", 100));
+                singleModel.Entities.AddRange(GetDimension(new Point3D(-10, 10), new Point3D(-50, 100), "LEFT", 100));
+                singleModel.Entities.AddRange(GetDimension(new Point3D(-10, 10), new Point3D(-50, 100), "RIGHT", 100));
+
+                singleModel.Entities.Add(new LinearPath(new Point3D[5] {new Point3D(10,10),new Point3D(-10,10),new Point3D(-10,-10),new Point3D(10,-10), new Point3D(10, 10) }));
+
+                //Text dimTextVertical = new Text(new Point3D(20, 40), "asdf", 20);
+                //dimTextVertical.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
+                Text dimTextVertical2 = new Text(new Point3D(40, -20), "asdf", 20);
+                dimTextVertical2.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
+
+
+
+
+
+
+                Triangle newTri=new Triangle(new Point3D(20,20), new Point3D(40,0), new Point3D(40,40));
+                //newTri.Color = Color.Blue;
+                //newTri.Regen(new RegenParams(0, singleModel));
+
+                //Point3D[] ss = new Point3D[3] { new Point3D(20, 20), new Point3D(40, 0), new Point3D(40, 40) };
+
+
+
+                ////Leader newLeader=new Leader()
+                //Line newLine = new Line(new Point3D(20, 40), new Point3D(100, 40));
+                //LinearDim newDim = new LinearDim(Plane.XY, new Point3D(20, 0), new Point3D(40, 0), new Point3D(30, 0), 20);
+                //newDim.Regen(new RegenParams(0, singleModel));
+                //Mesh[] dd=newDim.ConvertToMesh(singleModel);
+                //Mesh ddd = dd[2];
+                //Solid cccc = ddd.ConvertToSolid();
+                //cccc.Color = Color.Blue;
+                //cccc.ColorMethod = colorMethodType.byEntity;
+                //cccc.Regen(new RegenParams(0, singleModel));
+                //ddd.Color = Color.Blue;
+
+
+
+                //singleModel.Entities.Add(cccc );
+                //singleModel.Entities.Add(ddd);
+                //singleModel.Entities.Add(newLine);
+                //singleModel.Entities.Add(newTri);
                 singleModel.Entities.Regen();
                 singleModel.ZoomFit();
             }
 
+
         }
+
+        public Point3D GetMinPointXY(Point3D[] selPointArray)
+        {
+            Point3D returnValue = null;
+
+            foreach(Point3D eachPoint in selPointArray)
+            {
+                if (returnValue == null)
+                {
+                    returnValue = new Point3D();
+                    returnValue.X = eachPoint.X;
+                    returnValue.Y = eachPoint.Y;
+                }
+                else
+                {
+                    if (returnValue.X > eachPoint.X)
+                        returnValue.X = eachPoint.X;
+                    if (returnValue.Y > eachPoint.Y)
+                        returnValue.Y = eachPoint.Y;
+                }
+            }
+
+            return returnValue;
+        }
+        public Point3D GetMaxPointXY(Point3D[] selPointArray)
+        {
+            Point3D returnValue = null;
+
+            foreach (Point3D eachPoint in selPointArray)
+            {
+                if (returnValue == null)
+                {
+                    returnValue = new Point3D();
+                    returnValue.X = eachPoint.X;
+                    returnValue.Y = eachPoint.Y;
+                }
+                else
+                {
+                    if (returnValue.X < eachPoint.X)
+                        returnValue.X = eachPoint.X;
+                    if (returnValue.Y < eachPoint.Y)
+                        returnValue.Y = eachPoint.Y;
+                }
+            }
+
+            return returnValue;
+        }
+
+        #region Dimension 최신
+        public List<Entity> GetDimension(Point3D selPoint1,Point3D selPoint2, string selType,double selDimHeight)
+        {
+            List<Entity> newList = new List<Entity>();
+
+            Point3D textCenter = new Point3D();
+
+            double selTextHeight = 2.5;
+            double selArrowHeight = 2.5;
+            string selDimtext = "AAAAAbbbbbccc";
+
+            double extLine1 = 2;
+            double extLine2 = 2;
+            double pointGapLine1 = 1;
+            double pointGapLine2 = 1;
+
+            double textGap = 1;
+
+            Line dimLine1=null;
+            Line dimLine2=null;
+            Line arrowLine=null;
+            Triangle tri1=null;
+            Triangle tri2=null;
+            Text dimText=null;
+
+
+
+            // Top
+            switch (selType)
+            {
+                case "TOP":
+                    textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
+                    textCenter.Y = Math.Min(selPoint1.Y, selPoint2.Y) + selDimHeight;
+
+                    arrowLine = new Line(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y));
+                    dimLine1 = new Line(new Point3D(selPoint1.X, selPoint1.Y + pointGapLine1), new Point3D(selPoint1.X, textCenter.Y + extLine1));
+                    dimLine2 = new Line(new Point3D(selPoint2.X, selPoint2.Y + pointGapLine2), new Point3D(selPoint2.X, textCenter.Y + extLine2));
+                    dimText = new Text(new Point3D(textCenter.X, textCenter.Y + textGap), selDimtext, selTextHeight);
+                    dimText.Alignment = Text.alignmentType.BaselineCenter;
+                    tri1 = new Triangle(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint1.X + selArrowHeight * 3, textCenter.Y + selArrowHeight / 2), new Point3D(selPoint1.X + selArrowHeight * 3, textCenter.Y - selArrowHeight / 2));
+                    tri2 = new Triangle(new Point3D(selPoint2.X, textCenter.Y), new Point3D(selPoint2.X - selArrowHeight * 3, textCenter.Y + selArrowHeight / 2), new Point3D(selPoint2.X - selArrowHeight * 3, textCenter.Y - selArrowHeight / 2));
+
+                    break;
+
+                case "BOTTOM":
+                    textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
+                    textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) - selDimHeight;
+
+                    arrowLine = new Line(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y));
+                    dimLine1 = new Line(new Point3D(selPoint1.X, selPoint1.Y - pointGapLine1), new Point3D(selPoint1.X, textCenter.Y - extLine1));
+                    dimLine2 = new Line(new Point3D(selPoint2.X, selPoint2.Y - pointGapLine2), new Point3D(selPoint2.X, textCenter.Y - extLine2));
+                    dimText = new Text(new Point3D(textCenter.X, textCenter.Y + textGap), selDimtext, selTextHeight);
+                    dimText.Alignment = Text.alignmentType.BaselineCenter;
+                    tri1 = new Triangle(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint1.X + selArrowHeight * 3, textCenter.Y + selArrowHeight / 2), new Point3D(selPoint1.X + selArrowHeight * 3, textCenter.Y - selArrowHeight / 2));
+                    tri2 = new Triangle(new Point3D(selPoint2.X, textCenter.Y), new Point3D(selPoint2.X - selArrowHeight * 3, textCenter.Y + selArrowHeight / 2), new Point3D(selPoint2.X - selArrowHeight * 3, textCenter.Y - selArrowHeight / 2));
+
+                    break;
+
+
+                case "LEFT":
+                    textCenter.X = Math.Max(selPoint1.X, selPoint2.X) - selDimHeight;
+                    textCenter.Y = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+
+                    arrowLine = new Line(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y));
+                    dimLine1 = new Line(new Point3D(selPoint1.X - pointGapLine1, selPoint1.Y ), new Point3D(textCenter.X - extLine1, selPoint1.Y ));
+                    dimLine2 = new Line(new Point3D(selPoint2.X - pointGapLine2, selPoint2.Y ), new Point3D(textCenter.X - extLine2, selPoint2.Y));
+                    Plane planeLeft = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
+                    dimText = new Text(planeLeft,new Point3D(textCenter.X-textGap, textCenter.Y), selDimtext, selTextHeight);
+                    dimText.Alignment = Text.alignmentType.BaselineCenter;
+                    //dimText.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
+                    tri1 = new Triangle(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X - selArrowHeight / 2, selPoint1.Y + selArrowHeight * 3), new Point3D(textCenter.X + selArrowHeight / 2, selPoint1.Y + selArrowHeight * 3));
+                    tri2 = new Triangle(new Point3D(textCenter.X, selPoint2.Y), new Point3D(textCenter.X - selArrowHeight / 2, selPoint2.Y - selArrowHeight * 3), new Point3D(textCenter.X + selArrowHeight / 2, selPoint2.Y - selArrowHeight * 3));
+
+                    break;
+
+                case "RIGHT":
+                    textCenter.X = Math.Min(selPoint1.X, selPoint2.X) + selDimHeight;
+                    textCenter.Y = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+
+                    arrowLine = new Line(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y));
+                    dimLine1 = new Line(new Point3D(selPoint1.X + pointGapLine1, selPoint1.Y), new Point3D(textCenter.X + extLine1, selPoint1.Y));
+                    dimLine2 = new Line(new Point3D(selPoint2.X + pointGapLine2, selPoint2.Y), new Point3D(textCenter.X + extLine2, selPoint2.Y));
+                    Plane planeLeft2 = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
+                    dimText = new Text(planeLeft2, new Point3D(textCenter.X - textGap, textCenter.Y), selDimtext, selTextHeight);
+                    dimText.Alignment = Text.alignmentType.BaselineCenter;
+                    //dimText.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
+                    tri1 = new Triangle(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X - selArrowHeight / 2, selPoint1.Y + selArrowHeight * 3), new Point3D(textCenter.X + selArrowHeight / 2, selPoint1.Y + selArrowHeight * 3));
+                    tri2 = new Triangle(new Point3D(textCenter.X, selPoint2.Y), new Point3D(textCenter.X - selArrowHeight / 2, selPoint2.Y - selArrowHeight * 3), new Point3D(textCenter.X + selArrowHeight / 2, selPoint2.Y - selArrowHeight * 3));
+
+                    break;
+
+            }
+
+            tri1.Color = Color.Blue;
+            tri1.ColorMethod = colorMethodType.byEntity;
+            tri1.
+            newList.Add(arrowLine);
+            newList.Add(dimLine1);
+            newList.Add(dimLine2);
+            newList.Add(dimText);
+            newList.Add(tri1);
+            newList.Add(tri2);
+
+            return newList;
+        }
+
+        #endregion
     }
 }

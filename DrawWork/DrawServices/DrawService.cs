@@ -183,7 +183,7 @@ namespace DrawWork.DrawServices
         }
 
 
-        public Entity[] Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3, 
+        public Entity[] Draw_DimensionOld(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3, 
                                     string selPosition, double selDimHeight, double selTextHeight, double selTextGap, double selArrowSize, 
                                     string selTextPrefix, string selTextSuffix, string selTextUserInput, 
                                     double selRotate)
@@ -259,6 +259,132 @@ namespace DrawWork.DrawServices
                 newDim.TextOverride = selTextUserInput;
 
             customEntityList.Add(newDim);
+
+            return customEntityList.ToArray();
+        }
+        public Entity[] Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3,
+                                    string selPosition, double selDimHeight, double selTextHeight, double selTextGap, double selArrowSize,
+                                    string selTextPrefix, string selTextSuffix, string selTextUserInput,
+                                    double selRotate)
+        {
+            List<Entity> customEntityList = new List<Entity>();
+
+
+            Point3D textCenter = new Point3D();
+
+            double selArrowHeight = 2.5;
+            if (selArrowSize > selArrowHeight)
+                selArrowHeight = selArrowSize;
+
+            string selDimtext = "";
+
+
+            double extLine1 = 2;
+            double extLine2 = 2;
+            double pointGapLine1 = 1;
+            double pointGapLine2 = 1;
+
+            double textGap = 1;
+            if (selTextGap > textGap)
+                textGap = selTextGap;
+
+            Line dimLine1 = null;
+            Line dimLine2 = null;
+            Line arrowLine = null;
+            Triangle tri1 = null;
+            Triangle tri2 = null;
+            Text dimText = null;
+
+
+
+            // Top
+            switch (selPosition)
+            {
+                case "top":
+                    textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
+                    textCenter.Y = Math.Min(selPoint1.Y, selPoint2.Y) + selDimHeight;
+                    selDimtext = Point3D.Distance(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y)).ToString();
+
+                    arrowLine = new Line(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y));
+                    dimLine1 = new Line(new Point3D(selPoint1.X, selPoint1.Y + pointGapLine1), new Point3D(selPoint1.X, textCenter.Y + extLine1));
+                    dimLine2 = new Line(new Point3D(selPoint2.X, selPoint2.Y + pointGapLine2), new Point3D(selPoint2.X, textCenter.Y + extLine2));
+                    dimText = new Text(new Point3D(textCenter.X, textCenter.Y + textGap), selDimtext, selTextHeight);
+                    dimText.Alignment = Text.alignmentType.BaselineCenter;
+                    tri1 = new Triangle(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint1.X + selArrowHeight * 3, textCenter.Y + selArrowHeight / 2), new Point3D(selPoint1.X + selArrowHeight * 3, textCenter.Y - selArrowHeight / 2));
+                    tri2 = new Triangle(new Point3D(selPoint2.X, textCenter.Y), new Point3D(selPoint2.X - selArrowHeight * 3, textCenter.Y + selArrowHeight / 2), new Point3D(selPoint2.X - selArrowHeight * 3, textCenter.Y - selArrowHeight / 2));
+
+                    break;
+
+                case "bottom":
+                    textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
+                    textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) - selDimHeight;
+                    selDimtext = Point3D.Distance(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y)).ToString();
+
+                    arrowLine = new Line(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y));
+                    dimLine1 = new Line(new Point3D(selPoint1.X, selPoint1.Y - pointGapLine1), new Point3D(selPoint1.X, textCenter.Y - extLine1));
+                    dimLine2 = new Line(new Point3D(selPoint2.X, selPoint2.Y - pointGapLine2), new Point3D(selPoint2.X, textCenter.Y - extLine2));
+                    dimText = new Text(new Point3D(textCenter.X, textCenter.Y + textGap), selDimtext, selTextHeight);
+                    dimText.Alignment = Text.alignmentType.BaselineCenter;
+                    tri1 = new Triangle(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint1.X + selArrowHeight * 3, textCenter.Y + selArrowHeight / 2), new Point3D(selPoint1.X + selArrowHeight * 3, textCenter.Y - selArrowHeight / 2));
+                    tri2 = new Triangle(new Point3D(selPoint2.X, textCenter.Y), new Point3D(selPoint2.X - selArrowHeight * 3, textCenter.Y + selArrowHeight / 2), new Point3D(selPoint2.X - selArrowHeight * 3, textCenter.Y - selArrowHeight / 2));
+
+                    break;
+
+
+                case "left":
+                    textCenter.X = Math.Max(selPoint1.X, selPoint2.X) - selDimHeight;
+                    textCenter.Y = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+                    selDimtext = Point3D.Distance(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y)).ToString();
+
+                    arrowLine = new Line(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y));
+                    dimLine1 = new Line(new Point3D(selPoint1.X - pointGapLine1, selPoint1.Y), new Point3D(textCenter.X - extLine1, selPoint1.Y));
+                    dimLine2 = new Line(new Point3D(selPoint2.X - pointGapLine2, selPoint2.Y), new Point3D(textCenter.X - extLine2, selPoint2.Y));
+                    Plane planeLeft = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
+                    dimText = new Text(planeLeft, new Point3D(textCenter.X - textGap, textCenter.Y), selDimtext, selTextHeight);
+                    dimText.Alignment = Text.alignmentType.BaselineCenter;
+                    //dimText.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
+                    tri1 = new Triangle(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X - selArrowHeight / 2, selPoint1.Y + selArrowHeight * 3), new Point3D(textCenter.X + selArrowHeight / 2, selPoint1.Y + selArrowHeight * 3));
+                    tri2 = new Triangle(new Point3D(textCenter.X, selPoint2.Y), new Point3D(textCenter.X - selArrowHeight / 2, selPoint2.Y - selArrowHeight * 3), new Point3D(textCenter.X + selArrowHeight / 2, selPoint2.Y - selArrowHeight * 3));
+
+                    break;
+
+                case "right":
+                    textCenter.X = Math.Min(selPoint1.X, selPoint2.X) + selDimHeight;
+                    textCenter.Y = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+                    selDimtext = Point3D.Distance(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y)).ToString();
+
+                    arrowLine = new Line(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y));
+                    dimLine1 = new Line(new Point3D(selPoint1.X + pointGapLine1, selPoint1.Y), new Point3D(textCenter.X + extLine1, selPoint1.Y));
+                    dimLine2 = new Line(new Point3D(selPoint2.X + pointGapLine2, selPoint2.Y), new Point3D(textCenter.X + extLine2, selPoint2.Y));
+                    Plane planeLeft2 = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
+                    dimText = new Text(planeLeft2, new Point3D(textCenter.X - textGap, textCenter.Y), selDimtext, selTextHeight);
+                    dimText.Alignment = Text.alignmentType.BaselineCenter;
+                    //dimText.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
+                    tri1 = new Triangle(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X - selArrowHeight / 2, selPoint1.Y + selArrowHeight * 3), new Point3D(textCenter.X + selArrowHeight / 2, selPoint1.Y + selArrowHeight * 3));
+                    tri2 = new Triangle(new Point3D(textCenter.X, selPoint2.Y), new Point3D(textCenter.X - selArrowHeight / 2, selPoint2.Y - selArrowHeight * 3), new Point3D(textCenter.X + selArrowHeight / 2, selPoint2.Y - selArrowHeight * 3));
+
+                    break;
+
+
+
+            }
+
+            if (selTextUserInput != "")
+                selDimtext = selTextUserInput;
+
+            if (selTextPrefix != "")
+                selDimtext = selTextPrefix + selDimtext;
+            if (selTextSuffix != "")
+                selDimtext = selDimtext + selTextSuffix;
+
+            dimText.TextString = selDimtext;
+
+            customEntityList.Add(arrowLine);
+            customEntityList.Add(dimLine1);
+            customEntityList.Add(dimLine2);
+            customEntityList.Add(dimText);
+            customEntityList.Add(tri1);
+            customEntityList.Add(tri2);
 
             return customEntityList.ToArray();
         }
