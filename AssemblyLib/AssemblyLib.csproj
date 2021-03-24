@@ -57,9 +57,15 @@
     <Compile Include="AssemblyModels\RoofOutputModel.cs" />
     <Compile Include="AssemblyModels\ShellInputModel.cs" />
     <Compile Include="AssemblyModels\ShellOutputModel.cs" />
+    <Compile Include="AssemblyModels\StructureCenterRingInputModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnBaseSupportModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnCenterModel.cs" />
+    <Compile Include="AssemblyModels\StructureColumnInputModel.cs" />
+    <Compile Include="AssemblyModels\StructureColumnRafterModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnSideModel.cs" />
+    <Compile Include="AssemblyModels\StructureGirderInputModel.cs" />
+    <Compile Include="AssemblyModels\StructureInputModel.cs" />
+    <Compile Include="AssemblyModels\StructureRafterInputModel.cs" />
     <Compile Include="AssemblyModels\WindGirderInputModel.cs" />
     <Compile Include="AssemblyModels\WindGirderOutputModel.cs" />
     <Compile Include="Class1.cs" />
