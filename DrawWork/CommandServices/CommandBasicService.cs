@@ -27,6 +27,8 @@ namespace DrawWork.CommandServices
         public TranslateDataService commandTranslate;
         public DrawObjectService drawObject;
 
+        public object singleModel;
+
         public DrawEntityModel drawEntity;
 
         public List<Entity> commandEntities;
@@ -41,6 +43,8 @@ namespace DrawWork.CommandServices
             commandData = new BasicCommandModel();
             commandTranslate = new TranslateDataService();
             drawObject = new DrawObjectService();
+
+            singleModel = null;
 
             drawEntity = new DrawEntityModel();
             commandEntities = new List<Entity>();
@@ -57,6 +61,8 @@ namespace DrawWork.CommandServices
             SetAssemblyData(selAssembly);
             commandTranslate = new TranslateDataService(selAssembly);
             drawObject = new DrawObjectService();
+
+            singleModel = null;
 
             drawEntity = new DrawEntityModel();
             commandEntities = new List<Entity>();
@@ -84,6 +90,8 @@ namespace DrawWork.CommandServices
         #region Execute
         public void ExecuteCommand(Object selModel)
         {
+            singleModel = selModel;
+
             commandData.commandListTrans = commandTranslate.TranslateCommand(commandData.commandList);
             commandTranslate.TranslateUsing(commandData.commandListTrans);
             commandData.commandListTransFunciton = commandTranslate.TranslateCommandFunction(commandData.commandListTrans);
@@ -194,6 +202,15 @@ namespace DrawWork.CommandServices
                     drawEntity.nozzlelineList.AddRange(newNozzle[CommonGlobal.NozzleLine]);
                     drawEntity.nozzleMarkList.AddRange(newNozzle[CommonGlobal.NozzleMark]);
                     drawEntity.nozzleTextList.AddRange(newNozzle[CommonGlobal.NozzleText]);
+                    goto case "allways";
+
+                // Leader
+                case "leader":
+                case "leaderline":
+                    Dictionary<string, List<Entity>> newLeader = drawObject.DoLeader(eachCmd, ref refPoint, ref curPoint, singleModel);
+                    drawEntity.leaderlineList.AddRange(newLeader[CommonGlobal.LeaderLine]);
+                    drawEntity.leaderTextList.AddRange(newLeader[CommonGlobal.LeaderText]);
+                    drawEntity.leaderArrowList.AddRange(newLeader[CommonGlobal.LeaderArrow]);
                     goto case "allways";
 
                 // Contact Point

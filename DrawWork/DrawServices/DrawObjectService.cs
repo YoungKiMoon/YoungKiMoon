@@ -699,5 +699,125 @@ namespace DrawWork.DrawServices
             return returnEntity;
         }
 
+        // Leader
+        public Dictionary<string, List<Entity>> DoLeader(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, object selModel)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            string newPosition = "";
+            string newLeaderType = "";
+            string newLength = "";
+            string newFontSize = "";
+            string newLayerHeight = "7";
+            List<string> newText = new List<string>();
+            List<string> newTextSub = new List<string>();
+
+            NozzleInputModel newNozzle = new NozzleInputModel();
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+
+                switch (eachCmd[j].ToLower())
+                {
+                    case "xy":
+                    case "xy1":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "type":
+                        if (j + 1 <= eachCmd.Length)
+                            newLeaderType = eachCmd[j + 1];
+                        break;
+
+                    case "position":
+                        if (j + 1 <= eachCmd.Length)
+                            newPosition = eachCmd[j + 1];
+                        break;
+
+                    case "length":
+                        if (j + 1 <= eachCmd.Length)
+                            newLength = eachCmd[j + 1];
+                        break;
+
+                    case "textheight":
+                        if (j + 1 <= eachCmd.Length)
+                            newFontSize = eachCmd[j + 1];
+                        break;
+
+                    case "layerheight":
+                        if (j + 1 <= eachCmd.Length)
+                            newLayerHeight = eachCmd[j + 1];
+                        break;
+
+                    case "text1":
+                    case "text01":
+                        if (j + 1 <= eachCmd.Length)
+                            newText.Add(eachCmd[j + 1]);
+                        break;
+                    case "text2":
+                    case "text02":
+                        if (j + 1 <= eachCmd.Length)
+                            newText.Add(eachCmd[j + 1]);
+                        break;
+                    case "text3":
+                    case "text03":
+                        if (j + 1 <= eachCmd.Length)
+                            newText.Add(eachCmd[j + 1]);
+                        break;
+                    case "text4":
+                    case "text04":
+                        if (j + 1 <= eachCmd.Length)
+                            newText.Add(eachCmd[j + 1]);
+                        break;
+
+                    case "textsub1":
+                    case "textsub01":
+                        if (j + 1 <= eachCmd.Length)
+                            newTextSub.Add(eachCmd[j + 1]);
+                        break;
+                    case "textsub2":
+                    case "textsub02":
+                        if (j + 1 <= eachCmd.Length)
+                            newTextSub.Add(eachCmd[j + 1]);
+                        break;
+                    case "textsub3":
+                    case "textsub03":
+                        if (j + 1 <= eachCmd.Length)
+                            newTextSub.Add(eachCmd[j + 1]);
+                        break;
+                    case "textsub4":
+                    case "textsub04":
+                        if (j + 1 <= eachCmd.Length)
+                            newTextSub.Add(eachCmd[j + 1]);
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            Dictionary<string, List<Entity>> returnEntity = new Dictionary<string, List<Entity>>(); ;
+
+            returnEntity = drawService.Draw_Leader(newPoint1, newLength,newPosition,newFontSize,newLayerHeight,newText,newTextSub, selModel as Model);
+
+            return returnEntity;
+        }
+
     }
 }

@@ -402,6 +402,216 @@ namespace DrawWork.DrawServices
             return customEntityList;
         }
 
+        public Dictionary<string, List<Entity>> Draw_Leader(CDPoint selPoint1, string selLength, string selPostion,string selTextHeight,string selLayerHeight, List<string> selText, List<string> selTextSub, Model ssModel)
+        {
+
+            List<Entity> leaderLine = new List<Entity>();
+            List<Entity> leaderArrow = new List<Entity>();
+            List<Entity> leaderText = new List<Entity>();
+
+            //selPoint1.X = 10;
+            //selPoint1.Y = 10;
+            double calDegree = 30;
+            double distance = valueService.GetDoubleValue( selLength);
+
+            double selArrowHeight = 2.5;
+            double textHeight = 2.5;
+            double textGap = 1;
+            double textLayerHeight = 7;
+
+            if (selTextHeight != "")
+                textHeight = valueService.GetDoubleValue(selTextHeight);
+            if (selLayerHeight != "")
+                textLayerHeight = valueService.GetDoubleValue(selLayerHeight);
+            
+
+            textLayerHeight = 7 * textHeight / 2.5;
+            textGap = textLayerHeight / 7;
+            selArrowHeight = textHeight;
+
+            Line newLeaderLine = null;
+            Triangle newLeaderArrow = null;
+            Point3D centerPoint = null;
+            double currentTextLayerHeight = 0;
+
+            switch (selPostion)
+            {
+                case "topright":
+
+                    calDegree = 60;
+
+                    newLeaderLine = new Line(selPoint1.X, selPoint1.Y, selPoint1.X + distance, selPoint1.Y);
+                    newLeaderLine.Rotate(Utility.DegToRad(calDegree), Vector3D.AxisZ, new Point3D(selPoint1.X, selPoint1.Y));
+
+                    // arrow
+                    newLeaderArrow = new Triangle(new Point3D(selPoint1.X, selPoint1.Y), new Point3D(selPoint1.X + selArrowHeight * 3, selPoint1.Y - selArrowHeight / 2), new Point3D(selPoint1.X + selArrowHeight * 3, selPoint1.Y + selArrowHeight / 2));
+                    newLeaderArrow.Rotate(Utility.DegToRad(calDegree), Vector3D.AxisZ, new Point3D(selPoint1.X, selPoint1.Y));
+
+                    centerPoint = newLeaderLine.EndPoint;
+                    currentTextLayerHeight = 0;
+                    foreach (string eachString in selText)
+                    {
+                        // Text
+                        Text newText01 = new Text(new Point3D(centerPoint.X + textGap, centerPoint.Y + currentTextLayerHeight + textGap), eachString, textHeight);
+                        newText01.Regen(new RegenParams(0, ssModel));
+                        newText01.Alignment = Text.alignmentType.BaselineLeft;
+
+                        // base Line
+                        Line newLieDefault = new Line(new Point3D(centerPoint.X, centerPoint.Y + currentTextLayerHeight), new Point3D(centerPoint.X + newText01.BoxSize.X + textGap * 2, centerPoint.Y + currentTextLayerHeight));
+                        leaderText.Add(newText01);
+                        leaderLine.Add(newLieDefault);
+
+                        // Vertical LIne
+                        if (currentTextLayerHeight > 0)
+                        {
+                            Line newVertialLine = new Line(new Point3D(centerPoint.X, centerPoint.Y + currentTextLayerHeight - textLayerHeight), new Point3D(centerPoint.X, centerPoint.Y + currentTextLayerHeight));
+                            leaderLine.Add(newVertialLine);
+                        }
+
+                        currentTextLayerHeight += textLayerHeight;
+                    }
+
+
+                    leaderLine.Add(newLeaderLine);
+                    leaderArrow.Add(newLeaderArrow);
+
+                    break;
+
+                case "bottomright":
+
+                    calDegree = -60;
+
+                    newLeaderLine = new Line(selPoint1.X, selPoint1.Y, selPoint1.X + distance, selPoint1.Y);
+                    newLeaderLine.Rotate(Utility.DegToRad(calDegree), Vector3D.AxisZ, new Point3D(selPoint1.X, selPoint1.Y));
+
+                    // arrow
+                    newLeaderArrow = new Triangle(new Point3D(selPoint1.X, selPoint1.Y), new Point3D(selPoint1.X + selArrowHeight * 3, selPoint1.Y - selArrowHeight / 2), new Point3D(selPoint1.X + selArrowHeight * 3, selPoint1.Y + selArrowHeight / 2));
+                    newLeaderArrow.Rotate(Utility.DegToRad(calDegree), Vector3D.AxisZ, new Point3D(selPoint1.X, selPoint1.Y));
+
+                    centerPoint = newLeaderLine.EndPoint;
+                    currentTextLayerHeight = 0;
+                    foreach (string eachString in selText)
+                    {
+                        // Text
+                        Text newText01 = new Text(new Point3D(centerPoint.X + textGap, centerPoint.Y + currentTextLayerHeight + textGap), eachString, textHeight);
+                        newText01.Regen(new RegenParams(0, ssModel));
+                        newText01.Alignment = Text.alignmentType.BaselineLeft;
+
+                        // base Line
+                        Line newLieDefault = new Line(new Point3D(centerPoint.X, centerPoint.Y + currentTextLayerHeight), new Point3D(centerPoint.X + newText01.BoxSize.X + textGap * 2, centerPoint.Y + currentTextLayerHeight));
+                        leaderText.Add(newText01);
+                        leaderLine.Add(newLieDefault);
+
+                        // Vertical LIne
+                        if (currentTextLayerHeight < 0)
+                        {
+                            Line newVertialLine = new Line(new Point3D(centerPoint.X, centerPoint.Y + currentTextLayerHeight + textLayerHeight), new Point3D(centerPoint.X, centerPoint.Y + currentTextLayerHeight));
+                            leaderLine.Add(newVertialLine);
+                        }
+
+                        currentTextLayerHeight -= textLayerHeight;
+                    }
+
+
+                    leaderLine.Add(newLeaderLine);
+                    leaderArrow.Add(newLeaderArrow);
+
+                    break;
+
+                case "topleft":
+
+                    calDegree = 120;
+
+                    newLeaderLine = new Line(selPoint1.X, selPoint1.Y, selPoint1.X + distance, selPoint1.Y);
+                    newLeaderLine.Rotate(Utility.DegToRad(calDegree), Vector3D.AxisZ, new Point3D(selPoint1.X, selPoint1.Y));
+
+                    // arrow
+                    newLeaderArrow = new Triangle(new Point3D(selPoint1.X, selPoint1.Y), new Point3D(selPoint1.X + selArrowHeight * 3, selPoint1.Y - selArrowHeight / 2), new Point3D(selPoint1.X + selArrowHeight * 3, selPoint1.Y + selArrowHeight / 2));
+                    newLeaderArrow.Rotate(Utility.DegToRad(calDegree), Vector3D.AxisZ, new Point3D(selPoint1.X, selPoint1.Y));
+
+                    centerPoint = newLeaderLine.EndPoint;
+                    currentTextLayerHeight = 0;
+                    foreach (string eachString in selText)
+                    {
+                        // Text
+                        Text newText01 = new Text(new Point3D(centerPoint.X - textGap, centerPoint.Y + currentTextLayerHeight + textGap), eachString, textHeight);
+                        newText01.Regen(new RegenParams(0, ssModel));
+                        newText01.Alignment = Text.alignmentType.BaselineRight;
+
+                        // base Line
+                        Line newLieDefault = new Line(new Point3D(centerPoint.X, centerPoint.Y + currentTextLayerHeight), new Point3D(centerPoint.X - newText01.BoxSize.X - textGap * 2, centerPoint.Y + currentTextLayerHeight));
+                        leaderText.Add(newText01);
+                        leaderLine.Add(newLieDefault);
+
+                        // Vertical LIne
+                        if (currentTextLayerHeight > 0)
+                        {
+                            Line newVertialLine = new Line(new Point3D(centerPoint.X, centerPoint.Y + currentTextLayerHeight - textLayerHeight), new Point3D(centerPoint.X, centerPoint.Y + currentTextLayerHeight));
+                            leaderLine.Add(newVertialLine);
+                        }
+
+                        currentTextLayerHeight += textLayerHeight;
+                    }
+
+
+                    leaderLine.Add(newLeaderLine);
+                    leaderArrow.Add(newLeaderArrow);
+
+                    break;
+
+
+                case "bottomleft":
+
+                    calDegree = -120;
+
+                    newLeaderLine = new Line(selPoint1.X, selPoint1.Y, selPoint1.X + distance, selPoint1.Y);
+                    newLeaderLine.Rotate(Utility.DegToRad(calDegree), Vector3D.AxisZ, new Point3D(selPoint1.X, selPoint1.Y));
+
+                    // arrow
+                    newLeaderArrow = new Triangle(new Point3D(selPoint1.X, selPoint1.Y), new Point3D(selPoint1.X + selArrowHeight * 3, selPoint1.Y - selArrowHeight / 2), new Point3D(selPoint1.X + selArrowHeight * 3, selPoint1.Y + selArrowHeight / 2));
+                    newLeaderArrow.Rotate(Utility.DegToRad(calDegree), Vector3D.AxisZ, new Point3D(selPoint1.X, selPoint1.Y));
+
+                    centerPoint = newLeaderLine.EndPoint;
+                    currentTextLayerHeight = 0;
+                    foreach (string eachString in selText)
+                    {
+                        // Text
+                        Text newText01 = new Text(new Point3D(centerPoint.X - textGap, centerPoint.Y + currentTextLayerHeight + textGap), eachString, textHeight);
+                        newText01.Regen(new RegenParams(0, ssModel));
+                        newText01.Alignment = Text.alignmentType.BaselineRight;
+
+                        // base Line
+                        Line newLieDefault = new Line(new Point3D(centerPoint.X, centerPoint.Y + currentTextLayerHeight), new Point3D(centerPoint.X - newText01.BoxSize.X - textGap * 2, centerPoint.Y + currentTextLayerHeight));
+                        leaderText.Add(newText01);
+                        leaderLine.Add(newLieDefault);
+
+                        // Vertical LIne
+                        if (currentTextLayerHeight < 0)
+                        {
+                            Line newVertialLine = new Line(new Point3D(centerPoint.X, centerPoint.Y + currentTextLayerHeight + textLayerHeight), new Point3D(centerPoint.X, centerPoint.Y + currentTextLayerHeight));
+                            leaderLine.Add(newVertialLine);
+                        }
+
+                        currentTextLayerHeight -= textLayerHeight;
+                    }
+
+
+                    leaderLine.Add(newLeaderLine);
+                    leaderArrow.Add(newLeaderArrow);
+
+                    break;
+
+            }
+
+
+            Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
+            customEntityList.Add(CommonGlobal.LeaderLine, leaderLine);
+            customEntityList.Add(CommonGlobal.LeaderText, leaderText);
+            customEntityList.Add(CommonGlobal.LeaderArrow, leaderArrow);
+
+            return customEntityList;
+        }
+
     }
 }
 

@@ -656,57 +656,67 @@ namespace DrawWork.DrawAutomationService
             List<Entity> leaderArrowLinearPathList = new List<Entity>();
             foreach (Entity eachEntity in leaderArrowList)
             {
+                double degree = 0;
+                Triangle newDegreeTri = (Triangle)eachEntity.Clone();
+                if (eachEntity.Vertices[0].Y < eachEntity.Vertices[1].Y)
+                {
+                    if (eachEntity.Vertices[0].X < eachEntity.Vertices[1].X)
+                    {
+                        //topright 60
+                        degree = 60;
+                    }
+                    else
+                    {
+                        //topleft 120
+                        degree = 120;
+                    }
+                }
+                else
+                {
+                    if (eachEntity.Vertices[0].X < eachEntity.Vertices[1].X)
+                    {
+                        //bottomright -60
+                        degree = -60;
+                    }
+                    else
+                    {
+                        //bottomleft -120
+                        degree = 120;
+                    }
+                }
+                newDegreeTri.Rotate(Utility.DegToRad(-degree), Vector3D.AxisZ, eachEntity.Vertices[0]);
+
+                // Degree
+                //newLeaderArrow.Rotate(Utility.DegToRad(calDegree), Vector3D.AxisZ, new Point3D(selPoint1.X, selPoint1.Y));
+
                 List<Point3D> newTriPath = new List<Point3D>();
-                newTriPath.AddRange(eachEntity.Vertices);
+                newTriPath.AddRange(newDegreeTri.Vertices);
 
                 Point3D centerPoint = new Point3D();
 
-                if (newTriPath[1].X == newTriPath[2].X)
+
+                // 왼쪽으로 표족한 삼각형
+                double newDistance = Point3D.Distance(newTriPath[1], newTriPath[2]);
+                double minValue = Math.Min(newTriPath[1].X, newTriPath[2].X);
+                double quotient = Math.Truncate(newDistance / breakRadius);
+
+                centerPoint.X = newTriPath[0].X;
+                if (newTriPath[0].Y < newTriPath[1].Y)
                 {
-                    // Left Right
-                    double newDistance = Point3D.Distance(newTriPath[1], newTriPath[2]);
-                    double minValue = Math.Min(newTriPath[1].Y, newTriPath[2].Y);
-                    double quotient = Math.Truncate(newDistance / breakRadius);
-
-                    centerPoint.Y = newTriPath[0].Y;
-                    if (newTriPath[0].X < newTriPath[1].X)
-                    {
-                        centerPoint.X = newTriPath[0].X + 1;
-                    }
-                    else
-                    {
-                        centerPoint.X = newTriPath[0].X - 1;
-                    }
-
-                    for (int i = 1; i <= quotient; i++)
-                    {
-                        Line newLine = new Line(newTriPath[0], new Point3D(newTriPath[1].X, minValue + breakRadius * i));
-                        leaderArrowLinearPathList.Add(newLine);
-                    }
+                    centerPoint.Y = newTriPath[0].Y + 1;
                 }
-                else if (newTriPath[1].Y == newTriPath[2].Y)
+                else
                 {
-                    // Top Bottom
-                    double newDistance = Point3D.Distance(newTriPath[1], newTriPath[2]);
-                    double minValue = Math.Min(newTriPath[1].X, newTriPath[2].X);
-                    double quotient = Math.Truncate(newDistance / breakRadius);
-
-                    centerPoint.X = newTriPath[0].X;
-                    if (newTriPath[0].Y < newTriPath[1].Y)
-                    {
-                        centerPoint.Y = newTriPath[0].Y + 1;
-                    }
-                    else
-                    {
-                        centerPoint.Y = newTriPath[0].Y - 1;
-                    }
-
-                    for (int i = 1; i <= quotient; i++)
-                    {
-                        Line newLine = new Line(newTriPath[0], new Point3D(minValue + breakRadius * i, newTriPath[1].Y));
-                        leaderArrowLinearPathList.Add(newLine);
-                    }
+                    centerPoint.Y = newTriPath[0].Y - 1;
                 }
+
+                for (int i = 1; i <= quotient; i++)
+                {
+                    Line newLine = new Line(centerPoint, new Point3D(minValue + breakRadius * i, newTriPath[1].Y));
+                    newLine.Rotate(Utility.DegToRad(degree), Vector3D.AxisZ, centerPoint);
+                    leaderArrowLinearPathList.Add(newLine);
+                }
+                
 
                 newTriPath = new List<Point3D>();
                 newTriPath.Add(centerPoint);
@@ -753,7 +763,7 @@ namespace DrawWork.DrawAutomationService
                 List<Entity> newEachTargetList = new List<Entity>();
 
                 // 문자 제외
-                if (!eachTarget.Contains("text"))
+                if (!eachTarget.Contains("text") && !eachTarget.Contains("arrow"))
                 {
                     foreach (ICurve targetLine in eachTargetList)
                     {

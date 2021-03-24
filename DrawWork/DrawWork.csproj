@@ -70,6 +70,7 @@
     <Compile Include="Commons\CommonGlobal.cs" />
     <Compile Include="Commons\SingletonData.cs" />
     <Compile Include="DrawAutomationService\AutomationDimensionService.cs" />
+    <Compile Include="DrawAutomationService\AutomationLeaderService.cs" />
     <Compile Include="DrawBuilders\LogicBuilder.cs" />
     <Compile Include="DrawModels\DrawDimStyle.cs" />
     <Compile Include="DrawModels\DrawEntityModel.cs" />
