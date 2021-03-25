@@ -17,15 +17,19 @@ using MColor = System.Windows.Media.Color;
 using DrawWork.DrawModels;
 using DrawWork.ValueServices;
 using DrawWork.Commons;
+using AssemblyLib.AssemblyModels;
 
 namespace DrawWork.DrawServices
 {
     public class DrawService
     {
+        private AssemblyModel assemblyData;
+
         private ValueService valueService;
 
-        public DrawService()
+        public DrawService(AssemblyModel selAssembly)
         {
+            assemblyData = selAssembly;
             valueService = new ValueService();
         }
 
@@ -59,11 +63,14 @@ namespace DrawWork.DrawServices
         }
 
 
+
         public Arc Draw_Arc(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3)
         {
             Arc newArc = new Arc(new Point3D(selPoint1.X, selPoint1.Y,0), new Point3D(selPoint2.X, selPoint2.Y, 0), new Point3D(selPoint3.X, selPoint3.Y, 0));
             return newArc;
         }
+
+
         public Text Draw_Text(CDPoint selPoint1, string selText, double selHeight, string selAlign)
         {
 
@@ -101,14 +108,14 @@ namespace DrawWork.DrawServices
 
             return newPoint;
         }
-
         public string GetPointDataCal(string selCmd, string selXY, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             string calStr = "";
             string newStr = "";
             string newValue = "";
+            #region 사용 안함
             //bool calStart = false;
-
+            /*
             foreach (char ch in selCmd)
             {
                 switch (ch)
@@ -142,8 +149,11 @@ namespace DrawWork.DrawServices
                 }
 
             }
+            */
+            //newValue += GetPointDataCalAlpha(newStr, selXY, ref refPoint, ref curPoint);
+            #endregion
 
-            newValue += GetPointDataCalAlpha(newStr, selXY, ref refPoint, ref curPoint);
+            newValue += GetPointDataCalAlpha(selCmd, selXY, ref refPoint, ref curPoint);
 
 
 
@@ -402,7 +412,11 @@ namespace DrawWork.DrawServices
             return customEntityList;
         }
 
-        public Dictionary<string, List<Entity>> Draw_Leader(CDPoint selPoint1, string selLength, string selPostion,string selTextHeight,string selLayerHeight, List<string> selText, List<string> selTextSub, Model ssModel)
+        public Dictionary<string, List<Entity>> Draw_Leader(CDPoint selPoint1, 
+                                    string selLength, string selPostion,string selTextHeight,string selLayerHeight,
+                                    List<string> selText, List<string> selTextSub, 
+                                    Model ssModel)
+
         {
 
             List<Entity> leaderLine = new List<Entity>();

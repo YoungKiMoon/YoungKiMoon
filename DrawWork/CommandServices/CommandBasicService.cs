@@ -37,22 +37,6 @@ namespace DrawWork.CommandServices
         //public List<Entity[]> commandNozzleEntities;
 
         #region CONSTRUCTOR
-        public CommandBasicService()
-        {
-            assemblyData = new AssemblyModel();
-            commandData = new BasicCommandModel();
-            commandTranslate = new TranslateDataService();
-            drawObject = new DrawObjectService();
-
-            singleModel = null;
-
-            drawEntity = new DrawEntityModel();
-            commandEntities = new List<Entity>();
-
-            //commandDimensionEntities = new List<Entity[]>();
-            //commandNozzleEntities = new List<Entity[]>();
-        }
-
         public CommandBasicService(List<CommandLineModel> selCommandList,AssemblyModel selAssembly)
         {
             assemblyData = new AssemblyModel();
@@ -60,15 +44,12 @@ namespace DrawWork.CommandServices
             SetCommandData(selCommandList);
             SetAssemblyData(selAssembly);
             commandTranslate = new TranslateDataService(selAssembly);
-            drawObject = new DrawObjectService();
+            drawObject = new DrawObjectService(selAssembly);
 
             singleModel = null;
 
             drawEntity = new DrawEntityModel();
             commandEntities = new List<Entity>();
-
-            //commandDimensionEntities = new List<Entity[]>();
-            //commandNozzleEntities = new List<Entity[]>();
 
         }
         #endregion
@@ -145,7 +126,7 @@ namespace DrawWork.CommandServices
 
             switch (cmdObject)
             {
-
+                // Point
                 case "refpoint":
                     drawObject.DoRefPoint(eachCmd, ref refPoint, ref curPoint);
                     goto case "allways";
@@ -154,6 +135,15 @@ namespace DrawWork.CommandServices
                     drawObject.DoPoint(eachCmd, ref refPoint, ref curPoint);
                     goto case "allways";
 
+                // Contact Point
+                case "wp":
+                case "cp":
+                case "cpoint":
+                case "contactpoint":
+                    drawObject.DoContactPoint(eachCmd, ref refPoint, ref curPoint);
+                    goto case "allways";
+
+                // Object
                 case "line":
                     drawEntity.outlineList.Add(drawObject.DoLine(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
@@ -192,12 +182,12 @@ namespace DrawWork.CommandServices
                 // Block
                 case "blocktopangle":
                 case "topangle":
-                    drawEntity.outlineList.AddRange(drawObject.DoBlockTopAngle(eachCmd, ref refPoint, ref curPoint, assemblyData.AngleInput));
+                    drawEntity.outlineList.AddRange(drawObject.DoBlockTopAngle(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
 
                 // Nozzle
                 case "nozzle":
-                    Dictionary<string, List<Entity>> newNozzle = drawObject.DoNozzle(eachCmd, ref refPoint, ref curPoint, assemblyData);
+                    Dictionary<string, List<Entity>> newNozzle = drawObject.DoNozzle(eachCmd, ref refPoint, ref curPoint);
                     drawEntity.outlineList.AddRange(newNozzle[CommonGlobal.OutLine]);
                     drawEntity.nozzlelineList.AddRange(newNozzle[CommonGlobal.NozzleLine]);
                     drawEntity.nozzleMarkList.AddRange(newNozzle[CommonGlobal.NozzleMark]);
@@ -211,13 +201,6 @@ namespace DrawWork.CommandServices
                     drawEntity.leaderlineList.AddRange(newLeader[CommonGlobal.LeaderLine]);
                     drawEntity.leaderTextList.AddRange(newLeader[CommonGlobal.LeaderText]);
                     drawEntity.leaderArrowList.AddRange(newLeader[CommonGlobal.LeaderArrow]);
-                    goto case "allways";
-
-                // Contact Point
-                case "cp":
-                case "cpoint":
-                case "contactpoint":
-                    drawObject.DoContactPoint(eachCmd, ref refPoint, ref curPoint,assemblyData);
                     goto case "allways";
 
 

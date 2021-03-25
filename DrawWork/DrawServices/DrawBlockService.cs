@@ -23,10 +23,13 @@ namespace DrawWork.DrawServices
 {
     public class DrawBlockService
     {
+        private AssemblyModel assemblyData;
+
         private ValueService valueService;
 
-        public DrawBlockService()
+        public DrawBlockService(AssemblyModel selAssembly)
         {
+            assemblyData = selAssembly;
             valueService = new ValueService();
         }
 

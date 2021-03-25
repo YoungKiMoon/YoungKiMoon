@@ -22,10 +22,13 @@ namespace DrawWork.DrawServices
 {
     public class DrawNozzleService
     {
+        private AssemblyModel assemblyData;
+
         private ValueService valueService;
 
-        public DrawNozzleService()
+        public DrawNozzleService(AssemblyModel selAssembly)
         {
+            assemblyData = selAssembly;
             valueService = new ValueService();
         }
 
@@ -35,8 +38,7 @@ namespace DrawWork.DrawServices
                                       string selNozzlePosition,
                                       string selNozzleFontSize,
                                       string selLeaderCircleSize,
-                                      string selMultiColumn, 
-                                      AssemblyModel selAssembly)
+                                      string selMultiColumn)
         {
 
             // Shell Spacing
@@ -47,7 +49,7 @@ namespace DrawWork.DrawServices
 
             // Nozzle Area
             double lowerAreaLeft = refPoint.X- shellSpacingLeft;
-            double upperAreaLeft = valueService.GetDoubleValue(selAssembly.GeneralDesignData.SizeTankHeight);
+            double upperAreaLeft = valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight);
             double lowerAreaRight = 400;
             double upperAreaRight = 400;
             double lowerAreaBottom = 400;
@@ -80,7 +82,7 @@ namespace DrawWork.DrawServices
             List<NozzleInputModel> drawNozzle = new List<NozzleInputModel>();
 
             // Model
-            foreach (NozzleInputModel eachNozzle in selAssembly.NozzleInputModel)
+            foreach (NozzleInputModel eachNozzle in assemblyData.NozzleInputModel)
             {
                 if (eachNozzle.Position.ToLower() == selPosition)
                 {
