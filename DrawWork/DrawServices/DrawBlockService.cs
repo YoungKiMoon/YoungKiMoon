@@ -54,12 +54,12 @@ namespace DrawWork.DrawServices
 
             }
 
-            Line lineA = new Line(GetSumPoint(drawPoint, 0, AB, 0), GetSumPoint(drawPoint,AB, AB, 0));
-            Line lineAa = new Line(GetSumPoint(drawPoint, 0, AB - t, 0), GetSumPoint(drawPoint, AB - t, AB - t, 0));
-            Line lineAt = new Line(GetSumPoint(drawPoint, 0, AB, 0), GetSumPoint(drawPoint, 0, AB - t, 0));
-            Line lineB = new Line(GetSumPoint(drawPoint, AB, AB, 0), GetSumPoint(drawPoint, AB, 0, 0));
-            Line lineBb = new Line(GetSumPoint(drawPoint, AB - t, AB - t, 0), GetSumPoint(drawPoint, AB - t, 0, 0));
-            Line lineBt = new Line(GetSumPoint(drawPoint, AB - t, 0, 0), GetSumPoint(drawPoint, AB, 0, 0));
+            Line lineA = new Line(GetSumPoint(drawPoint, 0, AB), GetSumPoint(drawPoint,AB, AB));
+            Line lineAa = new Line(GetSumPoint(drawPoint, 0, AB - t), GetSumPoint(drawPoint, AB - t, AB - t));
+            Line lineAt = new Line(GetSumPoint(drawPoint, 0, AB), GetSumPoint(drawPoint, 0, AB - t));
+            Line lineB = new Line(GetSumPoint(drawPoint, AB, AB), GetSumPoint(drawPoint, AB, 0));
+            Line lineBb = new Line(GetSumPoint(drawPoint, AB - t, AB - t), GetSumPoint(drawPoint, AB - t, 0));
+            Line lineBt = new Line(GetSumPoint(drawPoint, AB - t, 0), GetSumPoint(drawPoint, AB, 0));
 
 
             List<Entity> customBlockList = new List<Entity>();

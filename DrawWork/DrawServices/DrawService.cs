@@ -25,11 +25,14 @@ namespace DrawWork.DrawServices
     {
         private AssemblyModel assemblyData;
 
+        private DrawContactPointService cpService;
         private ValueService valueService;
 
         public DrawService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
+            cpService = new DrawContactPointService(selAssembly);
+
             valueService = new ValueService();
         }
 
@@ -108,7 +111,7 @@ namespace DrawWork.DrawServices
 
             return newPoint;
         }
-        public string GetPointDataCal(string selCmd, string selXY, ref CDPoint refPoint, ref CDPoint curPoint)
+        private string GetPointDataCal(string selCmd, string selXY, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             string calStr = "";
             string newStr = "";
@@ -162,38 +165,86 @@ namespace DrawWork.DrawServices
 
 
         }
-        public string GetPointDataCalAlpha(string selPoint, string selXY, ref CDPoint refPoint, ref CDPoint curPoint)
+        private string GetPointDataCalAlpha(string selPoint, string selXY, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             string newValue = "";
             string newPoint = selPoint.Replace("@", "");
-            if (newPoint == "refpointx")
+
+            // Control Point
+            if (newPoint.Contains("cp["))
+                newPoint = "cp";
+
+            switch (newPoint)
             {
-                newValue = refPoint.X.ToString();
-            }
-            else if (newPoint == "refpointy")
-            {
-                newValue = refPoint.Y.ToString();
-            }
-            else
-            {
-                if (selXY == "x")
-                {
-                    newValue = newPoint;
-                    if (selPoint.Contains("@"))
-                        newValue += "+" + curPoint.X.ToString();
-                }
-                else if (selXY == "y")
-                {
-                    newValue = newPoint;
-                    if (selPoint.Contains("@"))
-                        newValue += "+" + curPoint.Y.ToString();
-                }
+                case "refpointx":
+                    newValue = refPoint.X.ToString();
+                    break;
+                case "refpointy":
+                    newValue = refPoint.Y.ToString();
+                    break;
+
+                case "wp":
+                case "cp":
+                case "cpoint":
+                case "contactpoint":
+                    string[] contactArray = GetContactPointArray(selPoint);
+                    CDPoint contactPoint= cpService.ContactPoint(contactArray[0], ref refPoint, ref curPoint);
+                    if (contactArray[1] == "x")
+                    {
+                        newValue = contactPoint.X.ToString();
+                    }
+                    else if (contactArray[1] == "y")
+                    {
+                        newValue = contactPoint.Y.ToString();
+                    }
+                    break;
+
+
+                default:
+                    if (selXY == "x")
+                    {
+                        newValue = newPoint;
+                        if (selPoint.Contains("@"))
+                            newValue += "+" + curPoint.X.ToString();
+                    }
+                    else if (selXY == "y")
+                    {
+                        newValue = newPoint;
+                        if (selPoint.Contains("@"))
+                            newValue += "+" + curPoint.Y.ToString();
+                    }
+                    break;
 
             }
+
+
             return newValue;
         }
+        private string[] GetContactPointArray(string selPoint)
+        {
+            string contactPointName = "";
+            string contactPointValue = "";
+            if (selPoint.Contains("["))
+            {
+                string[] firstArray = selPoint.Split(new char[] { '[' });
+                foreach(string eachStr in firstArray)
+                {
+                    if (eachStr.Contains("]"))
+                    {
+                        string[] secondArray = eachStr.Split(new char[] { ']' });
+                        contactPointName = secondArray[0];
+                        if (secondArray[1].Contains("."))
+                        {
+                            string[] thridArray = secondArray[1].Split(new char[] { '.' });
+                            contactPointValue = thridArray[1].Trim();
+                        }
+                    }
+                }
+            }
+            return new string[2]{ contactPointName,contactPointValue};
+        }
 
-
+        // 사용 안함
         public Entity[] Draw_DimensionOld(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3, 
                                     string selPosition, double selDimHeight, double selTextHeight, double selTextGap, double selArrowSize, 
                                     string selTextPrefix, string selTextSuffix, string selTextUserInput, 

@@ -453,6 +453,28 @@ namespace DrawWork.CommandServices
             string selCmdStr = selCmdArray[0].ToLower();
             int selCmdIndex = GetIndexValue(selCmdArray[1]);
 
+            // Bracket
+            string bracketResult="";
+            int intValue = 0;
+            if (int.TryParse(selCmdArray[1], out intValue))
+            {
+                selCmdIndex = intValue-1;
+            }
+            else
+            {
+                string selCmdNewBracket = selCmdArray[1];
+                #region Translate Model Switch : bracket
+                foreach (string eachUsing in usingData)
+                {
+                    bracketResult = translateModelService.GetTranslateModelSwitch(eachUsing, selCmdNewBracket, selCmdNewBracket, 0);
+                    if (bracketResult != "nothing")
+                        break;
+                }
+                if (bracketResult == "nothing")
+                    bracketResult = selCmdNewBracket;
+                selCmdIndex= valueService.GetIntValue(bracketResult)-1;
+                #endregion
+            }
 
 
             #region Translate Model Switch
