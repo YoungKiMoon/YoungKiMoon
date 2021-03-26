@@ -44,14 +44,27 @@ namespace DrawWork.DrawServices
             Line newLine = new Line(selPoint1.X, selPoint1.Y, selPoint2.X, selPoint2.Y);
             return newLine;
         }
-        public Line Draw_Line(CDPoint selPoint1, CDPoint selPoint2, double selDegree)
+        public Line Draw_Line(CDPoint selPoint1, CDPoint selPoint2, double selDegree, string selDirection)
         {
             // arctan // X: 1로 고정
-            double calDegree = Math.Atan2(1,selDegree);
+            double calDegree = Math.Atan2(1, selDegree);
 
-            double tempWidth = Point3D.Distance(new Point3D(selPoint1.X,selPoint1.Y,selPoint1.Z), new Point3D(selPoint2.X, selPoint2.Y, selPoint2.Z));
-            double tempHeight = tempWidth * calDegree;
-            Line newLine = new Line(selPoint1.X, selPoint1.Y, selPoint2.X, selPoint1.Y + tempHeight);
+            double tempWidth = 0;
+            double tempHeight = 0;
+            Line newLine = null;
+            if (selDirection == "x")
+            {
+                tempWidth = Point3D.Distance(new Point3D(selPoint1.X, selPoint1.Y, selPoint1.Z), new Point3D(selPoint2.X, selPoint1.Y, selPoint2.Z));
+                tempHeight = tempWidth* calDegree;
+                newLine= new Line(selPoint1.X, selPoint1.Y, selPoint2.X, selPoint1.Y + tempHeight);
+            }   
+            else if(selDirection=="y")
+            {
+                tempWidth = Point3D.Distance(new Point3D(selPoint1.X, selPoint1.Y, selPoint1.Z), new Point3D(selPoint1.X, selPoint2.Y, selPoint2.Z));
+                tempHeight = tempWidth * calDegree;
+                newLine = new Line(selPoint1.X, selPoint1.Y, selPoint1.X + tempHeight, selPoint2.Y);
+            }
+
             return newLine;
         }
 
@@ -116,31 +129,23 @@ namespace DrawWork.DrawServices
             string calStr = "";
             string newStr = "";
             string newValue = "";
-            #region 사용 안함
-            //bool calStart = false;
-            /*
+            bool calStart = false;
+
+            bool closeBracket = true;
             foreach (char ch in selCmd)
             {
-                switch (ch)
-                {
-                    case '+':
-                        calStr = "+";
-                        break;
-                    case '-':
-                        calStr = "-";
-                        break;
-                    case '*':
-                        calStr = "*";
-                        break;
-                    case '/':
-                        calStr = "/";
-                        break;
-                }
-                if (calStr != "")
-                {
-                    //calStart = true;
+                if (ch == '[')
+                    closeBracket = false;
+                if (ch == ']')
+                    closeBracket = true;
 
-                    newValue += GetPointDataCalAlpha(newStr, selXY, ref refPoint, ref curPoint);
+                calStr = getCalculationCharacter(ch);
+
+                if (calStr != "" && closeBracket)
+                {
+                    calStart = true;
+
+                    newValue += GetPointDataCalAlpha(newStr,selXY,ref refPoint,ref curPoint);
                     newValue += calStr;
 
                     newStr = "";
@@ -152,11 +157,8 @@ namespace DrawWork.DrawServices
                 }
 
             }
-            */
-            //newValue += GetPointDataCalAlpha(newStr, selXY, ref refPoint, ref curPoint);
-            #endregion
 
-            newValue += GetPointDataCalAlpha(selCmd, selXY, ref refPoint, ref curPoint);
+            newValue += GetPointDataCalAlpha(newStr, selXY, ref refPoint, ref curPoint);
 
 
 
@@ -205,13 +207,28 @@ namespace DrawWork.DrawServices
                     {
                         newValue = newPoint;
                         if (selPoint.Contains("@"))
-                            newValue += "+" + curPoint.X.ToString();
+                            if (newPoint == "")
+                            {
+                                newValue = curPoint.X.ToString() + "+" + "0";
+                            }
+                            else
+                            {
+                                newValue = curPoint.X.ToString() + "+" + newValue;
+                            }
                     }
                     else if (selXY == "y")
                     {
                         newValue = newPoint;
                         if (selPoint.Contains("@"))
-                            newValue += "+" + curPoint.Y.ToString();
+                            if (newPoint == "")
+                            {
+                                newValue = curPoint.Y.ToString() + "+" + "0";
+                            }
+                            else
+                            {
+                                newValue = curPoint.Y.ToString() + "+" + newValue;
+                            }
+                            
                     }
                     break;
 
@@ -242,6 +259,26 @@ namespace DrawWork.DrawServices
                 }
             }
             return new string[2]{ contactPointName,contactPointValue};
+        }
+        private string getCalculationCharacter(char ch)
+        {
+            string calStr = "";
+            switch (ch)
+            {
+                case '+':
+                    calStr = "+";
+                    break;
+                case '-':
+                    calStr = "-";
+                    break;
+                case '*':
+                    calStr = "*";
+                    break;
+                case '/':
+                    calStr = "/";
+                    break;
+            }
+            return calStr;
         }
 
         // 사용 안함

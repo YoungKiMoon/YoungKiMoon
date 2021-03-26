@@ -45,9 +45,12 @@ namespace DrawWork.DrawServices
                             {
                                 if (eachAngle.Size == newAngleSize)
                                 {
+                                    // Max course count
+                                    int maxCourse = valueService.GetIntValue(assemblyData.ShellInput[0].CourseCount) - 1;
                                     // Point
                                     cpPoint.X = refPoint.X 
-                                                - valueService.GetDoubleValue(eachAngle.E);
+                                                - valueService.GetDoubleValue(eachAngle.E)
+                                                - valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].MinThk);
                                     cpPoint.Y = refPoint.Y 
                                                 + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight);
                                     break;
@@ -66,8 +69,11 @@ namespace DrawWork.DrawServices
                             {
                                 if (eachAngle.Size == newAngleSize)
                                 {
+                                    // Max course count
+                                    int maxCourse = valueService.GetIntValue(assemblyData.ShellInput[0].CourseCount) - 1;
                                     // Point
-                                    cpPoint.X = refPoint.X;
+                                    cpPoint.X = refPoint.X
+                                                - valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].MinThk);
                                     cpPoint.Y = refPoint.Y 
                                                 + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight)
                                                 - valueService.GetDoubleValue(assemblyData.RoofOutput[0].TwoTcMax);

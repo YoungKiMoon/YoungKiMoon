@@ -140,6 +140,7 @@ namespace DrawWork.DrawServices
                             curPoint.Y = newSetPoint.Y;
                         }
                         break;
+
                 }
             }
 
@@ -147,6 +148,7 @@ namespace DrawWork.DrawServices
             Line customLine= drawService.Draw_Line(newPoint1, newPoint2);
 
             // Method
+            Line customLineMethod = null;
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
                 switch (eachCmd[j].ToLower())
@@ -154,10 +156,54 @@ namespace DrawWork.DrawServices
                     case "offset":
                         if (j + 1 <= eachCmd.Length)
                         {
-                            newOffsetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                            
+                            double offsetDistance = valueService.GetDoubleValue(eachCmd[j + 1]);
+                            customLineMethod = customLine.Offset(offsetDistance, Vector3D.AxisZ) as Line;
                         }
                             
+                        break;
+
+                    case "rotater":
+                    case "rotateradian":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            double rotateRadians = valueService.GetDoubleValue(eachCmd[j + 1]);
+                            customLine.Rotate(Math.Atan2(1, rotateRadians), Vector3D.AxisZ,customLine.StartPoint);
+                        }
+                        break;
+
+                    case "rotated":
+                    case "rotatedegree":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            double rotateDegree = valueService.GetDoubleValue(eachCmd[j + 1]);
+                            customLine.Rotate(UtilityEx.DegToRad(rotateDegree), Vector3D.AxisZ,customLine.StartPoint);
+                        }
+                        break;
+                }
+            }
+            if (customLineMethod != null)
+                customLine = customLineMethod;
+
+            // Working Point
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "wp":
+                    case "workingpoint":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            if(eachCmd[j + 1] == "start")
+                            {
+                                curPoint.X = customLine.StartPoint.X;
+                                curPoint.Y = customLine.StartPoint.Y;
+                            }
+                            else if (eachCmd[j + 1] == "end")
+                            {
+                                curPoint.X = customLine.EndPoint.X;
+                                curPoint.Y = customLine.EndPoint.Y;
+                            }
+                        }
                         break;
 
                 }
@@ -177,6 +223,7 @@ namespace DrawWork.DrawServices
             CDPoint newPoint2 = new CDPoint();
             CDPoint newSetPoint = new CDPoint();
             double newDgree = 0;
+            string newDirection = "x";
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
@@ -197,6 +244,11 @@ namespace DrawWork.DrawServices
                             newDgree = valueService.GetDoubleValue(eachCmd[j + 1]);
                         break;
 
+                    case "direction":
+                        if (j + 1 <= eachCmd.Length)
+                            newDirection = eachCmd[j + 1];
+                        break;
+
                     case "sp":
                         if (j + 1 <= eachCmd.Length)
                         {
@@ -208,8 +260,10 @@ namespace DrawWork.DrawServices
                 }
             }
 
-            Line returnEntity= drawService.Draw_Line(newPoint1, newPoint2, newDgree);
-            // Mirror
+            Line returnEntity= drawService.Draw_Line(newPoint1, newPoint2, newDgree, newDirection);
+
+            // Method
+            Line customLineMethod = null;
             if (returnEntity != null)
             {
                 for (int j = refIndex; j < eachCmd.Length; j += 2)
@@ -232,11 +286,54 @@ namespace DrawWork.DrawServices
                                 }
                             }
 
-                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
                             break;
 
+                        case "offset":
+                            if (j + 1 <= eachCmd.Length)
+                            {
+                                double offsetDistance = valueService.GetDoubleValue(eachCmd[j + 1]);
+                                customLineMethod = returnEntity.Offset(offsetDistance, Vector3D.AxisZ) as Line;
+                            }
+
+                            break;
+
+                        case "rotate":
+                            if (j + 1 <= eachCmd.Length)
+                            {
+                                double rotateRadians = valueService.GetDoubleValue(eachCmd[j + 1]);
+                                //customLineMethod = returnEntity.Offset(offsetDistance, Vector3D.AxisZ) as Line;
+                            }
+
+                            break;
 
                     }
+                }
+            }
+            if (customLineMethod != null)
+                returnEntity = customLineMethod;
+
+            // Working Point
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "wp":
+                    case "workingpoint":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            if (eachCmd[j + 1] == "start")
+                            {
+                                curPoint.X = returnEntity.StartPoint.X;
+                                curPoint.Y = returnEntity.StartPoint.Y;
+                            }
+                            else if (eachCmd[j + 1] == "end")
+                            {
+                                curPoint.X = returnEntity.EndPoint.X;
+                                curPoint.Y = returnEntity.EndPoint.Y;
+                            }
+                        }
+                        break;
+
                 }
             }
 

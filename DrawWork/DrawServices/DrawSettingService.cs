@@ -1039,7 +1039,7 @@ namespace DrawWork.DrawServices
 
 
                 #region Line Break : ing
-                if (true)
+                if (false)
                 {
 
 
@@ -1342,7 +1342,7 @@ namespace DrawWork.DrawServices
 
 
                 #region Leader
-                if (true)
+                if (false)
                 {
                     List<string> leaderText = new List<string>();
                     leaderText.Add("B1AAAAaaaaaM");
@@ -1364,11 +1364,31 @@ namespace DrawWork.DrawServices
                     singleModel.Entities.AddRange(cccccc);
 
 
-                    singleModel.Entities.Regen();
-                    singleModel.ZoomFit();
-                    singleModel.SetView(viewType.Top);
+                }
+
+                #endregion
+
+                #region offset
+                if (true)
+                {
+                    Line newLine = new Line(new Point3D(0, 0), new Point3D(30, 30));
+                    
+                    singleModel.Entities.Add(newLine, Color.Red);
+                    Line newLineOffset1 = newLine.Offset(10, Vector3D.AxisZ) as Line;
+                    Line newLineOffset2 = newLine.Offset(-5, Vector3D.AxisZ) as Line;
+
+                    newLine.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
+                    singleModel.Entities.Add(newLine, Color.Red);
+                    singleModel.Entities.Add(newLineOffset1, Color.Blue);
+                    singleModel.Entities.Add(newLineOffset2, Color.Green);
+
+                    
                 }
                 #endregion
+
+                singleModel.Entities.Regen();
+                singleModel.ZoomFit();
+                singleModel.SetView(viewType.Top);
             }
 
 

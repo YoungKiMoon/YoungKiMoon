@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using DrawWork.CommandModels;
 using DrawWork.ValueServices;
 using AssemblyLib.AssemblyModels;
+using System.Diagnostics;
 
 namespace DrawWork.CommandServices
 {
@@ -55,14 +56,20 @@ namespace DrawWork.CommandServices
         {
             char[] spaceChar = new char[] { ' ' };
             List<string[]> resultCmd = new List<string[]>();
+            Dictionary<string, int> excludingRemark = GetRemark();
+
             foreach (CommandLineModel eachCmd in selCmd)
             {
                 string eachCmdNew = eachCmd.CommandText.Replace("\t", " ");
                 eachCmdNew = eachCmdNew.TrimStart();
+                
                 if (eachCmdNew != "")
                 {
-                    string[] cmdArray = eachCmdNew.Split(spaceChar, StringSplitOptions.RemoveEmptyEntries);
-                    resultCmd.Add(cmdArray);
+                    if (!excludingRemark.ContainsKey(eachCmdNew.Substring(0, 1)))
+                    {
+                        string[] cmdArray = eachCmdNew.Split(spaceChar, StringSplitOptions.RemoveEmptyEntries);
+                        resultCmd.Add(cmdArray);
+                    }
                 }
                 else
                 {
@@ -71,6 +78,13 @@ namespace DrawWork.CommandServices
             }
 
             return resultCmd;
+        }
+        private Dictionary<string, int> GetRemark()
+        {
+            Dictionary<string, int> returnValue = new Dictionary<string, int>();
+            returnValue.Add("/", 0);
+            returnValue.Add("#", 0);
+            return returnValue;
         }
         #endregion
 
@@ -147,7 +161,8 @@ namespace DrawWork.CommandServices
                                 else
                                 {
                                     string tempEndValue = GetModelDataCal(eachCmd[3]);
-                                    endValue = valueService.GetIntValue(tempEndValue);
+                                    double tempendValueDouble=valueService.Evaluate(tempEndValue);
+                                    endValue = valueService.GetIntValue(tempendValueDouble.ToString());
                                 }
 ;
                             }
@@ -294,6 +309,7 @@ namespace DrawWork.CommandServices
 
             for (int i = 0; i < selCmd.Count; i++)
             {
+
                 string[] eachCmd = selCmd[i];
                 if (eachCmd != null)
                 {
@@ -354,11 +370,17 @@ namespace DrawWork.CommandServices
             string newValue = "";
             bool calStart = false;
 
+            bool closeBracket = true;  
             foreach (char ch in selCmd)
             {
+                if (ch == '[')
+                    closeBracket = false;
+                if (ch == ']')
+                    closeBracket = true;    
+
                 calStr = getCalculationCharacter(ch);
 
-                if (calStr != "")
+                if (calStr != "" && closeBracket)
                 {
                     calStart = true;
 
@@ -420,7 +442,7 @@ namespace DrawWork.CommandServices
             }
             else
             {
-                string selCmdNew = selCmd.Replace("]", "");
+                string selCmdNew = selCmd.Replace("]", "["); // very import
                 return selCmdNew.Split('[');
             }
 
@@ -454,7 +476,7 @@ namespace DrawWork.CommandServices
             int selCmdIndex = GetIndexValue(selCmdArray[1]);
 
             // Bracket
-            string bracketResult="";
+            
             int intValue = 0;
             if (int.TryParse(selCmdArray[1], out intValue))
             {
@@ -462,17 +484,18 @@ namespace DrawWork.CommandServices
             }
             else
             {
-                string selCmdNewBracket = selCmdArray[1];
                 #region Translate Model Switch : bracket
-                foreach (string eachUsing in usingData)
+                string selCmdNewBracket = selCmdArray[1];
+                string bracketResult = GetModelDataCal(selCmdNewBracket);
+                if (selCmdNewBracket != bracketResult)
                 {
-                    bracketResult = translateModelService.GetTranslateModelSwitch(eachUsing, selCmdNewBracket, selCmdNewBracket, 0);
-                    if (bracketResult != "nothing")
-                        break;
+                    int bracketResultNum = valueService.GetIntValue(valueService.Evaluate(bracketResult).ToString());
+                    selCmdIndex = bracketResultNum - 1;
                 }
-                if (bracketResult == "nothing")
-                    bracketResult = selCmdNewBracket;
-                selCmdIndex= valueService.GetIntValue(bracketResult)-1;
+                else
+                {
+                    selCmdIndex = 1;
+                }
                 #endregion
             }
 
