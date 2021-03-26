@@ -44,6 +44,7 @@
     <Compile Include="AssemblyModels\AssemblyModel.cs" />
     <Compile Include="AssemblyModels\BottomInputModel.cs" />
     <Compile Include="AssemblyModels\BottomOutputModel.cs" />
+    <Compile Include="AssemblyModels\ChannelModel.cs" />
     <Compile Include="AssemblyModels\EqualAngleSizeModel.cs" />
     <Compile Include="AssemblyModels\GeneralCapacityWeightModel.cs" />
     <Compile Include="AssemblyModels\GeneralCorrosionAllowanceModel.cs" />
@@ -51,8 +52,10 @@
     <Compile Include="AssemblyModels\GeneralEarthquakeModel.cs" />
     <Compile Include="AssemblyModels\GeneralMaterialSpecsModel.cs" />
     <Compile Include="AssemblyModels\GeneralMomentAndShearForceAtBaseModel.cs" />
+    <Compile Include="AssemblyModels\HBeamModel.cs" />
     <Compile Include="AssemblyModels\InsulationInputModel.cs" />
     <Compile Include="AssemblyModels\NozzleInputModel.cs" />
+    <Compile Include="AssemblyModels\PipeModel.cs" />
     <Compile Include="AssemblyModels\RoofInputModel.cs" />
     <Compile Include="AssemblyModels\RoofOutputModel.cs" />
     <Compile Include="AssemblyModels\ShellInputModel.cs" />
@@ -60,7 +63,7 @@
     <Compile Include="AssemblyModels\StructureCenterRingInputModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnBaseSupportModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnCenterModel.cs" />
-    <Compile Include="AssemblyModels\StructureColumnClipShellSide.cs" />
+    <Compile Include="AssemblyModels\StructureColumnClipShellSideModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnInputModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnRafterModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnSideModel.cs" />

@@ -64,6 +64,7 @@
     <Compile Include="CommandModels\CommandLineModel.cs" />
     <Compile Include="CommandModels\CommandPropertiyModel.cs" />
     <Compile Include="CommandServices\CommandBasicService.cs" />
+    <Compile Include="CommandServices\TranslateDataOutputService.cs" />
     <Compile Include="CommandServices\TranslateDataModelService.cs" />
     <Compile Include="CommandServices\TranslateDataService.cs" />
     <Compile Include="Commons\CommonBase.cs" />

@@ -41,7 +41,7 @@ namespace DrawWork.DrawServices
                     {
                         case "b":
                             string newAngleSize = assemblyData.RoofInput[0].TopAneSize;
-                            foreach (EqualAngleSizeModel eachAngle in assemblyData.AngleInput)
+                            foreach (EqualAngleSizeModel eachAngle in assemblyData.AngleIList)
                             {
                                 if (eachAngle.Size == newAngleSize)
                                 {
@@ -65,7 +65,7 @@ namespace DrawWork.DrawServices
                     {
                         case "b":
                             string newAngleSize = assemblyData.RoofInput[0].TopAneSize;
-                            foreach (EqualAngleSizeModel eachAngle in assemblyData.AngleInput)
+                            foreach (EqualAngleSizeModel eachAngle in assemblyData.AngleIList)
                             {
                                 if (eachAngle.Size == newAngleSize)
                                 {
@@ -89,7 +89,7 @@ namespace DrawWork.DrawServices
                     {
                         case "b":
                             string newAngleSize = assemblyData.RoofInput[0].TopAneSize;
-                            foreach (EqualAngleSizeModel eachAngle in assemblyData.AngleInput)
+                            foreach (EqualAngleSizeModel eachAngle in assemblyData.AngleIList)
                             {
                                 if (eachAngle.Size == newAngleSize)
                                 {

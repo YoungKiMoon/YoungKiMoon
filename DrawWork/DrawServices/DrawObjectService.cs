@@ -561,7 +561,7 @@ namespace DrawWork.DrawServices
                         if (j + 1 <= eachCmd.Length)
                         {
                             newAngleSize = eachCmd[j + 1];
-                            foreach(EqualAngleSizeModel eachAngle in assemblyData.AngleInput)
+                            foreach(EqualAngleSizeModel eachAngle in assemblyData.AngleIList)
                             {
                                 if (eachAngle.Size == newAngleSize)
                                 {
