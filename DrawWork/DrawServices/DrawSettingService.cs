@@ -1373,16 +1373,33 @@ namespace DrawWork.DrawServices
                 {
                     Line newLine = new Line(new Point3D(0, 0), new Point3D(30, 30));
                     
-                    singleModel.Entities.Add(newLine, Color.Red);
-                    Line newLineOffset1 = newLine.Offset(10, Vector3D.AxisZ) as Line;
-                    Line newLineOffset2 = newLine.Offset(-5, Vector3D.AxisZ) as Line;
+                    Line customLine = (Line)newLine.Clone();
+                    Plane pl1 = Plane.YZ;
+                    pl1.Origin.X = customLine.EndPoint.X;
+                    pl1.Origin.Y = customLine.EndPoint.Y;
+                    Mirror customMirror = new Mirror(pl1);
+                    customLine.TransformBy(customMirror);
 
-                    newLine.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
-                    singleModel.Entities.Add(newLine, Color.Red);
-                    singleModel.Entities.Add(newLineOffset1, Color.Blue);
-                    singleModel.Entities.Add(newLineOffset2, Color.Green);
+                    Line newLine2 = new Line(new Point3D(40, 0), new Point3D(40, 30));
+                    newLine2.Rotate(UtilityEx.DegToRad(80), Vector3D.AxisZ, newLine2.StartPoint);
+                    Line newLine3 = (Line)newLine2.Clone();
+                    newLine3.Rotate(-UtilityEx.DegToRad(80), Vector3D.AxisZ, newLine2.StartPoint);
+                    Line customLine2 = (Line)newLine2.Clone();
+                    Plane pl2 = Plane.YZ;
+                    pl2.Origin.X = customLine2.StartPoint.X;
+                    pl2.Origin.Y = customLine2.StartPoint.Y;
+                    Mirror customMirror2 = new Mirror(pl2);
+                    customLine2.TransformBy(customMirror2);
 
-                    
+                    singleModel.Entities.Add(customLine, Color.Black);
+                    singleModel.Entities.Add(newLine, Color.Red);
+
+                    singleModel.Entities.Add(customLine2, Color.Blue);
+                    singleModel.Entities.Add(newLine2, Color.Green);
+                    singleModel.Entities.Add(newLine3, Color.Gray);
+
+
+
                 }
                 #endregion
 

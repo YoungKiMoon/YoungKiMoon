@@ -99,13 +99,14 @@ namespace DrawWork.DrawServices
                                     // arctan // X: 1로 고정
                                     double calDegree = Math.Atan2(1, valueService.GetDoubleValue(assemblyData.RoofInput[0].RoofSlopeOne));
 
-                                    double tempWidth = Point3D.Distance(new Point3D(topAngleRoofPoint.X + refPoint.X, 0, 0), new Point3D(refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2, 0, 0));
+                                    double tempWidth = Point3D.Distance(new Point3D(topAngleRoofPoint.X, 0, 0), new Point3D(refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2, 0, 0));
                                     double tempHeight = tempWidth * calDegree;
 
                                     // Point
                                     cpPoint.X = refPoint.X 
                                                 + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2;
-                                    cpPoint.Y = refPoint.Y 
+                                    cpPoint.Y = refPoint.Y
+                                                + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight)
                                                 + tempHeight;
                                     break;
                                 }

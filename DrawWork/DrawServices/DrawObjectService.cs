@@ -153,6 +153,24 @@ namespace DrawWork.DrawServices
             {
                 switch (eachCmd[j].ToLower())
                 {
+                    case "mirror":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            switch (eachCmd[j + 1].ToLower())
+                            {
+                                case "right":
+
+                                    Plane pl1 = Plane.YZ;
+                                    pl1.Origin.X = newPoint2.X;
+                                    pl1.Origin.Y = newPoint2.Y;
+                                    Mirror customMirror = new Mirror(pl1);
+                                    customLine.TransformBy(customMirror);
+                                    break;
+                            }
+                        }
+
+                        break;
+
                     case "offset":
                         if (j + 1 <= eachCmd.Length)
                         {
@@ -297,13 +315,22 @@ namespace DrawWork.DrawServices
 
                             break;
 
-                        case "rotate":
+                        case "rotater":
+                        case "rotateradian":
                             if (j + 1 <= eachCmd.Length)
                             {
                                 double rotateRadians = valueService.GetDoubleValue(eachCmd[j + 1]);
-                                //customLineMethod = returnEntity.Offset(offsetDistance, Vector3D.AxisZ) as Line;
+                                returnEntity.Rotate(Math.Atan2(1, rotateRadians), Vector3D.AxisZ, returnEntity.StartPoint);
                             }
+                            break;
 
+                        case "rotated":
+                        case "rotatedegree":
+                            if (j + 1 <= eachCmd.Length)
+                            {
+                                double rotateDegree = valueService.GetDoubleValue(eachCmd[j + 1]);
+                                returnEntity.Rotate(UtilityEx.DegToRad(rotateDegree), Vector3D.AxisZ, returnEntity.StartPoint);
+                            }
                             break;
 
                     }

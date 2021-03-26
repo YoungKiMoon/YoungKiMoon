@@ -60,6 +60,7 @@
     <Compile Include="AssemblyModels\StructureCenterRingInputModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnBaseSupportModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnCenterModel.cs" />
+    <Compile Include="AssemblyModels\StructureColumnClipShellSide.cs" />
     <Compile Include="AssemblyModels\StructureColumnInputModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnRafterModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnSideModel.cs" />
