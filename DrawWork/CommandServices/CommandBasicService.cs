@@ -25,6 +25,7 @@ namespace DrawWork.CommandServices
         public BasicCommandModel commandData;
 
         public TranslateDataService commandTranslate;
+        public TranslateDataOutputService commandOutput;
         public DrawObjectService drawObject;
 
         public object singleModel;
@@ -44,6 +45,8 @@ namespace DrawWork.CommandServices
             SetCommandData(selCommandList);
             SetAssemblyData(selAssembly);
             commandTranslate = new TranslateDataService(selAssembly);
+            commandOutput = new TranslateDataOutputService();
+
             drawObject = new DrawObjectService(selAssembly);
 
             singleModel = null;
@@ -77,6 +80,9 @@ namespace DrawWork.CommandServices
             commandTranslate.TranslateUsing(commandData.commandListTrans);
             commandData.commandListTransFunciton = commandTranslate.TranslateCommandFunction(commandData.commandListTrans);
             commandTranslate.TranslateModelData(commandData.commandListTransFunciton);
+
+            // Create OutputData
+            commandOutput.CreateOutputData(assemblyData);
 
             CDPoint refPoint = commandData.drawPoint.referencePoint;
             CDPoint curPoint = commandData.drawPoint.currentPoint;

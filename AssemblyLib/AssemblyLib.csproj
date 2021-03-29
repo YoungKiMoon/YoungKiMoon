@@ -45,6 +45,7 @@
     <Compile Include="AssemblyModels\BottomInputModel.cs" />
     <Compile Include="AssemblyModels\BottomOutputModel.cs" />
     <Compile Include="AssemblyModels\ChannelModel.cs" />
+    <Compile Include="AssemblyModels\ClipSlotHoleModel.cs" />
     <Compile Include="AssemblyModels\EqualAngleSizeModel.cs" />
     <Compile Include="AssemblyModels\GeneralCapacityWeightModel.cs" />
     <Compile Include="AssemblyModels\GeneralCorrosionAllowanceModel.cs" />

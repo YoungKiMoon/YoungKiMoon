@@ -40,10 +40,23 @@ namespace DrawWork.DrawServices
                     switch (assemblyData.RoofInput[0].TopAngleType)
                     {
                         case "b":
-                            string newAngleSize = assemblyData.RoofInput[0].TopAneSize;
+
+                            EqualAngleSizeModel eachAngle = assemblyData.RoofAngleOutput[0];
+                            // Max course count
+                            int maxCourse = valueService.GetIntValue(assemblyData.ShellInput[0].CourseCount) - 1;
+                            // Point
+                            cpPoint.X = refPoint.X
+                                        - valueService.GetDoubleValue(eachAngle.E)
+                                        - valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].MinThk);
+                            cpPoint.Y = refPoint.Y
+                                        + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight);
+                            break;
+
+                            /*
+                            string newAngleSize = assemblyData.RoofInput[0].TopAngleSize;
                             foreach (EqualAngleSizeModel eachAngle in assemblyData.AngleIList)
                             {
-                                if (eachAngle.Size == newAngleSize)
+                                if (eachAngle.SIZE == newAngleSize)
                                 {
                                     // Max course count
                                     int maxCourse = valueService.GetIntValue(assemblyData.ShellInput[0].CourseCount) - 1;
@@ -57,6 +70,7 @@ namespace DrawWork.DrawServices
                                 }
                             }
                             break;
+                            */
                     }
                     break;
 
@@ -64,22 +78,15 @@ namespace DrawWork.DrawServices
                     switch (assemblyData.RoofInput[0].TopAngleType)
                     {
                         case "b":
-                            string newAngleSize = assemblyData.RoofInput[0].TopAneSize;
-                            foreach (EqualAngleSizeModel eachAngle in assemblyData.AngleIList)
-                            {
-                                if (eachAngle.Size == newAngleSize)
-                                {
-                                    // Max course count
-                                    int maxCourse = valueService.GetIntValue(assemblyData.ShellInput[0].CourseCount) - 1;
-                                    // Point
-                                    cpPoint.X = refPoint.X
-                                                - valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].MinThk);
-                                    cpPoint.Y = refPoint.Y 
-                                                + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight)
-                                                - valueService.GetDoubleValue(assemblyData.RoofOutput[0].TwoTcMax);
-                                    break;
-                                }
-                            }
+                            EqualAngleSizeModel eachAngle = assemblyData.RoofAngleOutput[0];
+                            // Max course count
+                            int maxCourse = valueService.GetIntValue(assemblyData.ShellInput[0].CourseCount) - 1;
+                            // Point
+                            cpPoint.X = refPoint.X
+                                        - valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].MinThk);
+                            cpPoint.Y = refPoint.Y 
+                                        + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight)
+                                        - valueService.GetDoubleValue(assemblyData.RoofOutput[0].TwoTcMax);
                             break;
                     }
                     break;
@@ -88,29 +95,23 @@ namespace DrawWork.DrawServices
                     switch (assemblyData.RoofInput[0].TopAngleType)
                     {
                         case "b":
-                            string newAngleSize = assemblyData.RoofInput[0].TopAneSize;
-                            foreach (EqualAngleSizeModel eachAngle in assemblyData.AngleIList)
-                            {
-                                if (eachAngle.Size == newAngleSize)
-                                {
-                                    // top angle roof point
-                                    CDPoint topAngleRoofPoint = ContactPoint("topangleroofpoint", ref refPoint, ref curPoint);
+                            string newAngleSize = assemblyData.RoofInput[0].TopAngleSize;
 
-                                    // arctan // X: 1로 고정
-                                    double calDegree = Math.Atan2(1, valueService.GetDoubleValue(assemblyData.RoofInput[0].RoofSlopeOne));
+                            // top angle roof point
+                            CDPoint topAngleRoofPoint = ContactPoint("topangleroofpoint", ref refPoint, ref curPoint);
 
-                                    double tempWidth = Point3D.Distance(new Point3D(topAngleRoofPoint.X, 0, 0), new Point3D(refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2, 0, 0));
-                                    double tempHeight = tempWidth * calDegree;
+                            // arctan // X: 1로 고정
+                            double calDegree = Math.Atan2(1, valueService.GetDoubleValue(assemblyData.RoofInput[0].RoofSlopeOne));
 
-                                    // Point
-                                    cpPoint.X = refPoint.X 
-                                                + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2;
-                                    cpPoint.Y = refPoint.Y
-                                                + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight)
-                                                + tempHeight;
-                                    break;
-                                }
-                            }
+                            double tempWidth = Point3D.Distance(new Point3D(topAngleRoofPoint.X, 0, 0), new Point3D(refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2, 0, 0));
+                            double tempHeight = tempWidth * calDegree;
+
+                            // Point
+                            cpPoint.X = refPoint.X 
+                                        + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2;
+                            cpPoint.Y = refPoint.Y
+                                        + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight)
+                                        + tempHeight;
                             break;
                     }
 
