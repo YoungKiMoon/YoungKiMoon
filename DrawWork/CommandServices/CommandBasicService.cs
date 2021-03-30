@@ -190,6 +190,16 @@ namespace DrawWork.CommandServices
                 case "topangle":
                     drawEntity.outlineList.AddRange(drawObject.DoBlockTopAngle(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
+                
+                case "hbeam":
+                case "blockhbeam":
+                    drawEntity.outlineList.AddRange(drawObject.DoBlockHBeam(eachCmd, ref refPoint, ref curPoint));
+                    goto case "allways";
+
+                case "columnsupportside":
+                case "blockcolumnsupportside":
+                    drawEntity.outlineList.AddRange(drawObject.DoBlockColumnSupportSide(eachCmd, ref refPoint, ref curPoint));
+                    goto case "allways";
 
                 // Nozzle
                 case "nozzle":

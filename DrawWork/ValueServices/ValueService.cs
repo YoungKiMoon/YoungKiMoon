@@ -67,8 +67,46 @@ namespace DrawWork.ValueServices
                 MessageBox.Show(expression ,"계산 오류" );
                 return 0;
             }
+        }
+        public double GetAtanOfSlope(string selSlope)
+        {
+            double selHeight;
+            double selWidth;
+            if (selSlope.Contains("/"))
+            {
+                string[] selArray = selSlope.Split(new char[] { '/' });
+                selHeight = GetDoubleValue(selArray[0]);
+                selWidth = GetDoubleValue(selArray[1]);
+            }
+            else
+            {
+                selHeight = 1;
+                selWidth = GetDoubleValue(selSlope);
+            }
+            double calDegree = Math.Atan2(selHeight,selWidth);
 
+            return calDegree;
+        }
 
+        public double GetSlopeOfHeight(string selSlope, string selWidth)
+        {
+            return GetSlopeOfHeight(selSlope, GetDoubleValue(selWidth));
+        }
+        public double GetSlopeOfHeight(string selSlope, double selWidth)
+        {
+            double tempDegree = GetAtanOfSlope(selSlope);
+            double tempWidth = selWidth;
+            return tempDegree * tempWidth;
+        }
+        public double GetSlopeOfWidth(string selSlope, string selHeight)
+        {
+            return GetSlopeOfWidth(selSlope, GetDoubleValue(selHeight));
+        }
+        public double GetSlopeOfWidth(string selSlope, double selHeight)
+        {
+            double tempDegree = GetAtanOfSlope(selSlope);
+            double tempHeight = selHeight;
+            return tempHeight / tempDegree;
         }
     }
 }

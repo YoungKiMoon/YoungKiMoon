@@ -1369,7 +1369,7 @@ namespace DrawWork.DrawServices
                 #endregion
 
                 #region offset
-                if (true)
+                if (false)
                 {
                     Line newLine = new Line(new Point3D(0, 0), new Point3D(30, 30));
                     
@@ -1397,6 +1397,45 @@ namespace DrawWork.DrawServices
                     singleModel.Entities.Add(customLine2, Color.Blue);
                     singleModel.Entities.Add(newLine2, Color.Green);
                     singleModel.Entities.Add(newLine3, Color.Gray);
+
+
+
+                }
+                #endregion
+
+                #region circle
+                if (true)
+                {
+                    Circle newCir1 = new Circle(new Point3D(40, 40), 45);
+                    singleModel.Entities.Add(newCir1, Color.Green);
+
+                    Circle newCir2 = new Circle(new Point3D(40, 40), 23);
+                    singleModel.Entities.Add(newCir2, Color.Green);
+
+                    Point3D newCenter = new Point3D();
+                    newCenter.X = 40;
+                    newCenter.Y = 40;
+                    double boltHeight = 23;
+                    double boltWidth = 45;
+
+                    Point3D newCenterLeft = new Point3D();
+                    newCenterLeft.X = newCenter.X - boltWidth + boltHeight;
+                    newCenterLeft.Y = newCenter.Y;
+                    Point3D newCenterRight = new Point3D();
+                    newCenterRight.X = newCenter.X + boltWidth - boltHeight;
+                    newCenterRight.Y = newCenter.Y;
+
+                    Arc arcarc1 = new Arc(Plane.XY, newCenterLeft, boltHeight, new Point3D(newCenterLeft.X, newCenterLeft.Y+ boltHeight), new Point3D(newCenterLeft.X,newCenterLeft.Y-boltHeight),false);
+                    Arc arcarc2 = new Arc(Plane.XY, newCenterRight, boltHeight, new Point3D(newCenterRight.X, newCenterRight.Y + boltHeight), new Point3D(newCenterRight.X, newCenterRight.Y - boltHeight), true);
+                    Line ll1 = new Line(arcarc1.StartPoint, arcarc2.EndPoint);
+                    Line ll2 = new Line(arcarc1.EndPoint, arcarc2.StartPoint);
+
+                    CompositeCurve compositeCurve = new CompositeCurve(arcarc1, arcarc2, ll1, ll2);
+                    singleModel.Entities.Add(compositeCurve, Color.Gray);
+
+                    CompositeCurve compositeCurve2 = (CompositeCurve)compositeCurve.Clone();
+                    compositeCurve2.Rotate(Math.Atan2(1,120), Vector3D.AxisZ);
+                    singleModel.Entities.Add(compositeCurve2, Color.Red);
 
 
 

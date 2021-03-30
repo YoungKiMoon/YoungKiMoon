@@ -47,19 +47,36 @@ namespace DrawWork.CommandServices
 
             #region Structure
 
-            // Structure Column Rafter Output : Only 1 Row
+            // Structure Column Rafter Output
             selAssembly.StructureColumnRafterOutput.Clear();
             string acRafterSize = GetAllTrim(selAssembly.StructureInput[firstIndex].RafterSize);
-            foreach(StructureColumnRafterModel eachRafter in selAssembly.StructureColumnRafter)
+            for (int i = 0; i < selAssembly.StructureRafterInput.Count ; i++)
             {
-                if (GetAllTrim(eachRafter.SIZE)== acRafterSize)
+                string rafterSize = GetAllTrim(selAssembly.StructureRafterInput[i].RafterInSize);
+                if (rafterSize != "")
                 {
-                    selAssembly.StructureColumnRafterOutput.Add(eachRafter);
-                    break;
+                    foreach (StructureColumnRafterModel eachRafter in selAssembly.StructureColumnRafter)
+                    {
+                        if (GetAllTrim(eachRafter.SIZE) == rafterSize)
+                        {
+                            selAssembly.StructureColumnRafterOutput.Add(eachRafter);
+                            break;
+                        }
+                    }
                 }
             }
 
 
+            // Structure : Clip Shell Side
+            selAssembly.StructureColumnClipShellSideOutput.Clear();
+            string acRafterSizeLast = GetAllTrim(selAssembly.StructureRafterInput[selAssembly.StructureRafterInput.Count-1].RafterInSize);
+            foreach (StructureColumnClipShellSideModel eachClip in selAssembly.StructureColumnClipShellSide)
+            {
+                if (GetAllTrim(eachClip.SIZE) == acRafterSizeLast)
+                {
+                    selAssembly.StructureColumnClipShellSideOutput.Add(eachClip);
+                }
+            }
 
 
             //int acStructureColumnCount = valueService.GetIntValue(selAssembly.StructureInput[firstIndex].ColumnNo);
@@ -75,15 +92,15 @@ namespace DrawWork.CommandServices
                 string eachColumnSize = "";
                 string eachRafterSize = "";
                 if (selAssembly.StructureColumnInput.Count>i)
-                    eachColumnSize = selAssembly.StructureColumnInput[i].Size;
+                    eachColumnSize = GetAllTrim(selAssembly.StructureColumnInput[i].ColumnInSize);
                 if (selAssembly.StructureRafterInput.Count>i)
-                    eachRafterSize = selAssembly.StructureRafterInput[i].Size;
+                    eachRafterSize = GetAllTrim(selAssembly.StructureRafterInput[i].RafterInSize);
 
                 if (i == 0 && eachColumnSize != "" && eachRafterSize != "")
                 {
                     foreach(StructureColumnCenterModel eachCenter in selAssembly.StructureColumnCenter)
                     {
-                        if (eachCenter.COLUMN == eachColumnSize && eachCenter.SIZE == eachRafterSize)
+                        if (GetAllTrim(eachCenter.COLUMN) == eachColumnSize && GetAllTrim(eachCenter.SIZE) == eachRafterSize)
                         {
                             selAssembly.StructureColumnCenterOutput.Add(eachCenter);
                             break;
@@ -107,24 +124,32 @@ namespace DrawWork.CommandServices
             }
 
             // Structure : Column Side Top Support : Column Count -1
-            // Structure : Column Girder : Column Count -1
             selAssembly.StructureColumnSideOutput.Clear();
-            selAssembly.StructureColumnHBeamOutput.Clear();
-            for(int i = 0; i < selAssembly.StructureGirderInput.Count; i++)
+            for(int i = 1; i < selAssembly.StructureRafterInput.Count; i++) // 1 에서 부터 시작
             {
-                string girderSize = selAssembly.StructureGirderInput[i].Size;
-                if (girderSize != "")
+                string rafterSize = GetAllTrim(selAssembly.StructureRafterInput[i].RafterInSize);
+                if (rafterSize !="")
                 {
-                    foreach(StructureColumnSideModel eachSide in selAssembly.StructureColumnSide)
+                    foreach (StructureColumnSideModel eachSide in selAssembly.StructureColumnSide)
                     {
-                        if (eachSide.SIZE == girderSize)
+                        if (GetAllTrim(eachSide.SIZE) == rafterSize)
                         {
                             selAssembly.StructureColumnSideOutput.Add(eachSide);
                         }
                     }
+                }
+            }
+
+            // Structure : Column Girder : Column Count -1
+            selAssembly.StructureColumnHBeamOutput.Clear();
+            for(int i = 0; i < selAssembly.StructureGirderInput.Count; i++)
+            {
+                string girderSize = GetAllTrim(selAssembly.StructureGirderInput[i].GirderInSize);
+                if (girderSize != "")
+                {
                     foreach(HBeamModel eachHBeam in selAssembly.HBeamList)
                     {
-                        if (eachHBeam.SIZE == girderSize)
+                        if (GetAllTrim(eachHBeam.SIZE) == girderSize)
                         {
                             selAssembly.StructureColumnHBeamOutput.Add(eachHBeam);
                         }
@@ -142,6 +167,9 @@ namespace DrawWork.CommandServices
                     selAssembly.StructureClipSlotHoleOutput.Add(eachHole);
                 }
             }
+
+
+
 
             #endregion
         }
