@@ -293,8 +293,8 @@ namespace DrawWork.DrawServices
 
             double midPointXGap = 200;
             
-            double staPointX = drawPoint.X - (10 + 24 + 40);// 나중에 가변으로 변경 해야 함
-            double endPointX = drawPoint.X - shellSpacingLeft;
+            double staPointX = -(10 + 24 + 40);// 나중에 가변으로 변경 해야 함
+            double endPointX = - shellSpacingLeft;
             double midPointX = endPointX;
             double midPointY = 0;
 

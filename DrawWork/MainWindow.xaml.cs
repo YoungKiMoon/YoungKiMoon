@@ -19,6 +19,11 @@ using DrawWork.DrawServices;
 using DrawWork.CommandModels;
 using DrawWork.FileServices;
 using DrawWork.Windows;
+using Microsoft.Win32;
+using devDept.Eyeshot.Translators;
+using devDept.Eyeshot;
+using devDept.Graphics;
+using devDept.Eyeshot.Entities;
 
 namespace DrawWork
 {
@@ -42,6 +47,7 @@ namespace DrawWork
             drawSetting.SetModelSpace(testModel);
 
             logicFile.Text = @"C:\Users\tree\Desktop\CAD\tabas\Sample_DrawLogic.txt";
+            dwgFile.Text = @"C:\Users\tree\Desktop\CAD\tabas\Block_Sample.dwg";
         }
 
 
@@ -83,6 +89,132 @@ namespace DrawWork
             AssemblyWindow cc = new AssemblyWindow();
             cc.SetAssembly(selView.TankData);
             cc.Show();
+        }
+
+        private void btnCreateDwg_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var exportFileDialog = new SaveFileDialog();
+            exportFileDialog.Filter = "CAD drawings(*.dwg)| *.dwg|" + "Drawing Exchange Format (*.dxf)|*.dxf";
+            exportFileDialog.AddExtension = true;
+            exportFileDialog.Title = "Export";
+            exportFileDialog.CheckPathExists = true;
+            var result = exportFileDialog.ShowDialog();
+            if (result == true)
+            {
+                WriteAutodeskParams wap = new WriteAutodeskParams(testModel,null, false, false);
+                WriteFileAsync wa = new WriteAutodesk(wap, exportFileDialog.FileName);
+
+                testModel.StartWork(wa);
+
+
+            }
+        }
+
+        private void btnLoadDWG_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+
+            var importFileDialog = new OpenFileDialog();
+            importFileDialog.Filter= "All compatible file types (*.*)|*.step;*.stp;*.iges;*.igs;*.stl;*.obj;*.dwg;*.dxf|Standard for the Exchange of Product Data (*.stp; *.step)|*.stp; *.step|Initial Graphics Exchange Specification (*.igs; *.iges)|*.igs; *.iges|WaveFront OBJ (*.obj)|*.obj|Stereolithography (*.stl)|*.stl|CAD drawings (*.dwg)|*.dwg|Drawing Exchange Format (*.dxf)|*.dxf";
+            importFileDialog.AddExtension = true;
+            importFileDialog.Title = "Import";
+            importFileDialog.CheckFileExists = true;
+            importFileDialog.CheckPathExists = true;
+            var result = importFileDialog.ShowDialog();
+            if (result == true)
+            {
+                //testModel.Clear();
+
+                BackgroundSettings temp = new BackgroundSettings();
+                temp.TopColor = new SolidColorBrush(Color.FromRgb(225,225,225));
+                testModel.Viewports[0].Background = temp;
+
+                //ReadFileAsync rfa = GetReader(importFileDialog.FileName);
+                //if (rfa != null)
+                //    testModel.StartWork(rfa);
+
+                ReadAutodesk ra = new ReadAutodesk(importFileDialog.FileName);
+                if (ra != null) 
+                {
+                    testModel.StartWork(ra);
+                    testModel.Refresh();
+                }
+
+            }
+
+
+        }
+
+
+
+
+        private ReadFileAsync GetReader(string fileName)
+        {
+            string ext = System.IO.Path.GetExtension(fileName);
+
+            if (ext != null)
+            {
+                ext = ext.TrimStart('.').ToLower();
+
+                switch (ext)
+                {
+                    case "dwg":
+                    case "dxf":
+
+                        ReadAutodesk ra = new ReadAutodesk(fileName);
+                        ra.SkipLayouts = false;
+                        return ra;
+
+                    case "stl":
+                        return new ReadSTL(fileName);
+                    case "obj":
+                        return new ReadOBJ(fileName);
+
+                }
+            }
+
+            return null;
+        }
+
+        private void testModel_WorkCompleted(object sender, WorkCompletedEventArgs e)
+        {
+            if (e.WorkUnit is ReadFileAsync)
+            {
+                ReadFileAsync rfa = (ReadFileAsync)e.WorkUnit;
+
+                //ReadFile rf = e.WorkUnit as ReadFile;
+
+                //ReadFile rf = e.WorkUnit as ReadFile;
+                //if (rf != null)
+                //if(rfa.Entities !=null)
+
+                // ReadFile rf = new ReadFile(rfa.Stream);
+
+                if (e.WorkUnit is ReadFileAsyncWithBlocks)
+                {
+                    ReadFileAsyncWithBlocks readFileWithBlocks = (ReadFileAsyncWithBlocks)e.WorkUnit;
+
+                    
+                    //devDept.Eyeshot.Block ddd= readFileWithBlocks.Blocks["block_Sample"]);
+                    testModel.Blocks.Add(readFileWithBlocks.Blocks["ssblock"]);
+
+                    var dd= testModel.Blocks["ssblock"];
+                    
+                    foreach(Entity eachEntity in dd.Entities)
+                    {
+                        eachEntity.LayerName = "DashDot";
+                        eachEntity.LineTypeName = "DashDot";
+                    }
+                }
+
+
+                
+                //var br3 = new BlockReference(10, 100, 10, "ssblock",testModel.RootBlock.Units,testModel.Blocks,0);
+                var br3 = new BlockReference(10, 100, 10, "ssblock",  0);
+                br3.Scale(100);
+                testModel.Entities.Add(br3, "DashDot");
+
+//                rfa.AddToScene(testModel);
+            }
         }
     }
 }
