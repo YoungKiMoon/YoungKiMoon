@@ -24,6 +24,7 @@
         <Grid Grid.Row="0">
             <StackPanel Orientation="Horizontal">
                 <Button Content="Assembly Model" Width="100" Click="Button_Click_2" />
+                <Button Content="CAD Environment" Width="100" Click="Button_Click_3" />
                 <Button Content="Create Logic"  Width="100" Click="Button_Click_1" Background="#FFE6A1A1"/>
                 <Button Content="Create Sample" Width="100" Click="Button_Click"/>
             </StackPanel>

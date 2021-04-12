@@ -24,6 +24,8 @@ using devDept.Eyeshot.Translators;
 using devDept.Eyeshot;
 using devDept.Graphics;
 using devDept.Eyeshot.Entities;
+using DrawWork.ImportServices;
+using DrawWork.DrawStyleServices;
 
 namespace DrawWork
 {
@@ -41,7 +43,8 @@ namespace DrawWork
             this.testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
             this.testModel.ActionMode = devDept.Eyeshot.actionType.SelectByPick;
 
-            this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Rendered;
+            //this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Rendered;
+            //this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Rendered;
 
             drawSetting = new DrawSettingService();
             drawSetting.SetModelSpace(testModel);
@@ -193,33 +196,49 @@ namespace DrawWork
                 {
                     ReadFileAsyncWithBlocks readFileWithBlocks = (ReadFileAsyncWithBlocks)e.WorkUnit;
 
-                    
-                    //devDept.Eyeshot.Block ddd= readFileWithBlocks.Blocks["block_Sample"]);
-                    testModel.Blocks.Add(readFileWithBlocks.Blocks["ssblock"]);
+                    ImportBlockService importBlockS = new ImportBlockService();
+                    importBlockS.CreateBlock(readFileWithBlocks, testModel);
 
-                    var dd= testModel.Blocks["ssblock"];
+                    //devDept.Eyeshot.Block ddd= readFileWithBlocks.Blocks["block_Sample"]);
+                    //testModel.Blocks.Add(readFileWithBlocks.Blocks["ssblock"]);
+
+                    //var dd= testModel.Blocks["ssblock"];
                     
-                    foreach(Entity eachEntity in dd.Entities)
-                    {
+                    //foreach(Entity eachEntity in dd.Entities)
+                    //{
                         //eachEntity is LinearPath
-                        eachEntity.LayerName = "DashDot1";
-                        eachEntity.LineTypeName = "";
-                        eachEntity.LineTypeMethod = colorMethodType.byLayer;
+                        //eachEntity.LayerName = "DashDot1";
+                        //eachEntity.LineTypeName = "";
+                        //eachEntity.LineTypeMethod = colorMethodType.byLayer;
                         //eachEntity.LayerName = "DashDot";
                         //eachEntity.LineTypeName = "DashDot";
-                    }
+                    //}
                 }
 
 
                 
                 //var br3 = new BlockReference(10, 100, 10, "ssblock",testModel.RootBlock.Units,testModel.Blocks,0);
-                var br3 = new BlockReference(10, 100, 10, "ssblock",  0);
+                var br3 = new BlockReference(10, 100, 10, "NOZZLE_SHELL_PROJECTION",  0);
                 br3.Scale(1);
-                testModel.Entities.Add(br3, "DashDot1");
+                testModel.Entities.Add(br3, "LayerDimension");
                 //testModel.Entities.Add(br3, "DashDot");
 
                 //                rfa.AddToScene(testModel);
             }
+        }
+
+
+
+        // Environment
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+
+            EnvironmentWindow newWin = new EnvironmentWindow();
+            EnvironmentWindowViewModel newWinView = newWin.DataContext as EnvironmentWindowViewModel;
+            newWinView.SetModelEnvironment(testModel);
+            newWinView.CreateEnvironment();
+            newWin.Show();
+
         }
     }
 }

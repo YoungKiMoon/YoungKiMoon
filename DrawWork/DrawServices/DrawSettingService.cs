@@ -18,6 +18,7 @@ using DrawWork.DrawModels;
 using DrawWork.DrawAutomationService;
 using System.Windows;
 using DrawWork.Commons;
+using DrawWork.DrawStyleServices;
 
 namespace DrawWork.DrawServices
 {
@@ -31,23 +32,16 @@ namespace DrawWork.DrawServices
         {
             singleModel.Invalidate();
 
-            string LayerDashDot = "DashDot";
-            singleModel.Layers.Add(new Layer(LayerDashDot, Color.CornflowerBlue));
-            singleModel.Layers[LayerDashDot].Color = Color.Red;
-            singleModel.Layers[LayerDashDot].LineWeight = 4;
+            LineStyleService lineStyle = new LineStyleService();
+            singleModel.LineTypes.AddRange(lineStyle.GetDefaultStyle());
 
-            string LayerDashDot1 = "DashDot1";
-            singleModel.Layers.Add(new Layer(LayerDashDot1, Color.Blue));
-            singleModel.Layers[LayerDashDot1].Color = Color.Red;
-            singleModel.Layers[LayerDashDot1].LineWeight = 4;
-            
+            LayerStyleService layerStyle = new LayerStyleService();
+            singleModel.Layers.AddRange(layerStyle.GetDefaultStyle());
 
-            singleModel.LineTypes.Add(LayerDashDot, new float[] { 5, -1, 1, -1 });
-            singleModel.Layers[LayerDashDot].LineTypeName = LayerDashDot;
-
-            //singleModel.LineTypes.Add(LayerDashDot1, new float[] { 5, -1, 1, -1 });
-            singleModel.Layers[LayerDashDot1].LineWeight = 0.5f;
+            TextStyleService textService = new TextStyleService();
+            singleModel.TextStyles.AddRange(textService.GetDefaultStyle());
         }
+
 
         public void CreateModelSpaceSample(Model singleModel)
         {
@@ -1412,7 +1406,7 @@ namespace DrawWork.DrawServices
                 #endregion
 
                 #region circle
-                if (true)
+                if (false)
                 {
                     Circle newCir1 = new Circle(new Point3D(40, 40), 45);
                     singleModel.Entities.Add(newCir1, Color.Green);
@@ -1444,6 +1438,22 @@ namespace DrawWork.DrawServices
                     CompositeCurve compositeCurve2 = (CompositeCurve)compositeCurve.Clone();
                     compositeCurve2.Rotate(Math.Atan2(1,120), Vector3D.AxisZ);
                     singleModel.Entities.Add(compositeCurve2, Color.Red);
+
+
+
+                }
+                #endregion
+
+                #region Solid
+                if (true)
+                {
+                    //Solid newSolid = new Solid(,);
+
+                    //Triangle tri1 = new Triangle(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint1.X + selArrowHeight * 3, textCenter.Y + selArrowHeight / 2), new Point3D(selPoint1.X + selArrowHeight * 3, textCenter.Y - selArrowHeight / 2));
+                    
+
+                    //singleModel.Entities.Add(newSolid, Color.Green);
+
 
 
 

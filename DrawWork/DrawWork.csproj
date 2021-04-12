@@ -84,15 +84,29 @@
     <Compile Include="DrawServices\DrawNozzleService.cs" />
     <Compile Include="DrawServices\DrawObjectService.cs" />
     <Compile Include="DrawServices\DrawSettingService.cs" />
+    <Compile Include="DrawStyleServices\EnvironmentStyleService.cs" />
+    <Compile Include="DrawStyleServices\LayerStyleService.cs" />
+    <Compile Include="DrawStyleServices\LineStyleService.cs" />
+    <Compile Include="DrawStyleServices\TextStyleService.cs" />
     <Compile Include="FileServices\TextFileService.cs" />
+    <Compile Include="ImportServices\ImportBlockModel.cs" />
     <Compile Include="ImportServices\ImportBlockService.cs" />
+    <Compile Include="Models\CustomBlockModel.cs" />
+    <Compile Include="Models\CustomEntityModel.cs" />
+    <Compile Include="Models\CustomLayerModel.cs" />
+    <Compile Include="Models\CustomLineModel.cs" />
+    <Compile Include="Models\CustomTextModel.cs" />
     <Compile Include="Models\TreeNodeModel.cs" />
     <Compile Include="Utils\Notifier.cs" />
     <Compile Include="ValueServices\ValueService.cs" />
     <Compile Include="ViewModels\AssemblyWindowViewModel.cs" />
+    <Compile Include="ViewModels\EnvironmentWindowViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Windows\AssemblyWindow.xaml.cs">
       <DependentUpon>AssemblyWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\EnvironmentWindow.xaml.cs">
+      <DependentUpon>EnvironmentWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -109,6 +123,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Windows\AssemblyWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\EnvironmentWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
