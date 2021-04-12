@@ -85,6 +85,7 @@
     <Compile Include="DrawServices\DrawObjectService.cs" />
     <Compile Include="DrawServices\DrawSettingService.cs" />
     <Compile Include="FileServices\TextFileService.cs" />
+    <Compile Include="ImportServices\ImportBlockService.cs" />
     <Compile Include="Models\TreeNodeModel.cs" />
     <Compile Include="Utils\Notifier.cs" />
     <Compile Include="ValueServices\ValueService.cs" />

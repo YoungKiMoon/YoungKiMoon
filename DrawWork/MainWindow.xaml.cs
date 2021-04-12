@@ -201,8 +201,12 @@ namespace DrawWork
                     
                     foreach(Entity eachEntity in dd.Entities)
                     {
-                        eachEntity.LayerName = "DashDot";
-                        eachEntity.LineTypeName = "DashDot";
+                        //eachEntity is LinearPath
+                        eachEntity.LayerName = "DashDot1";
+                        eachEntity.LineTypeName = "";
+                        eachEntity.LineTypeMethod = colorMethodType.byLayer;
+                        //eachEntity.LayerName = "DashDot";
+                        //eachEntity.LineTypeName = "DashDot";
                     }
                 }
 
@@ -210,10 +214,11 @@ namespace DrawWork
                 
                 //var br3 = new BlockReference(10, 100, 10, "ssblock",testModel.RootBlock.Units,testModel.Blocks,0);
                 var br3 = new BlockReference(10, 100, 10, "ssblock",  0);
-                br3.Scale(100);
-                testModel.Entities.Add(br3, "DashDot");
+                br3.Scale(1);
+                testModel.Entities.Add(br3, "DashDot1");
+                //testModel.Entities.Add(br3, "DashDot");
 
-//                rfa.AddToScene(testModel);
+                //                rfa.AddToScene(testModel);
             }
         }
     }

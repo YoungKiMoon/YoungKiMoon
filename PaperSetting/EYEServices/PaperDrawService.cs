@@ -105,7 +105,7 @@ namespace PaperSetting.EYEServices
             //singleDraw.Invalidate();
             singleDraw.Rebuild(singleModel);
 
-
+            
         }
 
         private Sheet CreateSheet(PaperDwgModel selPaper)

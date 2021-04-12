@@ -35,10 +35,18 @@ namespace DrawWork.DrawServices
             singleModel.Layers.Add(new Layer(LayerDashDot, Color.CornflowerBlue));
             singleModel.Layers[LayerDashDot].Color = Color.Red;
             singleModel.Layers[LayerDashDot].LineWeight = 4;
+
+            string LayerDashDot1 = "DashDot1";
+            singleModel.Layers.Add(new Layer(LayerDashDot1, Color.Blue));
+            singleModel.Layers[LayerDashDot1].Color = Color.Red;
+            singleModel.Layers[LayerDashDot1].LineWeight = 4;
             
 
             singleModel.LineTypes.Add(LayerDashDot, new float[] { 5, -1, 1, -1 });
             singleModel.Layers[LayerDashDot].LineTypeName = LayerDashDot;
+
+            //singleModel.LineTypes.Add(LayerDashDot1, new float[] { 5, -1, 1, -1 });
+            singleModel.Layers[LayerDashDot1].LineWeight = 0.5f;
         }
 
         public void CreateModelSpaceSample(Model singleModel)
