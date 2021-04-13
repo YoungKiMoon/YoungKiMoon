@@ -23,23 +23,34 @@ namespace DrawWork.DrawServices
 {
     public class DrawObjectService
     {
+        private Model singleModel;
+
         private AssemblyModel assemblyData;
 
         private DrawService drawService;
-        private DrawBlockService drawBlockService;
         private DrawNozzleService drawNozzleService;
+
+        private DrawLogicBlockService drawLogicBlockService;
+        private DrawImportBlockService drawImportBlockService;
 
         private DrawContactPointService cpService;
 
         private ValueService valueService;
 
-        public DrawObjectService(AssemblyModel selAssembly)
+
+
+        public DrawObjectService(AssemblyModel selAssembly,Object selModel)
         {
+            singleModel = selModel as Model;
+
             assemblyData = selAssembly;
 
             drawService = new DrawService(selAssembly);
-            drawBlockService = new DrawBlockService(selAssembly);
+
             drawNozzleService = new DrawNozzleService(selAssembly);
+
+            drawLogicBlockService = new DrawLogicBlockService(selAssembly);
+            drawImportBlockService = new DrawImportBlockService(singleModel);
 
             cpService = new DrawContactPointService(selAssembly);
 
@@ -523,8 +534,66 @@ namespace DrawWork.DrawServices
 
         }
 
+        // Improt :Block
+        public BlockReference DoBlockImport(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
 
-        // Block
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            string blockName = "";
+            double scaleFactor = 1;
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "xy":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "name":
+                        if (j + 1 <= eachCmd.Length)
+                            blockName = eachCmd[j + 1];
+                        break;
+
+                    case "scale":
+                        if (j + 1 <= eachCmd.Length)
+                            scaleFactor = valueService.GetDoubleValue(eachCmd[j + 1]);
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            BlockReference returnBlock = null;
+            // Create Block
+            if(blockName!="")
+                returnBlock = drawImportBlockService.Draw_ImportBlock(newPoint1, blockName, scaleFactor);
+            
+
+            return returnBlock;
+
+
+        }
+
+
+        // Drawing Logic : Block
         public Entity[] DoBlockTopAngle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             // 0 : Object
@@ -578,7 +647,7 @@ namespace DrawWork.DrawServices
             Entity[] returnEntity = null; 
             // Create Line
             if (newAngleType!="" && newAngleSize != "")
-                returnEntity= drawBlockService.DrawBlock_TopAngle(newPoint1, newAngleType, newAngle);
+                returnEntity= drawLogicBlockService.DrawBlock_TopAngle(newPoint1, newAngleType, newAngle);
 
 
 
@@ -672,7 +741,7 @@ namespace DrawWork.DrawServices
             Entity[] returnEntity = null;
             // Create Line
             if (newHBeamSize != "")
-                returnEntity = drawBlockService.DrawBlock_HBeam(newPoint1, newHBeam);
+                returnEntity = drawLogicBlockService.DrawBlock_HBeam(newPoint1, newHBeam);
 
 
 
@@ -746,7 +815,7 @@ namespace DrawWork.DrawServices
 
             Entity[] returnEntity = null;
             // Create Line
-            returnEntity = drawBlockService.DrawBlock_ColumnSupportSide(newPoint1);
+            returnEntity = drawLogicBlockService.DrawBlock_ColumnSupportSide(newPoint1);
 
 
 
@@ -787,7 +856,7 @@ namespace DrawWork.DrawServices
         }
 
         // Nozzle
-        public Dictionary<string, List<Entity>> DoNozzle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        public DrawEntityModel DoNozzle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -854,7 +923,7 @@ namespace DrawWork.DrawServices
                 }
             }
 
-            Dictionary<string, List<Entity>> returnEntity = new Dictionary<string, List<Entity>>(); ;
+            DrawEntityModel returnEntity = new DrawEntityModel();
             // Create Line
             if (newNozzleType != "" && newNozzlePosition != "")
                 returnEntity = drawNozzleService.DrawNozzle_GA(ref refPoint, newPosition,newNozzleType, newNozzlePosition, newNozzleFontSize, newReaderCircleSize,newMultiColumn);
@@ -1027,7 +1096,6 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-
                 switch (eachCmd[j].ToLower())
                 {
                     case "xy":

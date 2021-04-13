@@ -65,6 +65,7 @@ namespace DrawWork
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             MainWindowViewModel selView = this.DataContext as MainWindowViewModel;
+            selView.CreateCommandService(testModel);
 
             string logicFilePath = logicFile.Text;
 
@@ -77,7 +78,7 @@ namespace DrawWork
                     selView.commandData.commandList.Add(new CommandLineModel { CommandText = eachText });
             }
 
-            LogicBuilder testBuilder = selView.GetLogicBuilder(testModel);
+            LogicBuilder testBuilder = selView.GetLogicBuilder();
 
             // remove old block
             testModel.Entities.Clear();
@@ -203,24 +204,31 @@ namespace DrawWork
                     //testModel.Blocks.Add(readFileWithBlocks.Blocks["ssblock"]);
 
                     //var dd= testModel.Blocks["ssblock"];
-                    
+
                     //foreach(Entity eachEntity in dd.Entities)
                     //{
-                        //eachEntity is LinearPath
-                        //eachEntity.LayerName = "DashDot1";
-                        //eachEntity.LineTypeName = "";
-                        //eachEntity.LineTypeMethod = colorMethodType.byLayer;
-                        //eachEntity.LayerName = "DashDot";
-                        //eachEntity.LineTypeName = "DashDot";
+                    //eachEntity is LinearPath
+                    //eachEntity.LayerName = "DashDot1";
+                    //eachEntity.LineTypeName = "";
+                    //eachEntity.LineTypeMethod = colorMethodType.byLayer;
+                    //eachEntity.LayerName = "DashDot";
+                    //eachEntity.LineTypeName = "DashDot";
                     //}
+                    MessageBox.Show("Block Import 완료");
                 }
 
 
-                
+
                 //var br3 = new BlockReference(10, 100, 10, "ssblock",testModel.RootBlock.Units,testModel.Blocks,0);
-                var br3 = new BlockReference(10, 100, 10, "NOZZLE_SHELL_PROJECTION",  0);
-                br3.Scale(1);
-                testModel.Entities.Add(br3, "LayerDimension");
+
+                // 블럭 삽입 방법
+                if (false)
+                {
+                    var br3 = new BlockReference(-1000, 5000, 0, "LADDER-1", 0);
+                    br3.Scale(1);
+                    testModel.Entities.Add(br3, "LayerDimension");
+                }
+
                 //testModel.Entities.Add(br3, "DashDot");
 
                 //                rfa.AddToScene(testModel);

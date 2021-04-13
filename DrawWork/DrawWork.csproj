@@ -72,6 +72,7 @@
     <Compile Include="CommandServices\TranslateDataService.cs" />
     <Compile Include="Commons\CommonBase.cs" />
     <Compile Include="Commons\CommonGlobal.cs" />
+    <Compile Include="Commons\CommonMethod.cs" />
     <Compile Include="Commons\SingletonData.cs" />
     <Compile Include="DrawAutomationService\AutomationDimensionService.cs" />
     <Compile Include="DrawAutomationService\AutomationLeaderService.cs" />
@@ -79,7 +80,8 @@
     <Compile Include="DrawModels\DrawDimStyle.cs" />
     <Compile Include="DrawModels\DrawEntityModel.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
-    <Compile Include="DrawServices\DrawBlockService.cs" />
+    <Compile Include="DrawServices\DrawImportBlockService.cs" />
+    <Compile Include="DrawServices\DrawLogicBlockService.cs" />
     <Compile Include="DrawServices\DrawContactPointService.cs" />
     <Compile Include="DrawServices\DrawNozzleService.cs" />
     <Compile Include="DrawServices\DrawObjectService.cs" />

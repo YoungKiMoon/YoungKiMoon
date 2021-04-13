@@ -1444,21 +1444,34 @@ namespace DrawWork.DrawServices
                 }
                 #endregion
 
-                #region Solid
+                #region Group roate
                 if (true)
                 {
                     //Solid newSolid = new Solid(,);
 
                     //Triangle tri1 = new Triangle(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint1.X + selArrowHeight * 3, textCenter.Y + selArrowHeight / 2), new Point3D(selPoint1.X + selArrowHeight * 3, textCenter.Y - selArrowHeight / 2));
-                    
+
 
                     //singleModel.Entities.Add(newSolid, Color.Green);
 
 
+                    Line c1 = new Line(new Point3D(10, 20, 0), new Point3D(10, 100, 0));
+                    Line c2 = new Line(new Point3D(20, 20, 0), new Point3D(20, 100, 0));
 
+                    Line c11 = (Line)c1.Clone();
+                    Line c22 = (Line)c2.Clone();
 
+                    c11.Rotate(UtilityEx.DegToRad(-90), Vector3D.AxisZ, new Point3D(15, 20));
+                    c22.Rotate(UtilityEx.DegToRad(-90), Vector3D.AxisZ, new Point3D(15, 20));
+
+                    singleModel.Entities.Add(c1);
+                    singleModel.Entities.Add(c2);
+                    singleModel.Entities.Add(c11);
+                    singleModel.Entities.Add(c22);
                 }
                 #endregion
+
+
 
                 singleModel.Entities.Regen();
                 singleModel.ZoomFit();

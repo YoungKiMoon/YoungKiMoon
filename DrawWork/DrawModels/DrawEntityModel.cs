@@ -24,6 +24,7 @@ namespace DrawWork.DrawModels
             nozzlelineList = new List<Entity>();
             nozzleMarkList = new List<Entity>();
             nozzleTextList = new List<Entity>();
+            blockList = new List<Entity>();
         }
 
         private List<Entity> _outlineList;
@@ -99,6 +100,12 @@ namespace DrawWork.DrawModels
             set { _nozzleTextList = value; }
         }
 
+        public List<Entity> blockList
+        {
+            get { return _blockList; }
+            set { _blockList = value; }
+        }
+        private List<Entity> _blockList;
 
     }
 }

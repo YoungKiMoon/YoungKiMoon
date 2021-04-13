@@ -27,16 +27,17 @@ namespace DrawWork.ViewModels
             TankData.CreateSampleAssembly();
             commandData.CreateSampleCommandModel();
 
-            commandService = new CommandBasicService(commandData.commandList, TankData);
         }
 
-        
-
-        public LogicBuilder GetLogicBuilder(Object selModel)
+        public void CreateCommandService(Object selModel)
         {
+            commandService = new CommandBasicService(commandData.commandList, TankData, selModel);
+        }
 
-            commandService = new CommandBasicService(commandData.commandList, TankData);
-            commandService.ExecuteCommand(selModel);
+        public LogicBuilder GetLogicBuilder()
+        {
+            commandService.SetCommandData(commandData.commandList);
+            commandService.ExecuteCommand();
             LogicBuilder logicB = new LogicBuilder(commandService.commandEntities);
 
             return logicB;

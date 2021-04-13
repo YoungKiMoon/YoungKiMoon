@@ -22,14 +22,14 @@ using DrawWork.DrawModels;
 
 namespace DrawWork.DrawServices
 {
-    public class DrawBlockService
+    public class DrawLogicBlockService
     {
         private AssemblyModel assemblyData;
 
         private ValueService valueService;
         private DrawContactPointService contactService;
 
-        public DrawBlockService(AssemblyModel selAssembly)
+        public DrawLogicBlockService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
             valueService = new ValueService();

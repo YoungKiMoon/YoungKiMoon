@@ -25,14 +25,17 @@ namespace DrawWork.DrawServices
         private AssemblyModel assemblyData;
 
         private ValueService valueService;
+        private DrawContactPointService contactPointService;
 
         public DrawNozzleService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
+
             valueService = new ValueService();
+            contactPointService = new DrawContactPointService(selAssembly);
         }
 
-        public Dictionary<string, List<Entity>> DrawNozzle_GA(ref CDPoint refPoint,
+        public DrawEntityModel DrawNozzle_GA(ref CDPoint refPoint,
                                       string selPosition, 
                                       string selNozzleType,
                                       string selNozzlePosition,
@@ -41,11 +44,14 @@ namespace DrawWork.DrawServices
                                       string selMultiColumn)
         {
 
+            DrawEntityModel nozzleEntities = new DrawEntityModel();
+            POSITION_TYPE newNozzlePosition = CommonMethod.PositionToEnum(selNozzlePosition);
+
             // Shell Spacing
             double shellSpacingLeft = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length);
-            double shellSpacingRight = 400;
-            double shellSpacingTop = 400;
-            double shellSpacingBottom = 400;
+            double shellSpacingRight = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length); 
+            double shellSpacingTop = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length); 
+            double shellSpacingBottom = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length); 
 
             // Nozzle Area
             double lowerAreaLeft = refPoint.X- shellSpacingLeft;
@@ -57,53 +63,47 @@ namespace DrawWork.DrawServices
             double lowerAreaTop = 400;
             double upperAreaTop = 400;
 
-            // Type
-            switch (selNozzleType)
-            {
-                case "Bottom":
-                    //drawPoint = GetSumPoint(drawPoint, -AB, -AB);
-
-                    break;
-
-            }
+            // Type : 사용하지 않음
 
             // MutilColumn
             bool multiColumnValue = selMultiColumn == "true" ? true : false;
 
 
-            // Entity
-            List<Entity> nozzleOutlineList = new List<Entity>();
-            List<Entity> nozzlelineList = new List<Entity>();
-            List<Entity> nozzleMarkList = new List<Entity>();
-            List<Entity> nozzleTextList = new List<Entity>();
 
-
-            // Nozzle List
+            // Nozzle List : Adjust
             List<NozzleInputModel> drawNozzle = new List<NozzleInputModel>();
-
-            // Model
-            foreach (NozzleInputModel eachNozzle in assemblyData.NozzleInputModel)
+            foreach(NozzleInputModel eachNozzle in assemblyData.NozzleInputModel)
             {
-                if (eachNozzle.Position.ToLower() == selPosition)
+                eachNozzle.HeightSort = valueService.GetDoubleValue(eachNozzle.H); // sort value
+                eachNozzle.Position = eachNozzle.Position.ToLower();
+                eachNozzle.NozzlePosition = eachNozzle.NozzlePosition.ToLower();
+                drawNozzle.Add(eachNozzle);
+            }
+
+            // Nozzle List : Sort
+            List<NozzleInputModel> drawArrangeNozzle = drawNozzle.OrderBy(x => x.HeightSort).ToList();
+
+            // Create Model
+            double sizeNominalId = valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId);
+            CDPoint newCurPoint = new CDPoint();
+            CDPoint centerTopPoint = contactPointService.ContactPoint("centerroofpoint",ref refPoint,ref newCurPoint);
+            double centerTopHeight = centerTopPoint.Y;
+            foreach (NozzleInputModel eachNozzle in drawArrangeNozzle)
+            {
+                if (eachNozzle.Position == selPosition)
                 {
-                    if(eachNozzle.NozzlePosition.ToLower()== selNozzlePosition)
+                    if (eachNozzle.NozzlePosition == selNozzlePosition)
                     {
-                        eachNozzle.HeightSort = valueService.GetDoubleValue(eachNozzle.H);
-                        // add
-                        drawNozzle.Add(eachNozzle);
-
-                        Point3D drawPoint = new Point3D(refPoint.X, refPoint.Y + eachNozzle.HeightSort, 0);
-                        List<Entity> customEntity = CreateNozzleModel(drawPoint);
-
                         // outline
-                        nozzleOutlineList.AddRange(customEntity);
+                        List<Entity> customEntity = CreateNozzleModelPosition(CommonMethod.PositionToEnum( eachNozzle.NozzlePosition), eachNozzle.HeightSort,sizeNominalId,centerTopHeight, refPoint);
+                        nozzleEntities.outlineList.AddRange(customEntity);
                     }
                 }
             }
 
 
             // Arrangement
-            List<NozzleInputModel> drawArrangeNozzle = drawNozzle.OrderBy(x => x.HeightSort).ToList();
+            //List<NozzleInputModel> drawArrangeNozzle = drawNozzle.OrderBy(x => x.HeightSort).ToList();
             List<Point3D> leaderArrangementHeight = GetArrangeLeaderPosition(new Point3D(refPoint.X, refPoint.Y, 0), shellSpacingLeft, selLeaderCircleSize, drawArrangeNozzle, multiColumnValue);
 
             // Leader
@@ -116,31 +116,52 @@ namespace DrawWork.DrawServices
                 //Point3D drawPoint = new Point3D(refPoint.X - shellSpacingLeft, refPoint.Y + currentHeight, 0);
                 Point3D drawPoint = new Point3D(currentX, refPoint.Y + currentHeight, 0);
                 Dictionary<string, List<Entity>> customEntity = CreateNozzleLeader(drawPoint,eachNozzle.Mark,eachNozzle.Size,selNozzleFontSize, selLeaderCircleSize);
-                nozzleMarkList.AddRange(customEntity[CommonGlobal.NozzleMark]);
-                nozzleTextList.AddRange(customEntity[CommonGlobal.NozzleText]);
+                nozzleEntities.nozzleMarkList.AddRange(customEntity[CommonGlobal.NozzleMark]);
+                nozzleEntities.nozzleTextList.AddRange(customEntity[CommonGlobal.NozzleText]);
 
             }
 
             // Line
             List<Entity> customLineEntity = CreateNozzleLeaderLine(new Point3D(refPoint.X, refPoint.Y, 0), shellSpacingLeft, drawArrangeNozzle, leaderArrangementHeight);
-            nozzlelineList.AddRange(customLineEntity);
-
-
-            Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
-            customEntityList.Add(CommonGlobal.OutLine, nozzleOutlineList);
-            customEntityList.Add(CommonGlobal.NozzleLine, nozzlelineList);
-            customEntityList.Add(CommonGlobal.NozzleMark, nozzleMarkList);
-            customEntityList.Add(CommonGlobal.NozzleText, nozzleTextList);
+            nozzleEntities.nozzlelineList.AddRange(customLineEntity);
 
 
 
-            return customEntityList;
+            return nozzleEntities;
         }
 
-        // Width : 10 + 24 + 40 고정 -> 나중에 가변으로 변경해야 함
-        // 노즐 겹치 구현 암됨
-        private List<Entity> CreateNozzleModel(Point3D drawPoint)
+        #region Nozzel : Create Model
+        private List<Entity> CreateNozzleModelPosition(POSITION_TYPE selNozzlePosition,double selHeightSort,double selSizeNominalID,double selCenterTopHeight, CDPoint refPoint)
         {
+            Point3D drawPoint = null;
+            List<Entity> newNozzle = null;
+            switch (selNozzlePosition)
+            {
+                case POSITION_TYPE.LEFT:
+                    drawPoint = new Point3D(refPoint.X, refPoint.Y + selHeightSort, 0);
+                    newNozzle = CreateNozzleModel(drawPoint,POSITION_TYPE.LEFT);
+                    break;
+                case POSITION_TYPE.RIGHT:
+                    drawPoint = new Point3D(refPoint.X + selSizeNominalID, refPoint.Y + selHeightSort, 0);
+                    newNozzle = CreateNozzleModel(drawPoint,POSITION_TYPE.RIGHT);
+                    break;
+                case POSITION_TYPE.TOP:
+                    drawPoint = new Point3D(refPoint.X + selHeightSort, selCenterTopHeight, 0);
+                    newNozzle = CreateNozzleModel(drawPoint,POSITION_TYPE.TOP);
+                    break;
+                case POSITION_TYPE.BOTTOM:
+                    drawPoint = new Point3D(refPoint.X + selHeightSort, refPoint.Y, 0);
+                    newNozzle = CreateNozzleModel(drawPoint,POSITION_TYPE.BOTTOM);
+                    break;
+            }
+
+            return newNozzle;
+        }
+        private List<Entity> CreateNozzleModel(Point3D drawPoint,POSITION_TYPE selPosition)
+        {
+
+            // 노즐 겹치 구현 암됨
+            // Width : 10 + 24 + 40 고정 -> 나중에 가변으로 변경해야 함
             double flangeFaceWidth = 10;
             double flangeFaceHeight = 80;
             double flangeFaceInnerWidth = 10;
@@ -181,9 +202,31 @@ namespace DrawWork.DrawServices
             customEntity.Add(linePa);
             customEntity.Add(linePb);
 
+            // Rotation
+            foreach(Entity eachEntity in customEntity)
+            {
+                switch (selPosition)
+                {
+                    case POSITION_TYPE.LEFT:
+                        break;
+                    case POSITION_TYPE.RIGHT:
+                        eachEntity.Rotate(UtilityEx.DegToRad(-180), Vector3D.AxisZ, drawPoint);
+                        break;
+                    case POSITION_TYPE.TOP:
+                        eachEntity.Rotate(UtilityEx.DegToRad(-90), Vector3D.AxisZ, drawPoint);
+                        break;
+                    case POSITION_TYPE.BOTTOM:
+                        eachEntity.Rotate(UtilityEx.DegToRad(90), Vector3D.AxisZ, drawPoint);
+                        break;
+                }
+            }
 
             return customEntity;
         }
+
+        #endregion
+
+
 
         private Dictionary<string, List<Entity>> CreateNozzleLeader(Point3D drawPoint,string textUpperStr,string textLowerStr,string fontSize,string circleSize)
         {

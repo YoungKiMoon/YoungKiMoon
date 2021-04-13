@@ -20,5 +20,14 @@ namespace DrawWork.Commons
         NOZZLE_MARK = 9,
     }
 
+    public enum POSITION_TYPE 
+    {
+        NotSet = 0,
+        LEFT = 1,
+        RIGHT = 2,
+        BOTTOM = 3,
+        TOP = 4,
+    }
+
 
 }

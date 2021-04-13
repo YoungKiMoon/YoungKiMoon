@@ -57,8 +57,16 @@ namespace DrawWork.ImportServices
 
             foreach(ImportBlockModel eachBlock in blockList)
             {
+                //Point2D lowerLeftPoint = GetBoxPointOfLowerLeft(eachBlock.BlockArea.Vertices);
+                //Point2D upperRightPoint = GetBoxPointOfUpperRight(eachBlock.BlockArea.Vertices);
+
                 Point2D lowerLeftPoint = GetBoxPointOfLowerLeft(eachBlock.BlockArea.Vertices);
                 Point2D upperRightPoint = GetBoxPointOfUpperRight(eachBlock.BlockArea.Vertices);
+                //lowerLeftPoint.X= lowerLeftPoint.X+10;
+                //lowerLeftPoint.Y= lowerLeftPoint.Y+10;
+                //upperRightPoint.X = upperRightPoint.X - 10;
+                //upperRightPoint.Y = upperRightPoint.Y - 10;
+
                 foreach (Entity eachEntity in selFileData.Entities)
                 {
                     if(eachEntity is Text)
@@ -85,12 +93,21 @@ namespace DrawWork.ImportServices
                             eachBlock.BlockEntities.Add(eachEntityCurve);
                         }
                     }
+                    else if (eachEntity is CompositeCurve)
+                    {
+                        CompositeCurve eachEntityCom = eachEntity as CompositeCurve;
+                        if (UtilityEx.PointInRect(eachEntityCom.StartPoint, lowerLeftPoint, upperRightPoint))
+                        {
+                            eachBlock.BlockEntities.Add(eachEntityCom);
+                        }
+                    }
                     else if(!(eachEntity is LinearPath) && !(eachEntity is BlockReference))
                     {
                         if (UtilityEx.PointInRect(eachEntity.Vertices[0], lowerLeftPoint, upperRightPoint))
                         {
                             eachBlock.BlockEntities.Add(eachEntity);
                         }
+                        
                     }
                 }
             }
@@ -100,8 +117,14 @@ namespace DrawWork.ImportServices
             {
                 if (eachBlock.BlockEntities.Count > 0)
                 {
-                    Block newBlock = GetBlock(eachBlock.BlockName, eachBlock.BlockEntities);
-                    selModel.Blocks.Add(newBlock);
+                    if(eachBlock.BlockName != "")
+                    {
+                        Point2D lowerLeftPoint = GetBoxPointOfLowerLeft(eachBlock.BlockArea.Vertices);
+
+                        Block newBlock = GetBlock(eachBlock.BlockName, eachBlock.BlockEntities);
+                        newBlock.BasePoint =new Point3D( lowerLeftPoint.X, lowerLeftPoint.Y,0);
+                        selModel.Blocks.Add(newBlock);
+                    }
                 }
             }
         }
@@ -116,14 +139,16 @@ namespace DrawWork.ImportServices
                 eachEntity.ColorMethod = colorMethodType.byLayer;
                 newBlock.Entities.Add(eachEntity);
             }
-            //newBlock.Entities.AddRange(selEntityList);
+            //newBlock.Entities.AddRange(selEntityList);            
 
             return newBlock;
         }
 
         private List<ImportBlockModel> GetBlockList(List<LinearPath> selBoxList, List<Text> selTextList, List<MultilineText> selMultiTextList)
         {
-            double blockNameHeight = 10;
+            //double blockNameHeight = 10;
+            double blockNameHeight = 400;
+
             List<ImportBlockModel> newList = new List<ImportBlockModel>();
             List<LinearPath> nameList = new List<LinearPath>();
 

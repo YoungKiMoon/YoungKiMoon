@@ -101,6 +101,9 @@ namespace DrawWork.DrawServices
             return newText;
         }
         
+
+        
+
         public CDPoint GetDrawPoint(string selData, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             CDPoint newPoint = new CDPoint();
@@ -529,7 +532,10 @@ namespace DrawWork.DrawServices
 
             textLayerHeight = 7 * textHeight / 2.5;
             textGap = textLayerHeight / 7;
-            selArrowHeight = textHeight;
+
+
+            //selArrowHeight = textHeight;
+            selArrowHeight = textHeight/2;
 
             Line newLeaderLine = null;
             Triangle newLeaderArrow = null;
