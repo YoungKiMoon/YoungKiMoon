@@ -132,7 +132,7 @@ namespace DrawWork.DrawServices
             string calStr = "";
             string newStr = "";
             string newValue = "";
-            bool calStart = false;
+            //bool calStart = false;
 
             bool closeBracket = true;
             foreach (char ch in selCmd)
@@ -146,7 +146,7 @@ namespace DrawWork.DrawServices
 
                 if (calStr != "" && closeBracket)
                 {
-                    calStart = true;
+                    //calStart = true;
 
                     newValue += GetPointDataCalAlpha(newStr,selXY,ref refPoint,ref curPoint);
                     newValue += calStr;

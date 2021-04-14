@@ -80,6 +80,7 @@
     <Compile Include="DrawModels\DrawDimStyle.cs" />
     <Compile Include="DrawModels\DrawEntityModel.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
+    <Compile Include="DrawModels\DrawPositionValueModel.cs" />
     <Compile Include="DrawServices\DrawImportBlockService.cs" />
     <Compile Include="DrawServices\DrawLogicBlockService.cs" />
     <Compile Include="DrawServices\DrawContactPointService.cs" />

@@ -222,12 +222,12 @@ namespace DrawWork
                 //var br3 = new BlockReference(10, 100, 10, "ssblock",testModel.RootBlock.Units,testModel.Blocks,0);
 
                 // 블럭 삽입 방법
-                if (false)
-                {
-                    var br3 = new BlockReference(-1000, 5000, 0, "LADDER-1", 0);
-                    br3.Scale(1);
-                    testModel.Entities.Add(br3, "LayerDimension");
-                }
+                //if (false)
+                //{
+                //    var br3 = new BlockReference(-1000, 5000, 0, "LADDER-1", 0);
+                //    br3.Scale(1);
+                //    testModel.Entities.Add(br3, "LayerDimension");
+                //}
 
                 //testModel.Entities.Add(br3, "DashDot");
 

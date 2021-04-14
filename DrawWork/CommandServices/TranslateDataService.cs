@@ -368,7 +368,7 @@ namespace DrawWork.CommandServices
             string calStr = "";
             string newStr = "";
             string newValue = "";
-            bool calStart = false;
+            //bool calStart = false;
 
             bool closeBracket = true;  
             foreach (char ch in selCmd)
@@ -382,7 +382,7 @@ namespace DrawWork.CommandServices
 
                 if (calStr != "" && closeBracket)
                 {
-                    calStart = true;
+                    //calStart = true;
 
                     newValue += GetModelData(newStr);
                     newValue += calStr;
