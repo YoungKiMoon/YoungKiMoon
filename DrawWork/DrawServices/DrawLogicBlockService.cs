@@ -36,7 +36,7 @@ namespace DrawWork.DrawServices
             contactService = new DrawContactPointService(selAssembly);
         }
 
-        public Entity[] DrawBlock_TopAngle(CDPoint selPoint1,string selAngleType, EqualAngleSizeModel selAngle)
+        public Entity[] DrawBlock_TopAngle(CDPoint selPoint1,string selAngleType, AngleSizeModel selAngle)
         {
             
             double AB = valueService.GetDoubleValue( selAngle.AB);

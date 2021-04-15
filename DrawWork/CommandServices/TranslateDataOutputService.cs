@@ -33,7 +33,7 @@ namespace DrawWork.CommandServices
             string acTopAngleType = GetAllTrim(selAssembly.RoofInput[firstIndex].TopAngleType);
 
             string acTopAngleSize = GetAllTrim(selAssembly.RoofInput[firstIndex].TopAngleSize);
-            foreach(EqualAngleSizeModel eachAngle in selAssembly.AngleIList)
+            foreach(AngleSizeModel eachAngle in selAssembly.AngleIList)
             {
                 if (GetAllTrim(eachAngle.SIZE) == acTopAngleSize)
                 {

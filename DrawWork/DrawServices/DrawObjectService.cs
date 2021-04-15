@@ -593,267 +593,7 @@ namespace DrawWork.DrawServices
         }
 
 
-        // Drawing Logic : Block
-        public Entity[] DoBlockTopAngle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
-        {
-            // 0 : Object
-            // 1 : Command
-            // 2 : Data
-            int refIndex = 1;
 
-
-            CDPoint newPoint1 = new CDPoint();
-            CDPoint newPoint2 = new CDPoint();
-            CDPoint newPoint3 = new CDPoint();
-            CDPoint newSetPoint = new CDPoint();
-
-            string newAngleType = "";
-            string newAngleSize = "";
-            EqualAngleSizeModel newAngle = new EqualAngleSizeModel();
-
-            for (int j = refIndex; j < eachCmd.Length; j += 2)
-            {
-                switch (eachCmd[j].ToLower())
-                {
-                    case "xy":
-                        if (j + 1 <= eachCmd.Length)
-                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                        break;
-
-                    case "type":
-                        if (j + 1 <= eachCmd.Length)
-                            newAngleType = eachCmd[j + 1];
-                        break;
-
-                    case "size":
-                        if (j + 1 <= eachCmd.Length)
-                        {
-                            newAngleSize = eachCmd[j + 1];
-                            newAngle = assemblyData.RoofAngleOutput[0];
-                        }
-                        break;
-
-                    case "sp":
-                        if (j + 1 <= eachCmd.Length)
-                        {
-                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                            curPoint.X = newSetPoint.X;
-                            curPoint.Y = newSetPoint.Y;
-                        }
-                        break;
-                }
-            }
-
-            Entity[] returnEntity = null; 
-            // Create Line
-            if (newAngleType!="" && newAngleSize != "")
-                returnEntity= drawLogicBlockService.DrawBlock_TopAngle(newPoint1, newAngleType, newAngle);
-
-
-
-            // Mirror
-            if (returnEntity != null)
-            {
-                for (int j = refIndex; j < eachCmd.Length; j += 2)
-                {
-                    switch (eachCmd[j].ToLower())
-                    {
-                        case "mirror":
-                            if (j + 1 <= eachCmd.Length)
-                            {
-                                switch (eachCmd[j + 1].ToLower())
-                                {
-                                    case "right":
-                                        
-                                        Plane pl1 = Plane.YZ;
-                                        pl1.Origin.X = newPoint1.X;
-                                        pl1.Origin.Y = newPoint1.Y;
-                                        Mirror customMirror = new Mirror(pl1);
-                                        foreach (Entity eachEntity in returnEntity)
-                                        {
-                                            eachEntity.TransformBy(customMirror);
-                                        }
-                                        break;
-                                }
-                            }
-
-                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                            break;
-
-
-                    }
-                }
-            }
-            return returnEntity;
-        }
-
-        public Entity[] DoBlockHBeam(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
-        {
-            // 0 : Object
-            // 1 : Command
-            // 2 : Data
-            int refIndex = 1;
-
-
-            CDPoint newPoint1 = new CDPoint();
-            CDPoint newPoint2 = new CDPoint();
-            CDPoint newPoint3 = new CDPoint();
-            CDPoint newSetPoint = new CDPoint();
-
-            string newHBeamSize = "";
-            HBeamModel newHBeam = new HBeamModel();
-
-            for (int j = refIndex; j < eachCmd.Length; j += 2)
-            {
-                switch (eachCmd[j].ToLower())
-                {
-                    case "xy":
-                        if (j + 1 <= eachCmd.Length)
-                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                        break;
-
-                    case "size":
-                        if (j + 1 <= eachCmd.Length)
-                        {
-                            newHBeamSize = eachCmd[j + 1];
-                            foreach(HBeamModel eachHBeam in assemblyData.HBeamList)
-                            {
-                                if (eachHBeam.SIZE == newHBeamSize)
-                                {
-                                    newHBeam = eachHBeam;
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-
-                    case "sp":
-                        if (j + 1 <= eachCmd.Length)
-                        {
-                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                            curPoint.X = newSetPoint.X;
-                            curPoint.Y = newSetPoint.Y;
-                        }
-                        break;
-                }
-            }
-
-            Entity[] returnEntity = null;
-            // Create Line
-            if (newHBeamSize != "")
-                returnEntity = drawLogicBlockService.DrawBlock_HBeam(newPoint1, newHBeam);
-
-
-
-            // Mirror
-            if (returnEntity != null)
-            {
-                for (int j = refIndex; j < eachCmd.Length; j += 2)
-                {
-                    switch (eachCmd[j].ToLower())
-                    {
-                        case "mirror":
-                            if (j + 1 <= eachCmd.Length)
-                            {
-                                switch (eachCmd[j + 1].ToLower())
-                                {
-                                    case "right":
-
-                                        Plane pl1 = Plane.YZ;
-                                        pl1.Origin.X = newPoint1.X;
-                                        pl1.Origin.Y = newPoint1.Y;
-                                        Mirror customMirror = new Mirror(pl1);
-                                        foreach (Entity eachEntity in returnEntity)
-                                        {
-                                            eachEntity.TransformBy(customMirror);
-                                        }
-                                        break;
-                                }
-                            }
-
-                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                            break;
-
-
-                    }
-                }
-            }
-            return returnEntity;
-        }
-        public Entity[] DoBlockColumnSupportSide(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
-        {
-            // 0 : Object
-            // 1 : Command
-            // 2 : Data
-            int refIndex = 1;
-
-
-            CDPoint newPoint1 = new CDPoint();
-            CDPoint newPoint2 = new CDPoint();
-            CDPoint newPoint3 = new CDPoint();
-            CDPoint newSetPoint = new CDPoint();
-
-            for (int j = refIndex; j < eachCmd.Length; j += 2)
-            {
-                switch (eachCmd[j].ToLower())
-                {
-                    case "xy":
-                        if (j + 1 <= eachCmd.Length)
-                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                        break;
-
-                    case "sp":
-                        if (j + 1 <= eachCmd.Length)
-                        {
-                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                            curPoint.X = newSetPoint.X;
-                            curPoint.Y = newSetPoint.Y;
-                        }
-                        break;
-                }
-            }
-
-            Entity[] returnEntity = null;
-            // Create Line
-            returnEntity = drawLogicBlockService.DrawBlock_ColumnSupportSide(newPoint1);
-
-
-
-            // Mirror
-            if (returnEntity != null)
-            {
-                for (int j = refIndex; j < eachCmd.Length; j += 2)
-                {
-                    switch (eachCmd[j].ToLower())
-                    {
-                        case "mirror":
-                            if (j + 1 <= eachCmd.Length)
-                            {
-                                switch (eachCmd[j + 1].ToLower())
-                                {
-                                    case "right":
-
-                                        Plane pl1 = Plane.YZ;
-                                        pl1.Origin.X = newPoint1.X;
-                                        pl1.Origin.Y = newPoint1.Y;
-                                        Mirror customMirror = new Mirror(pl1);
-                                        foreach (Entity eachEntity in returnEntity)
-                                        {
-                                            eachEntity.TransformBy(customMirror);
-                                        }
-                                        break;
-                                }
-                            }
-
-                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                            break;
-
-
-                    }
-                }
-            }
-            return returnEntity;
-        }
 
         // Nozzle
         public DrawEntityModel DoNozzle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
@@ -1188,6 +928,405 @@ namespace DrawWork.DrawServices
 
             return returnEntity;
         }
+
+
+
+
+
+        // Drawing Logic : Block
+        public Entity[] DoBlockLogic(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+            string logicBlockName = "";
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "name":
+                        if (j + 1 <= eachCmd.Length)
+                            logicBlockName = eachCmd[j + 1];
+                        break;
+
+                }
+            }
+
+            Entity[] returnEntity = null;
+
+            // Drawing Logic Block
+            switch (logicBlockName)
+            {
+                case "topangle":
+                    returnEntity = (DoBlockTopAngle(eachCmd, ref refPoint, ref curPoint));
+                    goto case "allways";
+
+                case "hbeam":
+                    returnEntity = (DoBlockHBeam(eachCmd, ref refPoint, ref curPoint));
+                    goto case "allways";
+
+                case "columnsupportside":
+                    returnEntity = (DoBlockColumnSupportSide(eachCmd, ref refPoint, ref curPoint));
+                    goto case "allways";
+
+                case "windergirder":
+                    returnEntity = (DoBlockWinderGirder(eachCmd, ref refPoint, ref curPoint));
+                    goto case "allways";
+
+
+                // allways
+                case "allways":
+                    break;
+            }
+
+
+            return returnEntity;
+        }
+
+        public Entity[] DoBlockTopAngle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            string newAngleType = "";
+            string newAngleSize = "";
+            AngleSizeModel newAngle = new AngleSizeModel();
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "xy":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "type":
+                        if (j + 1 <= eachCmd.Length)
+                            newAngleType = eachCmd[j + 1];
+                        break;
+
+                    case "size":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newAngleSize = eachCmd[j + 1];
+                            newAngle = assemblyData.RoofAngleOutput[0];
+                        }
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            Entity[] returnEntity = null;
+            // Create Line
+            if (newAngleType != "" && newAngleSize != "")
+                returnEntity = drawLogicBlockService.DrawBlock_TopAngle(newPoint1, newAngleType, newAngle);
+
+
+
+            // Mirror
+            if (returnEntity != null)
+            {
+                for (int j = refIndex; j < eachCmd.Length; j += 2)
+                {
+                    switch (eachCmd[j].ToLower())
+                    {
+                        case "mirror":
+                            if (j + 1 <= eachCmd.Length)
+                            {
+                                switch (eachCmd[j + 1].ToLower())
+                                {
+                                    case "right":
+
+                                        Plane pl1 = Plane.YZ;
+                                        pl1.Origin.X = newPoint1.X;
+                                        pl1.Origin.Y = newPoint1.Y;
+                                        Mirror customMirror = new Mirror(pl1);
+                                        foreach (Entity eachEntity in returnEntity)
+                                        {
+                                            eachEntity.TransformBy(customMirror);
+                                        }
+                                        break;
+                                }
+                            }
+
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            break;
+
+
+                    }
+                }
+            }
+            return returnEntity;
+        }
+
+        public Entity[] DoBlockHBeam(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            string newHBeamSize = "";
+            HBeamModel newHBeam = new HBeamModel();
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "xy":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "size":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newHBeamSize = eachCmd[j + 1];
+                            foreach (HBeamModel eachHBeam in assemblyData.HBeamList)
+                            {
+                                if (eachHBeam.SIZE == newHBeamSize)
+                                {
+                                    newHBeam = eachHBeam;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            Entity[] returnEntity = null;
+            // Create Line
+            if (newHBeamSize != "")
+                returnEntity = drawLogicBlockService.DrawBlock_HBeam(newPoint1, newHBeam);
+
+
+
+            // Mirror
+            if (returnEntity != null)
+            {
+                for (int j = refIndex; j < eachCmd.Length; j += 2)
+                {
+                    switch (eachCmd[j].ToLower())
+                    {
+                        case "mirror":
+                            if (j + 1 <= eachCmd.Length)
+                            {
+                                switch (eachCmd[j + 1].ToLower())
+                                {
+                                    case "right":
+
+                                        Plane pl1 = Plane.YZ;
+                                        pl1.Origin.X = newPoint1.X;
+                                        pl1.Origin.Y = newPoint1.Y;
+                                        Mirror customMirror = new Mirror(pl1);
+                                        foreach (Entity eachEntity in returnEntity)
+                                        {
+                                            eachEntity.TransformBy(customMirror);
+                                        }
+                                        break;
+                                }
+                            }
+
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            break;
+
+
+                    }
+                }
+            }
+            return returnEntity;
+        }
+        public Entity[] DoBlockColumnSupportSide(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "xy":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            Entity[] returnEntity = null;
+            // Create Line
+            returnEntity = drawLogicBlockService.DrawBlock_ColumnSupportSide(newPoint1);
+
+
+
+            // Mirror
+            if (returnEntity != null)
+            {
+                for (int j = refIndex; j < eachCmd.Length; j += 2)
+                {
+                    switch (eachCmd[j].ToLower())
+                    {
+                        case "mirror":
+                            if (j + 1 <= eachCmd.Length)
+                            {
+                                switch (eachCmd[j + 1].ToLower())
+                                {
+                                    case "right":
+
+                                        Plane pl1 = Plane.YZ;
+                                        pl1.Origin.X = newPoint1.X;
+                                        pl1.Origin.Y = newPoint1.Y;
+                                        Mirror customMirror = new Mirror(pl1);
+                                        foreach (Entity eachEntity in returnEntity)
+                                        {
+                                            eachEntity.TransformBy(customMirror);
+                                        }
+                                        break;
+                                }
+                            }
+
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            break;
+
+
+                    }
+                }
+            }
+            return returnEntity;
+        }
+
+        public Entity[] DoBlockWinderGirder(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            string newAngleType = "";
+            string newAngleSize = "";
+            AngleSizeModel newAngle = new AngleSizeModel();
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j].ToLower())
+                {
+                    case "xy":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            Entity[] returnEntity = null;
+            // Create Line
+            if (newAngleType != "" && newAngleSize != "")
+                returnEntity = drawLogicBlockService.DrawBlock_TopAngle(newPoint1, newAngleType, newAngle);
+
+
+
+            // Mirror
+            if (returnEntity != null)
+            {
+                for (int j = refIndex; j < eachCmd.Length; j += 2)
+                {
+                    switch (eachCmd[j].ToLower())
+                    {
+                        case "mirror":
+                            if (j + 1 <= eachCmd.Length)
+                            {
+                                switch (eachCmd[j + 1].ToLower())
+                                {
+                                    case "right":
+
+                                        Plane pl1 = Plane.YZ;
+                                        pl1.Origin.X = newPoint1.X;
+                                        pl1.Origin.Y = newPoint1.Y;
+                                        Mirror customMirror = new Mirror(pl1);
+                                        foreach (Entity eachEntity in returnEntity)
+                                        {
+                                            eachEntity.TransformBy(customMirror);
+                                        }
+                                        break;
+                                }
+                            }
+
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            break;
+
+
+                    }
+                }
+            }
+            return returnEntity;
+        }
+
 
     }
 }

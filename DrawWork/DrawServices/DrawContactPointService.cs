@@ -50,7 +50,7 @@ namespace DrawWork.DrawServices
                     {
                         case "b":
 
-                            EqualAngleSizeModel eachAngle = assemblyData.RoofAngleOutput[0];
+                            AngleSizeModel eachAngle = assemblyData.RoofAngleOutput[0];
                             // Max course count
                             int maxCourse = valueService.GetIntValue(assemblyData.ShellInput[0].CourseCount) - 1;
                             // Point
@@ -63,7 +63,7 @@ namespace DrawWork.DrawServices
 
                             /*
                             string newAngleSize = assemblyData.RoofInput[0].TopAngleSize;
-                            foreach (EqualAngleSizeModel eachAngle in assemblyData.AngleIList)
+                            foreach (AngleSizeModel eachAngle in assemblyData.AngleIList)
                             {
                                 if (eachAngle.SIZE == newAngleSize)
                                 {
@@ -87,7 +87,7 @@ namespace DrawWork.DrawServices
                     switch (assemblyData.RoofInput[0].TopAngleType)
                     {
                         case "b":
-                            EqualAngleSizeModel eachAngle = assemblyData.RoofAngleOutput[0];
+                            AngleSizeModel eachAngle = assemblyData.RoofAngleOutput[0];
                             // Max course count
                             int maxCourse = valueService.GetIntValue(assemblyData.ShellInput[0].CourseCount) - 1;
                             // Point
