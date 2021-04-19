@@ -221,6 +221,7 @@ namespace DrawWork.CommandServices
                     drawEntity.nozzleTextList.AddRange(newNozzle.nozzleTextList);
                     goto case "allways";
 
+
                 // Leader
                 case "leader":
                 case "leaderline":

@@ -20,6 +20,12 @@ namespace DrawWork.DrawModels
             Y = newModel.Y;
             Z = newModel.Z;
         }
+        public CDPoint(double selX, double selY, double selZ)
+        {
+            X = selX;
+            Y = selY;
+            Z = selZ;
+        }
         public object Clone()
         {
             //this.MemberwiseClone();

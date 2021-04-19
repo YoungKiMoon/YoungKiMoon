@@ -108,5 +108,16 @@ namespace DrawWork.ValueServices
             double tempHeight = selHeight;
             return tempHeight / tempDegree;
         }
+
+
+
+        // 공백 제거
+        public string GetAllTrim(string selStr)
+        {
+            return selStr.Replace(" ", "");
+        }
+
+
+
     }
 }

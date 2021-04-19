@@ -30,12 +30,12 @@ namespace DrawWork.CommandServices
             // Top angle Output
             selAssembly.RoofAngleOutput.Clear();
             // Type : 아직 고려하지 않음
-            string acTopAngleType = GetAllTrim(selAssembly.RoofInput[firstIndex].TopAngleType);
+            string acTopAngleType = valueService.GetAllTrim(selAssembly.RoofInput[firstIndex].TopAngleType);
 
-            string acTopAngleSize = GetAllTrim(selAssembly.RoofInput[firstIndex].TopAngleSize);
+            string acTopAngleSize = valueService.GetAllTrim(selAssembly.RoofInput[firstIndex].TopAngleSize);
             foreach(AngleSizeModel eachAngle in selAssembly.AngleIList)
             {
-                if (GetAllTrim(eachAngle.SIZE) == acTopAngleSize)
+                if (valueService.GetAllTrim(eachAngle.SIZE) == acTopAngleSize)
                 {
                     selAssembly.RoofAngleOutput.Add(eachAngle);
                     break;
@@ -49,15 +49,15 @@ namespace DrawWork.CommandServices
 
             // Structure Column Rafter Output
             selAssembly.StructureColumnRafterOutput.Clear();
-            string acRafterSize = GetAllTrim(selAssembly.StructureInput[firstIndex].RafterSize);
+            string acRafterSize = valueService.GetAllTrim(selAssembly.StructureInput[firstIndex].RafterSize);
             for (int i = 0; i < selAssembly.StructureRafterInput.Count ; i++)
             {
-                string rafterSize = GetAllTrim(selAssembly.StructureRafterInput[i].RafterInSize);
+                string rafterSize = valueService.GetAllTrim(selAssembly.StructureRafterInput[i].RafterInSize);
                 if (rafterSize != "")
                 {
                     foreach (StructureColumnRafterModel eachRafter in selAssembly.StructureColumnRafter)
                     {
-                        if (GetAllTrim(eachRafter.SIZE) == rafterSize)
+                        if (valueService.GetAllTrim(eachRafter.SIZE) == rafterSize)
                         {
                             selAssembly.StructureColumnRafterOutput.Add(eachRafter);
                             break;
@@ -69,10 +69,10 @@ namespace DrawWork.CommandServices
 
             // Structure : Clip Shell Side
             selAssembly.StructureColumnClipShellSideOutput.Clear();
-            string acRafterSizeLast = GetAllTrim(selAssembly.StructureRafterInput[selAssembly.StructureRafterInput.Count-1].RafterInSize);
+            string acRafterSizeLast = valueService.GetAllTrim(selAssembly.StructureRafterInput[selAssembly.StructureRafterInput.Count-1].RafterInSize);
             foreach (StructureColumnClipShellSideModel eachClip in selAssembly.StructureColumnClipShellSide)
             {
-                if (GetAllTrim(eachClip.SIZE) == acRafterSizeLast)
+                if (valueService.GetAllTrim(eachClip.SIZE) == acRafterSizeLast)
                 {
                     selAssembly.StructureColumnClipShellSideOutput.Add(eachClip);
                 }
@@ -92,15 +92,15 @@ namespace DrawWork.CommandServices
                 string eachColumnSize = "";
                 string eachRafterSize = "";
                 if (selAssembly.StructureColumnInput.Count>i)
-                    eachColumnSize = GetAllTrim(selAssembly.StructureColumnInput[i].ColumnInSize);
+                    eachColumnSize = valueService.GetAllTrim(selAssembly.StructureColumnInput[i].ColumnInSize);
                 if (selAssembly.StructureRafterInput.Count>i)
-                    eachRafterSize = GetAllTrim(selAssembly.StructureRafterInput[i].RafterInSize);
+                    eachRafterSize = valueService.GetAllTrim(selAssembly.StructureRafterInput[i].RafterInSize);
 
                 if (i == 0 && eachColumnSize != "" && eachRafterSize != "")
                 {
                     foreach(StructureColumnCenterModel eachCenter in selAssembly.StructureColumnCenter)
                     {
-                        if (GetAllTrim(eachCenter.COLUMN) == eachColumnSize && GetAllTrim(eachCenter.SIZE) == eachRafterSize)
+                        if (valueService.GetAllTrim(eachCenter.COLUMN) == eachColumnSize && valueService.GetAllTrim(eachCenter.SIZE) == eachRafterSize)
                         {
                             selAssembly.StructureColumnCenterOutput.Add(eachCenter);
                             break;
@@ -127,12 +127,12 @@ namespace DrawWork.CommandServices
             selAssembly.StructureColumnSideOutput.Clear();
             for(int i = 1; i < selAssembly.StructureRafterInput.Count; i++) // 1 에서 부터 시작
             {
-                string rafterSize = GetAllTrim(selAssembly.StructureRafterInput[i].RafterInSize);
+                string rafterSize = valueService.GetAllTrim(selAssembly.StructureRafterInput[i].RafterInSize);
                 if (rafterSize !="")
                 {
                     foreach (StructureColumnSideModel eachSide in selAssembly.StructureColumnSide)
                     {
-                        if (GetAllTrim(eachSide.SIZE) == rafterSize)
+                        if (valueService.GetAllTrim(eachSide.SIZE) == rafterSize)
                         {
                             selAssembly.StructureColumnSideOutput.Add(eachSide);
                         }
@@ -144,12 +144,12 @@ namespace DrawWork.CommandServices
             selAssembly.StructureColumnHBeamOutput.Clear();
             for(int i = 0; i < selAssembly.StructureGirderInput.Count; i++)
             {
-                string girderSize = GetAllTrim(selAssembly.StructureGirderInput[i].GirderInSize);
+                string girderSize = valueService.GetAllTrim(selAssembly.StructureGirderInput[i].GirderInSize);
                 if (girderSize != "")
                 {
                     foreach(HBeamModel eachHBeam in selAssembly.HBeamList)
                     {
-                        if (GetAllTrim(eachHBeam.SIZE) == girderSize)
+                        if (valueService.GetAllTrim(eachHBeam.SIZE) == girderSize)
                         {
                             selAssembly.StructureColumnHBeamOutput.Add(eachHBeam);
                         }
@@ -174,9 +174,6 @@ namespace DrawWork.CommandServices
             #endregion
         }
 
-        private string GetAllTrim(string selStr)
-        {
-            return selStr.Replace(" ", "");
-        }
+
     }
 }

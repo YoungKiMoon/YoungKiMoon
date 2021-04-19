@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 using devDept.Eyeshot;
 using devDept.Graphics;
@@ -14,11 +15,12 @@ using MColor = System.Windows.Media.Color;
 using Color = System.Drawing.Color;
 using Environment = devDept.Eyeshot.Environment;
 using System.Collections.ObjectModel;
+
 using DrawWork.DrawModels;
 using DrawWork.DrawAutomationService;
-using System.Windows;
 using DrawWork.Commons;
 using DrawWork.DrawStyleServices;
+using DrawWork.DrawCustomObjectModels;
 
 namespace DrawWork.DrawServices
 {
@@ -1497,14 +1499,48 @@ namespace DrawWork.DrawServices
             //c11.Rotate(UtilityEx.DegToRad(-90), Vector3D.AxisZ, new Point3D(15, 20));
             //c22.Rotate(UtilityEx.DegToRad(-90), Vector3D.AxisZ, new Point3D(15, 20));
             Entity cd = c11;
-            
-
-            singleModel.Entities.Add(c1);
-            singleModel.Entities.Add(c2);
-            singleModel.Entities.Add(c11);
-            singleModel.Entities.Add(c22);
 
 
+
+            //singleModel.Entities.Add(c1);
+            //singleModel.Entities.Add(c2);
+            //singleModel.Entities.Add(c11);
+            //singleModel.Entities.Add(c22);
+
+            LinearDim ddd = new LinearDim(Plane.XY, new Point2D(10, 10), new Point2D(20, 10), new Point2D(15, 20), 4);
+
+            singleModel.Entities.Add(ddd);
+
+            // Triangle
+            Triangle t = new Triangle(5, 5, 0, 10, 5, 0, 7.5, 10, 0);
+            t.ColorMethod = colorMethodType.byEntity;
+            t.Color = Color.Blue;
+            CustomRenderedTriangle customArrow = new CustomRenderedTriangle(t);
+            //singleModel.Entities.Add(customArrow);
+
+
+            LinearPath sese = new LinearPath(t.Vertices);
+
+            HatchRegion hatch = new HatchRegion(sese);
+            //HatchRegion hatch = new HatchRegion(region.ContourList);
+            hatch.HatchName = "SOLID";
+            hatch.Color = Color.Red;
+
+            CustomRenderedHatch hhh = new CustomRenderedHatch(hatch);
+
+            singleModel.Entities.Add(hhh);
+
+            // Mesh
+            Mesh cc = new Mesh(4, 2, Mesh.natureType.ColorPlain);
+            cc.Color = Color.Red;
+            //singleModel.Entities.Add(cc);
+
+            Mesh dd=Mesh.CreateArrow(40, 10, 4, 5, 5, Mesh.natureType.ColorPlain);
+            dd.Color = Color.Red;
+
+            CustomRenderedMesh cuMesh = new CustomRenderedMesh(Mesh.CreateSphere(10, 10, 10));
+
+            //singleModel.Entities.Add(cuMesh);
 
             singleModel.Entities.Regen();
             singleModel.ZoomFit();

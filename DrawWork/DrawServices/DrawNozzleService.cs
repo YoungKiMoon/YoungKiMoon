@@ -70,27 +70,27 @@ namespace DrawWork.DrawServices
             List<NozzleInputModel> drawNozzle = new List<NozzleInputModel>();
             foreach(NozzleInputModel eachNozzle in assemblyData.NozzleInputModel)
             {
-                eachNozzle.HeightSort = valueService.GetDoubleValue(eachNozzle.H); // sort value
+                eachNozzle.HRSort= valueService.GetDoubleValue(eachNozzle.H); // sort value
                 eachNozzle.Position = eachNozzle.Position.ToLower();
-                eachNozzle.NozzlePosition = eachNozzle.NozzlePosition.ToLower();
+                eachNozzle.LR = eachNozzle.LR.ToLower();
                 drawNozzle.Add(eachNozzle);
             }
 
             // Nozzle List : Sort
-            List<NozzleInputModel> drawArrangeNozzle = drawNozzle.OrderBy(x => x.HeightSort).ToList();
+            List<NozzleInputModel> drawArrangeNozzle = drawNozzle.OrderBy(x => x.HRSort).ToList();
 
             // Nozzle Start Point List
             List<Point3D> NozzlePointList = new List<Point3D>();
             foreach (NozzleInputModel eachNozzle in drawArrangeNozzle)
             {
-                Point3D newNozzlePoint = GetPositionPoint(refPoint, CommonMethod.PositionToEnum(eachNozzle.NozzlePosition), eachNozzle.HeightSort,0, sizeNominalId, centerTopHeight);
+                Point3D newNozzlePoint = GetPositionPoint(refPoint, CommonMethod.PositionToEnum(eachNozzle.LR), eachNozzle.HRSort, 0, sizeNominalId, centerTopHeight);
                 NozzlePointList.Add(newNozzlePoint);
             }
 
             // Nozzle : Create Model
             foreach (NozzleInputModel eachNozzle in drawArrangeNozzle)
             {
-                List<Entity> customEntity = CreateNozzleModelPosition(CommonMethod.PositionToEnum( eachNozzle.NozzlePosition), eachNozzle.HeightSort, sizeNominalId,centerTopHeight, refPoint);
+                List<Entity> customEntity = CreateNozzleModelPosition(CommonMethod.PositionToEnum( eachNozzle.LR), eachNozzle.HRSort, sizeNominalId,centerTopHeight, refPoint);
                 // Create Model : OutLine
                 nozzleEntities.outlineList.AddRange(customEntity);
             }
@@ -105,7 +105,7 @@ namespace DrawWork.DrawServices
             {
                 indexArrange++;
                 Point3D drawPoint = leaderMarkPointList[indexArrange];
-                Dictionary<string, List<Entity>> customEntity = CreateNozzleLeader(drawPoint, CommonMethod.PositionToEnum(eachNozzle.NozzlePosition),eachNozzle.Mark,eachNozzle.Size,selNozzleFontSize, selLeaderCircleSize);
+                Dictionary<string, List<Entity>> customEntity = CreateNozzleLeader(drawPoint, CommonMethod.PositionToEnum(eachNozzle.LR),eachNozzle.Mark,eachNozzle.Size,selNozzleFontSize, selLeaderCircleSize);
                 nozzleEntities.nozzleMarkList.AddRange(customEntity[CommonGlobal.NozzleMark]);
                 nozzleEntities.nozzleTextList.AddRange(customEntity[CommonGlobal.NozzleText]);
 
@@ -241,17 +241,17 @@ namespace DrawWork.DrawServices
             foreach (NozzleInputModel eachNozzle in drawArrangeNozzle)
             {
 
-                POSITION_TYPE eachNozzlePosition = CommonMethod.PositionToEnum(eachNozzle.NozzlePosition);
+                POSITION_TYPE eachNozzlePosition = CommonMethod.PositionToEnum(eachNozzle.LR);
 
                 // New Value
-                double newHeight = eachNozzle.HeightSort;
+                double newHeight = eachNozzle.HRSort;
 
                 // Convergence & Before Value
                 switch (eachNozzlePosition)
                 {
                     case POSITION_TYPE.LEFT:
                         convergenceValue = GetConvergenceValue(newHeight, beforeValue.Left, convergenceHeight);
-                        beforeValue.Left = eachNozzle.HeightSort;
+                        beforeValue.Left = eachNozzle.HRSort;
                         if (multiColumnValue && convergenceValue)
                             convergencePosition.Left -= circleSize;
                         else
@@ -265,7 +265,7 @@ namespace DrawWork.DrawServices
 
                     case POSITION_TYPE.RIGHT:
                         convergenceValue = GetConvergenceValue(newHeight, beforeValue.Right, convergenceHeight);
-                        beforeValue.Right = eachNozzle.HeightSort;
+                        beforeValue.Right = eachNozzle.HRSort;
                         if (multiColumnValue && convergenceValue)
                             convergencePosition.Right += circleSize;
                         else
@@ -280,7 +280,7 @@ namespace DrawWork.DrawServices
 
                     case POSITION_TYPE.TOP:
                         convergenceValue = GetConvergenceValue(newHeight, beforeValue.Top, convergenceHeight);
-                        beforeValue.Top = eachNozzle.HeightSort;
+                        beforeValue.Top = eachNozzle.HRSort;
                         if (multiColumnValue && convergenceValue)
                             convergencePosition.Top += circleSize;
                         else
@@ -294,7 +294,7 @@ namespace DrawWork.DrawServices
 
                     case POSITION_TYPE.BOTTOM:
                         convergenceValue = GetConvergenceValue(newHeight, beforeValue.Bottom, convergenceHeight);
-                        beforeValue.Bottom = eachNozzle.HeightSort;
+                        beforeValue.Bottom = eachNozzle.HRSort;
                         if (multiColumnValue && convergenceValue)
                             convergencePosition.Bottom -= circleSize;
                         else
@@ -461,6 +461,11 @@ namespace DrawWork.DrawServices
             DrawPositionValueModel endPoint = new DrawPositionValueModel();
             DrawPositionValueModel midPoint = new DrawPositionValueModel();
 
+            // Mid Point
+            midPoint.Left = -99999999;
+            midPoint.Right = 99999999;
+            midPoint.Top = -99999999;
+            midPoint.Bottom = 99999999;
 
             // Convergence Check : 높이가 같을 경우
             DrawPositionValueModel beforeEndPoint = new DrawPositionValueModel();
@@ -473,7 +478,7 @@ namespace DrawWork.DrawServices
                 Point3D nozzlePoint = selNozzleStartPoint[indexArrange];
                 Point3D markPoint = selLeaderMarkPoint[indexArrange];
 
-                POSITION_TYPE eachNozzlePosition = CommonMethod.PositionToEnum(eachNozzle.NozzlePosition);
+                POSITION_TYPE eachNozzlePosition = CommonMethod.PositionToEnum(eachNozzle.LR);
                 switch (eachNozzlePosition)
                 {
                     case POSITION_TYPE.LEFT:
@@ -481,7 +486,9 @@ namespace DrawWork.DrawServices
                         {
                             // 직선
                             customEntity.AddRange(CreateBrokenLIne(GetSumPoint(nozzlePoint,-nozzleLength,0), markPoint));
-                            midPoint.Left = markPoint.X;
+                            
+                            if(midPoint.Left< markPoint.X)
+                                midPoint.Left = markPoint.X;
                         }
                         else if (nozzlePoint.Y > markPoint.Y)
                         {
@@ -503,7 +510,9 @@ namespace DrawWork.DrawServices
                         {
                             // 직선
                             customEntity.AddRange(CreateBrokenLIne(GetSumPoint(nozzlePoint,+nozzleLength,0), markPoint));
-                            midPoint.Right = markPoint.X;
+
+                            if (midPoint.Right > markPoint.X)
+                                midPoint.Right = markPoint.X;
                         }
                         else if (nozzlePoint.Y > markPoint.Y)
                         {
@@ -525,7 +534,8 @@ namespace DrawWork.DrawServices
                         {
                             // 직선
                             customEntity.AddRange(CreateBrokenLIne(GetSumPoint(nozzlePoint,0,+nozzleLength), markPoint));
-                            midPoint.Top = markPoint.Y;
+                            if (midPoint.Top > markPoint.Y)
+                                midPoint.Top = markPoint.Y;
                         }
                         else if (nozzlePoint.X > markPoint.X)
                         {
@@ -547,7 +557,8 @@ namespace DrawWork.DrawServices
                         {
                             // 직선
                             customEntity.AddRange(CreateBrokenLIne(GetSumPoint(nozzlePoint,0,-nozzleLength), markPoint));
-                            midPoint.Bottom = markPoint.Y;
+                            if (midPoint.Bottom < markPoint.Y)
+                                midPoint.Bottom = markPoint.Y;
                         }
                         else if (nozzlePoint.X > markPoint.X)
                         {
@@ -600,13 +611,17 @@ namespace DrawWork.DrawServices
         private Point3D GetPositionPoint(CDPoint refPoint, POSITION_TYPE selPosition, double newValue,double convergenceValue, double selSizeNominalID, double selCenterTopHeight)
         {
             Point3D newPoint = null;
+            CDPoint adjPoint = null;
+            CDPoint curPoint = null;
             switch (selPosition)
             {
                 case POSITION_TYPE.LEFT:
-                    newPoint = new Point3D(refPoint.X + convergenceValue, refPoint.Y + newValue, 0);
+                    adjPoint = contactPointService.ContactPoint("leftshelladj", newValue.ToString(),ref refPoint,ref curPoint);
+                    newPoint = new Point3D(adjPoint.X + convergenceValue, adjPoint.Y, 0);
                     break;
                 case POSITION_TYPE.RIGHT:
-                    newPoint = new Point3D(refPoint.X + convergenceValue + selSizeNominalID, refPoint.Y + newValue, 0);
+                    adjPoint = contactPointService.ContactPoint("rightshelladj", newValue.ToString(), ref refPoint, ref curPoint);
+                    newPoint = new Point3D(adjPoint.X + convergenceValue, adjPoint.Y, 0);
                     break;
                 case POSITION_TYPE.TOP:
                     newPoint = new Point3D(refPoint.X + newValue, selCenterTopHeight + convergenceValue, 0);

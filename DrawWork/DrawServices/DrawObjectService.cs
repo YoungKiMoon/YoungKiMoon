@@ -27,13 +27,15 @@ namespace DrawWork.DrawServices
 
         private AssemblyModel assemblyData;
 
+
         private DrawService drawService;
         private DrawNozzleService drawNozzleService;
 
         private DrawLogicBlockService drawLogicBlockService;
         private DrawImportBlockService drawImportBlockService;
+        private DrawReferenceBlockService drawReferenceBlockService;
 
-        private DrawContactPointService cpService;
+        private DrawContactPointService contactPointService;
 
         private ValueService valueService;
 
@@ -51,8 +53,9 @@ namespace DrawWork.DrawServices
 
             drawLogicBlockService = new DrawLogicBlockService(selAssembly);
             drawImportBlockService = new DrawImportBlockService(singleModel);
+            drawReferenceBlockService = new DrawReferenceBlockService(selAssembly);
 
-            cpService = new DrawContactPointService(selAssembly);
+            contactPointService = new DrawContactPointService(selAssembly);
 
             valueService = new ValueService();
         }
@@ -688,11 +691,11 @@ namespace DrawWork.DrawServices
             {
                 if (j + 1 < eachCmd.Length)
                 {
-                    newPoint1 = cpService.ContactPoint(eachCmd[j].ToLower(), eachCmd[j + 1].ToLower(), ref refPoint, ref curPoint);
+                    newPoint1 = contactPointService.ContactPoint(eachCmd[j].ToLower(), eachCmd[j + 1].ToLower(), ref refPoint, ref curPoint);
                 }
                 else
                 {
-                    newPoint1 = cpService.ContactPoint(eachCmd[j].ToLower(), ref refPoint, ref curPoint);
+                    newPoint1 = contactPointService.ContactPoint(eachCmd[j].ToLower(), ref refPoint, ref curPoint);
                 }
                 if (newPoint1 != null)
                 {
@@ -972,8 +975,8 @@ namespace DrawWork.DrawServices
                     returnEntity = (DoBlockColumnSupportSide(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
 
-                case "windergirder":
-                    returnEntity = (DoBlockWinderGirder(eachCmd, ref refPoint, ref curPoint));
+                case "windgirder":
+                    returnEntity = (DoBlockWindGirder(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
 
 
@@ -998,10 +1001,9 @@ namespace DrawWork.DrawServices
             CDPoint newPoint2 = new CDPoint();
             CDPoint newPoint3 = new CDPoint();
             CDPoint newSetPoint = new CDPoint();
+            CDPoint newMirrorPoint = new CDPoint();
 
-            string newAngleType = "";
-            string newAngleSize = "";
-            AngleSizeModel newAngle = new AngleSizeModel();
+
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
@@ -1010,19 +1012,6 @@ namespace DrawWork.DrawServices
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
                             newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
-                        break;
-
-                    case "type":
-                        if (j + 1 <= eachCmd.Length)
-                            newAngleType = eachCmd[j + 1];
-                        break;
-
-                    case "size":
-                        if (j + 1 <= eachCmd.Length)
-                        {
-                            newAngleSize = eachCmd[j + 1];
-                            newAngle = assemblyData.RoofAngleOutput[0];
-                        }
                         break;
 
                     case "sp":
@@ -1038,8 +1027,7 @@ namespace DrawWork.DrawServices
 
             Entity[] returnEntity = null;
             // Create Line
-            if (newAngleType != "" && newAngleSize != "")
-                returnEntity = drawLogicBlockService.DrawBlock_TopAngle(newPoint1, newAngleType, newAngle);
+            returnEntity = drawLogicBlockService.DrawBlock_TopAngle(newPoint1,ref refPoint, ref curPoint);
 
 
 
@@ -1051,6 +1039,8 @@ namespace DrawWork.DrawServices
                     switch (eachCmd[j].ToLower())
                     {
                         case "mirror":
+
+                            newMirrorPoint= contactPointService.ContactPoint("centerlinebottompoint",ref refPoint, ref curPoint);
                             if (j + 1 <= eachCmd.Length)
                             {
                                 switch (eachCmd[j + 1].ToLower())
@@ -1058,8 +1048,8 @@ namespace DrawWork.DrawServices
                                     case "right":
 
                                         Plane pl1 = Plane.YZ;
-                                        pl1.Origin.X = newPoint1.X;
-                                        pl1.Origin.Y = newPoint1.Y;
+                                        pl1.Origin.X = newMirrorPoint.X;
+                                        pl1.Origin.Y = newMirrorPoint.Y;
                                         Mirror customMirror = new Mirror(pl1);
                                         foreach (Entity eachEntity in returnEntity)
                                         {
@@ -1078,7 +1068,6 @@ namespace DrawWork.DrawServices
             }
             return returnEntity;
         }
-
         public Entity[] DoBlockHBeam(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             // 0 : Object
@@ -1108,14 +1097,14 @@ namespace DrawWork.DrawServices
                         if (j + 1 <= eachCmd.Length)
                         {
                             newHBeamSize = eachCmd[j + 1];
-                            foreach (HBeamModel eachHBeam in assemblyData.HBeamList)
-                            {
-                                if (eachHBeam.SIZE == newHBeamSize)
-                                {
-                                    newHBeam = eachHBeam;
-                                    break;
-                                }
-                            }
+                            //foreach (HBeamModel eachHBeam in assemblyData.HBeamList)
+                            //{
+                            //    if (eachHBeam.SIZE == newHBeamSize)
+                            //    {
+                            //        newHBeam = eachHBeam;
+                            //        break;
+                            //    }
+                            //}
                         }
                         break;
 
@@ -1133,7 +1122,7 @@ namespace DrawWork.DrawServices
             Entity[] returnEntity = null;
             // Create Line
             if (newHBeamSize != "")
-                returnEntity = drawLogicBlockService.DrawBlock_HBeam(newPoint1, newHBeam);
+                returnEntity = drawReferenceBlockService.DrawReference_HBeam(newPoint1, newHBeamSize);
 
 
 
@@ -1246,8 +1235,7 @@ namespace DrawWork.DrawServices
             }
             return returnEntity;
         }
-
-        public Entity[] DoBlockWinderGirder(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        public Entity[] DoBlockWindGirder(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -1259,10 +1247,8 @@ namespace DrawWork.DrawServices
             CDPoint newPoint2 = new CDPoint();
             CDPoint newPoint3 = new CDPoint();
             CDPoint newSetPoint = new CDPoint();
+            CDPoint newMirrorPoint = new CDPoint();
 
-            string newAngleType = "";
-            string newAngleSize = "";
-            AngleSizeModel newAngle = new AngleSizeModel();
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
@@ -1286,8 +1272,7 @@ namespace DrawWork.DrawServices
 
             Entity[] returnEntity = null;
             // Create Line
-            if (newAngleType != "" && newAngleSize != "")
-                returnEntity = drawLogicBlockService.DrawBlock_TopAngle(newPoint1, newAngleType, newAngle);
+            returnEntity = drawLogicBlockService.DrawBlock_WindGirder(newPoint1,ref refPoint,ref curPoint);
 
 
 
@@ -1299,6 +1284,9 @@ namespace DrawWork.DrawServices
                     switch (eachCmd[j].ToLower())
                     {
                         case "mirror":
+
+                            newMirrorPoint = contactPointService.ContactPoint("centerlinebottompoint", ref refPoint, ref curPoint);
+
                             if (j + 1 <= eachCmd.Length)
                             {
                                 switch (eachCmd[j + 1].ToLower())
@@ -1306,8 +1294,8 @@ namespace DrawWork.DrawServices
                                     case "right":
 
                                         Plane pl1 = Plane.YZ;
-                                        pl1.Origin.X = newPoint1.X;
-                                        pl1.Origin.Y = newPoint1.Y;
+                                        pl1.Origin.X = newMirrorPoint.X;
+                                        pl1.Origin.Y = newMirrorPoint.Y;
                                         Mirror customMirror = new Mirror(pl1);
                                         foreach (Entity eachEntity in returnEntity)
                                         {
