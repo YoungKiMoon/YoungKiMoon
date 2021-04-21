@@ -68,7 +68,9 @@ namespace DrawWork.ValueServices
                 return 0;
             }
         }
-        public double GetAtanOfSlope(string selSlope)
+
+        #region Degree Of Slope
+        public double GetDegreeOfSlope(string selSlope)
         {
             double selHeight;
             double selWidth;
@@ -83,33 +85,44 @@ namespace DrawWork.ValueServices
                 selHeight = 1;
                 selWidth = GetDoubleValue(selSlope);
             }
-            double calDegree = Math.Atan2(selHeight,selWidth);
 
-            return calDegree;
-        }
-
-        public double GetSlopeOfHeight(string selSlope, string selWidth)
-        {
-            return GetSlopeOfHeight(selSlope, GetDoubleValue(selWidth));
-        }
-        public double GetSlopeOfHeight(string selSlope, double selWidth)
-        {
-            double tempDegree = GetAtanOfSlope(selSlope);
-            double tempWidth = selWidth;
-            return tempDegree * tempWidth;
-        }
-        public double GetSlopeOfWidth(string selSlope, string selHeight)
-        {
-            return GetSlopeOfWidth(selSlope, GetDoubleValue(selHeight));
-        }
-        public double GetSlopeOfWidth(string selSlope, double selHeight)
-        {
-            double tempDegree = GetAtanOfSlope(selSlope);
-            double tempHeight = selHeight;
-            return tempHeight / tempDegree;
+            return GetDegreeOfSlope(selHeight, selWidth);
         }
 
+        public double GetDegreeOfSlope(double selHeight,double selWidth)
+        {
+            return Math.Atan2(selHeight, selWidth);
+        }
+        #endregion
 
+        #region Trigonometric Function
+        public double GetOppositeByWidth(string selSlope, string selWidth)
+        {
+            return GetOppositeByWidth(selSlope, GetDoubleValue(selWidth));
+        }
+        public double GetOppositeByWidth(string selSlope, double selWidth)
+        {
+            return GetOppositeByWidth(GetDegreeOfSlope(selSlope), selWidth);
+        }
+        public double GetOppositeByWidth(double selDegree, double selWidth)
+        {
+            return Math.Sin(selDegree) * selWidth;
+        }
+        public double GetAdjacentByHeight(string selSlope, string selHeight)
+        {
+            return GetAdjacentByHeight(selSlope, GetDoubleValue(selHeight));
+        }
+        public double GetAdjacentByHeight(string selSlope, double selHeight)
+        {
+            double tempDegree = GetDegreeOfSlope(selSlope);
+            return Math.Cos(tempDegree) * selHeight;
+        }
+
+        //public double GetHypotenuseByHeigth(string selSlope,string sel)
+        //{
+        //    double roofSlopeHeight = roofThickness / Math.Cos(roofSlopeDegree);
+        //}
+        #endregion
 
         // 공백 제거
         public string GetAllTrim(string selStr)

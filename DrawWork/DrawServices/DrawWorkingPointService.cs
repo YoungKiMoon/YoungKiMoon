@@ -19,13 +19,13 @@ using DrawWork.ValueServices;
 
 namespace DrawWork.DrawServices
 {
-    public class DrawContactPointService
+    public class DrawWorkingPointService
     {
         private AssemblyModel assemblyData;
 
         private ValueService valueService;
 
-        public DrawContactPointService(AssemblyModel selAssembly)
+        public DrawWorkingPointService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
             valueService = new ValueService();
@@ -59,7 +59,7 @@ namespace DrawWork.DrawServices
                 case "leftroofpoint":
                     CDPoint tempLeftRootPoint = ContactPoint("centertoppoint", ref refPoint, ref curPoint);
                     double tempTankLeftHalf = valueService.GetDoubleValue(selPointValue) - valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2;
-                    double tempLeftRoofHeight = valueService.GetSlopeOfHeight(assemblyData.RoofInput[0].RoofSlopeOne, tempTankLeftHalf.ToString());
+                    double tempLeftRoofHeight = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, tempTankLeftHalf.ToString());
 
                     // Point
                     cpPoint.X = tempLeftRootPoint.X
@@ -77,7 +77,7 @@ namespace DrawWork.DrawServices
                     CDPoint topAngleRoofPoint = ContactPoint("topangleroofpoint", ref refPoint, ref curPoint);
 
                     double tempWidth3 = Point3D.Distance(new Point3D(topAngleRoofPoint.X, 0, 0), new Point3D(refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2, 0, 0));
-                    double tempHeight3 = valueService.GetSlopeOfHeight(assemblyData.RoofInput[0].RoofSlopeOne, tempWidth3);
+                    double tempHeight3 = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, tempWidth3);
 
                     cpPoint = GetSumCDPoint(refPoint,
                                             valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2,
@@ -90,7 +90,7 @@ namespace DrawWork.DrawServices
                     // Point : Center Top
                     CDPoint tempRightRootPoint = ContactPoint("centertoppoint", ref refPoint, ref curPoint);
                     // Adj : selPointValue : Distance
-                    double tempRightRoofHeight = valueService.GetSlopeOfHeight(assemblyData.RoofInput[0].RoofSlopeOne, selPointValue);
+                    double tempRightRoofHeight = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, selPointValue);
 
                     cpPoint = GetSumCDPoint(tempRightRootPoint,
                                             valueService.GetDoubleValue(selPointValue),
@@ -106,7 +106,7 @@ namespace DrawWork.DrawServices
                     
                 // Left Bottom : Point
                 case "bottomleftpoint":
-                        double tempHeight = valueService.GetSlopeOfHeight(assemblyData.BottomInput[0].BottomSlope, assemblyData.BottomInput[0].BottomThickness);
+                        double tempHeight = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, assemblyData.BottomInput[0].BottomThickness);
 
                         // Point
                         cpPoint.X = refPoint.X
@@ -129,7 +129,7 @@ namespace DrawWork.DrawServices
                         CDPoint bottomleftpoint = ContactPoint("bottomleftpoint", ref refPoint, ref curPoint);
 
                         double tempWidth2 = Point3D.Distance(new Point3D(bottomleftpoint.X, 0, 0), new Point3D(refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2, 0, 0));
-                        double tempHeight2 = valueService.GetSlopeOfHeight(assemblyData.BottomInput[0].BottomSlope, tempWidth2);
+                        double tempHeight2 = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, tempWidth2);
 
                         cpPoint = GetSumCDPoint(refPoint,
                                                 valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2,
@@ -139,7 +139,7 @@ namespace DrawWork.DrawServices
                 // Center Bottom : Adj
                 case "centerbottompoint":
                     CDPoint tempCenterBottomPoint = ContactPoint("centerlinebottompoint", ref refPoint, ref curPoint);
-                    double tempCenterBottomHeight = valueService.GetSlopeOfHeight(assemblyData.BottomInput[0].BottomSlope, selPointValue);
+                    double tempCenterBottomHeight = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, selPointValue);
 
                     cpPoint = GetSumCDPoint(tempCenterBottomPoint,
                                             valueService.GetDoubleValue(selPointValue),

@@ -26,13 +26,13 @@ namespace DrawWork.DrawServices
         private AssemblyModel assemblyData;
 
         private ValueService valueService;
-        private DrawContactPointService contactService;
+        private DrawWorkingPointService contactService;
 
         public DrawReferenceBlockService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
             valueService = new ValueService();
-            contactService = new DrawContactPointService(selAssembly);
+            contactService = new DrawWorkingPointService(selAssembly);
         }
 
         #region Angle

@@ -35,7 +35,7 @@ namespace DrawWork.DrawServices
         private DrawImportBlockService drawImportBlockService;
         private DrawReferenceBlockService drawReferenceBlockService;
 
-        private DrawContactPointService contactPointService;
+        private DrawWorkingPointService workingPointService;
 
         private ValueService valueService;
 
@@ -55,7 +55,7 @@ namespace DrawWork.DrawServices
             drawImportBlockService = new DrawImportBlockService(singleModel);
             drawReferenceBlockService = new DrawReferenceBlockService(selAssembly);
 
-            contactPointService = new DrawContactPointService(selAssembly);
+            workingPointService = new DrawWorkingPointService(selAssembly);
 
             valueService = new ValueService();
         }
@@ -198,7 +198,7 @@ namespace DrawWork.DrawServices
                     case "rotateradian":
                         if (j + 1 <= eachCmd.Length)
                         {
-                            customLine.Rotate(valueService.GetAtanOfSlope(eachCmd[j+1]), Vector3D.AxisZ,customLine.StartPoint);
+                            customLine.Rotate(valueService.GetDegreeOfSlope(eachCmd[j+1]), Vector3D.AxisZ,customLine.StartPoint);
                         }
                         break;
 
@@ -333,7 +333,7 @@ namespace DrawWork.DrawServices
                             if (j + 1 <= eachCmd.Length)
                             {
 
-                                returnEntity.Rotate(valueService.GetAtanOfSlope(eachCmd[j + 1]), Vector3D.AxisZ, returnEntity.StartPoint);
+                                returnEntity.Rotate(valueService.GetDegreeOfSlope(eachCmd[j + 1]), Vector3D.AxisZ, returnEntity.StartPoint);
                             }
                             break;
 
@@ -691,11 +691,11 @@ namespace DrawWork.DrawServices
             {
                 if (j + 1 < eachCmd.Length)
                 {
-                    newPoint1 = contactPointService.ContactPoint(eachCmd[j].ToLower(), eachCmd[j + 1].ToLower(), ref refPoint, ref curPoint);
+                    newPoint1 = workingPointService.ContactPoint(eachCmd[j].ToLower(), eachCmd[j + 1].ToLower(), ref refPoint, ref curPoint);
                 }
                 else
                 {
-                    newPoint1 = contactPointService.ContactPoint(eachCmd[j].ToLower(), ref refPoint, ref curPoint);
+                    newPoint1 = workingPointService.ContactPoint(eachCmd[j].ToLower(), ref refPoint, ref curPoint);
                 }
                 if (newPoint1 != null)
                 {
@@ -1040,7 +1040,7 @@ namespace DrawWork.DrawServices
                     {
                         case "mirror":
 
-                            newMirrorPoint= contactPointService.ContactPoint("centerlinebottompoint",ref refPoint, ref curPoint);
+                            newMirrorPoint= workingPointService.ContactPoint("centerlinebottompoint",ref refPoint, ref curPoint);
                             if (j + 1 <= eachCmd.Length)
                             {
                                 switch (eachCmd[j + 1].ToLower())
@@ -1285,7 +1285,7 @@ namespace DrawWork.DrawServices
                     {
                         case "mirror":
 
-                            newMirrorPoint = contactPointService.ContactPoint("centerlinebottompoint", ref refPoint, ref curPoint);
+                            newMirrorPoint = workingPointService.ContactPoint("centerlinebottompoint", ref refPoint, ref curPoint);
 
                             if (j + 1 <= eachCmd.Length)
                             {

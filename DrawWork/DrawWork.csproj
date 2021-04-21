@@ -77,6 +77,8 @@
     <Compile Include="DrawAutomationService\AutomationDimensionService.cs" />
     <Compile Include="DrawAutomationService\AutomationLeaderService.cs" />
     <Compile Include="DrawBuilders\LogicBuilder.cs" />
+    <Compile Include="DrawCustomObjectModels\CustomEntityModel.cs" />
+    <Compile Include="DrawCustomObjectModels\CustomLine.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedHatch.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedMesh.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedTriangle.cs" />
@@ -84,9 +86,10 @@
     <Compile Include="DrawModels\DrawEntityModel.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
     <Compile Include="DrawModels\DrawPositionValueModel.cs" />
+    <Compile Include="DrawServices\DrawBoundaryService.cs" />
     <Compile Include="DrawServices\DrawImportBlockService.cs" />
     <Compile Include="DrawServices\DrawLogicBlockService.cs" />
-    <Compile Include="DrawServices\DrawContactPointService.cs" />
+    <Compile Include="DrawServices\DrawWorkingPointService.cs" />
     <Compile Include="DrawServices\DrawNozzleService.cs" />
     <Compile Include="DrawServices\DrawObjectService.cs" />
     <Compile Include="DrawServices\DrawReferenceBlockService.cs" />

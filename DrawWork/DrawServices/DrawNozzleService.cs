@@ -17,6 +17,7 @@ using AssemblyLib.AssemblyModels;
 using DrawWork.ValueServices;
 using DrawWork.DrawModels;
 using DrawWork.Commons;
+using DrawWork.DrawCustomObjectModels;
 
 namespace DrawWork.DrawServices
 {
@@ -25,14 +26,14 @@ namespace DrawWork.DrawServices
         private AssemblyModel assemblyData;
 
         private ValueService valueService;
-        private DrawContactPointService contactPointService;
+        private DrawWorkingPointService workingPointService;
 
         public DrawNozzleService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
 
             valueService = new ValueService();
-            contactPointService = new DrawContactPointService(selAssembly);
+            workingPointService = new DrawWorkingPointService(selAssembly);
         }
 
         public DrawEntityModel DrawNozzle_GA(ref CDPoint refPoint,
@@ -57,7 +58,7 @@ namespace DrawWork.DrawServices
             // Reference Position
             double sizeNominalId = valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId);
             CDPoint newCurPoint = new CDPoint();
-            CDPoint centerTopPoint = contactPointService.ContactPoint("centertoppoint", ref refPoint, ref newCurPoint);
+            CDPoint centerTopPoint = workingPointService.ContactPoint("centertoppoint", ref refPoint, ref newCurPoint);
             double centerTopHeight = centerTopPoint.Y;
 
 
@@ -135,9 +136,22 @@ namespace DrawWork.DrawServices
 
             // Nozzle : Create Line
             List<Entity> customLineEntity = CreateNozzleLeaderLine(refPoint, shellSpacing, drawArrangeNozzle, leaderMarkPointList, NozzleLinePointList);
+            //List<Entity> customLineEntity = CreateNozzleLeaderLine(refPoint, shellSpacing, drawArrangeNozzle, leaderMarkPointList, NozzlePointList);
             nozzleEntities.nozzlelineList.AddRange(customLineEntity);
 
 
+            CDPoint ccc = workingPointService.ContactPoint("topangleroofpoint",ref refPoint,ref newCurPoint);
+            Line lineref01 = new Line(new Point3D(ccc.X,ccc.Y),new Point3D(ccc.X,ccc.Y+1000));
+            nozzleEntities.outlineList.Add(lineref01);
+
+            CDPoint cccc = workingPointService.ContactPoint("leftroofpoint", ref refPoint, ref newCurPoint);
+            Line lineref02 = new Line(new Point3D(cccc.X, cccc.Y), new Point3D(cccc.X, cccc.Y + 1000));
+            nozzleEntities.outlineList.Add(lineref02);
+
+            //CDPoint ccccc = workingPointService.ContactPoint("leftroofpoint", "70", ref refPoint, ref newCurPoint);
+            CDPoint ccccc = workingPointService.ContactPoint("leftroofpoint", "3793.6", ref refPoint, ref newCurPoint);
+            Line lineref03 = new Line(new Point3D(ccccc.X, ccccc.Y), new Point3D(ccccc.X, ccccc.Y + 1000));
+            nozzleEntities.outlineList.Add(lineref03);
 
             return nozzleEntities;
         }
@@ -389,7 +403,10 @@ namespace DrawWork.DrawServices
                         case "left":
                         case "right":
                             foreach (Entity eachEntity in customEntity)
-                                eachEntity.Rotate(UtilityEx.DegToRad(-90), Vector3D.AxisZ, drawPoint);
+                                if(eachEntity.EntityData!=null)
+                                    eachEntity.Rotate(UtilityEx.DegToRad(-90), Vector3D.AxisZ, drawPoint);
+                                else
+                                    eachEntity.Rotate(UtilityEx.DegToRad(-90), Vector3D.AxisZ, drawPoint);
                             break;
                     }
                     break;
@@ -416,12 +433,12 @@ namespace DrawWork.DrawServices
             {
                 if (selNozzle.LR == "left")
                 {
-                    shellThickness = contactPointService.GetShellThicknessAccordingToHeight(selNozzle.H);
+                    shellThickness = workingPointService.GetShellThicknessAccordingToHeight(selNozzle.H);
                     neckLength = R - (selSizeNominalID / 2) - shellThickness;
                 }
                 else if (selNozzle.LR == "right")
                 {
-                    shellThickness = contactPointService.GetShellThicknessAccordingToHeight(selNozzle.H);
+                    shellThickness = workingPointService.GetShellThicknessAccordingToHeight(selNozzle.H);
                     neckLength = R - (selSizeNominalID / 2) - shellThickness;
                 }
             }
@@ -484,6 +501,10 @@ namespace DrawWork.DrawServices
             adjPoint.X = drawPoint.X - fullWidth;
             adjPoint.Y = drawPoint.Y + (fullHeight / 2);
 
+
+            Line lineRef = new Line(GetSumPoint(drawPoint, 0, 0, 0), GetSumPoint(drawPoint, -1000, 0, 0));
+            customEntity.Add(lineRef);
+
             // Blind Flange
             Line lineBFa = new Line(GetSumPoint(adjPoint, 0, 0, 0), GetSumPoint(adjPoint, 0, -OD, 0));
 
@@ -545,7 +566,7 @@ namespace DrawWork.DrawServices
                 Line lineNeckRight = null;
                 if (selNozzle.Position == "roof")
                 {
-                    double neckSlopeHeight = valueService.GetSlopeOfHeight(assemblyData.RoofInput[0].RoofSlopeOne,G/2);
+                    double neckSlopeHeight = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne,G/2);
 
                     switch (selNozzle.LR)
                     {
@@ -564,7 +585,14 @@ namespace DrawWork.DrawServices
                     lineNeckLeft = new Line(GetSumPoint(neckPoint, 0, -sideWidth3, 0), GetSumPoint(neckPoint, neckLengthReal, -sideWidth3, 0));
                     lineNeckRight = new Line(GetSumPoint(neckPoint, 0, -OD + sideWidth3, 0), GetSumPoint(neckPoint, neckLengthReal, -OD + sideWidth3, 0));
                 }
+                //lineNeckLeft.AssyName = "neckleft";
+                //lineNeckRight.AssyName = "neckright";
 
+                //CustomEntityModel dd = ((CustomEntityModel)lineNeckLeft);
+                //CustomLine ffff = dd;
+                lineNeckLeft.EntityData = "aa";
+
+                
                 customEntity.Add(lineNeckLeft);
                 customEntity.Add(lineNeckRight);
             }
@@ -1188,11 +1216,11 @@ namespace DrawWork.DrawServices
                     switch (selLR)
                     {
                         case "left":
-                            adjPoint = contactPointService.ContactPoint("leftshelladj", newValue.ToString(), ref refPoint, ref curPoint);
+                            adjPoint = workingPointService.ContactPoint("leftshelladj", newValue.ToString(), ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X + convergenceValue, adjPoint.Y, 0);
                             break;
                         case "right":
-                            adjPoint = contactPointService.ContactPoint("rightshelladj", newValue.ToString(), ref refPoint, ref curPoint);
+                            adjPoint = workingPointService.ContactPoint("rightshelladj", newValue.ToString(), ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X + convergenceValue, adjPoint.Y, 0);
                             break;
                     }
@@ -1201,18 +1229,19 @@ namespace DrawWork.DrawServices
 
                     // Roof Slope
                     string roofSlopeString = assemblyData.RoofInput[0].RoofSlopeOne;
-                    double roofSlopeDegree = valueService.GetAtanOfSlope(roofSlopeString);
+                    double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
                     double roofThickness = valueService.GetDoubleValue(assemblyData.RoofInput[0].RoofThickness);
                     double roofSlopeHeight = roofThickness / Math.Cos(roofSlopeDegree);
+                    //double roofSlopeHeight = roofThickness * Math.Cos(roofSlopeDegree);
 
                     switch (selLR)
                     {
                         case "left":
-                            adjPoint = contactPointService.ContactPoint("centerroofadj", (-newValue).ToString(), ref refPoint, ref curPoint);
+                            adjPoint = workingPointService.ContactPoint("centerroofadj", (-newValue).ToString(), ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X , adjPoint.Y + roofSlopeHeight + convergenceValue, 0);
                             break;
                         case "right":
-                            adjPoint = contactPointService.ContactPoint("centerroofadj", (-newValue).ToString(), ref refPoint, ref curPoint);
+                            adjPoint = workingPointService.ContactPoint("centerroofadj", (-newValue).ToString(), ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X + (newValue*2), adjPoint.Y + roofSlopeHeight + convergenceValue, 0);
                             break;
                     }
@@ -1241,14 +1270,14 @@ namespace DrawWork.DrawServices
             {
                 if (selNozzle.LR == "left")
                 {
-                    shellThickness = contactPointService.GetShellThicknessAccordingToHeight(selNozzle.H);
+                    shellThickness = workingPointService.GetShellThicknessAccordingToHeight(selNozzle.H);
                     neckLength = R - (selSizeNominalID / 2) - shellThickness;
                     neckLength = R - (selSizeNominalID / 2) - shellThickness;
                     newPoint = GetSumPoint(drawPoint, -neckLength, 0);
                 }
                 else if (selNozzle.LR == "right")
                 {
-                    shellThickness = contactPointService.GetShellThicknessAccordingToHeight(selNozzle.H);
+                    shellThickness = workingPointService.GetShellThicknessAccordingToHeight(selNozzle.H);
                     neckLength = R - (selSizeNominalID / 2) - shellThickness;
                     newPoint = GetSumPoint(drawPoint, +neckLength, 0);
                 }

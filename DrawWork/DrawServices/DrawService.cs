@@ -25,13 +25,13 @@ namespace DrawWork.DrawServices
     {
         private AssemblyModel assemblyData;
 
-        private DrawContactPointService cpService;
+        private DrawWorkingPointService cpService;
         private ValueService valueService;
 
         public DrawService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
-            cpService = new DrawContactPointService(selAssembly);
+            cpService = new DrawWorkingPointService(selAssembly);
 
             valueService = new ValueService();
         }
@@ -47,7 +47,7 @@ namespace DrawWork.DrawServices
         public Line Draw_Line(CDPoint selPoint1, CDPoint selPoint2, double selDegree, string selDirection)
         {
             // arctan // X: 1로 고정
-            double calDegree = Math.Atan2(1, selDegree);
+            double calDegree = valueService.GetDegreeOfSlope(1,selDegree);
 
             double tempWidth = 0;
             double tempHeight = 0;
@@ -55,13 +55,13 @@ namespace DrawWork.DrawServices
             if (selDirection == "x")
             {
                 tempWidth = Point3D.Distance(new Point3D(selPoint1.X, selPoint1.Y, selPoint1.Z), new Point3D(selPoint2.X, selPoint1.Y, selPoint2.Z));
-                tempHeight = tempWidth* calDegree;
+                tempHeight = valueService.GetOppositeByWidth(calDegree,tempWidth);
                 newLine= new Line(selPoint1.X, selPoint1.Y, selPoint2.X, selPoint1.Y + tempHeight);
             }   
             else if(selDirection=="y")
             {
                 tempWidth = Point3D.Distance(new Point3D(selPoint1.X, selPoint1.Y, selPoint1.Z), new Point3D(selPoint1.X, selPoint2.Y, selPoint2.Z));
-                tempHeight = tempWidth * calDegree;
+                tempHeight = valueService.GetOppositeByWidth(calDegree, tempWidth);
                 newLine = new Line(selPoint1.X, selPoint1.Y, selPoint1.X + tempHeight, selPoint2.Y);
             }
 
