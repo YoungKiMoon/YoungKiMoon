@@ -55,7 +55,16 @@
     <Compile Include="AssemblyModels\GeneralMomentAndShearForceAtBaseModel.cs" />
     <Compile Include="AssemblyModels\HBeamModel.cs" />
     <Compile Include="AssemblyModels\InsulationInputModel.cs" />
+    <Compile Include="AssemblyModels\NozzleEtcModel.cs" />
     <Compile Include="AssemblyModels\NozzleInputModel.cs" />
+    <Compile Include="AssemblyModels\NozzleOHFLWNModel.cs" />
+    <Compile Include="AssemblyModels\NozzleOHFModel.cs" />
+    <Compile Include="AssemblyModels\NozzleOHFSeriesAModel.cs" />
+    <Compile Include="AssemblyModels\NozzleOHFSeriesBModel.cs" />
+    <Compile Include="AssemblyModels\NozzleTHLWNModel.cs" />
+    <Compile Include="AssemblyModels\NozzleTHModel.cs" />
+    <Compile Include="AssemblyModels\NozzleTHSeriesAModel.cs" />
+    <Compile Include="AssemblyModels\NozzleTHSeriesBModel.cs" />
     <Compile Include="AssemblyModels\PipeModel.cs" />
     <Compile Include="AssemblyModels\RoofInputModel.cs" />
     <Compile Include="AssemblyModels\RoofOutputModel.cs" />

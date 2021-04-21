@@ -160,7 +160,7 @@ namespace DrawWork.DrawServices
 
                 double radius = -valueService.GetDoubleValue(assemblyData.StructureGirderInput[i].GirderInRadius);
 
-                CDPoint eachColumnPoint = contactPointService.ContactPoint("centerroofpoint", radius.ToString(), ref refPoint,ref curPoint);
+                CDPoint eachColumnPoint = contactPointService.ContactPoint("centerroofadj", radius.ToString(), ref refPoint,ref curPoint);
                 #endregion
 
                 #region HBream
@@ -258,7 +258,7 @@ namespace DrawWork.DrawServices
             double centerPipeOD = valueService.GetDoubleValue(centerPipe.OD);
             double centerPipeODHalf = centerPipeOD / 2;
             double centerRadius = 0; // Center
-            CDPoint centerColumnPoint = contactPointService.ContactPoint("centerroofpoint", centerRadius.ToString(), ref refPoint, ref curPoint);
+            CDPoint centerColumnPoint = contactPointService.ContactPoint("centerroofadj", centerRadius.ToString(), ref refPoint, ref curPoint);
 
             StructureColumnCenterModel centerTopSupport = assemblyData.StructureColumnCenterOutput[firstIndex];
             double tsSize = valueService.GetDoubleValue(centerTopSupport.COLUMN);
@@ -288,7 +288,7 @@ namespace DrawWork.DrawServices
 
             // WP : Left Square Center
             double centerLeftWidthHalf = tsB;
-            CDPoint centerTopRoofLeftB = contactPointService.ContactPoint("centerroofpoint", (centerRadius - centerLeftWidthHalf).ToString(), ref refPoint, ref curPoint);
+            CDPoint centerTopRoofLeftB = contactPointService.ContactPoint("centerroofadj", (centerRadius - centerLeftWidthHalf).ToString(), ref refPoint, ref curPoint);
 
             double centerRafterHeightHalf = rA / 2;
             double raHeightHalf = valueService.GetSlopeOfHeight(roofSlopeString, centerRafterHeightHalf);
@@ -299,7 +299,7 @@ namespace DrawWork.DrawServices
 
             // WP : Left Pad 
             double centerLeftWidthODHalf = centerPipeODHalf + tsG + 30;// 30 값 고정
-            CDPoint centerTopRoofLeft = contactPointService.ContactPoint("centerroofpoint", (centerRadius - centerLeftWidthODHalf).ToString(), ref refPoint, ref curPoint);
+            CDPoint centerTopRoofLeft = contactPointService.ContactPoint("centerroofadj", (centerRadius - centerLeftWidthODHalf).ToString(), ref refPoint, ref curPoint);
 
             // Square : 평행 방향이동 : 아래쪽
             double centerRafterHeight = rA + 20; // MinValue : 20
@@ -539,7 +539,7 @@ namespace DrawWork.DrawServices
             CDPoint rafterEndPoint = contactPointService.ContactPoint("leftroofpoint", shellClipTriTopGap.ToString(), ref refPoint, ref curPoint);
 
             // 수직방향 이동 : 오른쪽으로
-            CDPoint rafterStartPoint= contactPointService.ContactPoint("centerroofpoint", (centerRadius - centerLeftWidthHalf).ToString(), ref refPoint, ref curPoint);
+            CDPoint rafterStartPoint= contactPointService.ContactPoint("centerroofadj", (centerRadius - centerLeftWidthHalf).ToString(), ref refPoint, ref curPoint);
             double rafterStartPointtSlope = rafterSideBoltGap/2 + rafterSideBoltWidth;
             double rafterStartPointtWidth = rafterStartPointtSlope * Math.Cos(roofSlopeDegree);
             double rafterStartPointtHeight = rafterStartPointtSlope * Math.Sin(roofSlopeDegree);
@@ -562,7 +562,7 @@ namespace DrawWork.DrawServices
                 }
 
                 double rafterEachRadius = -valueService.GetDoubleValue(assemblyData.StructureRafterInput[i].RafterInRadius);
-                CDPoint rafterCurrentColumnPointTemp = contactPointService.ContactPoint("centerroofpoint", rafterEachRadius.ToString(), ref refPoint, ref curPoint);
+                CDPoint rafterCurrentColumnPointTemp = contactPointService.ContactPoint("centerroofadj", rafterEachRadius.ToString(), ref refPoint, ref curPoint);
                 Point3D rafterCurrentColumnPoint = GetSumPoint(rafterCurrentColumnPointTemp, 0, 0);
 
                 if (i== assemblyData.StructureColumnRafterOutput.Count - 1)

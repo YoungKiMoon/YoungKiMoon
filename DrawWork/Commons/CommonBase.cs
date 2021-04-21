@@ -29,5 +29,13 @@ namespace DrawWork.Commons
         TOP = 4,
     }
 
+    public enum TANKASS_TYPE
+    {
+        NotSet = 0,
+        SHELL = 1,
+        ROOF = 2,
+
+    }
+
 
 }

@@ -10,23 +10,40 @@ namespace DrawWork.Commons
     {
         public static POSITION_TYPE PositionToEnum(string selPosition)
         {
-            POSITION_TYPE retrunValue = POSITION_TYPE.LEFT;
+            POSITION_TYPE returnValue = POSITION_TYPE.LEFT;
             switch (selPosition)
             {
                 case "left":
-                    retrunValue = POSITION_TYPE.LEFT;
+                    returnValue = POSITION_TYPE.LEFT;
                     break;
                 case "right":
-                    retrunValue = POSITION_TYPE.RIGHT;
+                    returnValue = POSITION_TYPE.RIGHT;
                     break;
                 case "bottom":
-                    retrunValue = POSITION_TYPE.BOTTOM;
+                    returnValue = POSITION_TYPE.BOTTOM;
                     break;
                 case "top":
-                    retrunValue = POSITION_TYPE.TOP;
+                    returnValue = POSITION_TYPE.TOP;
                     break;
             }
-            return retrunValue;
+            return returnValue;
+        }
+
+        public static TANKASS_TYPE TankAssToEnum(string selTankAss)
+        {
+            TANKASS_TYPE returnValue = TANKASS_TYPE.NotSet;
+            switch (selTankAss)
+            {
+                case "shell":
+                    returnValue = TANKASS_TYPE.SHELL;
+                    break;
+                case "roof":
+                    returnValue = TANKASS_TYPE.ROOF;
+                    break;
+            }
+            return returnValue;
         }
     }
+
+    
 }

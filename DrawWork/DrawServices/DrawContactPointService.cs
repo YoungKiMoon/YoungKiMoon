@@ -57,7 +57,7 @@ namespace DrawWork.DrawServices
 
                 // Left Roof : Adj
                 case "leftroofpoint":
-                    CDPoint tempLeftRootPoint = ContactPoint("centerlinetoppoint", ref refPoint, ref curPoint);
+                    CDPoint tempLeftRootPoint = ContactPoint("centertoppoint", ref refPoint, ref curPoint);
                     double tempTankLeftHalf = valueService.GetDoubleValue(selPointValue) - valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2;
                     double tempLeftRoofHeight = valueService.GetSlopeOfHeight(assemblyData.RoofInput[0].RoofSlopeOne, tempTankLeftHalf.ToString());
 
@@ -71,7 +71,7 @@ namespace DrawWork.DrawServices
 
 
                 // Center Top : Point
-                case "centerlinetoppoint":
+                case "centertoppoint":
 
                     // top angle roof point
                     CDPoint topAngleRoofPoint = ContactPoint("topangleroofpoint", ref refPoint, ref curPoint);
@@ -86,9 +86,9 @@ namespace DrawWork.DrawServices
                     break;
 
                 // Center Roof : Adj
-                case "centerroofpoint":
+                case "centerroofadj":
                     // Point : Center Top
-                    CDPoint tempRightRootPoint = ContactPoint("centerlinetoppoint", ref refPoint, ref curPoint);
+                    CDPoint tempRightRootPoint = ContactPoint("centertoppoint", ref refPoint, ref curPoint);
                     // Adj : selPointValue : Distance
                     double tempRightRoofHeight = valueService.GetSlopeOfHeight(assemblyData.RoofInput[0].RoofSlopeOne, selPointValue);
 
@@ -194,7 +194,7 @@ namespace DrawWork.DrawServices
             CDPoint newPoint = GetSumCDPoint(refPoint, tankWidth + currentThickness, currentHeight);
             return newPoint;
         }
-        private double GetShellThicknessAccordingToHeight(string selHeight)
+        public double GetShellThicknessAccordingToHeight(string selHeight)
         {
             double currentHeight = valueService.GetDoubleValue(selHeight);
             double currentThickness = 0;
