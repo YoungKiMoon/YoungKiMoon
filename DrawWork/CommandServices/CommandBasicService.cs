@@ -210,11 +210,11 @@ namespace DrawWork.CommandServices
                     goto case "allways";
 
                 // Contact Point
-                case "wp":
                 case "cp":
                 case "cpoint":
                 case "contactpoint":
-                    drawObject.DoContactPoint(eachCmd, ref refPoint, ref curPoint);
+                case "workingpoint":
+                    drawObject.DoWorkingPoint(eachCmd, ref refPoint, ref curPoint);
                     goto case "allways";
 
                 // Object

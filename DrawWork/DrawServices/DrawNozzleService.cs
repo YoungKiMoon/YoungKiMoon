@@ -58,7 +58,7 @@ namespace DrawWork.DrawServices
             // Reference Position
             double sizeNominalId = valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId);
             CDPoint newCurPoint = new CDPoint();
-            CDPoint centerTopPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref newCurPoint);
+            CDPoint centerTopPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref newCurPoint);
             double centerTopHeight = centerTopPoint.Y;
 
 
@@ -505,16 +505,16 @@ namespace DrawWork.DrawServices
             // Blind Flange
             Line lineBFa = new Line(GetSumPoint(adjPoint, 0, 0, 0), GetSumPoint(adjPoint, 0, -OD, 0));
 
-            Line lineBFb = new Line(GetSumPoint(adjPoint, 0, 0, 0), GetSumPoint(adjPoint, BBF, 0, 0));
-            Line lineBFc = new Line(GetSumPoint(adjPoint, 0, -OD, 0), GetSumPoint(adjPoint, BBF, -OD, 0));
+            Line lineBFb = new Line(GetSumPoint(adjPoint, 0, 0, 0), GetSumPoint(adjPoint, BBF-C, 0, 0));
+            Line lineBFc = new Line(GetSumPoint(adjPoint, 0, -OD, 0), GetSumPoint(adjPoint, BBF-C, -OD, 0));
 
-            Line lineBFd = new Line(GetSumPoint(adjPoint, BBF,0 , 0), GetSumPoint(adjPoint, BBF, -OD, 0));
+            Line lineBFd = new Line(GetSumPoint(adjPoint, BBF-C,0 , 0), GetSumPoint(adjPoint, BBF-C, -OD, 0));
             //Line lineBFd = new Line(GetSumPoint(adjPoint, BBF, 0, 0), GetSumPoint(adjPoint, BBF, -sideWidth, 0));
             //Line lineBFe = new Line(GetSumPoint(adjPoint, BBF, -OD, 0), GetSumPoint(adjPoint, BBF, -OD + sideWidth, 0));
 
-            Line lineBFf = new Line(GetSumPoint(adjPoint, BBF + C, -sideWidth, 0), GetSumPoint(adjPoint, BBF, -sideWidth, 0));
-            Line lineBFg = new Line(GetSumPoint(adjPoint, BBF + C, -OD + sideWidth, 0), GetSumPoint(adjPoint, BBF, -OD + sideWidth, 0));
-            Line lineBFh = new Line(GetSumPoint(adjPoint, BBF + C, -sideWidth, 0), GetSumPoint(adjPoint, BBF + C, -OD + sideWidth, 0));
+            Line lineBFf = new Line(GetSumPoint(adjPoint, BBF - C, -sideWidth, 0), GetSumPoint(adjPoint, BBF, -sideWidth, 0));
+            Line lineBFg = new Line(GetSumPoint(adjPoint, BBF - C, -OD + sideWidth, 0), GetSumPoint(adjPoint, BBF, -OD + sideWidth, 0));
+            Line lineBFh = new Line(GetSumPoint(adjPoint, BBF - C, -sideWidth, 0), GetSumPoint(adjPoint, BBF - C, -OD + sideWidth, 0));
             customEntity.AddRange(new Entity[] { lineBFa, lineBFb, lineBFc, lineBFd, lineBFf, lineBFg, lineBFh });
 
 
@@ -1213,11 +1213,11 @@ namespace DrawWork.DrawServices
                     switch (selLR)
                     {
                         case "left":
-                            adjPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjLeftShell, newValue.ToString(), ref refPoint, ref curPoint);
+                            adjPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjLeftShell, newValue, ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X + convergenceValue, adjPoint.Y, 0);
                             break;
                         case "right":
-                            adjPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjRightShell, newValue.ToString(), ref refPoint, ref curPoint);
+                            adjPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjRightShell, newValue, ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X + convergenceValue, adjPoint.Y, 0);
                             break;
                     }
@@ -1231,11 +1231,11 @@ namespace DrawWork.DrawServices
                     switch (selLR)
                     {
                         case "left":
-                            adjPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, (-newValue).ToString(), ref refPoint, ref curPoint);
+                            adjPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, newValue, ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X , adjPoint.Y + roofSlopeHeight + convergenceValue, 0);
                             break;
                         case "right":
-                            adjPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, (-newValue).ToString(), ref refPoint, ref curPoint);
+                            adjPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, newValue, ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X + (newValue*2), adjPoint.Y + roofSlopeHeight + convergenceValue, 0);
                             break;
                     }

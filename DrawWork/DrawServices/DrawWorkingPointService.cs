@@ -30,206 +30,231 @@ namespace DrawWork.DrawServices
             valueService = new ValueService();
         }
 
-        public CDPoint ContactPoint(string selPoint, ref CDPoint refPoint, ref CDPoint curPoint)
+        public CDPoint WorkingPoint(string selPoint, ref CDPoint refPoint, ref CDPoint curPoint)
         {
-            return ContactPointOrigin(CommonMethod.WorkingPointToEnum(selPoint), "", ref refPoint, ref curPoint);
+            return WorkingPointOrigin(CommonMethod.WorkingPointToEnum(selPoint), 0, ref refPoint, ref curPoint);
         }
-        public CDPoint ContactPoint(string selPoint, string selPointValue, ref CDPoint refPoint, ref CDPoint curPoint)
+        public CDPoint WorkingPoint(string selPoint, string selPointValue, ref CDPoint refPoint, ref CDPoint curPoint)
         {
-            return ContactPointOrigin(CommonMethod.WorkingPointToEnum(selPoint), selPointValue, ref refPoint, ref curPoint);
-        }
-
-        public CDPoint ContactPoint(WORKINGPOINT_TYPE selPoint, ref CDPoint refPoint, ref CDPoint curPoint)
-        {
-            return ContactPointOrigin(selPoint, "", ref refPoint, ref curPoint);
-        }
-        public CDPoint ContactPoint(WORKINGPOINT_TYPE selPoint, string selPointValue, ref CDPoint refPoint, ref CDPoint curPoint)
-        {
-            return ContactPointOrigin(selPoint, selPointValue,ref refPoint,ref curPoint);
+            return WorkingPointOrigin(CommonMethod.WorkingPointToEnum(selPoint), valueService.GetDoubleValue(selPointValue), ref refPoint, ref curPoint);
         }
 
-        private CDPoint ContactPointOrigin(WORKINGPOINT_TYPE selPoint, string selPointValue, ref CDPoint refPoint, ref CDPoint curPoint)
+        public CDPoint WorkingPoint(WORKINGPOINT_TYPE selPoint, ref CDPoint refPoint, ref CDPoint curPoint)
         {
-            CDPoint cpPoint = new CDPoint();
+            return WorkingPointOrigin(selPoint, 0, ref refPoint, ref curPoint);
+        }
+        public CDPoint WorkingPoint(WORKINGPOINT_TYPE selPoint, string selPointValue, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            return WorkingPointOrigin(selPoint, valueService.GetDoubleValue(selPointValue),ref refPoint,ref curPoint);
+        }
+        public CDPoint WorkingPoint(WORKINGPOINT_TYPE selPoint, double selPointValue, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            return WorkingPointOrigin(selPoint, selPointValue, ref refPoint, ref curPoint);
+        }
+
+        private CDPoint WorkingPointOrigin(WORKINGPOINT_TYPE selPoint, double selPointValue, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            CDPoint WPPoint = new CDPoint();
             switch (selPoint)
             {
 
+
                 // Point : Center
 
-                case WORKINGPOINT_TYPE.PointCenterTopUp:
+                case WORKINGPOINT_TYPE.PointCenterTopUp:                // 2021-04-22 완료
+                    CDPoint topcenterpoint = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
+                    double verticalHeight2 = valueService.GetHypotenuseByWidth(assemblyData.RoofInput[0].RoofSlopeOne, assemblyData.RoofInput[0].RoofThickness);
+                    WPPoint = GetSumCDPoint(topcenterpoint, 0, verticalHeight2);
                     break;
 
-                case WORKINGPOINT_TYPE.PointCenterTopDown:
+                case WORKINGPOINT_TYPE.PointCenterTopDown:              // 2021-04-22 완료
 
                     // top angle roof point
-                    CDPoint topAngleRoofPoint = ContactPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
+                    CDPoint topAngleRoofPoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
 
-                    double tempWidth3 = Point3D.Distance(new Point3D(topAngleRoofPoint.X, 0, 0), new Point3D(refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2, 0, 0));
+                    double tempWidth3 = GetDistanceX(topAngleRoofPoint.X, refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2);
                     double tempHeight3 = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, tempWidth3);
 
-                    cpPoint = GetSumCDPoint(refPoint,
-                                            valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2,
-                                            valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight) + tempHeight3);
+                    WPPoint = GetSumCDPoint(topAngleRoofPoint, tempWidth3, tempHeight3);
 
                     break;
 
 
-                case WORKINGPOINT_TYPE.PointCenterBottomUp:
+                case WORKINGPOINT_TYPE.PointCenterBottomUp:             // 2021-04-22 완료
+                    CDPoint bottomcenterpoint = WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottomDown, ref refPoint, ref curPoint);
+                    double verticalHeight = valueService.GetHypotenuseByWidth(assemblyData.BottomInput[0].BottomSlope, assemblyData.BottomInput[0].BottomThickness);
+                    WPPoint = GetSumCDPoint(bottomcenterpoint, 0, verticalHeight);
                     break;
 
-                case WORKINGPOINT_TYPE.PointCenterBottomDown:
+                case WORKINGPOINT_TYPE.PointCenterBottomDown:           // 2021-04-22 완료
+                    CDPoint bottomleftpoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftBottomDown, ref refPoint, ref curPoint);
 
-
-                    CDPoint bottomleftpoint = ContactPoint(WORKINGPOINT_TYPE.PointLeftBottomDown, ref refPoint, ref curPoint);
-
-                    double tempWidth2 = Point3D.Distance(new Point3D(bottomleftpoint.X, 0, 0), new Point3D(refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2, 0, 0));
+                    double tempWidth2 = GetDistanceX(bottomleftpoint.X, refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2);
                     double tempHeight2 = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, tempWidth2);
 
-                    cpPoint = GetSumCDPoint(refPoint,
+                    WPPoint = GetSumCDPoint(bottomleftpoint, tempWidth2, tempHeight2);
+                    break;
+
+
+                case WORKINGPOINT_TYPE.PointCenterTop:                  // 2021-04-22 완료
+                    WPPoint = GetSumCDPoint(refPoint,
                                             valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2,
-                                            valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomThickness) + tempHeight2);
+                                            valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight));
                     break;
 
-
-                case WORKINGPOINT_TYPE.PointCenterTop:
-                    break;
-
-                case WORKINGPOINT_TYPE.PointCenterBottom:
+                case WORKINGPOINT_TYPE.PointCenterBottom:               // 2021-04-22 완료
+                    WPPoint = GetSumCDPoint(refPoint, 
+                                            valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2,
+                                            0);
                     break;
 
 
                 // Point : Bottom
-                case WORKINGPOINT_TYPE.PointLeftBottomUp:
+                case WORKINGPOINT_TYPE.PointLeftBottomUp:               // 2021-04-22 완료
+                    CDPoint bottomleftpoint2 = WorkingPoint(WORKINGPOINT_TYPE.PointLeftBottomDown, ref refPoint, ref curPoint);
+                    WPPoint = GetSumCDPoint(bottomleftpoint2, 
+                                            valueService.GetOppositeByHypotenuse(assemblyData.BottomInput[0].BottomSlope, assemblyData.BottomInput[0].BottomThickness), 
+                                            valueService.GetAdjacentByHypotenuse(assemblyData.BottomInput[0].BottomSlope, assemblyData.BottomInput[0].BottomThickness));
                     break;
 
-                case WORKINGPOINT_TYPE.PointLeftBottomDown:
-                    double tempHeight = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, assemblyData.BottomInput[0].BottomThickness);
-                    cpPoint.X = refPoint.X
-                                + valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateWidth)
-                                - valueService.GetDoubleValue(assemblyData.BottomOutput[0].ShellThk)
-                                - valueService.GetDoubleValue(assemblyData.BottomOutput[0].OutSideProjection)
-                                - valueService.GetDoubleValue(assemblyData.BottomOutput[0].OverlapOfAnnular)
-                                - tempHeight;
-                    cpPoint.Y = refPoint.Y
-                                + valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomThickness);
-
+                case WORKINGPOINT_TYPE.PointLeftBottomDown:             // Entry Point : 2021-04-22 완료
+                    WPPoint = PointCenterBottomDown(ref refPoint, ref curPoint);
                     break;
 
 
                 // Point : Roof
-                case WORKINGPOINT_TYPE.PointLeftRoofUp:
+                case WORKINGPOINT_TYPE.PointLeftRoofUp:                 // 2021-04-22 완료
+                    CDPoint topleftpoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
+                    WPPoint = GetSumCDPoint(topleftpoint,
+                                            valueService.GetOppositeByHypotenuse(assemblyData.RoofInput[0].RoofSlopeOne, assemblyData.RoofInput[0].RoofThickness),
+                                            valueService.GetAdjacentByHypotenuse(assemblyData.RoofInput[0].RoofSlopeOne, assemblyData.RoofInput[0].RoofThickness));
                     break;
 
-                case WORKINGPOINT_TYPE.PointLeftRoofDown:
-                    cpPoint = PointTopAngleRoof(ref refPoint, ref curPoint);
+                case WORKINGPOINT_TYPE.PointLeftRoofDown:               // Entiry Point : 2021-04-22 완료
+                    WPPoint = PointTopAngleRoof(ref refPoint, ref curPoint);
                     break;
 
 
 
                 // Point : Shell
-                case WORKINGPOINT_TYPE.PointLeftShellTop:
-                    break;
-                case WORKINGPOINT_TYPE.PointLeftShellTopAdj:
-                    cpPoint = PointTopAngleShell(ref refPoint, ref curPoint);
-                    break;
-                case WORKINGPOINT_TYPE.PointReference:
-                case WORKINGPOINT_TYPE.PointLeftShellBottom:
-                    cpPoint = GetSumCDPoint(refPoint, 0, 0);
+                case WORKINGPOINT_TYPE.PointLeftShellTop:               // 2021-04-22 완료
+                    WPPoint = GetSumCDPoint(refPoint, 0, valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight));
                     break;
 
-                case WORKINGPOINT_TYPE.PointRightShellTop:
+                case WORKINGPOINT_TYPE.PointLeftShellTopAdj:            // 2021-04-22 완료
+                    WPPoint = PointTopAngleShell(ref refPoint, ref curPoint);
                     break;
-                case WORKINGPOINT_TYPE.PointRightShellTopAdj:
+
+                case WORKINGPOINT_TYPE.PointReference:                  // Point : Reference : 2021-04-22 완료
+                case WORKINGPOINT_TYPE.PointLeftShellBottom:            // 2021-04-22 완료
+                    WPPoint = GetSumCDPoint(refPoint, 0, 0);
                     break;
-                case WORKINGPOINT_TYPE.PointRightShellBottom:
+
+                case WORKINGPOINT_TYPE.PointRightShellTop:              // 2021-04-22 완료
+                    CDPoint tempLeftShellTop = WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTop, ref refPoint, ref curPoint);
+                    WPPoint = GetSumCDPoint(tempLeftShellTop, valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId), 0);
+                    break;
+
+                case WORKINGPOINT_TYPE.PointRightShellTopAdj:           // 2021-04-22 완료
+                    CDPoint tempLeftShellTopAdj = WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTopAdj, ref refPoint, ref curPoint);
+                    WPPoint = GetSumCDPoint(tempLeftShellTopAdj, valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId), 0);
+                    break;
+                case WORKINGPOINT_TYPE.PointRightShellBottom:           // 2021-04-22 완료
+                    CDPoint tempLeftShellBottom = WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellBottom, ref refPoint, ref curPoint);
+                    WPPoint = GetSumCDPoint(tempLeftShellBottom, valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId), 0);
                     break;
 
 
                 // Adj : Roof
-                case WORKINGPOINT_TYPE.AdjCenterRoofUp:
-                    break;
-                case WORKINGPOINT_TYPE.AdjCenterRoofDown:
-                    // Point : Center Top
-                    CDPoint tempRightRootPoint = ContactPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
-                    // Adj : selPointValue : Distance
-                    double tempRightRoofHeight = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, selPointValue);
+                case WORKINGPOINT_TYPE.AdjCenterRoofUp:                 // 2021-04-22 완료
+                    CDPoint tempCenterRoofPoint2 = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref curPoint);
+                    double tempRightRoofHeight2 = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, selPointValue);
 
-                    cpPoint = GetSumCDPoint(tempRightRootPoint,
-                                            valueService.GetDoubleValue(selPointValue),
-                                            tempRightRoofHeight);
+                    WPPoint = GetSumCDPoint(tempCenterRoofPoint2, -selPointValue, -tempRightRoofHeight2);
                     break;
-                case WORKINGPOINT_TYPE.AdjLeftRoofUp:
-                    break;
-                case WORKINGPOINT_TYPE.AdjLeftRoofDown:
-                    CDPoint tempLeftRootPoint = ContactPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
-                    double tempTankLeftHalf = valueService.GetDoubleValue(selPointValue) - valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2;
-                    double tempLeftRoofHeight = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, tempTankLeftHalf.ToString());
+                    
+                case WORKINGPOINT_TYPE.AdjCenterRoofDown:               // 2021-04-22 완료
+                    CDPoint tempCenterRoofPoint = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
+                    double tempLeftRoofHeight = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, selPointValue);
 
-                    // Point
-                    cpPoint.X = tempLeftRootPoint.X
-                                + tempTankLeftHalf;
-                    cpPoint.Y = tempLeftRootPoint.Y
-                                + tempLeftRoofHeight;
+                    WPPoint = GetSumCDPoint(tempCenterRoofPoint, -selPointValue, -tempLeftRoofHeight);
+                    break;
+
+                case WORKINGPOINT_TYPE.AdjLeftRoofUp:                   // 2021-04-22 완료
+                    double tempTankWidthHalf2 = valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2 - selPointValue;
+                    CDPoint tempCenterRoofPoint4 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, tempTankWidthHalf2.ToString(), ref refPoint, ref curPoint);
+
+                    WPPoint = GetSumCDPoint(tempCenterRoofPoint4, 0, 0);
+                    break;
+
+                case WORKINGPOINT_TYPE.AdjLeftRoofDown:                 // 2021-04-22 완료
+                    double tempTankWidthHalf=  valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2 - selPointValue;
+                    CDPoint tempCenterRoofPoint3 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, tempTankWidthHalf.ToString(), ref refPoint, ref curPoint);
+
+                    WPPoint = GetSumCDPoint(tempCenterRoofPoint3, 0, 0);
                     break;
 
 
                 // Adj : Bottom
-                case WORKINGPOINT_TYPE.AdjCenterBottomUp:
+                case WORKINGPOINT_TYPE.AdjCenterBottomUp:               // 2021-04-22 완료
+                    CDPoint tempCenterBottomPoint2 = WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottomUp, ref refPoint, ref curPoint);
+                    double tempCenterBottomHeight2 = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, selPointValue);
+
+                    WPPoint = GetSumCDPoint(tempCenterBottomPoint2, -selPointValue, -tempCenterBottomHeight2);
                     break;
-                case WORKINGPOINT_TYPE.AdjCenterBottomDown:
-                    CDPoint tempCenterBottomPoint = ContactPoint(WORKINGPOINT_TYPE.PointCenterBottomDown, ref refPoint, ref curPoint);
+
+                case WORKINGPOINT_TYPE.AdjCenterBottomDown:             // 2021-04-22 완료
+                    CDPoint tempCenterBottomPoint = WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottomDown, ref refPoint, ref curPoint);
                     double tempCenterBottomHeight = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, selPointValue);
 
-                    cpPoint = GetSumCDPoint(tempCenterBottomPoint,
-                                            valueService.GetDoubleValue(selPointValue),
-                                            tempCenterBottomHeight);
+                    WPPoint = GetSumCDPoint(tempCenterBottomPoint, -selPointValue, -tempCenterBottomHeight);
                     break;
 
 
                 // Adj : Shell
-                case WORKINGPOINT_TYPE.AdjLeftShell:
-                    cpPoint = AdjLeftShell(selPointValue, ref refPoint, ref curPoint);
+                case WORKINGPOINT_TYPE.AdjLeftShell:                    // 2021-04-22 완료
+                    WPPoint = AdjLeftShell(selPointValue, ref refPoint, ref curPoint);
                     break;
-                case WORKINGPOINT_TYPE.AdjRightShell:
-                    cpPoint = AdjRightShell(selPointValue, ref refPoint, ref curPoint);
+
+                case WORKINGPOINT_TYPE.AdjRightShell:                   // 2021-04-22 완료
+                    WPPoint = AdjRightShell(selPointValue, ref refPoint, ref curPoint);
                     break;
 
 
 
                 default:
-                    cpPoint = null;
+                    WPPoint = null;
                     break;
             }
 
-            return cpPoint;
+            return WPPoint;
         }
 
 
-        // Adj : Left Shell
-        private CDPoint AdjLeftShell( string selHeight, ref CDPoint refPoint, ref CDPoint curPoint)
+        #region Adj : Shell
+        private CDPoint AdjLeftShell( double selHeight, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             // Shell Bottom Y = 0
-
-            double currentHeight= valueService.GetDoubleValue(selHeight);
             double currentThickness = GetShellThicknessAccordingToHeight(selHeight);
-
-            CDPoint newPoint = GetSumCDPoint(refPoint, -currentThickness, currentHeight);
+            CDPoint newPoint = GetSumCDPoint(refPoint, -currentThickness, selHeight);
             return newPoint;
         }
-        private CDPoint AdjRightShell(string selHeight, ref CDPoint refPoint, ref CDPoint curPoint)
+        private CDPoint AdjRightShell(double selHeight, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             // Shell Bottom Y = 0
-
-            double currentHeight = valueService.GetDoubleValue(selHeight);
             double currentThickness = GetShellThicknessAccordingToHeight(selHeight);
             double tankWidth = valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId);
 
-            CDPoint newPoint = GetSumCDPoint(refPoint, tankWidth + currentThickness, currentHeight);
+            CDPoint newPoint = GetSumCDPoint(refPoint, tankWidth + currentThickness, selHeight);
             return newPoint;
         }
+
         public double GetShellThicknessAccordingToHeight(string selHeight)
         {
-            double currentHeight = valueService.GetDoubleValue(selHeight);
+            return GetShellThicknessAccordingToHeight(valueService.GetDoubleValue(selHeight));
+        }
+        public double GetShellThicknessAccordingToHeight(double selHeight)
+        {
             double currentThickness = 0;
 
             int maxCourse = valueService.GetIntValue(assemblyData.ShellInput[0].CourseCount);
@@ -238,7 +263,7 @@ namespace DrawWork.DrawServices
             {
                 double plateWidth = valueService.GetDoubleValue(assemblyData.ShellOutput[i].Width);
                 sumHeight += plateWidth;
-                if (currentHeight < sumHeight)
+                if (selHeight < sumHeight)
                 {
                     double minThickness = valueService.GetDoubleValue(assemblyData.ShellOutput[i].MinThk);
                     currentThickness = minThickness;
@@ -247,8 +272,9 @@ namespace DrawWork.DrawServices
             }
             return currentThickness;
         }
+        #endregion
 
-        // Point : Top Angle Roof
+        #region Point : Roof
         private CDPoint PointTopAngleRoof(ref CDPoint refPoint, ref CDPoint curPoint)
         {
             CDPoint newPoint = new CDPoint();
@@ -295,7 +321,7 @@ namespace DrawWork.DrawServices
 
             return newPoint;
         }
-        // Point : Top Angel Shell
+
         private CDPoint PointTopAngleShell(ref CDPoint refPoint, ref CDPoint curPoint)
         {
             CDPoint newPoint = new CDPoint();
@@ -333,6 +359,43 @@ namespace DrawWork.DrawServices
             return newPoint;
         }
 
+        #endregion
+
+        #region Point : Bottom
+        private CDPoint PointCenterBottomDown(ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            return GetSumCDPoint(refPoint,
+                                    + valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateWidth)
+                                    - valueService.GetDoubleValue(assemblyData.BottomOutput[0].ShellThk)
+                                    - valueService.GetDoubleValue(assemblyData.BottomOutput[0].OutSideProjection)
+                                    - valueService.GetDoubleValue(assemblyData.BottomOutput[0].OverlapOfAnnular),
+
+                                    0);
+        }
+        #endregion
+
+
+
+        #region Distance
+        private double GetDistanceX(double selX1, double selX2)
+        {
+            return Point3D.Distance(new Point3D(selX1, 0, 0), new Point3D(selX2, 0, 0));
+        }
+        private double GetDistanceY(double selY1, double selY2)
+        {
+            return Point3D.Distance(new Point3D(0,selY1, 0), new Point3D(0, selY2, 0));
+        }
+        #endregion
+
+        #region Vertical Height By Degree
+        private double GetVerticalHeightByDegree(double selDegree,double selHeight)
+        {
+            double firstA = valueService.GetAdjacentByHypotenuse(selDegree, selHeight);
+            double firstO = valueService.GetOppositeByHypotenuse(selDegree, selHeight);
+            double secondO = valueService.GetOppositeByWidth(selDegree,firstO);
+            return firstA + secondO;
+        }
+        #endregion
 
 
         private CDPoint GetSumCDPoint(CDPoint selPoint1, double X, double Y, double Z = 0)

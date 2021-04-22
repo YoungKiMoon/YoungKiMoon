@@ -110,6 +110,22 @@ namespace DrawWork.ValueServices
             // O = Tan * A
             return Math.Tan(selDegree) * selWidth;
         }
+
+        public double GetOppositeByHypotenuse(string selSlope, string selHypotenuse)
+        {
+            return GetOppositeByHypotenuse(GetDegreeOfSlope(selSlope), GetDoubleValue(selHypotenuse));
+        }
+        public double GetOppositeByHypotenuse(string selSlope, double selHypotenuse)
+        {
+            return GetOppositeByHypotenuse(GetDegreeOfSlope(selSlope), selHypotenuse);
+        }
+        public double GetOppositeByHypotenuse(double selDegree, double selHypotenuse)
+        {
+            // Tan = O/A
+            // O = Tan * A
+            return Math.Sin(selDegree) * selHypotenuse;
+        }
+
         public double GetAdjacentByHeight(string selSlope, string selHeight)
         {
             return GetAdjacentByHeight(GetDegreeOfSlope(selSlope), GetDoubleValue(selHeight));
@@ -125,6 +141,23 @@ namespace DrawWork.ValueServices
             return selHeight / Math.Tan(selDegree);
         }
 
+
+        public double GetAdjacentByHypotenuse(string selSlope, string selHypotenuse)
+        {
+            return GetAdjacentByHypotenuse(GetDegreeOfSlope(selSlope), GetDoubleValue(selHypotenuse));
+        }
+        public double GetAdjacentByHypotenuse(string selSlope, double selHypotenuse)
+        {
+            return GetAdjacentByHypotenuse(GetDegreeOfSlope(selSlope), selHypotenuse);
+        }
+        public double GetAdjacentByHypotenuse(double selDegree, double selHypotenuse)
+        {
+            // Tan = O/A
+            // A = O/Tan
+            return selHypotenuse * Math.Cos(selDegree);
+        }
+
+
         public double GetHypotenuseByWidth(string selSlope,string selWidth)
         {
             return GetHypotenuseByWidth(GetDegreeOfSlope(selSlope), GetDoubleValue(selWidth));
@@ -139,6 +172,10 @@ namespace DrawWork.ValueServices
             // H = A/COS
             return selWidth / Math.Cos(selDegree);
         }
+
+
+
+
         #endregion
 
         // 공백 제거

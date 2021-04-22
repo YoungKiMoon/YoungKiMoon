@@ -194,7 +194,7 @@ namespace DrawWork.DrawServices
                 case "contactpoint":
                 case "workingpoint":
                     string[] contactArray = GetContactPointArray(selPoint);
-                    CDPoint contactPoint= cpService.ContactPoint(contactArray[0], ref refPoint, ref curPoint);
+                    CDPoint contactPoint= cpService.WorkingPoint(contactArray[0], ref refPoint, ref curPoint);
                     if (contactArray[1] == "x")
                     {
                         newValue = contactPoint.X.ToString();

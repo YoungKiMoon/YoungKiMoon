@@ -675,8 +675,8 @@ namespace DrawWork.DrawServices
             return returnEntity;
         }
 
-        // Contact Point
-        public void DoContactPoint(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        // Working Point
+        public void DoWorkingPoint(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -692,11 +692,11 @@ namespace DrawWork.DrawServices
             {
                 if (j + 1 < eachCmd.Length)
                 {
-                    newPoint1 = workingPointService.ContactPoint(eachCmd[j], eachCmd[j + 1], ref refPoint, ref curPoint);
+                    newPoint1 = workingPointService.WorkingPoint(eachCmd[j], eachCmd[j + 1], ref refPoint, ref curPoint);
                 }
                 else
                 {
-                    newPoint1 = workingPointService.ContactPoint(eachCmd[j], ref refPoint, ref curPoint);
+                    newPoint1 = workingPointService.WorkingPoint(eachCmd[j], ref refPoint, ref curPoint);
                 }
                 if (newPoint1 != null)
                 {
@@ -1041,7 +1041,7 @@ namespace DrawWork.DrawServices
                     {
                         case "mirror":
 
-                            newMirrorPoint= workingPointService.ContactPoint(WORKINGPOINT_TYPE.PointCenterBottomDown, ref refPoint, ref curPoint);
+                            newMirrorPoint= workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottomUp, ref refPoint, ref curPoint);
                             if (j + 1 <= eachCmd.Length)
                             {
                                 switch (eachCmd[j + 1])
@@ -1286,7 +1286,7 @@ namespace DrawWork.DrawServices
                     {
                         case "mirror":
 
-                            newMirrorPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.PointCenterBottomDown, ref refPoint, ref curPoint);
+                            newMirrorPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottomUp, ref refPoint, ref curPoint);
 
                             if (j + 1 <= eachCmd.Length)
                             {
