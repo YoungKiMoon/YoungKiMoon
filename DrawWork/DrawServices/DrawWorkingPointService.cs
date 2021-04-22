@@ -14,8 +14,7 @@ using devDept.Serialization;
 using AssemblyLib.AssemblyModels;
 using DrawWork.DrawModels;
 using DrawWork.ValueServices;
-
-
+using DrawWork.Commons;
 
 namespace DrawWork.DrawServices
 {
@@ -33,31 +32,136 @@ namespace DrawWork.DrawServices
 
         public CDPoint ContactPoint(string selPoint, ref CDPoint refPoint, ref CDPoint curPoint)
         {
-            return ContactPointOrigin(selPoint, "", ref refPoint, ref curPoint);
+            return ContactPointOrigin(CommonMethod.WorkingPointToEnum(selPoint), "", ref refPoint, ref curPoint);
         }
         public CDPoint ContactPoint(string selPoint, string selPointValue, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            return ContactPointOrigin(CommonMethod.WorkingPointToEnum(selPoint), selPointValue, ref refPoint, ref curPoint);
+        }
+
+        public CDPoint ContactPoint(WORKINGPOINT_TYPE selPoint, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            return ContactPointOrigin(selPoint, "", ref refPoint, ref curPoint);
+        }
+        public CDPoint ContactPoint(WORKINGPOINT_TYPE selPoint, string selPointValue, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             return ContactPointOrigin(selPoint, selPointValue,ref refPoint,ref curPoint);
         }
 
-        private CDPoint ContactPointOrigin(string selPoint, string selPointValue, ref CDPoint refPoint, ref CDPoint curPoint)
+        private CDPoint ContactPointOrigin(WORKINGPOINT_TYPE selPoint, string selPointValue, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             CDPoint cpPoint = new CDPoint();
             switch (selPoint)
             {
-                // Top Angle Roof : Point
-                case "topangleroofpoint":
+
+                // Point : Center
+
+                case WORKINGPOINT_TYPE.PointCenterTopUp:
+                    break;
+
+                case WORKINGPOINT_TYPE.PointCenterTopDown:
+
+                    // top angle roof point
+                    CDPoint topAngleRoofPoint = ContactPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
+
+                    double tempWidth3 = Point3D.Distance(new Point3D(topAngleRoofPoint.X, 0, 0), new Point3D(refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2, 0, 0));
+                    double tempHeight3 = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, tempWidth3);
+
+                    cpPoint = GetSumCDPoint(refPoint,
+                                            valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2,
+                                            valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight) + tempHeight3);
+
+                    break;
+
+
+                case WORKINGPOINT_TYPE.PointCenterBottomUp:
+                    break;
+
+                case WORKINGPOINT_TYPE.PointCenterBottomDown:
+
+
+                    CDPoint bottomleftpoint = ContactPoint(WORKINGPOINT_TYPE.PointLeftBottomDown, ref refPoint, ref curPoint);
+
+                    double tempWidth2 = Point3D.Distance(new Point3D(bottomleftpoint.X, 0, 0), new Point3D(refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2, 0, 0));
+                    double tempHeight2 = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, tempWidth2);
+
+                    cpPoint = GetSumCDPoint(refPoint,
+                                            valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2,
+                                            valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomThickness) + tempHeight2);
+                    break;
+
+
+                case WORKINGPOINT_TYPE.PointCenterTop:
+                    break;
+
+                case WORKINGPOINT_TYPE.PointCenterBottom:
+                    break;
+
+
+                // Point : Bottom
+                case WORKINGPOINT_TYPE.PointLeftBottomUp:
+                    break;
+
+                case WORKINGPOINT_TYPE.PointLeftBottomDown:
+                    double tempHeight = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, assemblyData.BottomInput[0].BottomThickness);
+                    cpPoint.X = refPoint.X
+                                + valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateWidth)
+                                - valueService.GetDoubleValue(assemblyData.BottomOutput[0].ShellThk)
+                                - valueService.GetDoubleValue(assemblyData.BottomOutput[0].OutSideProjection)
+                                - valueService.GetDoubleValue(assemblyData.BottomOutput[0].OverlapOfAnnular)
+                                - tempHeight;
+                    cpPoint.Y = refPoint.Y
+                                + valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomThickness);
+
+                    break;
+
+
+                // Point : Roof
+                case WORKINGPOINT_TYPE.PointLeftRoofUp:
+                    break;
+
+                case WORKINGPOINT_TYPE.PointLeftRoofDown:
                     cpPoint = PointTopAngleRoof(ref refPoint, ref curPoint);
                     break;
 
-                // Tp Angle Shell : Point
-                case "topangleshellpoint":
-                    cpPoint = PointTopAngleShell(ref refPoint,ref curPoint);
+
+
+                // Point : Shell
+                case WORKINGPOINT_TYPE.PointLeftShellTop:
+                    break;
+                case WORKINGPOINT_TYPE.PointLeftShellTopAdj:
+                    cpPoint = PointTopAngleShell(ref refPoint, ref curPoint);
+                    break;
+                case WORKINGPOINT_TYPE.PointReference:
+                case WORKINGPOINT_TYPE.PointLeftShellBottom:
+                    cpPoint = GetSumCDPoint(refPoint, 0, 0);
                     break;
 
-                // Left Roof : Adj
-                case "leftroofpoint":
-                    CDPoint tempLeftRootPoint = ContactPoint("centertoppoint", ref refPoint, ref curPoint);
+                case WORKINGPOINT_TYPE.PointRightShellTop:
+                    break;
+                case WORKINGPOINT_TYPE.PointRightShellTopAdj:
+                    break;
+                case WORKINGPOINT_TYPE.PointRightShellBottom:
+                    break;
+
+
+                // Adj : Roof
+                case WORKINGPOINT_TYPE.AdjCenterRoofUp:
+                    break;
+                case WORKINGPOINT_TYPE.AdjCenterRoofDown:
+                    // Point : Center Top
+                    CDPoint tempRightRootPoint = ContactPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
+                    // Adj : selPointValue : Distance
+                    double tempRightRoofHeight = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, selPointValue);
+
+                    cpPoint = GetSumCDPoint(tempRightRootPoint,
+                                            valueService.GetDoubleValue(selPointValue),
+                                            tempRightRoofHeight);
+                    break;
+                case WORKINGPOINT_TYPE.AdjLeftRoofUp:
+                    break;
+                case WORKINGPOINT_TYPE.AdjLeftRoofDown:
+                    CDPoint tempLeftRootPoint = ContactPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
                     double tempTankLeftHalf = valueService.GetDoubleValue(selPointValue) - valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2;
                     double tempLeftRoofHeight = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, tempTankLeftHalf.ToString());
 
@@ -69,76 +173,11 @@ namespace DrawWork.DrawServices
                     break;
 
 
-
-                // Center Top : Point
-                case "centertoppoint":
-
-                    // top angle roof point
-                    CDPoint topAngleRoofPoint = ContactPoint("topangleroofpoint", ref refPoint, ref curPoint);
-
-                    double tempWidth3 = Point3D.Distance(new Point3D(topAngleRoofPoint.X, 0, 0), new Point3D(refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2, 0, 0));
-                    double tempHeight3 = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, tempWidth3);
-
-                    cpPoint = GetSumCDPoint(refPoint,
-                                            valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2,
-                                            valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight) + tempHeight3);
-
+                // Adj : Bottom
+                case WORKINGPOINT_TYPE.AdjCenterBottomUp:
                     break;
-
-                // Center Roof : Adj
-                case "centerroofadj":
-                    // Point : Center Top
-                    CDPoint tempRightRootPoint = ContactPoint("centertoppoint", ref refPoint, ref curPoint);
-                    // Adj : selPointValue : Distance
-                    double tempRightRoofHeight = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, selPointValue);
-
-                    cpPoint = GetSumCDPoint(tempRightRootPoint,
-                                            valueService.GetDoubleValue(selPointValue),
-                                            tempRightRoofHeight);
-                    break;
-
-
-
-
-
-                
-                    
-                    
-                // Left Bottom : Point
-                case "bottomleftpoint":
-                        double tempHeight = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, assemblyData.BottomInput[0].BottomThickness);
-
-                        // Point
-                        cpPoint.X = refPoint.X
-                                    + valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateWidth)
-                                    - valueService.GetDoubleValue(assemblyData.BottomOutput[0].ShellThk)
-                                    - valueService.GetDoubleValue(assemblyData.BottomOutput[0].OutSideProjection)
-                                    - valueService.GetDoubleValue(assemblyData.BottomOutput[0].OverlapOfAnnular)
-                                    - tempHeight;
-                        cpPoint.Y = refPoint.Y
-                                    + valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomThickness);
-
-
-                    break;
-
-                // Center Bottom : Point
-                case "centerlinebottompoint":
-
-
-                        // top angle roof point
-                        CDPoint bottomleftpoint = ContactPoint("bottomleftpoint", ref refPoint, ref curPoint);
-
-                        double tempWidth2 = Point3D.Distance(new Point3D(bottomleftpoint.X, 0, 0), new Point3D(refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2, 0, 0));
-                        double tempHeight2 = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, tempWidth2);
-
-                        cpPoint = GetSumCDPoint(refPoint,
-                                                valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2,
-                                                valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomThickness) + tempHeight2);
-                    break;
-
-                // Center Bottom : Adj
-                case "centerbottompoint":
-                    CDPoint tempCenterBottomPoint = ContactPoint("centerlinebottompoint", ref refPoint, ref curPoint);
+                case WORKINGPOINT_TYPE.AdjCenterBottomDown:
+                    CDPoint tempCenterBottomPoint = ContactPoint(WORKINGPOINT_TYPE.PointCenterBottomDown, ref refPoint, ref curPoint);
                     double tempCenterBottomHeight = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, selPointValue);
 
                     cpPoint = GetSumCDPoint(tempCenterBottomPoint,
@@ -147,21 +186,15 @@ namespace DrawWork.DrawServices
                     break;
 
 
-
-
-                // Left Shell Bottom : Point
-                case "leftshellbottompoint":
-                    cpPoint = GetSumCDPoint(refPoint, 0, 0);
-                    break;
-
-                // Left Shell : Adj
-                case "leftshelladj":
+                // Adj : Shell
+                case WORKINGPOINT_TYPE.AdjLeftShell:
                     cpPoint = AdjLeftShell(selPointValue, ref refPoint, ref curPoint);
                     break;
-                // Right Shell : Adj
-                case "rightshelladj":
+                case WORKINGPOINT_TYPE.AdjRightShell:
                     cpPoint = AdjRightShell(selPointValue, ref refPoint, ref curPoint);
                     break;
+
+
 
                 default:
                     cpPoint = null;

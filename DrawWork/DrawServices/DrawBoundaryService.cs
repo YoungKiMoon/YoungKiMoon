@@ -28,6 +28,14 @@ namespace DrawWork.DrawServices
 
         public Dictionary<TANKBOUNDARY_TYPE, Line> BoundaryDic;
 
+
+        private DrawPointModel _drawPoint;
+        public DrawPointModel drawPoint
+        {
+            get { return _drawPoint; }
+            set { _drawPoint = value; }
+        }
+
         public DrawBoundaryService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
@@ -36,11 +44,26 @@ namespace DrawWork.DrawServices
             workingPointService = new DrawWorkingPointService(selAssembly);
 
             BoundaryDic = new Dictionary<TANKBOUNDARY_TYPE, Line>();
+
+            drawPoint = new DrawPointModel();
         }
 
-        public void CreateBoundaryService()
+        public void SetDrawPoint(DrawPointModel selDrawPoint)
         {
-            //Line leftRoofTopLine=new CustomLine(new Point3D()
+            drawPoint.referencePoint = selDrawPoint.referencePoint;
+            drawPoint.currentPoint = selDrawPoint.currentPoint;
+        }
+        public void CreateBoundary(DrawPointModel selDrawPoint)
+        {
+            SetDrawPoint(selDrawPoint);
+            CreateBoundaryEntity();
+        }
+
+        private void CreateBoundaryEntity()
+        {
+            BoundaryDic = new Dictionary<TANKBOUNDARY_TYPE, Line>();
+
+            //
         }
     }
 }

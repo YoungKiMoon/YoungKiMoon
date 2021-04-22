@@ -25,7 +25,7 @@ namespace DrawWork.ViewModels
             TankData = new AssemblyModel();
             commandData = new BasicCommandModel();
             TankData.CreateSampleAssembly();
-            commandData.CreateSampleCommandModel();
+            //commandData.CreateSampleCommandModel();
 
         }
 

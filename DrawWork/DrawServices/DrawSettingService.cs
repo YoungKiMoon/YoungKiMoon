@@ -1490,15 +1490,23 @@ namespace DrawWork.DrawServices
             //singleModel.Entities.Add(newSolid, Color.Green);
 
 
-            Line c1 = new Line(new Point3D(10, 20, 0), new Point3D(10, 100, 0));
-            Line c2 = new Line(new Point3D(20, 20, 0), new Point3D(20, 100, 0));
+            Line c1 = new Line(new Point3D(10, 20, 0), new Point3D(10000, 1000, 0));
+            Line c2 = new Line(new Point3D(2000, 20, 0), new Point3D(2000, 1000, 0));
 
             Line c11 = (Line)c1.Clone();
             Line c22 = (Line)c2.Clone();
 
+            Point3D[] ins= c2.IntersectWith(c1);
+
+            Line c222 = new Line(ins[0], new Point3D(2000, 1000, 0));
+
+            singleModel.Entities.Add(c1);
+            singleModel.Entities.Add(c222);
+
+            
             //c11.Rotate(UtilityEx.DegToRad(-90), Vector3D.AxisZ, new Point3D(15, 20));
             //c22.Rotate(UtilityEx.DegToRad(-90), Vector3D.AxisZ, new Point3D(15, 20));
-            Entity cd = c11;
+            //Entity cd = c11;
 
 
 

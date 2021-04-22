@@ -18,7 +18,7 @@ using AssemblyLib.AssemblyModels;
 
 using DrawWork.ValueServices;
 using DrawWork.DrawModels;
-
+using DrawWork.Commons;
 
 namespace DrawWork.DrawServices
 {
@@ -160,7 +160,7 @@ namespace DrawWork.DrawServices
 
                 double radius = -valueService.GetDoubleValue(assemblyData.StructureGirderInput[i].GirderInRadius);
 
-                CDPoint eachColumnPoint = workingPointService.ContactPoint("centerroofadj", radius.ToString(), ref refPoint,ref curPoint);
+                CDPoint eachColumnPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, radius.ToString(), ref refPoint,ref curPoint);
                 #endregion
 
                 #region HBream
@@ -197,34 +197,34 @@ namespace DrawWork.DrawServices
 
                 #region Support Buttom Support
 
-                CDPoint eachColumnBasePoint = workingPointService.ContactPoint("centerbottompoint", radius.ToString(), ref refPoint, ref curPoint);
+                CDPoint eachColumnBasePoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, radius.ToString(), ref refPoint, ref curPoint);
                 drawPoint.X = eachColumnBasePoint.X;
                 drawPoint.Y = eachColumnBasePoint.Y;
 
-                CDPoint eachColumnBasePointLeft = workingPointService.ContactPoint("centerbottompoint", (radius - pipeODHalf - bD - bC - bJ).ToString(), ref refPoint, ref curPoint);
-                CDPoint eachColumnBasePointRight = workingPointService.ContactPoint("centerbottompoint", (radius + pipeODHalf + bD + bC + bJ).ToString(), ref refPoint, ref curPoint);
+                CDPoint eachColumnBasePointLeft = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, (radius - pipeODHalf - bD - bC - bJ).ToString(), ref refPoint, ref curPoint);
+                CDPoint eachColumnBasePointRight = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, (radius + pipeODHalf + bD + bC + bJ).ToString(), ref refPoint, ref curPoint);
                 //Line basePad1 = new Line(new Point3D(eachColumnBasePointLeft.X, eachColumnBasePointLeft.Y), new Point3D(eachColumnBasePointRight.X, eachColumnBasePointRight.Y));                    
                 Line basePad2 = new Line(GetSumPoint(eachColumnBasePointLeft,0,0), GetSumPoint(eachColumnBasePointLeft,0,bA));
                 Line basePad3 = new Line(GetSumPoint(eachColumnBasePointLeft,0,bA), GetSumPoint(eachColumnBasePointRight,0,bA));
                 Line basePad4 = new Line(GetSumPoint(eachColumnBasePointRight,0,0), GetSumPoint(eachColumnBasePointRight,0,bA));
                 customBlockList.AddRange(new Line[] { basePad2, basePad3, basePad4 });
 
-                CDPoint eachColumnBasePointLeft2 = workingPointService.ContactPoint("centerbottompoint", (radius - pipeODHalf - bD - bC - bI).ToString(), ref refPoint, ref curPoint);
-                CDPoint eachColumnBasePointRight2 = workingPointService.ContactPoint("centerbottompoint", (radius + pipeODHalf + bD + bC + bI).ToString(), ref refPoint, ref curPoint);
+                CDPoint eachColumnBasePointLeft2 = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, (radius - pipeODHalf - bD - bC - bI).ToString(), ref refPoint, ref curPoint);
+                CDPoint eachColumnBasePointRight2 = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, (radius + pipeODHalf + bD + bC + bI).ToString(), ref refPoint, ref curPoint);
                 //Line basePadPad1 = new Line(new Point3D(eachColumnBasePointLeft2.X, eachColumnBasePointLeft2.Y + bA), new Point3D(eachColumnBasePointRight2.X, eachColumnBasePointRight2.Y + bA));
                 Line basePadPad2 = new Line(GetSumPoint(eachColumnBasePointLeft2, 0, bA), GetSumPoint(eachColumnBasePointLeft2, 0, bA + bB));
                 Line basePadPad3 = new Line(GetSumPoint(eachColumnBasePointLeft2, 0, bA + bB), GetSumPoint(eachColumnBasePointRight2, 0, bA + bB));
                 Line basePadPad4 = new Line(GetSumPoint(eachColumnBasePointRight2, 0, bA), GetSumPoint(eachColumnBasePointRight2, 0, bA + bB));
                 customBlockList.AddRange(new Line[] {  basePadPad2, basePadPad3, basePadPad4 });
 
-                CDPoint eachColumnBasePointLeft3 = workingPointService.ContactPoint("centerbottompoint", (radius - pipeODHalf - bD - bC ).ToString(), ref refPoint, ref curPoint);
-                CDPoint eachColumnBasePointRight3 = workingPointService.ContactPoint("centerbottompoint", (radius + pipeODHalf + bD + bC).ToString(), ref refPoint, ref curPoint);
+                CDPoint eachColumnBasePointLeft3 = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, (radius - pipeODHalf - bD - bC ).ToString(), ref refPoint, ref curPoint);
+                CDPoint eachColumnBasePointRight3 = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, (radius + pipeODHalf + bD + bC).ToString(), ref refPoint, ref curPoint);
                 Line baseLeft1 = new Line(GetSumPoint(eachColumnBasePointLeft3, 0, bA + bB), GetSumPoint(eachColumnBasePointLeft3, 0, bA + bB + bF));
                 Line baseRight1 = new Line(GetSumPoint(eachColumnBasePointRight3, 0, bA + bB), GetSumPoint(eachColumnBasePointRight3, 0, bA + bB + bF));
                 customBlockList.AddRange(new Line[] { baseLeft1, baseRight1 });
 
-                CDPoint eachColumnBasePointLeft4 = workingPointService.ContactPoint("centerbottompoint", (radius - pipeODHalf - bC -bG).ToString(), ref refPoint, ref curPoint);
-                CDPoint eachColumnBasePointRight4 = workingPointService.ContactPoint("centerbottompoint", (radius + pipeODHalf + bC +bG).ToString(), ref refPoint, ref curPoint);
+                CDPoint eachColumnBasePointLeft4 = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, (radius - pipeODHalf - bC -bG).ToString(), ref refPoint, ref curPoint);
+                CDPoint eachColumnBasePointRight4 = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, (radius + pipeODHalf + bC +bG).ToString(), ref refPoint, ref curPoint);
                 Line baseLeftLeft1 = new Line(GetSumPoint(eachColumnBasePointLeft4, 0, bA + bB), GetSumPoint(eachColumnBasePoint, -pipeODHalf - bC - bG, bA + bB + bE - bH));
                 //Line baseLeftLeft2 = new Line(GetSumPoint(eachColumnBasePoint, -pipeODHalf - bC - bG, +bA + bB + bE - bH), GetSumPoint(eachColumnBasePoint, 0, bA + bB + bE - bH));
                 Line baseLeftLeft3 = new Line(GetSumPoint(eachColumnBasePoint, -pipeODHalf - bC, +bA + bB + bE - bH), GetSumPoint(eachColumnBasePoint, -pipeODHalf - bC, +bA + bB + bE));
@@ -258,7 +258,7 @@ namespace DrawWork.DrawServices
             double centerPipeOD = valueService.GetDoubleValue(centerPipe.OD);
             double centerPipeODHalf = centerPipeOD / 2;
             double centerRadius = 0; // Center
-            CDPoint centerColumnPoint = workingPointService.ContactPoint("centerroofadj", centerRadius.ToString(), ref refPoint, ref curPoint);
+            CDPoint centerColumnPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, centerRadius.ToString(), ref refPoint, ref curPoint);
 
             StructureColumnCenterModel centerTopSupport = assemblyData.StructureColumnCenterOutput[firstIndex];
             double tsSize = valueService.GetDoubleValue(centerTopSupport.COLUMN);
@@ -288,7 +288,7 @@ namespace DrawWork.DrawServices
 
             // WP : Left Square Center
             double centerLeftWidthHalf = tsB;
-            CDPoint centerTopRoofLeftB = workingPointService.ContactPoint("centerroofadj", (centerRadius - centerLeftWidthHalf).ToString(), ref refPoint, ref curPoint);
+            CDPoint centerTopRoofLeftB = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, (centerRadius - centerLeftWidthHalf).ToString(), ref refPoint, ref curPoint);
 
             double centerRafterHeightHalf = rA / 2;
             double raHeightHalf = valueService.GetOppositeByWidth(roofSlopeString, centerRafterHeightHalf);
@@ -299,7 +299,7 @@ namespace DrawWork.DrawServices
 
             // WP : Left Pad 
             double centerLeftWidthODHalf = centerPipeODHalf + tsG + 30;// 30 값 고정
-            CDPoint centerTopRoofLeft = workingPointService.ContactPoint("centerroofadj", (centerRadius - centerLeftWidthODHalf).ToString(), ref refPoint, ref curPoint);
+            CDPoint centerTopRoofLeft = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, (centerRadius - centerLeftWidthODHalf).ToString(), ref refPoint, ref curPoint);
 
             // Square : 평행 방향이동 : 아래쪽
             double centerRafterHeight = rA + 20; // MinValue : 20
@@ -355,27 +355,27 @@ namespace DrawWork.DrawServices
 
 
             // Support Buttom Support
-            CDPoint centerColumnBasePoint = workingPointService.ContactPoint("centerbottompoint", centerRadius.ToString(), ref refPoint, ref curPoint);
+            CDPoint centerColumnBasePoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, centerRadius.ToString(), ref refPoint, ref curPoint);
             drawPoint.X = centerColumnBasePoint.X;
             drawPoint.Y = centerColumnBasePoint.Y;
 
-            CDPoint centerColumnBasePointLeft = workingPointService.ContactPoint("centerbottompoint", (centerRadius - centerPipeODHalf - bD - bC - bJ).ToString(), ref refPoint, ref curPoint); 
+            CDPoint centerColumnBasePointLeft = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, (centerRadius - centerPipeODHalf - bD - bC - bJ).ToString(), ref refPoint, ref curPoint); 
             Line centerPad2 = new Line(GetSumPoint(centerColumnBasePointLeft, 0, 0), GetSumPoint(centerColumnBasePointLeft, 0, bA));
             Line centerPad3 = new Line(GetSumPoint(centerColumnBasePointLeft, 0, bA), GetSumPoint(centerColumnBasePoint, 0, bA));
             Line centerPad4 = new Line(GetSumPoint(centerColumnBasePoint, 0, 0), GetSumPoint(centerColumnBasePoint, 0, bA));
             customBlockList.AddRange(new Line[] { centerPad2, centerPad3, centerPad4 });
 
-            CDPoint centerColumnBasePointLeft2 = workingPointService.ContactPoint("centerbottompoint", (centerRadius - centerPipeODHalf - bD - bC - bI).ToString(), ref refPoint, ref curPoint);
+            CDPoint centerColumnBasePointLeft2 = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, (centerRadius - centerPipeODHalf - bD - bC - bI).ToString(), ref refPoint, ref curPoint);
             Line centerPadPad2 = new Line(GetSumPoint(centerColumnBasePointLeft2, 0, bA), GetSumPoint(centerColumnBasePointLeft2, 0, bA + bB));
             Line centerPadPad3 = new Line(GetSumPoint(centerColumnBasePointLeft2, 0, bA + bB), GetSumPoint(centerColumnBasePoint, 0, bA + bB));
             Line centerPadPad4 = new Line(GetSumPoint(centerColumnBasePoint, 0, bA), GetSumPoint(centerColumnBasePoint, 0, bA + bB));
             customBlockList.AddRange(new Line[] { centerPadPad2, centerPadPad3, centerPadPad4 });
 
-            CDPoint centerColumnBasePointLeft3 = workingPointService.ContactPoint("centerbottompoint", (centerRadius - centerPipeODHalf - bD - bC).ToString(), ref refPoint, ref curPoint);
+            CDPoint centerColumnBasePointLeft3 = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, (centerRadius - centerPipeODHalf - bD - bC).ToString(), ref refPoint, ref curPoint);
             Line centerLeft1 = new Line(GetSumPoint(centerColumnBasePointLeft3, 0, bA + bB), GetSumPoint(centerColumnBasePointLeft3, 0, bA + bB + bF));
             customBlockList.AddRange(new Line[] { centerLeft1 });
 
-            CDPoint centerColumnBasePointLeft4 = workingPointService.ContactPoint("centerbottompoint", (centerRadius - centerPipeODHalf - bC - bG).ToString(), ref refPoint, ref curPoint);
+            CDPoint centerColumnBasePointLeft4 = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, (centerRadius - centerPipeODHalf - bC - bG).ToString(), ref refPoint, ref curPoint);
             Line centerLeftLeft1 = new Line(GetSumPoint(centerColumnBasePointLeft4, 0, bA + bB), GetSumPoint(centerColumnBasePoint, -centerPipeODHalf - bC - bG, bA + bB + bE - bH));
             Line centerLeftLeft2 = new Line(GetSumPoint(centerColumnBasePoint, -centerPipeODHalf - bC - bG, +bA + bB + bE - bH), GetSumPoint(centerColumnBasePoint, 0, bA + bB + bE - bH));
             Line centerLeftLeft3 = new Line(GetSumPoint(centerColumnBasePoint, -centerPipeODHalf - bC, +bA + bB + bE - bH), GetSumPoint(centerColumnBasePoint, -centerPipeODHalf - bC, +bA + bB + bE));
@@ -428,7 +428,7 @@ namespace DrawWork.DrawServices
             Line shellClipPad4 = new Line(GetSumPoint(leftTankTop, 0, -shellClipTopGap - scF), GetSumPoint(leftTankTop, shellClipPadWidth, -shellClipTopGap - scF));
             customBlockList.AddRange(new Line[] { shellClipPad1, shellClipPad2, shellClipPad3, shellClipPad4 });
 
-            CDPoint leftTankRoofTop = workingPointService.ContactPoint("leftroofpoint", ref refPoint, ref curPoint);
+            CDPoint leftTankRoofTop = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjLeftRoofDown, ref refPoint, ref curPoint);
 
 
             // Gap : Slope
@@ -437,14 +437,14 @@ namespace DrawWork.DrawServices
             double leftTankRoofTopGapSlope = Math.Sqrt(leftTankRoofTopGapWidth * leftTankRoofTopGapWidth + leftTankRoofTopGapHeight * leftTankRoofTopGapHeight);
 
             // 평행 방향 이동 : 아래쪽
-            CDPoint leftTankRoofTop1 = workingPointService.ContactPoint("leftroofpoint", shellClipTriTopGap.ToString(), ref refPoint, ref curPoint);
+            CDPoint leftTankRoofTop1 = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjLeftRoofDown, shellClipTriTopGap.ToString(), ref refPoint, ref curPoint);
             leftTankRoofTop1.Y = leftTankRoofTop1.Y - leftTankRoofTopGapSlope;
 
             // 중간 : Slope 길이 -> Width로 변환
             double shellBoltWidth = (rafterSideBoltWidth + rafterSideBoltGap)*Math.Cos(roofSlopeDegree);
 
             // 평행 방향 이동 : 아래쪽
-            CDPoint leftTankRoofTop2 = workingPointService.ContactPoint("leftroofpoint", (shellClipTriTopGap+ shellBoltWidth+ shellClipTriTopEndGap).ToString(), ref refPoint, ref curPoint);
+            CDPoint leftTankRoofTop2 = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjLeftRoofDown, (shellClipTriTopGap+ shellBoltWidth+ shellClipTriTopEndGap).ToString(), ref refPoint, ref curPoint);
             leftTankRoofTop2.Y = leftTankRoofTop2.Y - leftTankRoofTopGapSlope;
 
             Line shellClipTri1 = new Line(GetSumPoint(leftTankTop, shellClipPadWidth, -shellClipTopGap - shellClipPadInto), GetSumPoint(leftTankRoofTop1, 0, 0));
@@ -536,10 +536,10 @@ namespace DrawWork.DrawServices
 
             #region Rafter
 
-            CDPoint rafterEndPoint = workingPointService.ContactPoint("leftroofpoint", shellClipTriTopGap.ToString(), ref refPoint, ref curPoint);
+            CDPoint rafterEndPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjLeftRoofDown, shellClipTriTopGap.ToString(), ref refPoint, ref curPoint);
 
             // 수직방향 이동 : 오른쪽으로
-            CDPoint rafterStartPoint= workingPointService.ContactPoint("centerroofadj", (centerRadius - centerLeftWidthHalf).ToString(), ref refPoint, ref curPoint);
+            CDPoint rafterStartPoint= workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, (centerRadius - centerLeftWidthHalf).ToString(), ref refPoint, ref curPoint);
             double rafterStartPointtSlope = rafterSideBoltGap/2 + rafterSideBoltWidth;
             double rafterStartPointtWidth = rafterStartPointtSlope * Math.Cos(roofSlopeDegree);
             double rafterStartPointtHeight = rafterStartPointtSlope * Math.Sin(roofSlopeDegree);
@@ -562,7 +562,7 @@ namespace DrawWork.DrawServices
                 }
 
                 double rafterEachRadius = -valueService.GetDoubleValue(assemblyData.StructureRafterInput[i].RafterInRadius);
-                CDPoint rafterCurrentColumnPointTemp = workingPointService.ContactPoint("centerroofadj", rafterEachRadius.ToString(), ref refPoint, ref curPoint);
+                CDPoint rafterCurrentColumnPointTemp = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, rafterEachRadius.ToString(), ref refPoint, ref curPoint);
                 Point3D rafterCurrentColumnPoint = GetSumPoint(rafterCurrentColumnPointTemp, 0, 0);
 
                 if (i== assemblyData.StructureColumnRafterOutput.Count - 1)
@@ -670,7 +670,7 @@ namespace DrawWork.DrawServices
                         AngleSizeModel selAngleModel = refBlockService.GetAngleSizeModel(eachWindGirder[1]);
 
                         // Left
-                        CDPoint adjPoint = workingPointService.ContactPoint("leftshelladj", eachWindGirder[0], ref refPoint, ref curPoint);
+                        CDPoint adjPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjLeftShell, eachWindGirder[0], ref refPoint, ref curPoint);
                         CDPoint drawPoint = GetSumCDPoint(adjPoint, -valueService.GetDoubleValue(selAngleModel.AB), 0);
                         Point3D rotatePoint = GetSumPoint(adjPoint, 0,0);
                         Entity[] angleEntity = refBlockService.DrawReference_Angle(drawPoint, selAngleModel);
@@ -708,7 +708,7 @@ namespace DrawWork.DrawServices
                         AngleSizeModel selAngleModel = refBlockService.GetAngleSizeModel(eachWindGirder[1]);
 
                         // Left
-                        CDPoint adjPoint = workingPointService.ContactPoint("leftshelladj", eachWindGirder[0], ref refPoint, ref curPoint);
+                        CDPoint adjPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjLeftShell, eachWindGirder[0], ref refPoint, ref curPoint);
                         CDPoint drawPoint = GetSumCDPoint(adjPoint, -valueService.GetDoubleValue(selAngleModel.AB), -valueService.GetDoubleValue(selAngleModel.AB));
                         Entity[] angleEntity = refBlockService.DrawReference_Angle(drawPoint, selAngleModel);
 

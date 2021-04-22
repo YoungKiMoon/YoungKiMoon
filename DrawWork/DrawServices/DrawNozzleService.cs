@@ -58,7 +58,7 @@ namespace DrawWork.DrawServices
             // Reference Position
             double sizeNominalId = valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId);
             CDPoint newCurPoint = new CDPoint();
-            CDPoint centerTopPoint = workingPointService.ContactPoint("centertoppoint", ref refPoint, ref newCurPoint);
+            CDPoint centerTopPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref newCurPoint);
             double centerTopHeight = centerTopPoint.Y;
 
 
@@ -140,18 +140,18 @@ namespace DrawWork.DrawServices
             nozzleEntities.nozzlelineList.AddRange(customLineEntity);
 
 
-            CDPoint ccc = workingPointService.ContactPoint("topangleroofpoint",ref refPoint,ref newCurPoint);
-            Line lineref01 = new Line(new Point3D(ccc.X,ccc.Y),new Point3D(ccc.X,ccc.Y+1000));
-            nozzleEntities.outlineList.Add(lineref01);
+           // CDPoint ccc = workingPointService.ContactPoint("topangleroofpoint",ref refPoint,ref newCurPoint);
+            //Line lineref01 = new Line(new Point3D(ccc.X,ccc.Y),new Point3D(ccc.X,ccc.Y+1000));
+            //nozzleEntities.outlineList.Add(lineref01);
 
-            CDPoint cccc = workingPointService.ContactPoint("leftroofpoint", ref refPoint, ref newCurPoint);
-            Line lineref02 = new Line(new Point3D(cccc.X, cccc.Y), new Point3D(cccc.X, cccc.Y + 1000));
-            nozzleEntities.outlineList.Add(lineref02);
+            //CDPoint cccc = workingPointService.ContactPoint("leftroofpoint", ref refPoint, ref newCurPoint);
+            //Line lineref02 = new Line(new Point3D(cccc.X, cccc.Y), new Point3D(cccc.X, cccc.Y + 1000));
+            //nozzleEntities.outlineList.Add(lineref02);
 
             //CDPoint ccccc = workingPointService.ContactPoint("leftroofpoint", "70", ref refPoint, ref newCurPoint);
-            CDPoint ccccc = workingPointService.ContactPoint("leftroofpoint", "3793.6", ref refPoint, ref newCurPoint);
-            Line lineref03 = new Line(new Point3D(ccccc.X, ccccc.Y), new Point3D(ccccc.X, ccccc.Y + 1000));
-            nozzleEntities.outlineList.Add(lineref03);
+            //CDPoint ccccc = workingPointService.ContactPoint("leftroofpoint", "3793.6", ref refPoint, ref newCurPoint);
+            //Line lineref03 = new Line(new Point3D(ccccc.X, ccccc.Y), new Point3D(ccccc.X, ccccc.Y + 1000));
+            //nozzleEntities.outlineList.Add(lineref03);
 
             return nozzleEntities;
         }
@@ -502,9 +502,6 @@ namespace DrawWork.DrawServices
             adjPoint.Y = drawPoint.Y + (fullHeight / 2);
 
 
-            Line lineRef = new Line(GetSumPoint(drawPoint, 0, 0, 0), GetSumPoint(drawPoint, -1000, 0, 0));
-            customEntity.Add(lineRef);
-
             // Blind Flange
             Line lineBFa = new Line(GetSumPoint(adjPoint, 0, 0, 0), GetSumPoint(adjPoint, 0, -OD, 0));
 
@@ -590,7 +587,7 @@ namespace DrawWork.DrawServices
 
                 //CustomEntityModel dd = ((CustomEntityModel)lineNeckLeft);
                 //CustomLine ffff = dd;
-                lineNeckLeft.EntityData = "aa";
+                //lineNeckLeft.EntityData = "aa";
 
                 
                 customEntity.Add(lineNeckLeft);
@@ -1216,11 +1213,11 @@ namespace DrawWork.DrawServices
                     switch (selLR)
                     {
                         case "left":
-                            adjPoint = workingPointService.ContactPoint("leftshelladj", newValue.ToString(), ref refPoint, ref curPoint);
+                            adjPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjLeftShell, newValue.ToString(), ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X + convergenceValue, adjPoint.Y, 0);
                             break;
                         case "right":
-                            adjPoint = workingPointService.ContactPoint("rightshelladj", newValue.ToString(), ref refPoint, ref curPoint);
+                            adjPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjRightShell, newValue.ToString(), ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X + convergenceValue, adjPoint.Y, 0);
                             break;
                     }
@@ -1228,20 +1225,17 @@ namespace DrawWork.DrawServices
                 case "roof":
 
                     // Roof Slope
-                    string roofSlopeString = assemblyData.RoofInput[0].RoofSlopeOne;
-                    double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
-                    double roofThickness = valueService.GetDoubleValue(assemblyData.RoofInput[0].RoofThickness);
-                    double roofSlopeHeight = roofThickness / Math.Cos(roofSlopeDegree);
+                    double roofSlopeHeight = valueService.GetHypotenuseByWidth(assemblyData.RoofInput[0].RoofSlopeOne, assemblyData.RoofInput[0].RoofThickness);
                     //double roofSlopeHeight = roofThickness * Math.Cos(roofSlopeDegree);
 
                     switch (selLR)
                     {
                         case "left":
-                            adjPoint = workingPointService.ContactPoint("centerroofadj", (-newValue).ToString(), ref refPoint, ref curPoint);
+                            adjPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, (-newValue).ToString(), ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X , adjPoint.Y + roofSlopeHeight + convergenceValue, 0);
                             break;
                         case "right":
-                            adjPoint = workingPointService.ContactPoint("centerroofadj", (-newValue).ToString(), ref refPoint, ref curPoint);
+                            adjPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, (-newValue).ToString(), ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X + (newValue*2), adjPoint.Y + roofSlopeHeight + convergenceValue, 0);
                             break;
                     }

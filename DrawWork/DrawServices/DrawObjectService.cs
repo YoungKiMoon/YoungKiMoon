@@ -18,6 +18,7 @@ using DrawWork.CommandModels;
 
 using AssemblyLib.AssemblyModels;
 using System.Diagnostics;
+using DrawWork.Commons;
 
 namespace DrawWork.DrawServices
 {
@@ -70,7 +71,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "":
                     case "xy":
@@ -100,7 +101,7 @@ namespace DrawWork.DrawServices
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
                 string newValue = "";
-                string newName = eachCmd[j].ToLower();
+                string newName = eachCmd[j];
                 if (j + 1 <= eachCmd.Length)
                     newValue = eachCmd[j + 1];
 
@@ -134,7 +135,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "xy1":
                         if (j + 1 <= eachCmd.Length)
@@ -165,12 +166,12 @@ namespace DrawWork.DrawServices
             Line customLineMethod = null;
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "mirror":
                         if (j + 1 <= eachCmd.Length)
                         {
-                            switch (eachCmd[j + 1].ToLower())
+                            switch (eachCmd[j + 1])
                             {
                                 case "right":
 
@@ -218,7 +219,7 @@ namespace DrawWork.DrawServices
             // Working Point
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "wp":
                     case "workingpoint":
@@ -258,7 +259,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "xy1":
                         if (j + 1 <= eachCmd.Length)
@@ -299,12 +300,12 @@ namespace DrawWork.DrawServices
             {
                 for (int j = refIndex; j < eachCmd.Length; j += 2)
                 {
-                    switch (eachCmd[j].ToLower())
+                    switch (eachCmd[j])
                     {
                         case "mirror":
                             if (j + 1 <= eachCmd.Length)
                             {
-                                switch (eachCmd[j + 1].ToLower())
+                                switch (eachCmd[j + 1])
                                 {
                                     case "right":
 
@@ -355,7 +356,7 @@ namespace DrawWork.DrawServices
             // Working Point
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "wp":
                     case "workingpoint":
@@ -398,7 +399,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
@@ -447,7 +448,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "xy1":
                         if (j + 1 <= eachCmd.Length)
@@ -497,7 +498,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
@@ -556,7 +557,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
@@ -622,7 +623,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
 
                     case "type":
@@ -691,11 +692,11 @@ namespace DrawWork.DrawServices
             {
                 if (j + 1 < eachCmd.Length)
                 {
-                    newPoint1 = workingPointService.ContactPoint(eachCmd[j].ToLower(), eachCmd[j + 1].ToLower(), ref refPoint, ref curPoint);
+                    newPoint1 = workingPointService.ContactPoint(eachCmd[j], eachCmd[j + 1], ref refPoint, ref curPoint);
                 }
                 else
                 {
-                    newPoint1 = workingPointService.ContactPoint(eachCmd[j].ToLower(), ref refPoint, ref curPoint);
+                    newPoint1 = workingPointService.ContactPoint(eachCmd[j], ref refPoint, ref curPoint);
                 }
                 if (newPoint1 != null)
                 {
@@ -736,7 +737,7 @@ namespace DrawWork.DrawServices
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
                 string newValue = "";
-                string newName = eachCmd[j].ToLower();
+                string newName = eachCmd[j];
                 if (j + 1 <= eachCmd.Length)
                     newValue = eachCmd[j + 1];
                 
@@ -839,7 +840,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "xy":
                     case "xy1":
@@ -948,7 +949,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "name":
                         if (j + 1 <= eachCmd.Length)
@@ -1007,7 +1008,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
@@ -1036,14 +1037,14 @@ namespace DrawWork.DrawServices
             {
                 for (int j = refIndex; j < eachCmd.Length; j += 2)
                 {
-                    switch (eachCmd[j].ToLower())
+                    switch (eachCmd[j])
                     {
                         case "mirror":
 
-                            newMirrorPoint= workingPointService.ContactPoint("centerlinebottompoint",ref refPoint, ref curPoint);
+                            newMirrorPoint= workingPointService.ContactPoint(WORKINGPOINT_TYPE.PointCenterBottomDown, ref refPoint, ref curPoint);
                             if (j + 1 <= eachCmd.Length)
                             {
-                                switch (eachCmd[j + 1].ToLower())
+                                switch (eachCmd[j + 1])
                                 {
                                     case "right":
 
@@ -1086,7 +1087,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
@@ -1131,12 +1132,12 @@ namespace DrawWork.DrawServices
             {
                 for (int j = refIndex; j < eachCmd.Length; j += 2)
                 {
-                    switch (eachCmd[j].ToLower())
+                    switch (eachCmd[j])
                     {
                         case "mirror":
                             if (j + 1 <= eachCmd.Length)
                             {
-                                switch (eachCmd[j + 1].ToLower())
+                                switch (eachCmd[j + 1])
                                 {
                                     case "right":
 
@@ -1176,7 +1177,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
@@ -1205,12 +1206,12 @@ namespace DrawWork.DrawServices
             {
                 for (int j = refIndex; j < eachCmd.Length; j += 2)
                 {
-                    switch (eachCmd[j].ToLower())
+                    switch (eachCmd[j])
                     {
                         case "mirror":
                             if (j + 1 <= eachCmd.Length)
                             {
-                                switch (eachCmd[j + 1].ToLower())
+                                switch (eachCmd[j + 1])
                                 {
                                     case "right":
 
@@ -1252,7 +1253,7 @@ namespace DrawWork.DrawServices
 
             for (int j = refIndex; j < eachCmd.Length; j += 2)
             {
-                switch (eachCmd[j].ToLower())
+                switch (eachCmd[j])
                 {
                     case "xy":
                         if (j + 1 <= eachCmd.Length)
@@ -1281,15 +1282,15 @@ namespace DrawWork.DrawServices
             {
                 for (int j = refIndex; j < eachCmd.Length; j += 2)
                 {
-                    switch (eachCmd[j].ToLower())
+                    switch (eachCmd[j])
                     {
                         case "mirror":
 
-                            newMirrorPoint = workingPointService.ContactPoint("centerlinebottompoint", ref refPoint, ref curPoint);
+                            newMirrorPoint = workingPointService.ContactPoint(WORKINGPOINT_TYPE.PointCenterBottomDown, ref refPoint, ref curPoint);
 
                             if (j + 1 <= eachCmd.Length)
                             {
-                                switch (eachCmd[j + 1].ToLower())
+                                switch (eachCmd[j + 1])
                                 {
                                     case "right":
 

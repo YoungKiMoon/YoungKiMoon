@@ -12,6 +12,10 @@ namespace DrawWork.CommandModels
         {
             CommandText = "";
         }
+        public CommandLineModel(string selCommandText)
+        {
+            CommandText = selCommandText;
+        }
 
         private string _CommandText;
         public string CommandText

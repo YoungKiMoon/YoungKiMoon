@@ -94,6 +94,9 @@ namespace DrawWork.Commons
     {
         NotSet = 0,
 
+        // Point : Reference
+        PointReference =100,
+
         // Point : Center
         PointCenterTopUp = 1,
         PointCenterTopDown = 2,
@@ -102,7 +105,7 @@ namespace DrawWork.Commons
         PointCenterBottomDown = 4,
 
         PointCenterTop = 5,
-        PointCenterBttom = 6,
+        PointCenterBottom = 6,
 
         // Point : Botom
         PointLeftBottomUp = 7,
@@ -133,6 +136,7 @@ namespace DrawWork.Commons
 
         // Adj : Shell
         AdjLeftShell = 23,
+        AdjRightShell = 24,
     }
 
 

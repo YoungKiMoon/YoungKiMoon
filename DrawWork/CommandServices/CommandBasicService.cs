@@ -28,6 +28,8 @@ namespace DrawWork.CommandServices
         public TranslateDataOutputService commandOutput;
         public DrawObjectService drawObject;
 
+        public DrawBoundaryService boundaryService;
+
         public object singleModel;
 
         public DrawEntityModel drawEntity;
@@ -51,6 +53,8 @@ namespace DrawWork.CommandServices
             commandOutput = new TranslateDataOutputService();
 
             drawObject = new DrawObjectService(selAssembly, singleModel);
+            boundaryService = new DrawBoundaryService(selAssembly);
+
 
             drawEntity = new DrawEntityModel();
             commandEntities = new List<Entity>();
@@ -61,7 +65,18 @@ namespace DrawWork.CommandServices
         #region CommandData
         public void SetCommandData(List<CommandLineModel> selCommandList)
         {
-            commandData.commandList = selCommandList;
+            commandData.commandList = CommandTextToLower(selCommandList);
+
+        }
+        private List<CommandLineModel> CommandTextToLower(List<CommandLineModel> selCommandList)
+        {
+            List<CommandLineModel> newCommandList = new List<CommandLineModel>();
+            foreach (CommandLineModel eachCommand in selCommandList)
+            {
+                newCommandList.Add(new CommandLineModel(eachCommand.CommandText.ToLower()));
+            }
+
+            return newCommandList;
         }
         #endregion
 
@@ -77,13 +92,19 @@ namespace DrawWork.CommandServices
         {
             singleModel = selModel;
         }
-        
+
+        #endregion
+
+        #region ReferencePoint
+        public void SetDrawPoint(DrawPointModel selDrawPoint)
+        {
+            commandData.drawPoint.referencePoint = selDrawPoint.referencePoint;
+            commandData.drawPoint.currentPoint = selDrawPoint.currentPoint;
+        }
         #endregion
 
 
-
-
-        #region Execute
+        #region Execute : Create Entity
         public void ExecuteCommand()
         {
 
@@ -95,8 +116,16 @@ namespace DrawWork.CommandServices
             // Create OutputData
             commandOutput.CreateOutputData(assemblyData);
 
-            CDPoint refPoint = commandData.drawPoint.referencePoint;
-            CDPoint curPoint = commandData.drawPoint.currentPoint;
+
+            // Create ReferencePoint
+            DrawPointModel drawPoint= GetReferencePoint();
+            CDPoint refPoint = drawPoint.referencePoint;
+            CDPoint curPoint = drawPoint.currentPoint;
+
+            SetDrawPoint(drawPoint);
+
+            // Create Boundary
+            boundaryService.CreateBoundary(drawPoint);
 
             // Create Entity
             foreach (string[] eachCmd in commandData.commandListTransFunciton)
@@ -125,12 +154,39 @@ namespace DrawWork.CommandServices
             commandEntities.AddRange(autoDimService.SetLineBreak(singleModel as Model, drawEntity));
             commandEntities.AddRange(drawEntity.blockList);
 
-            commandData.drawPoint.referencePoint = refPoint;
-            commandData.drawPoint.currentPoint = curPoint;
+
         }
         #endregion
 
-       
+
+        #region Reference Point
+        private DrawPointModel GetReferencePoint()
+        {
+            DrawPointModel drawPoint = new DrawPointModel();
+            CDPoint refPoint = new CDPoint();
+            CDPoint curPoint = new CDPoint();
+
+            foreach (string[] eachCmd in commandData.commandListTransFunciton)
+            {
+                if (eachCmd == null)
+                    continue;
+
+                string cmdObject = eachCmd[0];
+                switch (cmdObject)
+                {
+                    case "refpoint":
+                        drawObject.DoRefPoint(eachCmd, ref refPoint, ref curPoint);
+                        break;
+                }                
+            }
+
+            drawPoint.referencePoint = refPoint;
+            drawPoint.currentPoint = curPoint;
+
+            return drawPoint;
+        }
+        
+        #endregion
 
 
         #region DrawLogic
@@ -140,7 +196,7 @@ namespace DrawWork.CommandServices
 
             CommandFunctionModel newCmdFunction = new CommandFunctionModel();
             List<CommandPropertiyModel> newCmdProperty = new List<CommandPropertiyModel>();
-            string cmdObject = eachCmd[0].ToLower();
+            string cmdObject = eachCmd[0];
 
             switch (cmdObject)
             {

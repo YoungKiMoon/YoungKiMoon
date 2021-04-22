@@ -62,6 +62,7 @@ namespace DrawWork
 
 
 
+        // Create
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             MainWindowViewModel selView = this.DataContext as MainWindowViewModel;
@@ -73,9 +74,9 @@ namespace DrawWork
             {
                 TextFileService newFileService = new TextFileService();
                 string[] newComData = newFileService.GetTextFileArray(logicFile.Text);
-                selView.commandData.commandList = new List<CommandLineModel>();
+                //selView.commandData.commandList = new List<CommandLineModel>();
                 foreach (string eachText in newComData)
-                    selView.commandData.commandList.Add(new CommandLineModel { CommandText = eachText });
+                    selView.commandData.commandList.Add(new CommandLineModel(eachText));
             }
 
             LogicBuilder testBuilder = selView.GetLogicBuilder();

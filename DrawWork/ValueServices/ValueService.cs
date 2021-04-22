@@ -98,7 +98,7 @@ namespace DrawWork.ValueServices
         #region Trigonometric Function
         public double GetOppositeByWidth(string selSlope, string selWidth)
         {
-            return GetOppositeByWidth(selSlope, GetDoubleValue(selWidth));
+            return GetOppositeByWidth(GetDegreeOfSlope(selSlope), GetDoubleValue(selWidth));
         }
         public double GetOppositeByWidth(string selSlope, double selWidth)
         {
@@ -106,22 +106,39 @@ namespace DrawWork.ValueServices
         }
         public double GetOppositeByWidth(double selDegree, double selWidth)
         {
-            return Math.Sin(selDegree) * selWidth;
+            // Tan = O/A
+            // O = Tan * A
+            return Math.Tan(selDegree) * selWidth;
         }
         public double GetAdjacentByHeight(string selSlope, string selHeight)
         {
-            return GetAdjacentByHeight(selSlope, GetDoubleValue(selHeight));
+            return GetAdjacentByHeight(GetDegreeOfSlope(selSlope), GetDoubleValue(selHeight));
         }
         public double GetAdjacentByHeight(string selSlope, double selHeight)
         {
-            double tempDegree = GetDegreeOfSlope(selSlope);
-            return Math.Cos(tempDegree) * selHeight;
+            return GetAdjacentByHeight(GetDegreeOfSlope(selSlope), selHeight);
+        }
+        public double GetAdjacentByHeight(double selDegree, double selHeight)
+        {
+            // Tan = O/A
+            // A = O/Tan
+            return selHeight / Math.Tan(selDegree);
         }
 
-        //public double GetHypotenuseByHeigth(string selSlope,string sel)
-        //{
-        //    double roofSlopeHeight = roofThickness / Math.Cos(roofSlopeDegree);
-        //}
+        public double GetHypotenuseByWidth(string selSlope,string selWidth)
+        {
+            return GetHypotenuseByWidth(GetDegreeOfSlope(selSlope), GetDoubleValue(selWidth));
+        }
+        public double GetHypotenuseByWidth(string selSlope, double selWidth)
+        {
+            return GetHypotenuseByWidth(GetDegreeOfSlope(selSlope),selWidth);
+        }
+        public double GetHypotenuseByWidth(double selDegree, double selWidth)
+        {
+            // Cos = A/H
+            // H = A/COS
+            return selWidth / Math.Cos(selDegree);
+        }
         #endregion
 
         // 공백 제거

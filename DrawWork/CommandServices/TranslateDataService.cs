@@ -330,12 +330,12 @@ namespace DrawWork.CommandServices
             {
                 if (eachCmd != null)
                 {
-                    string cmdUsing = eachCmd[0].ToLower();
+                    string cmdUsing = eachCmd[0];
                     if (cmdUsing == "using")
                     {
                         if (eachCmd.Length > 1)
                         {
-                            usingData.Add(eachCmd[1].ToLower());
+                            usingData.Add(eachCmd[1]);
                         }
                     }
                 }
@@ -472,7 +472,7 @@ namespace DrawWork.CommandServices
 
             string[] selCmdArray = GetModelIndex(selCmdNew);
 
-            string selCmdStr = selCmdArray[0].ToLower();
+            string selCmdStr = selCmdArray[0];
             int selCmdIndex = GetIndexValue(selCmdArray[1]);
 
             // Bracket
