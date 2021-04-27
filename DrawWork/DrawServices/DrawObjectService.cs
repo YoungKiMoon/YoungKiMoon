@@ -709,7 +709,7 @@ namespace DrawWork.DrawServices
         }
 
         // Dimension
-        public Dictionary<string, List<Entity>> DoDimension(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,out List<CommandPropertiyModel> selCmdFunctionList)
+        public Dictionary<string, List<Entity>> DoDimension(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,out List<CommandPropertiyModel> selCmdFunctionList, double scaleValue)
         {
             // 0 : Object
             // 1 : Command
@@ -809,13 +809,13 @@ namespace DrawWork.DrawServices
 
             Dictionary<string,List<Entity>> returnEntity = new Dictionary<string, List<Entity>>();
 
-            returnEntity =drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newPosition,newDimHeight, newTextHeight, newTextGap, newArrowSize,newPrefix,newSuffix,newText, 0);
+            returnEntity =drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newPosition,newDimHeight, newTextHeight, newTextGap, newArrowSize,newPrefix,newSuffix,newText, 0, scaleValue);
 
             return returnEntity;
         }
 
         // Leader
-        public Dictionary<string, List<Entity>> DoLeader(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, object selModel)
+        public Dictionary<string, List<Entity>> DoLeader(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
         {
             // 0 : Object
             // 1 : Command
@@ -928,7 +928,7 @@ namespace DrawWork.DrawServices
 
             Dictionary<string, List<Entity>> returnEntity = new Dictionary<string, List<Entity>>(); ;
 
-            returnEntity = drawService.Draw_Leader(newPoint1, newLength,newPosition,newFontSize,newLayerHeight,newText,newTextSub, selModel as Model);
+            returnEntity = drawService.Draw_Leader(newPoint1, newLength,newPosition,newFontSize,newLayerHeight,newText,newTextSub, selModel as Model, scaleValue);
 
             return returnEntity;
         }

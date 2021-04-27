@@ -21,9 +21,11 @@ namespace DrawWork
 
         private void SetDrawSettingInformation()
         {
-            SingletonData.GAArea.Dimension.Length = "5000";
+            SingletonData.GAArea.Dimension.Length = "8000";
             SingletonData.GAArea.NozzleLeader.Length = "5000";
             SingletonData.GAArea.ShellCourse.Length = "5000";
+            
+            // Assembly : course 2500 : Dim Area 500 : Nozzle Area 5000
         }
     }
 }

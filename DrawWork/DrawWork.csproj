@@ -75,8 +75,9 @@
     <Compile Include="Commons\CommonGlobal.cs" />
     <Compile Include="Commons\CommonMethod.cs" />
     <Compile Include="Commons\SingletonData.cs" />
-    <Compile Include="DrawAutomationService\AutomationDimensionService.cs" />
-    <Compile Include="DrawAutomationService\AutomationLeaderService.cs" />
+    <Compile Include="DrawAreaServices\AreaService.cs" />
+    <Compile Include="DrawAutomationServices\AutomationDimensionService.cs" />
+    <Compile Include="DrawAutomationServices\AutomationLeaderService.cs" />
     <Compile Include="DrawBuilders\LogicBuilder.cs" />
     <Compile Include="DrawCustomObjectModels\CustomEntityModel.cs" />
     <Compile Include="DrawCustomObjectModels\CustomLine.cs" />
@@ -87,6 +88,10 @@
     <Compile Include="DrawModels\DrawEntityModel.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
     <Compile Include="DrawModels\DrawPositionValueModel.cs" />
+    <Compile Include="DrawModels\DrawScaleModel.cs" />
+    <Compile Include="DrawPaperServices\PaperPreviewService.cs" />
+    <Compile Include="DrawPaperServices\ViewPortSettingModel.cs" />
+    <Compile Include="DrawSacleServices\DrawScaleService.cs" />
     <Compile Include="DrawServices\DrawBoundaryService.cs" />
     <Compile Include="DrawServices\DrawImportBlockService.cs" />
     <Compile Include="DrawServices\DrawLogicBlockService.cs" />
@@ -113,11 +118,15 @@
     <Compile Include="ViewModels\AssemblyWindowViewModel.cs" />
     <Compile Include="ViewModels\EnvironmentWindowViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\PreviewWindowViewModel.cs" />
     <Compile Include="Windows\AssemblyWindow.xaml.cs">
       <DependentUpon>AssemblyWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\EnvironmentWindow.xaml.cs">
       <DependentUpon>EnvironmentWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\PreviewWindow.xaml.cs">
+      <DependentUpon>PreviewWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -138,6 +147,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\EnvironmentWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\PreviewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

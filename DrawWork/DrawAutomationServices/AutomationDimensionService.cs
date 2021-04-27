@@ -16,7 +16,7 @@ using Environment = devDept.Eyeshot.Environment;
 using DrawWork.Commons;
 using DrawWork.DrawModels;
 
-namespace DrawWork.DrawAutomationService
+namespace DrawWork.DrawAutomationServices
 {
     public class AutomationDimensionService
     {

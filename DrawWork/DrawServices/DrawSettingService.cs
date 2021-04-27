@@ -1490,63 +1490,78 @@ namespace DrawWork.DrawServices
             //singleModel.Entities.Add(newSolid, Color.Green);
 
 
-            Line c1 = new Line(new Point3D(10, 20, 0), new Point3D(10000, 1000, 0));
-            Line c2 = new Line(new Point3D(2000, 20, 0), new Point3D(2000, 1000, 0));
+            //Line c1 = new Line(new Point3D(10, 20, 0), new Point3D(10000, 1000, 0));
+            //Line c2 = new Line(new Point3D(2000, 20, 0), new Point3D(2000, 1000, 0));
 
-            Line c11 = (Line)c1.Clone();
-            Line c22 = (Line)c2.Clone();
+            //Line c11 = (Line)c1.Clone();
+            //Line c22 = (Line)c2.Clone();
 
-            Point3D[] ins= c2.IntersectWith(c1);
+            //Point3D[] ins= c2.IntersectWith(c1);
 
-            Line c222 = new Line(ins[0], new Point3D(2000, 1000, 0));
+            //Line c222 = new Line(ins[0], new Point3D(2000, 1000, 0));
 
-            singleModel.Entities.Add(c1);
-            singleModel.Entities.Add(c222);
+            //singleModel.Entities.Add(c1);
+            //singleModel.Entities.Add(c222);
 
-            
-            //c11.Rotate(UtilityEx.DegToRad(-90), Vector3D.AxisZ, new Point3D(15, 20));
-            //c22.Rotate(UtilityEx.DegToRad(-90), Vector3D.AxisZ, new Point3D(15, 20));
-            //Entity cd = c11;
+            // 나옴
+            Line c2ss = new Line(new Point3D(0, 3, 0), new Point3D(0, 50, 0));
+            singleModel.Entities.Add(c2ss);
+
+            Line c1ss = new Line(new Point3D(0, 1, 0), new Point3D(100, 300, 0));
+            singleModel.Entities.Add(c1ss);
+
+            Line c3ss = new Line(new Point3D(-100, 100, 0), new Point3D(100, 100, 0));
+            singleModel.Entities.Add(c3ss);
+
+            Line c1ss1 = new Line(new Point3D(0, 0, 0), new Point3D(50, 200, 0));
+            singleModel.Entities.Add(c1ss1,Color.Blue);
+            //Line c1ss2 = new Line(new Point3D(0, 10, 0), new Point3D(50, 10, 0));
+            //singleModel.Entities.Add(c1ss2);
+            Circle newCir = new Circle(0, 0, 0, 10);
+            //singleModel.Entities.Add(newCir);
+            //singleModel.Entities.Add(c3ss, Color.Blue);
 
 
+            //Line c3ss = new Line(new Point3D(0, 0, 0), new Point3D(0, 10000, 0));
+            //singleModel.Entities.Add(c3ss, Color.Red);
 
             //singleModel.Entities.Add(c1);
             //singleModel.Entities.Add(c2);
             //singleModel.Entities.Add(c11);
             //singleModel.Entities.Add(c22);
 
-            LinearDim ddd = new LinearDim(Plane.XY, new Point2D(10, 10), new Point2D(20, 10), new Point2D(15, 20), 4);
+            //LinearDim ddd = new LinearDim(Plane.XY, new Point2D(10, 10), new Point2D(1000, 500), new Point2D(500, 500), 200);
 
-            singleModel.Entities.Add(ddd);
+            //singleModel.Entities.Add(ddd);
 
             // Triangle
-            Triangle t = new Triangle(5, 5, 0, 10, 5, 0, 7.5, 10, 0);
-            t.ColorMethod = colorMethodType.byEntity;
-            t.Color = Color.Blue;
-            CustomRenderedTriangle customArrow = new CustomRenderedTriangle(t);
+            //Triangle t = new Triangle(5, 5, 0, 10, 5, 0, 7.5, 10, 0);
+            //t.ColorMethod = colorMethodType.byEntity;
+            //t.Color = Color.Blue;
+            //CustomRenderedTriangle customArrow = new CustomRenderedTriangle(t);
             //singleModel.Entities.Add(customArrow);
 
 
-            LinearPath sese = new LinearPath(t.Vertices);
+            //LinearPath sese = new LinearPath(t.Vertices);
 
-            HatchRegion hatch = new HatchRegion(sese);
+            //HatchRegion hatch = new HatchRegion(sese);
             //HatchRegion hatch = new HatchRegion(region.ContourList);
-            hatch.HatchName = "SOLID";
-            hatch.Color = Color.Red;
+            //hatch.HatchName = "SOLID";
+            //hatch.Color = Color.Red;
 
-            CustomRenderedHatch hhh = new CustomRenderedHatch(hatch);
+            //CustomRenderedHatch hhh = new CustomRenderedHatch(hatch);
 
-            singleModel.Entities.Add(hhh);
+            //singleModel.Entities.Add(hhh);
 
             // Mesh
-            Mesh cc = new Mesh(4, 2, Mesh.natureType.ColorPlain);
-            cc.Color = Color.Red;
+           // Mesh cc = new Mesh(4, 2, Mesh.natureType.ColorPlain);
+            //cc.Color = Color.Red;
             //singleModel.Entities.Add(cc);
 
-            Mesh dd=Mesh.CreateArrow(40, 10, 4, 5, 5, Mesh.natureType.ColorPlain);
-            dd.Color = Color.Red;
+            //Mesh dd=Mesh.CreateArrow(40, 10, 4, 5, 5, Mesh.natureType.ColorPlain);
+            //dd.Color = Color.Red;
 
-            CustomRenderedMesh cuMesh = new CustomRenderedMesh(Mesh.CreateSphere(10, 10, 10));
+            //CustomRenderedMesh cuMesh = new CustomRenderedMesh(Mesh.CreateSphere(10, 10, 10));
 
             //singleModel.Entities.Add(cuMesh);
 

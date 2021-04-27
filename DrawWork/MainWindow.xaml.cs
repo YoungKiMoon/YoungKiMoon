@@ -36,6 +36,8 @@ namespace DrawWork
     {
         DrawSettingService drawSetting;
 
+        private Drawings tempPaper;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -72,12 +74,15 @@ namespace DrawWork
 
             if (logicFilePath != "")
             {
+                selView.commandData.commandList.Clear();
                 TextFileService newFileService = new TextFileService();
                 string[] newComData = newFileService.GetTextFileArray(logicFile.Text);
                 //selView.commandData.commandList = new List<CommandLineModel>();
                 foreach (string eachText in newComData)
                     selView.commandData.commandList.Add(new CommandLineModel(eachText));
             }
+
+
 
             LogicBuilder testBuilder = selView.GetLogicBuilder();
 
@@ -106,7 +111,7 @@ namespace DrawWork
             var result = exportFileDialog.ShowDialog();
             if (result == true)
             {
-                WriteAutodeskParams wap = new WriteAutodeskParams(testModel,null, false, false);
+                WriteAutodeskParams wap = new WriteAutodeskParams(testModel, tempPaper, false, false);
                 WriteFileAsync wa = new WriteAutodesk(wap, exportFileDialog.FileName);
 
                 testModel.StartWork(wa);
@@ -248,6 +253,20 @@ namespace DrawWork
             newWinView.CreateEnvironment();
             newWin.Show();
 
+        }
+
+
+        // Preview
+        private void btnPreview_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            PreviewWindow cc = new PreviewWindow();
+            cc.Owner = this;
+            PreviewWindowViewModel previewView = cc.DataContext as PreviewWindowViewModel;
+            previewView.previewService.SetModelObject(this.testModel);
+            previewView.previewService.SetDrawingsObject(cc.testDraw);
+
+            tempPaper = cc.testDraw;
+            cc.Show();
         }
     }
 }

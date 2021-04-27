@@ -36,6 +36,9 @@ namespace DrawWork.ViewModels
 
         public LogicBuilder GetLogicBuilder()
         {
+            // Scale 1:200
+            commandService.SetScaleData(130);
+
             commandService.SetCommandData(commandData.commandList);
             commandService.ExecuteCommand();
             LogicBuilder logicB = new LogicBuilder(commandService.commandEntities);

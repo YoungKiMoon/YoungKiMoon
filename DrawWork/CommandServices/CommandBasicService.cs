@@ -12,7 +12,7 @@ using devDept.Eyeshot.Entities;
 using DrawWork.CommandModels;
 using DrawWork.DrawModels;
 using DrawWork.DrawServices;
-using DrawWork.DrawAutomationService;
+using DrawWork.DrawAutomationServices;
 
 using AssemblyLib.AssemblyModels;
 using DrawWork.Commons;
@@ -34,6 +34,7 @@ namespace DrawWork.CommandServices
 
         public DrawEntityModel drawEntity;
 
+        public DrawScaleModel scaleData;
         public List<Entity> commandEntities;
 
         //public List<Entity[]> commandDimensionEntities;
@@ -59,6 +60,7 @@ namespace DrawWork.CommandServices
             drawEntity = new DrawEntityModel();
             commandEntities = new List<Entity>();
 
+            scaleData = new DrawScaleModel();
         }
         #endregion
 
@@ -103,10 +105,18 @@ namespace DrawWork.CommandServices
         }
         #endregion
 
+        #region Scale
+        public void SetScaleData(double selScaleValue)
+        {
+            scaleData.Value = selScaleValue;
+        }
+        #endregion
 
         #region Execute : Create Entity
         public void ExecuteCommand()
         {
+            // Draw Entity Clear
+            drawEntity = new DrawEntityModel();
 
             commandData.commandListTrans = commandTranslate.TranslateCommand(commandData.commandList);
             commandTranslate.TranslateUsing(commandData.commandListTrans);
@@ -242,10 +252,10 @@ namespace DrawWork.CommandServices
                     drawEntity.outlineList.AddRange(drawObject.DoRectangle(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
 
-                // Dimension
+                // Dimension : Scale
                 case "dim":
                 case "dimline":
-                    Dictionary<string, List<Entity>> newDim = drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint,out newCmdProperty);
+                    Dictionary<string, List<Entity>> newDim = drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint,out newCmdProperty,scaleData.Value);
                     drawEntity.dimlineList.AddRange(newDim[CommonGlobal.DimLine]);
                     drawEntity.dimTextList.AddRange(newDim[CommonGlobal.DimText]);
                     drawEntity.dimlineExtList.AddRange(newDim[CommonGlobal.DimLineExt]);
@@ -278,10 +288,10 @@ namespace DrawWork.CommandServices
                     goto case "allways";
 
 
-                // Leader
+                // Leader : Scale
                 case "leader":
                 case "leaderline":
-                    Dictionary<string, List<Entity>> newLeader = drawObject.DoLeader(eachCmd, ref refPoint, ref curPoint, singleModel);
+                    Dictionary<string, List<Entity>> newLeader = drawObject.DoLeader(eachCmd, ref refPoint, ref curPoint, singleModel,scaleData.Value);
                     drawEntity.leaderlineList.AddRange(newLeader[CommonGlobal.LeaderLine]);
                     drawEntity.leaderTextList.AddRange(newLeader[CommonGlobal.LeaderText]);
                     drawEntity.leaderArrowList.AddRange(newLeader[CommonGlobal.LeaderArrow]);
