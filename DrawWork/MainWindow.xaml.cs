@@ -53,6 +53,8 @@ namespace DrawWork
 
             logicFile.Text = @"C:\Users\tree\Desktop\CAD\tabas\Sample_DrawLogic.txt";
             dwgFile.Text = @"C:\Users\tree\Desktop\CAD\tabas\Block_Sample.dwg";
+
+            inputScale.Text = "90";
         }
 
 
@@ -83,8 +85,8 @@ namespace DrawWork
             }
 
 
-
-            LogicBuilder testBuilder = selView.GetLogicBuilder();
+            double selScale = Convert.ToDouble(inputScale.Text);
+            LogicBuilder testBuilder = selView.GetLogicBuilder(selScale);
 
             // remove old block
             testModel.Entities.Clear();
@@ -264,6 +266,8 @@ namespace DrawWork
             PreviewWindowViewModel previewView = cc.DataContext as PreviewWindowViewModel;
             previewView.previewService.SetModelObject(this.testModel);
             previewView.previewService.SetDrawingsObject(cc.testDraw);
+
+            previewView.viewPortSet.Scale = inputScale.Text;
 
             tempPaper = cc.testDraw;
             cc.Show();

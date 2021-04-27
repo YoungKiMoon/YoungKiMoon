@@ -22,6 +22,7 @@ namespace DrawWork.ImportServices
             BlockArea = null;
             BlockNameList = new List<LinearPath>();
             BlockEntities = new List<Entity>();
+            BlockBasePoint = new Point3D();
         }
 
         public LinearPath BlockArea
@@ -50,5 +51,12 @@ namespace DrawWork.ImportServices
             set { _BlockName = value; }
         }
         private string _BlockName;
+
+        public Point3D BlockBasePoint
+        {
+            get { return _BlockBasePoint; }
+            set { _BlockBasePoint = value; }
+        }
+        private Point3D _BlockBasePoint;
     }
 }

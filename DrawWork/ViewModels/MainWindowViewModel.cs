@@ -34,10 +34,10 @@ namespace DrawWork.ViewModels
             commandService = new CommandBasicService(commandData.commandList, TankData, selModel);
         }
 
-        public LogicBuilder GetLogicBuilder()
+        public LogicBuilder GetLogicBuilder(double selScale)
         {
             // Scale 1:200
-            commandService.SetScaleData(130);
+            commandService.SetScaleData(selScale);
 
             commandService.SetCommandData(commandData.commandList);
             commandService.ExecuteCommand();

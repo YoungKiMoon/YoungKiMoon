@@ -15,6 +15,8 @@ using Color = System.Drawing.Color;
 using System.Collections.ObjectModel;
 using DrawWork.ValueServices;
 using DrawWork.DrawSacleServices;
+using DrawWork.DrawServices;
+using DrawWork.DrawModels;
 
 namespace DrawWork.DrawPaperServices
 {
@@ -22,6 +24,8 @@ namespace DrawWork.DrawPaperServices
     {
         ValueService valueService;
         DrawScaleService scaleService;
+
+        private DrawImportBlockService drawImportBlockService;
 
         private Model singleModel = null;
         private Drawings singleDraw=null;
@@ -37,6 +41,7 @@ namespace DrawWork.DrawPaperServices
         public void SetModelObject(Model selModel)
         {
             singleModel = selModel;
+            drawImportBlockService = new DrawImportBlockService(selModel);
         }
         public void SetDrawingsObject(Drawings selDraw)
         {
@@ -50,6 +55,7 @@ namespace DrawWork.DrawPaperServices
             singleDraw.Sheets.Clear();
             singleDraw.Entities.Clear();
             singleDraw.Blocks.Remove("newView");
+            singleDraw.Blocks.Remove("DRAW_BLOCK");
             if (singleDraw.Sheets.Count == 0)
             {
                 CreateSheet();
@@ -134,11 +140,27 @@ namespace DrawWork.DrawPaperServices
 
 
 
+            CDPoint newPoint1 = new CDPoint();
+            double scaleFactor = 1;
+            string blockName = "DRAW_BLOCK";
+            Block newBlock = drawImportBlockService.GetImportBlock(blockName);
+            singleDraw.Blocks.Add(newBlock);
+
+            BlockReference returnBlock = new BlockReference(0, 0, 0, blockName.ToUpper(),0);
+            returnBlock.Scale(scaleFactor);
+
+            returnBlock.LayerName = "LayerPaper";
+
+
+
+            singleDraw.Sheets[0].Entities.Add(returnBlock);
 
             //ViewBuilder _viewBuilder = new ViewBuilder(singleModel, singleDraw, true, ViewBuilder.operatingType.Queue);
             //_viewBuilder.AddToQueue(singleDraw, true, selSheet);
             //singleDraw.StartWork(_viewBuilder);
+            singleDraw.Entities.Regen();
 
+            
             singleDraw.UpdateBoundingBox();
             singleDraw.Invalidate();
             

@@ -29,6 +29,7 @@
                 <Button Content="Create Sample" Width="100" Click="Button_Click"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBox x:Name="inputScale" Width="50"/>
                 <Button x:Name="btnPreview" Content="Preview" Width="100" PreviewMouseLeftButtonUp="btnPreview_PreviewMouseLeftButtonUp" />
                 <Button x:Name="btnCreateDwg" Content="Create DWG" Width="100" PreviewMouseLeftButtonUp="btnCreateDwg_PreviewMouseLeftButtonUp" />
             </StackPanel>

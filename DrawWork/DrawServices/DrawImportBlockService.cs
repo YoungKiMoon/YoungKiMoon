@@ -36,5 +36,17 @@ namespace DrawWork.DrawServices
                 return null;
             }
         }
+        public Block GetImportBlock(string selBlockName)
+        {
+            Block returnBlock = null;
+            if (singleModel.Blocks.Contains(selBlockName))
+            {
+                foreach (Block eachBlock in singleModel.Blocks)
+                    if (eachBlock.Name == selBlockName)
+                        returnBlock= eachBlock;
+            }
+
+            return returnBlock;
+        }
     }
 }

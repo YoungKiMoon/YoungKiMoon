@@ -43,6 +43,24 @@ namespace DrawWork.DrawServices
             TextStyleService textService = new TextStyleService();
             singleModel.TextStyles.AddRange(textService.GetDefaultStyle());
         }
+        
+        public void SetPaperSpace(Drawings singleDraw)
+        {
+            singleDraw.Invalidate();
+
+            LineStyleService lineStyle = new LineStyleService();
+            singleDraw.LineTypes.AddRange(lineStyle.GetDefaultStyle());
+
+            LayerStyleService layerStyle = new LayerStyleService();
+            singleDraw.Layers.AddRange(layerStyle.GetDefaultStyle());
+
+            TextStyleService textService = new TextStyleService();
+            singleDraw.TextStyles.AddRange(textService.GetDefaultStyle());
+        }
+
+
+
+
 
 
         public void CreateModelSpaceSample(Model singleModel)

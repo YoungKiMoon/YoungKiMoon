@@ -18,12 +18,14 @@ namespace DrawWork.ImportServices
 {
     public class ImportBlockService
     {
-        #region CONSTRUCTOR
+
+        private string blockLayerName;
+
         public ImportBlockService()
         {
-
+            blockLayerName = "WP";
         }
-        #endregion
+        
 
         public void CreateBlock(ReadFileAsyncWithBlocks selFileData,Model selModel)
         {
@@ -31,43 +33,70 @@ namespace DrawWork.ImportServices
             List<LinearPath> boxList = new List<LinearPath>();
             List<Text> textList = new List<Text>();
             List<MultilineText> multitextList = new List<MultilineText>();
+            List<Point3D> blockBasePointList = new List<Point3D>();
+
+            List<Entity> blockSpareList = new List<Entity>();
 
             foreach (Entity eachEntity in selFileData.Entities)
             {
-                if(eachEntity is LinearPath)
+                if (eachEntity.LayerName == blockLayerName)
                 {
-                    LinearPath tempLinearPath = eachEntity as LinearPath;
-                    if (tempLinearPath.IsClosed) // Close
+                    if (eachEntity is LinearPath)
                     {
-                        boxList.Add(tempLinearPath);
+                        LinearPath tempLinearPath = eachEntity as LinearPath;
+                        if (tempLinearPath.IsClosed) // Close
+                        {
+                            boxList.Add(tempLinearPath);
+                        }
+                    }
+                    else if (eachEntity is Text)
+                    {
+                        textList.Add(eachEntity as Text);
+                    }
+                    else if (eachEntity is MultilineText)
+                    {
+                        multitextList.Add(eachEntity as MultilineText);
+                    }
+                    else if (eachEntity is Circle)
+                    {
+                        Circle tempBaseCircle = eachEntity as Circle;
+                        blockBasePointList.Add(tempBaseCircle.Center);
                     }
                 }
-                else if(eachEntity is Text)
+                else
                 {
-                    textList.Add(eachEntity as Text);
+                    blockSpareList.Add(eachEntity);
                 }
-                else if (eachEntity is MultilineText)
-                {
-                    multitextList.Add(eachEntity as MultilineText);
-                }
+
             }
 
             // Find Block Name
             List<ImportBlockModel> blockList = GetBlockList(boxList,textList,multitextList);
 
-            foreach(ImportBlockModel eachBlock in blockList)
+            // Find Base Point
+            foreach (ImportBlockModel eachBlock in blockList)
             {
-                //Point2D lowerLeftPoint = GetBoxPointOfLowerLeft(eachBlock.BlockArea.Vertices);
-                //Point2D upperRightPoint = GetBoxPointOfUpperRight(eachBlock.BlockArea.Vertices);
-
                 Point2D lowerLeftPoint = GetBoxPointOfLowerLeft(eachBlock.BlockArea.Vertices);
                 Point2D upperRightPoint = GetBoxPointOfUpperRight(eachBlock.BlockArea.Vertices);
-                //lowerLeftPoint.X= lowerLeftPoint.X+10;
-                //lowerLeftPoint.Y= lowerLeftPoint.Y+10;
-                //upperRightPoint.X = upperRightPoint.X - 10;
-                //upperRightPoint.Y = upperRightPoint.Y - 10;
 
-                foreach (Entity eachEntity in selFileData.Entities)
+                foreach (Point3D eachPoint in blockBasePointList)
+                {
+                    if (UtilityEx.PointInRect(eachPoint, lowerLeftPoint, upperRightPoint))
+                    {
+                        eachBlock.BlockBasePoint = eachPoint;
+                        break;
+                    }
+                }
+
+            }
+
+            // Find Block Entity
+            foreach (ImportBlockModel eachBlock in blockList)
+            {
+                Point2D lowerLeftPoint = GetBoxPointOfLowerLeft(eachBlock.BlockArea.Vertices);
+                Point2D upperRightPoint = GetBoxPointOfUpperRight(eachBlock.BlockArea.Vertices);
+                
+                foreach (Entity eachEntity in blockSpareList)
                 {
                     if(eachEntity is Text)
                     {
@@ -101,35 +130,80 @@ namespace DrawWork.ImportServices
                             eachBlock.BlockEntities.Add(eachEntityCom);
                         }
                     }
-                    else if(!(eachEntity is LinearPath) && !(eachEntity is BlockReference))
+                    else if (eachEntity is Ellipse)
+                    {
+                        Ellipse eachEntityEll = eachEntity as Ellipse;
+                        if (UtilityEx.PointInRect(eachEntityEll.Center, lowerLeftPoint, upperRightPoint))
+                        {
+                            eachBlock.BlockEntities.Add(eachEntityEll);
+                        }
+                    }
+                    else if (eachEntity is EllipticalArc)
+                    {
+                        EllipticalArc eachEntityEllArc = eachEntity as EllipticalArc;
+                        if (UtilityEx.PointInRect(eachEntityEllArc.Center, lowerLeftPoint, upperRightPoint))
+                        {
+                            eachBlock.BlockEntities.Add(eachEntityEllArc);
+                        }
+                    }
+                    else if (eachEntity is Text)
+                    {
+                        Text eachEntityText = eachEntity as Text;
+                        if (UtilityEx.PointInRect(eachEntityText.Vertices[0], lowerLeftPoint, upperRightPoint))
+                        {
+                            eachEntityText.StyleName = "ROMANS";
+                            eachBlock.BlockEntities.Add(eachEntityText);
+                        }
+                    }
+                    else if ( eachEntity is MultilineText)
+                    {
+                        Text eachEntityMText = eachEntity as Text;
+                        if (UtilityEx.PointInRect(eachEntityMText.Vertices[0], lowerLeftPoint, upperRightPoint))
+                        {
+                            eachEntityMText.StyleName = "ROMANS";
+                            eachBlock.BlockEntities.Add(eachEntityMText);
+                        }
+                    }
+                    else if (eachEntity is LinearPath)
                     {
                         if (UtilityEx.PointInRect(eachEntity.Vertices[0], lowerLeftPoint, upperRightPoint))
                         {
                             eachBlock.BlockEntities.Add(eachEntity);
                         }
-                        
                     }
+                    else if(eachEntity is BlockReference)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        if (UtilityEx.PointInRect(eachEntity.Vertices[0], lowerLeftPoint, upperRightPoint))
+                        {
+                            eachBlock.BlockEntities.Add(eachEntity);
+                        }
+                    }
+
+
                 }
+
             }
 
-            // Add block
+            // Add Block, Set Base Point
             foreach(ImportBlockModel eachBlock in blockList)
             {
                 if (eachBlock.BlockEntities.Count > 0)
                 {
                     if(eachBlock.BlockName != "")
                     {
-                        Point2D lowerLeftPoint = GetBoxPointOfLowerLeft(eachBlock.BlockArea.Vertices);
+                        Block newBlock = GetBlock(eachBlock.BlockName, eachBlock.BlockEntities, eachBlock.BlockBasePoint);
 
-                        Block newBlock = GetBlock(eachBlock.BlockName, eachBlock.BlockEntities);
-                        newBlock.BasePoint =new Point3D( lowerLeftPoint.X, lowerLeftPoint.Y,0);
                         selModel.Blocks.Add(newBlock);
                     }
                 }
             }
         }
 
-        private Block GetBlock(string selBlockName, List<Entity> selEntityList)
+        private Block GetBlock(string selBlockName, List<Entity> selEntityList,Point3D selBasePoint)
         {
             Block newBlock = new Block(selBlockName);
             // Layer 지정이 필요
@@ -139,7 +213,7 @@ namespace DrawWork.ImportServices
                 eachEntity.ColorMethod = colorMethodType.byLayer;
                 newBlock.Entities.Add(eachEntity);
             }
-            //newBlock.Entities.AddRange(selEntityList);            
+            newBlock.BasePoint = selBasePoint;
 
             return newBlock;
         }
@@ -155,18 +229,23 @@ namespace DrawWork.ImportServices
             // Area : One
             foreach (LinearPath eachBox in selBoxList)
             {
-                double calHeight = eachBox.Vertices[3].DistanceTo(eachBox.Vertices[4]);
-                calHeight = Math.Round(calHeight, 1, MidpointRounding.AwayFromZero);
-                if (calHeight == blockNameHeight)
+                int verticesCount = eachBox.Vertices.Length;
+                if (verticesCount > 4)
                 {
-                    nameList.Add(eachBox);
+                    double calHeight = eachBox.Vertices[3].DistanceTo(eachBox.Vertices[4]);
+                    calHeight = Math.Round(calHeight, 1, MidpointRounding.AwayFromZero);
+                    if (calHeight == blockNameHeight)
+                    {
+                        nameList.Add(eachBox);
+                    }
+                    else
+                    {
+                        ImportBlockModel newBlock = new ImportBlockModel();
+                        newBlock.BlockArea = eachBox;
+                        newList.Add(newBlock);
+                    }
                 }
-                else
-                { 
-                    ImportBlockModel newBlock = new ImportBlockModel();
-                    newBlock.BlockArea = eachBox;
-                    newList.Add(newBlock);
-                }
+
             }
 
             foreach (ImportBlockModel eachArea in newList)

@@ -29,12 +29,12 @@ namespace DrawWork.ViewModels
             viewPortSet = new ViewPortSettingModel();
 
             viewPortSet.Scale = "130";
-            viewPortSet.TargetX = "16000";
-            viewPortSet.TargetY = "13000";
-            viewPortSet.LocationX = "300";
-            viewPortSet.LocationY = "400";
-            viewPortSet.SizeX = "500";
-            viewPortSet.SizeY = "300";
+            viewPortSet.TargetX = "17000";
+            viewPortSet.TargetY = "14000";
+            viewPortSet.LocationX = "330";
+            viewPortSet.LocationY = "360";
+            viewPortSet.SizeX = "600";
+            viewPortSet.SizeY = "400";
         }
     }
 }

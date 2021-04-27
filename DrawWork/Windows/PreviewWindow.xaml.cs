@@ -1,4 +1,5 @@
-﻿using DrawWork.ViewModels;
+﻿using DrawWork.DrawServices;
+using DrawWork.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,10 +21,15 @@ namespace DrawWork.Windows
     /// </summary>
     public partial class PreviewWindow : Window
     {
+        DrawSettingService drawSetting;
+
         public PreviewWindow()
         {
             InitializeComponent();
             testDraw.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
+
+            drawSetting = new DrawSettingService();
+            drawSetting.SetPaperSpace(testDraw);
         }
 
         private void btnRefresh_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
