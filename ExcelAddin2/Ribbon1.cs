@@ -13,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows;
 using Office = Microsoft.Office.Core;
 
 // TODO:  리본(XML) 항목을 설정하려면 다음 단계를 수행하십시오.
@@ -116,6 +117,10 @@ namespace ExcelAddIn
             {
                 return Resources.list;
             }
+            else if (control.Id == "cuGroupButton01")
+            {
+                return Resources.list;
+            }
             else if (control.Id == "cuGroupButton02")
             {
                 return Resources.list;
@@ -146,7 +151,11 @@ namespace ExcelAddIn
         #region Action
         public void CallbackButton01(Office.IRibbonControl control)
         {
-            if (control.Id == "cuGroupButton01")
+            if (control.Id == "cuGroupButton00")
+            {
+                MessageBox.Show("aaa");
+            }
+            else if (control.Id == "cuGroupButton01")
             {
                 FileBaseService newFile = new FileBaseService();
                 newFile.SelectFileOfCal();
