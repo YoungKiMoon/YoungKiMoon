@@ -29,6 +29,8 @@ namespace ExcelAddIn.Panes
         }
 
 
+
+        // Main Index
         private void Ellipse_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
 
@@ -37,6 +39,16 @@ namespace ExcelAddIn.Panes
 
             ChangeProcess(currentIndex);
             ChangeSheet(currentIndex);
+        }
+
+        // Sub Index
+        private void Border_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Border currentItem = sender as Border;
+            int currentSubIndex= Grid.GetColumn(currentItem);
+            int currentIndex = Grid.GetColumn(currentItem.Parent as Grid);
+
+            ChangeSheet(currentIndex, currentSubIndex);
         }
 
         private void ChangeProcess(int currentIndex)
@@ -125,23 +137,67 @@ namespace ExcelAddIn.Panes
                     eachItem.Foreground = deactiveColor;
                 }
             }
+
+
+            // Item : Sub
+            foreach (Grid eachItem in gridProcessItemSub.Children.OfType<Grid>())
+            {
+                int colValue = Grid.GetColumn(eachItem);
+                if (currentIndex == colValue)
+                {
+                    eachItem.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    eachItem.Visibility = Visibility.Collapsed;
+                }
+
+            }
         }
 
-        private void ChangeSheet(int currentIndex)
+        private void ChangeSheet(int currentIndex,int currentSubIndex=999)
         {
             switch (currentIndex)
             {
                 case 0:
-                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_GENERAL);
+                    if (currentSubIndex == 999)
+                    {
+                        ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_GENERAL);
+                    }
+                    else
+                    {
+                        switch (currentSubIndex)
+                        {
+                            case 0:
+                                ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_GENERAL);
+                                break;
+                            case 1:
+                                ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_WELDING);
+                                break;
+                        }
+                    }
+
                     break;
                 case 1:
                     ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_ROOF);
                     break;
                 case 2:
-                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_SHEEL);
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_SHELL);
                     break;
                 case 3:
                     ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_BOTTOM);
+                    break;
+                case 4:
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_STRUCTURE);
+                    break;
+                case 5:
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_NOZZLE);
+                    break;
+                case 6:
+                    //ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_NOZZLE);
+                    break;
+                case 7:
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_APPURTENANCES);
                     break;
 
                 default:
@@ -150,9 +206,12 @@ namespace ExcelAddIn.Panes
             
         }
 
+
         private void sese_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             MessageBox.Show(Globals.Ribbons.Count().ToString());
         }
+
+
     }
 }

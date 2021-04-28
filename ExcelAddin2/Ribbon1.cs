@@ -1,7 +1,10 @@
 ﻿
+using ExcelAddIn.Commons;
+using ExcelAddIn.ExcelServices;
 using ExcelAddIn.Properties;
 using ExcelAddIn.Service;
 using ExcelAddIn.Utils;
+using ExcelAddIn.Windows;
 using Microsoft.Office.Core;
 using PaperSetting;
 using System;
@@ -79,6 +82,10 @@ namespace ExcelAddIn
             {
                 return "TAnk Basic Automation System";
             }
+            else if (control.Id == "cuGroupButton00")
+            {
+                return "ROOF TYPE";
+            }
             else if (control.Id == "cuGroupButton01")
             {
                 return "계산서 INFROM";
@@ -113,9 +120,9 @@ namespace ExcelAddIn
         #region Image
         public Bitmap GetCustomImage(IRibbonControl control)
         {
-            if (control.Id == "cuGroupButton01")
+            if (control.Id == "cuGroupButton00")
             {
-                return Resources.list;
+                return Resources.CreatePlan;
             }
             else if (control.Id == "cuGroupButton01")
             {
@@ -153,7 +160,16 @@ namespace ExcelAddIn
         {
             if (control.Id == "cuGroupButton00")
             {
-                MessageBox.Show("aaa");
+                TypePlanWindow newType = new TypePlanWindow();
+                var ss= new IntPtr(CommonAddin.GetAddinApplicationHWND());
+               
+                newType.ShowDialog();
+                ROOF_TYPE selButton = newType.selectButton;
+                if (selButton != ROOF_TYPE.NotSet)
+                {
+                    ExcelService.ChangeRoofType(selButton);
+                }
+
             }
             else if (control.Id == "cuGroupButton01")
             {

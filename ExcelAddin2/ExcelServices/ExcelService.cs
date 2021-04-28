@@ -1,5 +1,6 @@
 ﻿using ExcelAddIn.Commons;
 using ExcelAddIn.ExcelModels;
+using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,45 +42,36 @@ namespace ExcelAddIn.ExcelServices
         }
         private static void SelectSheet(Excel.Workbook selWorkBook, EXCELSHEET_LIST selSheetType)
         {
+            string selSheetName = CommonMethod.GetSheetName(selSheetType);
             foreach (Excel.Worksheet eachSheet in selWorkBook.Worksheets)
             {
-                string eachSheetName = eachSheet.Name;
-                bool selectValue = false;
-                switch (selSheetType)
-                {
-                    case EXCELSHEET_LIST.SHEET_INFORMATION:
-                        if (eachSheetName.Contains("Information"))
-                            selectValue = true;
-                        break;
-                    case EXCELSHEET_LIST.SHEET_GENERAL:
-                        if (eachSheetName.Contains("General"))
-                            selectValue = true;
-                        break;
-                    case EXCELSHEET_LIST.SHEET_SHEEL:
-                        if (eachSheetName.Contains("Shell"))
-                            selectValue = true;
-                        break;
-                    case EXCELSHEET_LIST.SHEET_ROOF:
-                        if (eachSheetName.Contains("Roof"))
-                            selectValue = true;
-                        break;
-                    case EXCELSHEET_LIST.SHEET_BOTTOM:
-                        if (eachSheetName.Contains("Bottom"))
-                            selectValue = true;
-                        break;
-
-                    default:
-                        break;
-                }
-                if (selectValue)
+                string eachSheetName = eachSheet.Name.ToLower();
+                if (selSheetName == eachSheetName)
                 {
                     eachSheet.Select();
                     break;
                 }
-
             }
 
-            Globals.ThisAddIn.roofSheet= GetActiveSheetModel("Roof");
+            //Globals.ThisAddIn.roofSheet= GetActiveSheetModel("Roof");
+        }
+
+        public static Excel.Worksheet GetWorkSheet(EXCELSHEET_LIST selSheetType)
+        {
+            Excel.Workbook selWorkBook = GetTankWorkbook();
+            Excel.Worksheet returnSheet = null;
+
+            string selSheetName = CommonMethod.GetSheetName(selSheetType);
+            foreach (Excel.Worksheet eachSheet in selWorkBook.Worksheets)
+            {
+                string eachSheetName = eachSheet.Name.ToLower();
+                if (selSheetName == eachSheetName)
+                {
+                    returnSheet = eachSheet;
+                    break;
+                }
+            }
+            return returnSheet;
         }
 
         public static ExcelWorkSheetModel GetSelectModel(xlApp selApp, string selWork, string selSheet)
@@ -203,6 +195,78 @@ namespace ExcelAddIn.ExcelServices
                 return null;
             }
 
+        }
+        #endregion
+
+
+        #region Roof Type Setting
+        public static void ChangeRoofType(ROOF_TYPE selRoofType)
+        {
+            // Roof
+            Excel.Worksheet roofSheet = GetWorkSheet(EXCELSHEET_LIST.SHEET_ROOF);
+            if(roofSheet != null)
+            {
+                Range tempRange1 = roofSheet.Range[roofSheet.Cells[1, 3], roofSheet.Cells[1, 39]];
+                tempRange1.EntireColumn.Hidden = true;
+                Range roofViewRange = null;
+
+                switch (selRoofType)
+                {
+                    case ROOF_TYPE.CRT:
+                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 3], roofSheet.Cells[1, 8]];
+                        roofViewRange.EntireColumn.Hidden = false;
+                        break;
+                    case ROOF_TYPE.DRT:
+                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 10], roofSheet.Cells[1, 16]];
+                        roofViewRange.EntireColumn.Hidden = false;
+                        break;
+                    case ROOF_TYPE.IFRT:
+                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 18], roofSheet.Cells[1, 24]];
+                        roofViewRange.EntireColumn.Hidden = false;
+                        break;
+                    case ROOF_TYPE.EFRTSingle:
+                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 26], roofSheet.Cells[1, 32]];
+                        roofViewRange.EntireColumn.Hidden = false;
+                        break;
+                    case ROOF_TYPE.EFRTDouble:
+                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 34], roofSheet.Cells[1, 39]];
+                        roofViewRange.EntireColumn.Hidden = false;
+                        break;
+                }
+            }
+
+            // Structure
+            Excel.Worksheet structureSheet = GetWorkSheet(EXCELSHEET_LIST.SHEET_STRUCTURE);
+            if (structureSheet != null)
+            {
+                Range tempRange1 = structureSheet.Range[structureSheet.Cells[1, 3], structureSheet.Cells[1, 59]];
+                tempRange1.EntireColumn.Hidden = true;
+                Range structureViewRange = null;
+
+                switch (selRoofType)
+                {
+                    case ROOF_TYPE.CRT:
+                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 3], structureSheet.Cells[1, 13]];
+                        structureViewRange.EntireColumn.Hidden = false;
+                        break;
+                    case ROOF_TYPE.DRT:
+                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 15], structureSheet.Cells[1, 25]];
+                        structureViewRange.EntireColumn.Hidden = false;
+                        break;
+                    case ROOF_TYPE.IFRT:
+                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 27], structureSheet.Cells[1, 37]];
+                        structureViewRange.EntireColumn.Hidden = false;
+                        break;
+                    case ROOF_TYPE.EFRTSingle:
+                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 39], structureSheet.Cells[1, 48]];
+                        structureViewRange.EntireColumn.Hidden = false;
+                        break;
+                    case ROOF_TYPE.EFRTDouble:
+                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 50], structureSheet.Cells[1, 59]];
+                        structureViewRange.EntireColumn.Hidden = false;
+                        break;
+                }
+            }
         }
         #endregion
     }

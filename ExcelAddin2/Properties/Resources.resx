@@ -127,6 +127,9 @@
   <data name="angle_list" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\angle_list.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="CreatePlan" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CreatePlan.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="iTank2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\iTank2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

@@ -109,7 +109,7 @@
                     <Ellipse Width="10" Height="10" Fill="White" IsHitTestVisible="False"/>
                 </Grid>
             </Grid>
-            <Grid x:Name="gridProcessText" Height="30" Margin="40,0,40,30" VerticalAlignment="Bottom">
+            <Grid x:Name="gridProcessText" Height="30" Margin="40,0,40,40" VerticalAlignment="Bottom">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
@@ -129,7 +129,44 @@
                 <TextBlock Grid.Column="6" Text="Access" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
                 <TextBlock Grid.Column="7" Text="Appurtenances" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
             </Grid>
-
+            <Grid x:Name="gridProcessItemSub" Height="20" Margin="40,0,40,24" VerticalAlignment="Bottom" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Border CornerRadius="6" Grid.Column="0" Background="#FF7BEEC6" Margin="1,0" Width="60" Cursor="Hand" PreviewMouseLeftButtonUp="Border_PreviewMouseLeftButtonUp">
+                        <TextBlock Grid.Column="0" Text="General" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
+                    </Border>
+                    <Border CornerRadius="6" Grid.Column="1" Background="#FF7BEEC6" Margin="1,0" Width="60" Cursor="Hand" PreviewMouseLeftButtonUp="Border_PreviewMouseLeftButtonUp">
+                        <TextBlock Grid.Column="1" Text="Welding"  FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF4C4C4F" FontFamily="Malgun Gothic" FontWeight="Bold"/>
+                    </Border>
+                </Grid>
+                <Grid Grid.Column="1">
+                </Grid>
+                <Grid Grid.Column="2">
+                </Grid>
+                <Grid Grid.Column="3">
+                </Grid>
+                <Grid Grid.Column="4">
+                </Grid>
+                <Grid Grid.Column="5">
+                </Grid>
+                <Grid Grid.Column="6">
+                </Grid>
+                <Grid Grid.Column="7">
+                </Grid>
+            </Grid>
 
 
 

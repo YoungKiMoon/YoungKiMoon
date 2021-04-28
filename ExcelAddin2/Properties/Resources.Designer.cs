@@ -93,6 +93,16 @@ namespace ExcelAddIn.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
+        internal static System.Drawing.Bitmap CreatePlan {
+            get {
+                object obj = ResourceManager.GetObject("CreatePlan", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
         internal static System.Drawing.Bitmap iTank2 {
             get {
                 object obj = ResourceManager.GetObject("iTank2", resourceCulture);

@@ -1,0 +1,42 @@
+﻿<Window x:Class="ExcelAddIn.Windows.TypePlanWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ExcelAddIn.Windows"
+             mc:Ignorable="d"
+             Topmost="True"
+             Title="ROOF TYPE" Height="160" Width="500" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid Margin="5,0,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Border x:Name="btnCRT" Grid.Row="0" Grid.Column="0" Margin="5,10,5,10" BorderThickness="4" PreviewMouseLeftButtonUp="btnCRT_PreviewMouseLeftButtonUp" Background="#FF2D95D1" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnCRT_MouseEnter" >
+                <TextBlock x:Name="textCRT" Grid.Row="1" Grid.Column="0" Text="CRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+            </Border>
+            <Border x:Name="btnDRT" Grid.Row="0" Grid.Column="1" Margin="5,10,5,10" BorderThickness="4"  PreviewMouseLeftButtonUp="btnDRT_PreviewMouseLeftButtonUp" Background="#FF2D95D1" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnDRT_MouseEnter" >
+                <TextBlock x:Name="textDRT" Grid.Row="1" Grid.Column="1" Text="DRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+            </Border>
+            <Border x:Name="btnIFRT" Grid.Row="0" Grid.Column="2" Margin="5,10,5,10" BorderThickness="4"  PreviewMouseLeftButtonUp="btnIFRT_PreviewMouseLeftButtonUp" Background="#FF2D95D1" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnIFRT_MouseEnter" >
+                <TextBlock x:Name="textIFRT" Grid.Row="1" Grid.Column="2" Text="IFRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+            </Border>
+            <Border x:Name="btnEFRTs" Grid.Row="0" Grid.Column="3" Margin="5,10,5,10" BorderThickness="4"  PreviewMouseLeftButtonUp="btnEFRTs_PreviewMouseLeftButtonUp" Background="#FF2D95D1" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnEFRTs_MouseEnter" >
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock x:Name="textEFRTs1" Grid.Row="1" Grid.Column="3" Text="EFRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+                    <TextBlock x:Name="textEFRTs2" Grid.Row="1" Grid.Column="3" Text="Single Deck" FontSize="10"  VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFBBF4F9"/>
+                </StackPanel>
+            </Border>
+            <Border x:Name="btnEFRTd" Grid.Row="0" Grid.Column="4" Margin="5,10,5,10" BorderThickness="4"  PreviewMouseLeftButtonUp="btnEFRTd_PreviewMouseLeftButtonUp" Background="#FF2D95D1" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnEFRTd_MouseEnter" >
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock x:Name="textEFRTd1" Grid.Row="1" Grid.Column="3" Text="EFRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+                    <TextBlock x:Name="textEFRTd2" Grid.Row="1" Grid.Column="3" Text="Double Deck" FontSize="10"  VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFBBF4F9"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

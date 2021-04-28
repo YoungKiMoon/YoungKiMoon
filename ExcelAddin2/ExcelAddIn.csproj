@@ -185,7 +185,9 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="Commons\CommonAddin.cs" />
     <Compile Include="Commons\CommonBase.cs" />
+    <Compile Include="Commons\CommonMethod.cs" />
     <Compile Include="ExcelModels\ExcelWorkSheetModel.cs" />
     <Compile Include="ExcelServices\ExcelService.cs" />
     <Compile Include="Panes\InputPane.cs">
@@ -212,6 +214,9 @@
     <Compile Include="Service\FileBaseService.cs" />
     <Compile Include="Utils\Notifier.cs" />
     <Compile Include="Utils\VersionData.cs" />
+    <Compile Include="Windows\TypePlanWindow.xaml.cs">
+      <DependentUpon>TypePlanWindow.xaml</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Panes\InputPane.resx">
       <DependentUpon>InputPane.cs</DependentUpon>
     </EmbeddedResource>
@@ -259,7 +264,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Ribbons\" />
-    <Folder Include="ViewModel\" />
+    <Folder Include="ViewModels\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\process.png" />
@@ -273,6 +278,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Panes\ProcessPaneWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\TypePlanWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -315,6 +324,29 @@
       <Project>{54646763-9077-4586-b318-6a50f28cda15}</Project>
       <Name>PaperSetting</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AssemblyImage\Anchor_type1.png" />
+    <Content Include="AssemblyImage\Anchor_type2.png" />
+    <Content Include="AssemblyImage\Centering_ext.png" />
+    <Content Include="AssemblyImage\Centering_int.png" />
+    <Content Include="AssemblyImage\compressionRing_detail_b.png" />
+    <Content Include="AssemblyImage\compressionRing_detail_d.png" />
+    <Content Include="AssemblyImage\compressionRing_detail_e.png" />
+    <Content Include="AssemblyImage\compressionRing_detail_i.png" />
+    <Content Include="AssemblyImage\compressionRing_detail_k.png" />
+    <Content Include="AssemblyImage\EarthLug.png" />
+    <Content Include="AssemblyImage\NamePlate.png" />
+    <Content Include="AssemblyImage\ScaffoldCableSupt.png" />
+    <Content Include="AssemblyImage\SettlementCheckPiece.png" />
+    <Content Include="AssemblyImage\ShapeSteel_Angle.png" />
+    <Content Include="AssemblyImage\ShapeSteel_Channel.png" />
+    <Content Include="AssemblyImage\ShapeSteel_Flatbar.png" />
+    <Content Include="AssemblyImage\ShapeSteel_Hbeam.png" />
+    <Content Include="AssemblyImage\Stiffening-ring_detail_c.png" />
+    <Content Include="AssemblyImage\Stiffening-ring_detail_d.png" />
+    <Content Include="AssemblyImage\Stiffening-ring_detail_e.png" />
+    <Resource Include="Resources\CreatePlan.png" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

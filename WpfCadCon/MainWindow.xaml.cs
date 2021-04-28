@@ -54,5 +54,11 @@ namespace WpfCadCon
             TestUI cc = new TestUI();
             cc.Show();
         }
+
+        private void btnReg4_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            TestTable cc = new TestTable();
+            cc.Show();
+        }
     }
 }

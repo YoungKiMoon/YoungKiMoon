@@ -12,6 +12,7 @@
             <Button x:Name="btnReg" Content="레지스트리 등록" HorizontalAlignment="Left" Width="100" Height="100" PreviewMouseLeftButtonUp="btnReg_PreviewMouseLeftButtonUp"/>
             <Button x:Name="btnReg2" Content="레지스트리 삭제" HorizontalAlignment="Left" Width="100" Height="100" PreviewMouseLeftButtonUp="btnReg2_PreviewMouseLeftButtonUp"/>
             <Button x:Name="btnReg3" Content="TestWin" HorizontalAlignment="Left" Width="100" Height="100" PreviewMouseLeftButtonUp="btnReg3_PreviewMouseLeftButtonUp"/>
+            <Button x:Name="btnReg4" Content="TESTTable" HorizontalAlignment="Left" Width="100" Height="100" PreviewMouseLeftButtonUp="btnReg4_PreviewMouseLeftButtonUp"/>
         </StackPanel>
         
     </Grid>

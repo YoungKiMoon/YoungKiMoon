@@ -7,16 +7,56 @@ namespace ExcelAddIn.Commons
 {
     public enum EXCELSHEET_LIST
     {
-        NotSet = 0,
-        SHEET_INFORMATION = 1,
-        SHEET_GENERAL = 2,
-        SHEET_SHEEL = 3,
-        SHEET_ROOF = 4,
-        SHEET_BOTTOM = 5,
-        SHEET_STRUCTURE = 6,
-        SHEET_NOZZLE = 7,
-        SHEET_ACCESS = 8,
-        SHEET_APPURTENANCES = 9,
+        NotSet,
+        
+        SHEET_GENERAL,
+        SHEET_ROOF,
+
+        SHEET_SHELL,
+        SHEET_WINDGIRDER,
+        
+        SHEET_STRUCTURE,
+        SHEET_BOTTOM,
+        
+        SHEET_APPURTENANCES,
+        SHEET_NOZZLE,
+        SHEET_WELDING,
+
+        SHEET_DWGLIST,
+        SHEET_NOTES,
+        SHEET_LEADERLIST,
+
+        SHEET_ANCHOR,
+        SHEET_APPURT,
+        SHEET_NOZZLESHELL,
+        SHEET_NOZZLEROOF,
+        SHEET_INTERNALPIPE,
+
+        SHEET_FIREFIGHTING,
+        SHEET_SUMP,
+        SHEET_COMPRESSIONRING,
+        SHEET_CENTERING,
+        SHEET_COLUMNSUPT,
+
+        SHEET_RAFTERSUPTCLIP,
+        SHEET_COLUMNRAFTER,
+        SHEET_FLANGE,
+        SHEET_PIPESCH,
+        SHEET_HBEAM,
+
+        SHEET_ANGLE,
+        SHEET_CHANNEL,
+        SHEET_FITTING,
+    }
+
+    public enum ROOF_TYPE
+    {
+        NotSet,
+        CRT,
+        DRT,
+        IFRT,
+        EFRTSingle,
+        EFRTDouble,
     }
 
     public enum CUSTOMPANE_LIST
