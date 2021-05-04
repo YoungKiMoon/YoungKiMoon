@@ -25,7 +25,7 @@ namespace ExcelAddIn
         public InputPane customInputPane;
 
         // Excel : WorkSheet
-        public ExcelWorkSheetModel roofSheet;
+        public ExcelWorkSheetModel ActionActiveSheet;
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
@@ -39,7 +39,7 @@ namespace ExcelAddIn
 
             customProcessTaskPane.Visible = true;
 
-            roofSheet = null;
+            ActionActiveSheet = null;
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)

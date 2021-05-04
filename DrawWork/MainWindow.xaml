@@ -31,10 +31,12 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBox x:Name="inputScale" Width="50"/>
                 <Button x:Name="btnPreview" Content="Preview" Width="100" PreviewMouseLeftButtonUp="btnPreview_PreviewMouseLeftButtonUp" />
+                <Button x:Name="btnCreateBlock" Content="Create Block" Width="100" PreviewMouseLeftButtonUp="btnLoadDWG_PreviewMouseLeftButtonUp" />
                 <Button x:Name="btnCreateDwg" Content="Create DWG" Width="100" PreviewMouseLeftButtonUp="btnCreateDwg_PreviewMouseLeftButtonUp" />
+
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition/>
@@ -43,7 +45,7 @@
             <TextBox x:Name="logicFile" Grid.Column="1"  Margin="0,2"/>
             
         </Grid>
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition/>

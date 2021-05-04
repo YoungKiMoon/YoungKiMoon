@@ -1,8 +1,10 @@
 ﻿using ExcelAddIn.Commons;
 using ExcelAddIn.ExcelModels;
+using ExcelAddIn.Models;
 using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows.Media;
@@ -42,18 +44,15 @@ namespace ExcelAddIn.ExcelServices
         }
         private static void SelectSheet(Excel.Workbook selWorkBook, EXCELSHEET_LIST selSheetType)
         {
-            string selSheetName = CommonMethod.GetSheetName(selSheetType);
-            foreach (Excel.Worksheet eachSheet in selWorkBook.Worksheets)
+            Excel.Worksheet newSelectSheet = GetWorkSheet(selSheetType);
+
+            if (newSelectSheet != null)
             {
-                string eachSheetName = eachSheet.Name.ToLower();
-                if (selSheetName == eachSheetName)
-                {
-                    eachSheet.Select();
-                    break;
-                }
+                newSelectSheet.Select();
+                Globals.ThisAddIn.ActionActiveSheet = GetActionActiveSheet(selSheetType, newSelectSheet);
             }
 
-            //Globals.ThisAddIn.roofSheet= GetActiveSheetModel("Roof");
+
         }
 
         public static Excel.Worksheet GetWorkSheet(EXCELSHEET_LIST selSheetType)
@@ -61,14 +60,17 @@ namespace ExcelAddIn.ExcelServices
             Excel.Workbook selWorkBook = GetTankWorkbook();
             Excel.Worksheet returnSheet = null;
 
-            string selSheetName = CommonMethod.GetSheetName(selSheetType);
-            foreach (Excel.Worksheet eachSheet in selWorkBook.Worksheets)
+            if(selWorkBook != null)
             {
-                string eachSheetName = eachSheet.Name.ToLower();
-                if (selSheetName == eachSheetName)
+                string selSheetName = CommonMethod.GetSheetName(selSheetType);
+                foreach (Excel.Worksheet eachSheet in selWorkBook.Worksheets)
                 {
-                    returnSheet = eachSheet;
-                    break;
+                    string eachSheetName = eachSheet.Name.ToLower();
+                    if (selSheetName == eachSheetName)
+                    {
+                        returnSheet = eachSheet;
+                        break;
+                    }
                 }
             }
             return returnSheet;
@@ -104,72 +106,286 @@ namespace ExcelAddIn.ExcelServices
             return newModel;
         }
 
-        public static ExcelWorkSheetModel GetActiveSheetModel(string selSheet)
+
+
+
+        #region Information Window
+        public static ExcelWorkSheetModel GetActionActiveSheet(EXCELSHEET_LIST selSheetType, Excel.Worksheet selSheet)
         {
-            InformationWindowReset();
+            SetInformationWindowArea(false,false);
 
             ExcelWorkSheetModel newModel = new ExcelWorkSheetModel();
 
             if (Globals.ThisAddIn.Application == null)
                 return newModel;
 
-            Excel.Worksheet newSheet = null;
-            newSheet = GetActiveWorkSheet();
-            if (newSheet != null)
-                if (newSheet.Name == selSheet)
-                {
-                    newModel.ExcelSheet = newSheet;
-                    newModel.ExcelSheet.SelectionChange += ExcelSheet_SelectionChange;
-                }
+
+            newModel.ExcelSheet = selSheet;
+
+            // Each Event : binding
+            ROOF_TYPE currentRoofType = GetSheetRoofType();
+            switch (selSheetType)
+            {
+                case EXCELSHEET_LIST.SHEET_ROOF:
+
+                    switch (currentRoofType)
+                    {
+                        case ROOF_TYPE.CRT:
+                            AddInformationTable(GetSheetTable(EXCELSHEET_LIST.SHEET_ANGLE));
+                            newModel.ExcelSheet.SelectionChange += ExcelSheetRoof_SelectionChange;
+                            break;
+                        case ROOF_TYPE.IFRT:
+                        case ROOF_TYPE.EFRTSingle:
+                            SetInformationWindowArea(true, false);
+                            AddInformationImage(new List<ImageModel> { new ImageModel("Roof_FRTsingleDeck", "Roof_FRTsingleDeck") });
+                            break;
+                        case ROOF_TYPE.EFRTDouble:
+                            SetInformationWindowArea(true, false);
+                            AddInformationImage(new List<ImageModel> { new ImageModel("Roof_FRTdoubleDeck", "Roof_FRTdoubleDeck") });
+                            break;
+                    }
+                    break;
+
+                case EXCELSHEET_LIST.SHEET_SHELL:
+                    newModel.ExcelSheet.SelectionChange += ExcelSheetShell_SelectionChange;
+                    break;
+
+                case EXCELSHEET_LIST.SHEET_BOTTOM:
+                    newModel.ExcelSheet.SelectionChange += ExcelSheetBottom_SelectionChange;
+                    break;
+
+                case EXCELSHEET_LIST.SHEET_STRUCTURE:
+                    switch (currentRoofType)
+                    {
+                        case ROOF_TYPE.CRT:
+                        case ROOF_TYPE.DRT:
+                            newModel.ExcelSheet.SelectionChange += ExcelSheetStructure_SelectionChange;
+                            break;
+                        case ROOF_TYPE.IFRT:
+                        case ROOF_TYPE.EFRTSingle:
+                            SetInformationWindowArea(true, false);
+                            AddInformationImage(new List<ImageModel> { new ImageModel("Structure_FRTsingleDeck", "Structure_FRTsingleDeck") });
+                            break;
+                        case ROOF_TYPE.EFRTDouble:
+                            SetInformationWindowArea(true, false);
+                            AddInformationImage(new List<ImageModel> { new ImageModel("Structure_FRTdoubleDeck", "Structure_FRTdoubleDeck") });
+                            break;
+                    }
+                    break;
+
+                case EXCELSHEET_LIST.SHEET_APPURTENANCES:
+                    newModel.ExcelSheet.SelectionChange += ExcelSheetAppurtenances_SelectionChange;
+                    break;
+
+            }
+
 
             return newModel;
         }
 
-        private static void InformationWindowReset()
+        private static void ExcelSheetAppurtenances_SelectionChange(Range Target)
+        {
+            SetInformationWindowArea(true, false);
+
+            if (Target.Column == 6)
+            {
+                if (Target.Row == 8)
+                {
+                    // Name Plate
+                    List<ImageModel> newImage = new List<ImageModel>();
+                    newImage.Add(new ImageModel("NamePlate", "Name Plate"));
+
+                    AddInformationImage(newImage);
+                }
+                else if (Target.Row == 15)
+                {
+                    // Earth Lug
+                    AddInformationImage(new List<ImageModel> { new ImageModel("EarthLug", "Earth Lug") });
+                }
+                else if (Target.Row == 31)
+                {
+                    // Settlement
+                    AddInformationImage(new List<ImageModel> { new ImageModel("SettlementCheckPiece", "Settlement Check Piece") });
+                }
+                else if (Target.Row == 40)
+                {
+                    // Scaffold Cable 
+                    AddInformationImage(new List<ImageModel> { new ImageModel("ScaffoldCableSupt", "Scaffold Cable Support") });
+                }
+            }
+        }
+
+        private static void ExcelSheetStructure_SelectionChange(Range Target)
+        {
+            SetInformationWindowArea(true, false);
+
+            if (Target.Column == 6)
+            {
+                if (Target.Row == 41)
+                {
+                    // Centering position
+                    List<ImageModel> newImage = new List<ImageModel>();
+                    newImage.Add(new ImageModel("Centering_int", "Internal"));
+                    newImage.Add(new ImageModel("Centering_ext", "External"));
+
+                    AddInformationImage(newImage);
+                }
+                else if (Target.Row == 47)
+                {
+                    AddInformationImage(new List<ImageModel> { new ImageModel("ShapeSteel_Angle", "Purlin Size") });
+                }
+                else if (Target.Row == 48)
+                {
+                    AddInformationImage(new List<ImageModel> { new ImageModel("ShapeSteel_Channel", "Rafter Size") });
+                }
+            }
+            else if (Target.Column == 18)
+            {
+                if (Target.Row == 32)
+                {
+                    // Centering position
+                    List<ImageModel> newImage = new List<ImageModel>();
+                    newImage.Add(new ImageModel("Centering_int", "Internal"));
+                    newImage.Add(new ImageModel("Centering_ext", "External"));
+
+                    AddInformationImage(newImage);
+                }
+                else if (Target.Row == 38)
+                {
+                    AddInformationImage(new List<ImageModel> { new ImageModel("ShapeSteel_Angle", "Purlin Size") });
+                }
+                else if (Target.Row == 39)
+                {
+                    AddInformationImage(new List<ImageModel> { new ImageModel("ShapeSteel_Channel", "Rafter Size") });
+                }
+            }
+        }
+
+        private static void ExcelSheetBottom_SelectionChange(Range Target)
+        {
+            SetInformationWindowArea(true, false);
+
+            if (Target.Column == 6)
+            {
+                if (Target.Row == 22)
+                {
+                    // Anchor Chair
+                    List<ImageModel> newImage = new List<ImageModel>();
+                    newImage.Add(new ImageModel("Anchor_type1", "TYPE I"));
+                    newImage.Add(new ImageModel("Anchor_type2", "TYPE II"));
+                    AddInformationImage(newImage);
+                }
+            }
+        }
+
+        private static void ExcelSheetShell_SelectionChange(Range Target)
+        {
+            SetInformationWindowArea(true, false);
+
+            if (Target.Column == 18)
+            {
+                if (Target.Row == 8)
+                {
+
+                    // Stiffening ring
+                    List<ImageModel> newImage = new List<ImageModel>();
+                    newImage.Add(new ImageModel("Stiffening-ring_detail_c", "Detail c"));
+                    newImage.Add(new ImageModel("Stiffening-ring_detail_d", "Detail d"));
+                    newImage.Add(new ImageModel("Stiffening-ring_detail_e", "Detail e"));
+                    AddInformationImage(newImage);
+                }
+                else if (Target.Row == 14 || Target.Row == 15 || Target.Row == 16)
+                {
+                    // Angle
+                    AddInformationImage(new List<ImageModel> { new ImageModel("ShapeSteel_Angle", "Angle") });
+
+                }
+            }
+        }
+
+        private static void ExcelSheetRoof_SelectionChange(Range Target)
+        {
+            SetInformationWindowArea(true, false);
+            if (Target.Column == 7)
+            {
+                if (Target.Row == 16)
+                {
+                    // Compression Ring
+                    List<ImageModel> newImage = new List<ImageModel>();
+                    newImage.Add(new ImageModel("compressionRing_detail_b", "Detail b"));
+                    newImage.Add(new ImageModel("compressionRing_detail_d", "Detail d"));
+                    newImage.Add(new ImageModel("compressionRing_detail_e", "Detail e"));
+                    newImage.Add(new ImageModel("compressionRing_detail_i", "Detail i"));
+                    newImage.Add(new ImageModel("compressionRing_detail_k", "Detail k"));
+
+                    AddInformationImage(newImage);
+                }
+                else if (Target.Row == 17)
+                {
+                    // Angle
+                    SetInformationWindowArea(true, true);
+                    AddInformationImage(new List<ImageModel> { new ImageModel("ShapeSteel_Angle", "Angle") });
+                    
+                }
+            }
+        }
+
+
+        public static void SetInformationWindowArea(bool imageVisible, bool listVisible)
         {
             if (Globals.ThisAddIn.customInputPane != null)
             {
-                Globals.ThisAddIn.customInputPane.elementHost1WPF.imageArea.Visibility = System.Windows.Visibility.Collapsed;
-                Globals.ThisAddIn.customInputPane.elementHost1WPF.listArea.Visibility = System.Windows.Visibility.Collapsed;
+                Globals.ThisAddIn.customInputPane.elementHost1WPF.imageArea.Children.Clear();
+
+                if (imageVisible)
+                {
+                    Globals.ThisAddIn.customInputPane.elementHost1WPF.imageArea.Visibility = System.Windows.Visibility.Visible;
+                }
+                else
+                {
+                    Globals.ThisAddIn.customInputPane.elementHost1WPF.imageArea.Visibility = System.Windows.Visibility.Collapsed;
+                }
+
+                if (listVisible)
+                {
+                    Globals.ThisAddIn.customInputPane.elementHost1WPF.listArea.Visibility = System.Windows.Visibility.Visible;
+                }
+                else
+                {
+                    Globals.ThisAddIn.customInputPane.elementHost1WPF.listArea.Visibility = System.Windows.Visibility.Collapsed;
+                }
+
             }
 
 
         }
-        private static void ExcelSheet_SelectionChange(Excel.Range Target)
+
+        private static void AddInformationImage(List<ImageModel> selImageList)
         {
-            Globals.ThisAddIn.customInputPane.elementHost1WPF.imageArea.Visibility = System.Windows.Visibility.Collapsed;
-            Globals.ThisAddIn.customInputPane.elementHost1WPF.listArea.Visibility = System.Windows.Visibility.Collapsed;
+            List<ImageModel> newImageList = new List<ImageModel>();
+            foreach (ImageModel eachImage in selImageList)
+                newImageList.Add(new ImageModel("/ExcelAddIn;component/AssemblyImage/" + eachImage.ImagePath + ".png", eachImage.ImageName));
 
-            if (Target.Column == 5 && (Target.Row == 8 || Target.Row == 9))
+            if (Globals.ThisAddIn.customInputPane != null)
             {
-                // angle
-                Globals.ThisAddIn.customInputPane.elementHost1WPF.listArea.Visibility = System.Windows.Visibility.Visible;
-                Globals.ThisAddIn.customInputPane.elementHost1WPF.listAreaimgItem.Source = new BitmapImage(new Uri("/ExcelAddIn;component/Resources/angle_image.png", UriKind.Relative));
-                Globals.ThisAddIn.customInputPane.elementHost1WPF.listAreaListHedaerItem.Source = new BitmapImage(new Uri("/ExcelAddIn;component/Resources/angle_header.png", UriKind.Relative));
-                Globals.ThisAddIn.customInputPane.elementHost1WPF.listAreaListItem.Source = new BitmapImage(new Uri("/ExcelAddIn;component/Resources/angle_list.png",UriKind.Relative));
-
+                if (Globals.ThisAddIn.customInputPane.Visible == false)
+                    Globals.ThisAddIn.customInputPane.Visible = true;
+                Globals.ThisAddIn.customInputPane.elementHost1WPF.AddImage(newImageList);
             }
-            else if (Target.Row == 15)
-            {
-                // abc
-                Globals.ThisAddIn.customInputPane.elementHost1WPF.imageArea.Visibility = System.Windows.Visibility.Visible;
-                Globals.ThisAddIn.customInputPane.elementHost1WPF.imageAreaimgItem.Source = new BitmapImage(new Uri("/ExcelAddIn;component/Resources/roof_a.png", UriKind.Relative));
-            }
-            else if (Target.Row == 20)
-            {
-                // k
-                Globals.ThisAddIn.customInputPane.elementHost1WPF.imageArea.Visibility = System.Windows.Visibility.Visible;
-                Globals.ThisAddIn.customInputPane.elementHost1WPF.imageAreaimgItem.Source = new BitmapImage(new Uri("/ExcelAddIn;component/Resources/roof_de.png", UriKind.Relative));
-            }
-            else if (Target.Row == 25)
-            {
-                // i
-                Globals.ThisAddIn.customInputPane.elementHost1WPF.imageArea.Visibility = System.Windows.Visibility.Visible;
-                Globals.ThisAddIn.customInputPane.elementHost1WPF.imageAreaimgItem.Source = new BitmapImage(new Uri("/ExcelAddIn;component/Resources/roof_k.png", UriKind.Relative));
-            }
-
 
         }
+        private static void AddInformationTable(ObservableCollection<TableModel> selTable)
+        {
+            if (Globals.ThisAddIn.customInputPane != null)
+            {
+                if (Globals.ThisAddIn.customInputPane.Visible == false)
+                    Globals.ThisAddIn.customInputPane.Visible = true;
+                Globals.ThisAddIn.customInputPane.elementHost1WPF.AddTable(selTable);
+            }
+        }
+
+
+        #endregion
 
         #region Excel Basic Function
         public static Excel.Worksheet GetActiveWorkSheet()
@@ -267,6 +483,97 @@ namespace ExcelAddIn.ExcelServices
                         break;
                 }
             }
+
+            // General
+            Excel.Worksheet generalSheet = GetWorkSheet(EXCELSHEET_LIST.SHEET_GENERAL);
+            if(generalSheet != null)
+            {
+                string typeString = "";
+                switch (selRoofType)
+                {
+                    case ROOF_TYPE.CRT:
+                        typeString = "CRT";
+                        break;
+                    case ROOF_TYPE.DRT:
+                        typeString = "DRT";
+                        break;
+                    case ROOF_TYPE.IFRT:
+                        typeString = "IFRT";
+                        break;
+                    case ROOF_TYPE.EFRTSingle:
+                        typeString = "EFRT_singleDeck";
+                        break;
+                    case ROOF_TYPE.EFRTDouble:
+                        typeString = "EFRT_doubleDeck";
+                        break;
+                }
+                if (typeString != "")
+                    generalSheet.Cells[14, 6] = typeString;
+
+            }
+        }
+
+        public static ROOF_TYPE GetSheetRoofType()
+        {
+            ROOF_TYPE returnValue = ROOF_TYPE.NotSet;
+            Excel.Worksheet generalSheet = GetWorkSheet(EXCELSHEET_LIST.SHEET_GENERAL);
+            if (generalSheet != null)
+            {
+                string typeString = generalSheet.Cells[14, 6].Value;
+                switch (typeString)
+                {
+                    case "CRT":
+                        returnValue = ROOF_TYPE.CRT;
+                        break;
+                    case "DRT":
+                        returnValue = ROOF_TYPE.DRT;
+                        break;
+                    case "IFRT":
+                        returnValue = ROOF_TYPE.IFRT;
+                        break;
+                    case "EFRT_singleDeck":
+                        returnValue = ROOF_TYPE.EFRTSingle;
+                        break;
+                    case "EFRT_doubleDeck":
+                        returnValue = ROOF_TYPE.EFRTDouble;
+                        break;
+                }
+            }
+            return returnValue;
+        }
+        #endregion
+
+        #region Table
+        public static ObservableCollection<TableModel> GetSheetTable(EXCELSHEET_LIST selSheet)
+        {
+            ObservableCollection<TableModel> newTable = new ObservableCollection<TableModel>();
+
+            Excel.Worksheet newSheet = GetWorkSheet(selSheet);
+            if (newSheet != null)
+            {
+                var tempTable = newSheet.Cells[3, 1].Resize[37, 7].Value;
+                if(tempTable != null)
+                {
+                    object[,] tempArray = tempTable as object[,];
+                    int maxRow =tempArray.GetLength(0);
+                    int maxCol = tempArray.GetLength(1);
+                    for(int i=1;i<=maxRow; i++)
+                    {
+                        TableModel newRow = new TableModel();
+                        newRow.COL01 = tempArray[i, 1].ToString();
+                        newRow.COL02 = tempArray[i, 2].ToString();
+                        newRow.COL03 = tempArray[i, 3].ToString();
+                        newRow.COL04 = tempArray[i, 4].ToString();
+                        newRow.COL05 = tempArray[i, 5].ToString();
+                        newRow.COL06 = tempArray[i, 6].ToString();
+                        newRow.COL07 = tempArray[i, 7].ToString();
+                        newTable.Add(newRow);
+                    }
+                }
+                
+            }
+
+            return newTable;
         }
         #endregion
     }

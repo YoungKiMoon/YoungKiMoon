@@ -1523,16 +1523,16 @@ namespace DrawWork.DrawServices
 
             // 나옴
             Line c2ss = new Line(new Point3D(0, 3, 0), new Point3D(0, 50, 0));
-            singleModel.Entities.Add(c2ss);
+            //singleModel.Entities.Add(c2ss);
 
             Line c1ss = new Line(new Point3D(0, 1, 0), new Point3D(100, 300, 0));
-            singleModel.Entities.Add(c1ss);
+            //singleModel.Entities.Add(c1ss);
 
             Line c3ss = new Line(new Point3D(-100, 100, 0), new Point3D(100, 100, 0));
-            singleModel.Entities.Add(c3ss);
+            //singleModel.Entities.Add(c3ss);
 
             Line c1ss1 = new Line(new Point3D(0, 0, 0), new Point3D(50, 200, 0));
-            singleModel.Entities.Add(c1ss1,Color.Blue);
+            //singleModel.Entities.Add(c1ss1,Color.Blue);
             //Line c1ss2 = new Line(new Point3D(0, 10, 0), new Point3D(50, 10, 0));
             //singleModel.Entities.Add(c1ss2);
             Circle newCir = new Circle(0, 0, 0, 10);

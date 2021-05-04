@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 
 using ExcelAddIn.ExcelServices;
 using ExcelAddIn.Commons;
+using ExcelAddIn.Windows;
 
 namespace ExcelAddIn.Panes
 {
@@ -26,6 +27,7 @@ namespace ExcelAddIn.Panes
         {
             InitializeComponent();
             ChangeProcess(0);
+            ChangeCurrentDesignType();
         }
 
 
@@ -51,7 +53,7 @@ namespace ExcelAddIn.Panes
             ChangeSheet(currentIndex, currentSubIndex);
         }
 
-        private void ChangeProcess(int currentIndex)
+        public void ChangeProcess(int currentIndex)
         {
             SolidColorBrush activeColor = new SolidColorBrush(Color.FromRgb(110, 128, 147));
             SolidColorBrush deactiveColor = new SolidColorBrush(Color.FromRgb(202, 209, 216));
@@ -155,7 +157,7 @@ namespace ExcelAddIn.Panes
             }
         }
 
-        private void ChangeSheet(int currentIndex,int currentSubIndex=999)
+        public void ChangeSheet(int currentIndex,int currentSubIndex=999)
         {
             switch (currentIndex)
             {
@@ -212,6 +214,80 @@ namespace ExcelAddIn.Panes
             MessageBox.Show(Globals.Ribbons.Count().ToString());
         }
 
+        private void btnDesignType_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            TypePlanWindow newType = new TypePlanWindow();
+            var ss = new IntPtr(CommonAddin.GetAddinApplicationHWND());
 
+            newType.ShowDialog();
+            ROOF_TYPE selButton = newType.selectButton;
+            if (selButton != ROOF_TYPE.NotSet)
+            {
+                // Desing Type
+                ChangeDesignType(selButton);
+
+                // Excel Value
+                ExcelService.ChangeRoofType(selButton);
+
+                // Process Panel Value
+                if (Globals.ThisAddIn.customProcessPane != null)
+                {
+                    int selIndex = 0;
+                    Globals.ThisAddIn.customProcessPane.elementHost1WPF.ChangeProcess(selIndex);
+                    Globals.ThisAddIn.customProcessPane.elementHost1WPF.ChangeSheet(selIndex);
+                }
+                else
+                {
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_GENERAL);
+                    ExcelService.SetInformationWindowArea(false, false);
+                }
+
+
+            }
+        }
+
+
+
+        #region Current Status
+        private void ChangeDesignType(ROOF_TYPE selType)
+        {
+            switch (selType)
+            {
+                case ROOF_TYPE.CRT:
+                    textDesignType01.Text = "CRT";
+                    textDesignType02.Visibility = Visibility.Collapsed;
+                    break;
+                case ROOF_TYPE.DRT:
+                    textDesignType01.Text = "DRT";
+                    textDesignType02.Visibility = Visibility.Collapsed;
+                    break;
+                case ROOF_TYPE.IFRT:
+                    textDesignType01.Text = "IFRT";
+                    textDesignType02.Visibility = Visibility.Collapsed;
+                    break;
+                case ROOF_TYPE.EFRTSingle:
+                    textDesignType01.Text = "EFRT";
+                    textDesignType02.Text = "Single Deck";
+                    textDesignType02.Visibility = Visibility.Visible;
+                    break;
+                case ROOF_TYPE.EFRTDouble:
+                    textDesignType01.Text = "EFRT";
+                    textDesignType02.Text = "Double Deck";
+                    textDesignType02.Visibility = Visibility.Visible;
+                    break;
+                default:
+                    textDesignType01.Text = "TABAS";
+                    textDesignType02.Text = "Open the file";
+                    break;
+            }
+        }
+
+        private void ChangeCurrentDesignType()
+        {
+            ROOF_TYPE currentType= ExcelService.GetSheetRoofType();
+            ChangeDesignType(currentType);
+        }
+
+        #endregion
     }
 }

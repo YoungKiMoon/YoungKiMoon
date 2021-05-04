@@ -156,6 +156,126 @@ namespace DrawWork.DrawServices
             return nozzleEntities;
         }
 
+        public DrawEntityModel DrawNozzle_GGG(ref CDPoint refPoint,
+                              string selPosition,
+                              string selNozzleType,
+                              string selNozzlePosition,
+                              string selNozzleFontSize,
+                              string selLeaderCircleSize,
+                              string selMultiColumn)
+        {
+
+            DrawEntityModel nozzleEntities = new DrawEntityModel();
+            POSITION_TYPE newNozzlePosition = CommonMethod.PositionToEnum(selNozzlePosition);
+
+            // Shell Spacing
+            DrawPositionValueModel shellSpacing = new DrawPositionValueModel();
+            shellSpacing.Left = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length);
+            shellSpacing.Right = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length);
+            shellSpacing.Top = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length);
+            shellSpacing.Bottom = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length);
+
+            // Reference Position
+            double sizeNominalId = valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId);
+            CDPoint newCurPoint = new CDPoint();
+            CDPoint centerTopPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref newCurPoint);
+            double centerTopHeight = centerTopPoint.Y;
+
+
+            // MutilColumn
+            bool multiColumnValue = selMultiColumn == "true" ? true : false;
+
+
+
+            // Nozzle List : Adjust : Sort Value
+            List<NozzleInputModel> drawNozzle = new List<NozzleInputModel>();
+            foreach (NozzleInputModel eachNozzle in assemblyData.NozzleInputModel)
+            {
+                eachNozzle.Position = eachNozzle.Position.ToLower();
+                eachNozzle.LR = eachNozzle.LR.ToLower();
+                eachNozzle.Type = eachNozzle.Type.ToLower();
+                eachNozzle.Facing = eachNozzle.Facing.ToLower();
+
+                eachNozzle.ReinforcingPadType = eachNozzle.ReinforcingPadType.ToLower();
+                eachNozzle.InletOutlet = eachNozzle.InletOutlet.ToLower();
+                eachNozzle.Interal = eachNozzle.Interal.ToLower();
+                eachNozzle.Sump = eachNozzle.Sump.ToLower();
+                eachNozzle.OtherFlange = eachNozzle.OtherFlange.ToLower();
+
+                // Sort Value
+                if (eachNozzle.Position == "shell")
+                    eachNozzle.HRSort = valueService.GetDoubleValue(eachNozzle.H);
+                else if (eachNozzle.Position == "roof")
+                    eachNozzle.HRSort = valueService.GetDoubleValue(eachNozzle.R);
+
+
+                eachNozzle.LR = eachNozzle.LR.ToLower();
+                drawNozzle.Add(eachNozzle);
+            }
+
+            // Nozzle List : Sort
+            List<NozzleInputModel> drawArrangeNozzle = drawNozzle.OrderBy(x => x.HRSort).ThenBy(x => x.LR).ThenBy(x => x.Position).ToList();
+
+            // Nozzle Start Point List : Nozzle
+            List<Point3D> NozzlePointList = new List<Point3D>();
+
+            // Nozzle Start Point List : Line
+            List<Point3D> NozzleLinePointList = new List<Point3D>();
+
+            // Nozzle : Create Model
+            foreach (NozzleInputModel eachNozzle in drawArrangeNozzle)
+            {
+                // Start Point
+                Point3D newNozzlePoint = GetPositionPoint(refPoint, eachNozzle.Position, eachNozzle.LR, eachNozzle.HRSort, 0, sizeNominalId, centerTopHeight, shellSpacing);
+                NozzlePointList.Add(newNozzlePoint);
+
+                Point3D newNozzleLinePoint = GetPositionLinePoint(refPoint, newNozzlePoint, eachNozzle, eachNozzle.Position, eachNozzle.LR, eachNozzle.HRSort, 0, sizeNominalId, centerTopHeight, shellSpacing);
+                NozzleLinePointList.Add(newNozzleLinePoint);
+                //List<Entity> customEntity = CreateNozzleModelPosition(refPoint, newNozzlePoint, eachNozzle, sizeNominalId,centerTopHeight, shellSpacing);
+                List<Entity> customEntity = CreateFlangeAll(refPoint, newNozzlePoint, eachNozzle, sizeNominalId, centerTopHeight);
+
+                // Create Model : OutLine
+                nozzleEntities.outlineList.AddRange(customEntity);
+            }
+
+
+            // Nozzel Mark Point List : Create Mark Position Arrangement 
+            List<Point3D> leaderMarkPointList = GetArrangeLeaderMarkPosition(drawArrangeNozzle, selLeaderCircleSize, multiColumnValue, sizeNominalId, centerTopHeight, shellSpacing, refPoint);
+
+            // Nozzle : Create Mark
+            int indexArrange = -1;
+            foreach (NozzleInputModel eachNozzle in drawArrangeNozzle)
+            {
+                indexArrange++;
+                Point3D drawPoint = leaderMarkPointList[indexArrange];
+                Dictionary<string, List<Entity>> customEntity = CreateNozzleLeader(drawPoint, eachNozzle, selNozzleFontSize, selLeaderCircleSize);
+                nozzleEntities.nozzleMarkList.AddRange(customEntity[CommonGlobal.NozzleMark]);
+                nozzleEntities.nozzleTextList.AddRange(customEntity[CommonGlobal.NozzleText]);
+
+            }
+
+            // Nozzle : Create Line
+            List<Entity> customLineEntity = CreateNozzleLeaderLine(refPoint, shellSpacing, drawArrangeNozzle, leaderMarkPointList, NozzleLinePointList);
+            //List<Entity> customLineEntity = CreateNozzleLeaderLine(refPoint, shellSpacing, drawArrangeNozzle, leaderMarkPointList, NozzlePointList);
+            nozzleEntities.nozzlelineList.AddRange(customLineEntity);
+
+
+            // CDPoint ccc = workingPointService.ContactPoint("topangleroofpoint",ref refPoint,ref newCurPoint);
+            //Line lineref01 = new Line(new Point3D(ccc.X,ccc.Y),new Point3D(ccc.X,ccc.Y+1000));
+            //nozzleEntities.outlineList.Add(lineref01);
+
+            //CDPoint cccc = workingPointService.ContactPoint("leftroofpoint", ref refPoint, ref newCurPoint);
+            //Line lineref02 = new Line(new Point3D(cccc.X, cccc.Y), new Point3D(cccc.X, cccc.Y + 1000));
+            //nozzleEntities.outlineList.Add(lineref02);
+
+            //CDPoint ccccc = workingPointService.ContactPoint("leftroofpoint", "70", ref refPoint, ref newCurPoint);
+            //CDPoint ccccc = workingPointService.ContactPoint("leftroofpoint", "3793.6", ref refPoint, ref newCurPoint);
+            //Line lineref03 = new Line(new Point3D(ccccc.X, ccccc.Y), new Point3D(ccccc.X, ccccc.Y + 1000));
+            //nozzleEntities.outlineList.Add(lineref03);
+
+            return nozzleEntities;
+        }
+
         #region Nozzel : Create Model : Sample
         private List<Entity> CreateNozzleModelPosition(CDPoint refPoint, Point3D startPoint, NozzleInputModel selNozzle, double selSizeNominalID, double selCenterTopHeight, DrawPositionValueModel selShellSpacing)
         {
@@ -645,6 +765,153 @@ namespace DrawWork.DrawServices
         {
             List<Entity> customEntity = new List<Entity>();
 
+
+            double G = valueService.GetDoubleValue(drawNozzle.G);
+            double OD = valueService.GetDoubleValue(drawNozzle.OD);
+            double BCD = valueService.GetDoubleValue(drawNozzle.BCD);
+            double R = 0;
+            double RRF = valueService.GetDoubleValue(drawNozzle.RRF);
+            double RFF = valueService.GetDoubleValue(drawNozzle.RFF);
+            double H = valueService.GetDoubleValue(drawNozzle.H);
+            double A = valueService.GetDoubleValue(drawNozzle.AWN);
+            double AWN = valueService.GetDoubleValue(drawNozzle.AWN);
+            double ASO = valueService.GetDoubleValue(drawNozzle.ASO);
+            double BWN = valueService.GetDoubleValue(drawNozzle.B);
+            double BBF = valueService.GetDoubleValue(drawNozzle.B);
+            double C = valueService.GetDoubleValue(drawNozzle.C);
+
+            double gasketT = valueService.GetDoubleValue(assemblyData.NozzleEtcList[0].GasketThickness);
+
+            // Facing
+            if (selNozzle.Facing == "rf")
+                R = RRF;
+            if (selNozzle.Facing == "ff")
+                R = RFF;
+
+            // type
+            if (selNozzle.Type == "wn")
+            {
+                A = AWN;
+            }
+            else
+            {
+                A = ASO;
+            }
+
+            // Pipe Thickness
+            double pipeThickness = GetPipeThickness(selNozzle.Size);
+
+            // Neck : adjust
+            double neckLengthOrigin = GetNeckLength(refPoint, drawPoint, selNozzle, selSizeNominalID, selCenterTopHeight);
+            double neckLengthReal = neckLengthOrigin - (BBF + gasketT + A);
+
+            // 전체 크기
+            double fullHeight = OD;
+            double fullWidth = neckLengthOrigin;
+
+
+
+            double sideWidth = (OD - R) / 2;
+            double sideWidth2 = (OD - H) / 2;
+            double sideWidth3 = (OD - G) / 2;
+
+            // Point Adj : 좌측 상단으로 이동 하여 그림
+            Point3D adjPoint = (Point3D)drawPoint.Clone();
+            adjPoint.X = drawPoint.X - fullWidth;
+            adjPoint.Y = drawPoint.Y + (fullHeight / 2);
+
+
+            // Blind Flange
+            Line lineBFa = new Line(GetSumPoint(adjPoint, 0, 0, 0), GetSumPoint(adjPoint, 0, -OD, 0));
+
+            Line lineBFb = new Line(GetSumPoint(adjPoint, 0, 0, 0), GetSumPoint(adjPoint, BBF - C, 0, 0));
+            Line lineBFc = new Line(GetSumPoint(adjPoint, 0, -OD, 0), GetSumPoint(adjPoint, BBF - C, -OD, 0));
+
+            Line lineBFd = new Line(GetSumPoint(adjPoint, BBF - C, 0, 0), GetSumPoint(adjPoint, BBF - C, -OD, 0));
+            //Line lineBFd = new Line(GetSumPoint(adjPoint, BBF, 0, 0), GetSumPoint(adjPoint, BBF, -sideWidth, 0));
+            //Line lineBFe = new Line(GetSumPoint(adjPoint, BBF, -OD, 0), GetSumPoint(adjPoint, BBF, -OD + sideWidth, 0));
+
+            Line lineBFf = new Line(GetSumPoint(adjPoint, BBF - C, -sideWidth, 0), GetSumPoint(adjPoint, BBF, -sideWidth, 0));
+            Line lineBFg = new Line(GetSumPoint(adjPoint, BBF - C, -OD + sideWidth, 0), GetSumPoint(adjPoint, BBF, -OD + sideWidth, 0));
+            Line lineBFh = new Line(GetSumPoint(adjPoint, BBF - C, -sideWidth, 0), GetSumPoint(adjPoint, BBF - C, -OD + sideWidth, 0));
+            customEntity.AddRange(new Entity[] { lineBFa, lineBFb, lineBFc, lineBFd, lineBFf, lineBFg, lineBFh });
+
+
+            // Gasket
+            Point3D gasketPoint = (Point3D)adjPoint.Clone();
+            gasketPoint.X = gasketPoint.X + BBF;
+
+            Line lineGAa = new Line(GetSumPoint(gasketPoint, 0, -sideWidth, 0), GetSumPoint(gasketPoint, 0, -OD + sideWidth, 0));
+            Line lineGAb = new Line(GetSumPoint(gasketPoint, gasketT, -sideWidth, 0), GetSumPoint(gasketPoint, gasketT, -OD + sideWidth, 0));
+            Line lineGAc = new Line(GetSumPoint(gasketPoint, 0, -sideWidth, 0), GetSumPoint(gasketPoint, gasketT, -sideWidth, 0));
+            Line lineGAd = new Line(GetSumPoint(gasketPoint, 0, -OD + sideWidth, 0), GetSumPoint(gasketPoint, gasketT, -OD + sideWidth, 0));
+
+            double gasketCirWidth = (R - (G - pipeThickness * 2)) / 2;
+            Line lineGAe = new Line(GetSumPoint(gasketPoint, 0, -sideWidth - gasketCirWidth, 0), GetSumPoint(gasketPoint, gasketT, -sideWidth - gasketCirWidth, 0));
+            Line lineGAf = new Line(GetSumPoint(gasketPoint, 0, -OD + sideWidth + gasketCirWidth, 0), GetSumPoint(gasketPoint, gasketT, -OD + sideWidth + gasketCirWidth, 0));
+            customEntity.AddRange(new Entity[] { lineGAa, lineGAb, lineGAc, lineGAd, lineGAe, lineGAf });
+
+            // Flange : Only WN
+            Point3D flangePoint = (Point3D)gasketPoint.Clone();
+            flangePoint.X = flangePoint.X + gasketT;
+
+            Line lineFa = new Line(GetSumPoint(flangePoint, 0, -sideWidth, 0), GetSumPoint(flangePoint, 0, -OD + sideWidth, 0));
+
+            Line lineFb = new Line(GetSumPoint(flangePoint, 0, -sideWidth, 0), GetSumPoint(flangePoint, C, -sideWidth, 0));
+            Line lineFc = new Line(GetSumPoint(flangePoint, 0, -OD + sideWidth, 0), GetSumPoint(flangePoint, C, -OD + sideWidth, 0));
+
+            Line lineFd = new Line(GetSumPoint(flangePoint, C, 0, 0), GetSumPoint(flangePoint, C, -OD, 0));
+            Line lineFe = new Line(GetSumPoint(flangePoint, BWN, 0, 0), GetSumPoint(flangePoint, BWN, -OD, 0));
+
+            Line lineFf = new Line(GetSumPoint(flangePoint, BWN, 0, 0), GetSumPoint(flangePoint, C, 0, 0));
+            Line lineFg = new Line(GetSumPoint(flangePoint, BWN, -OD, 0), GetSumPoint(flangePoint, C, -OD, 0));
+
+            Line lineFh = new Line(GetSumPoint(flangePoint, A, -sideWidth3, 0), GetSumPoint(flangePoint, A, -OD + sideWidth3, 0));
+            Line lineFi = new Line(GetSumPoint(flangePoint, A, -sideWidth3, 0), GetSumPoint(flangePoint, BWN, -sideWidth2, 0));
+            Line lineFj = new Line(GetSumPoint(flangePoint, A, -OD + sideWidth3, 0), GetSumPoint(flangePoint, BWN, -OD + sideWidth2, 0));
+            customEntity.AddRange(new Entity[] { lineFa, lineFb, lineFc, lineFd, lineFe, lineFf, lineFg, lineFh, lineFi, lineFj });
+
+
+            // Neck
+            Point3D neckPoint = (Point3D)flangePoint.Clone();
+            neckPoint.X = neckPoint.X + A;
+
+            if (neckLengthReal > 0)
+            {
+                Line lineNeckLeft = null;
+                Line lineNeckRight = null;
+                if (selNozzle.Position == "roof")
+                {
+                    double neckSlopeHeight = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, G / 2);
+
+                    switch (selNozzle.LR)
+                    {
+                        case "left":
+                            lineNeckLeft = new Line(GetSumPoint(neckPoint, 0, -OD + sideWidth3, 0), GetSumPoint(neckPoint, neckLengthReal + neckSlopeHeight, -OD + sideWidth3, 0));
+                            lineNeckRight = new Line(GetSumPoint(neckPoint, 0, -sideWidth3, 0), GetSumPoint(neckPoint, neckLengthReal - neckSlopeHeight, -sideWidth3, 0));
+                            break;
+                        case "right":
+                            lineNeckLeft = new Line(GetSumPoint(neckPoint, 0, -OD + sideWidth3, 0), GetSumPoint(neckPoint, neckLengthReal - neckSlopeHeight, -OD + sideWidth3, 0));
+                            lineNeckRight = new Line(GetSumPoint(neckPoint, 0, -sideWidth3, 0), GetSumPoint(neckPoint, neckLengthReal + neckSlopeHeight, -sideWidth3, 0));
+                            break;
+                    }
+                }
+                else
+                {
+                    lineNeckLeft = new Line(GetSumPoint(neckPoint, 0, -sideWidth3, 0), GetSumPoint(neckPoint, neckLengthReal, -sideWidth3, 0));
+                    lineNeckRight = new Line(GetSumPoint(neckPoint, 0, -OD + sideWidth3, 0), GetSumPoint(neckPoint, neckLengthReal, -OD + sideWidth3, 0));
+                }
+                //lineNeckLeft.AssyName = "neckleft";
+                //lineNeckRight.AssyName = "neckright";
+
+                //CustomEntityModel dd = ((CustomEntityModel)lineNeckLeft);
+                //CustomLine ffff = dd;
+                //lineNeckLeft.EntityData = "aa";
+
+
+                customEntity.Add(lineNeckLeft);
+                customEntity.Add(lineNeckRight);
+            }
             return customEntity;
         }
 

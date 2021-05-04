@@ -10,13 +10,32 @@
         xmlns:customCon="clr-namespace:WpfCadCon.CustomControl"
         
         mc:Ignorable="d"
-        Title="TestTable" Height="450" Width="800">
+        Title="TestTable" Height="800" Width="400">
     <Window.DataContext>
         <vm:TestTableViewModel/>
     </Window.DataContext>
     <Grid>
-        <customCon:BaseListView DataType="{x:Type mm:TableModel}" ItemsSource="{Binding Mode=OneWay,Path=TableData}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="24"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button x:Name="btnCreateImage" Content="Add Image" Click="btnCreateImage_Click"/>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid Grid.Row="1">
+                <StackPanel Grid.Row="1" Orientation="Vertical">
+                    <StackPanel x:Name="spImage" Orientation="Vertical">
 
-        </customCon:BaseListView>
+                    </StackPanel>
+                    <customCon:BaseListView DataType="{x:Type mm:TableModel}" ItemsSource="{Binding Mode=OneWay,Path=TableData}"  MaxHeight="200">
+
+                    </customCon:BaseListView>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+
+
+
     </Grid>
 </Window>

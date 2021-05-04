@@ -123,6 +123,9 @@
   -->
   <ItemGroup>
     <Reference Include="Accessibility" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -166,10 +169,6 @@
       <Private>False</Private>
       <EmbedInteropTypes>true</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
-      <Private>False</Private>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>False</Private>
     </Reference>
@@ -188,8 +187,12 @@
     <Compile Include="Commons\CommonAddin.cs" />
     <Compile Include="Commons\CommonBase.cs" />
     <Compile Include="Commons\CommonMethod.cs" />
+    <Compile Include="CustomControl\BaseListView.cs" />
     <Compile Include="ExcelModels\ExcelWorkSheetModel.cs" />
     <Compile Include="ExcelServices\ExcelService.cs" />
+    <Compile Include="Models\ImageModel.cs" />
+    <Compile Include="Models\TableModel.cs" />
+    <Compile Include="PanesViewModels\InputPaneWindowViewModel.cs" />
     <Compile Include="Panes\InputPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -326,27 +329,35 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AssemblyImage\Anchor_type1.png" />
-    <Content Include="AssemblyImage\Anchor_type2.png" />
-    <Content Include="AssemblyImage\Centering_ext.png" />
-    <Content Include="AssemblyImage\Centering_int.png" />
-    <Content Include="AssemblyImage\compressionRing_detail_b.png" />
-    <Content Include="AssemblyImage\compressionRing_detail_d.png" />
-    <Content Include="AssemblyImage\compressionRing_detail_e.png" />
-    <Content Include="AssemblyImage\compressionRing_detail_i.png" />
-    <Content Include="AssemblyImage\compressionRing_detail_k.png" />
-    <Content Include="AssemblyImage\EarthLug.png" />
-    <Content Include="AssemblyImage\NamePlate.png" />
-    <Content Include="AssemblyImage\ScaffoldCableSupt.png" />
-    <Content Include="AssemblyImage\SettlementCheckPiece.png" />
-    <Content Include="AssemblyImage\ShapeSteel_Angle.png" />
-    <Content Include="AssemblyImage\ShapeSteel_Channel.png" />
-    <Content Include="AssemblyImage\ShapeSteel_Flatbar.png" />
-    <Content Include="AssemblyImage\ShapeSteel_Hbeam.png" />
-    <Content Include="AssemblyImage\Stiffening-ring_detail_c.png" />
-    <Content Include="AssemblyImage\Stiffening-ring_detail_d.png" />
-    <Content Include="AssemblyImage\Stiffening-ring_detail_e.png" />
+    <Resource Include="AssemblyImage\Anchor_type1.png" />
+    <Resource Include="AssemblyImage\Anchor_type2.png" />
+    <Resource Include="AssemblyImage\Centering_ext.png" />
+    <Resource Include="AssemblyImage\Centering_int.png" />
+    <Resource Include="AssemblyImage\compressionRing_detail_b.png" />
+    <Resource Include="AssemblyImage\compressionRing_detail_d.png" />
+    <Resource Include="AssemblyImage\compressionRing_detail_e.png" />
+    <Resource Include="AssemblyImage\compressionRing_detail_i.png" />
+    <Resource Include="AssemblyImage\compressionRing_detail_k.png" />
+    <Resource Include="AssemblyImage\EarthLug.png" />
+    <Resource Include="AssemblyImage\NamePlate.png" />
+    <Resource Include="AssemblyImage\ScaffoldCableSupt.png" />
+    <Resource Include="AssemblyImage\SettlementCheckPiece.png" />
+    <Resource Include="AssemblyImage\ShapeSteel_Angle.png" />
+    <Resource Include="AssemblyImage\ShapeSteel_Channel.png" />
+    <Resource Include="AssemblyImage\ShapeSteel_Flatbar.png" />
+    <Resource Include="AssemblyImage\ShapeSteel_Hbeam.png" />
+    <Resource Include="AssemblyImage\Stiffening-ring_detail_c.png" />
+    <Resource Include="AssemblyImage\Stiffening-ring_detail_d.png" />
+    <Resource Include="AssemblyImage\Stiffening-ring_detail_e.png" />
     <Resource Include="Resources\CreatePlan.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="AssemblyImage\Roof_FRTdoubleDeck.png" />
+    <Resource Include="AssemblyImage\Roof_FRTsingleDeck.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="AssemblyImage\Structure_FRTdoubleDeck.png" />
+    <Resource Include="AssemblyImage\Structure_FRTsingleDeck.png" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

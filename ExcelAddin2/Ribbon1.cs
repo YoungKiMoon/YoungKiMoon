@@ -80,7 +80,7 @@ namespace ExcelAddIn
             }
             else if (control.Id == "cuGroup01")
             {
-                return "TAnk Basic Automation System";
+                return "TAnk Basic Design Automation System";
             }
             else if (control.Id == "cuGroupButton00")
             {
@@ -168,6 +168,20 @@ namespace ExcelAddIn
                 if (selButton != ROOF_TYPE.NotSet)
                 {
                     ExcelService.ChangeRoofType(selButton);
+
+                    if (Globals.ThisAddIn.customProcessPane != null)
+                    {
+                        int selIndex = 0;
+                        Globals.ThisAddIn.customProcessPane.elementHost1WPF.ChangeProcess(selIndex);
+                        Globals.ThisAddIn.customProcessPane.elementHost1WPF.ChangeSheet(selIndex);
+                    }
+                    else
+                    {
+                        ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_GENERAL);
+                        ExcelService.SetInformationWindowArea(false, false);
+                    }
+
+
                 }
 
             }
@@ -205,7 +219,8 @@ namespace ExcelAddIn
                 //UserControl2 selWpf = newService.GetWWWPaneWPF();
                 FileBaseService newFile = new FileBaseService();
                 string selFile=newFile.CreateFile();
-                Process.Start(selFile);
+                if(selFile!="")
+                    Process.Start(selFile);
             }
             else if (control.Id == "cuGroupButton06")
             {

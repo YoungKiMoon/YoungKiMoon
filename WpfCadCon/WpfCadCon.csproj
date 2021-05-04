@@ -80,6 +80,9 @@
     <Compile Include="Windows\TestUI.xaml.cs">
       <DependentUpon>TestUI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\Window1.xaml.cs">
+      <DependentUpon>Window1.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -97,6 +100,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\TestUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\Window1.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -124,6 +131,27 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="CustomImage\Anchor_type1.png" />
+    <Resource Include="CustomImage\Anchor_type2.png" />
+    <Resource Include="CustomImage\Centering_ext.png" />
+    <Resource Include="CustomImage\Centering_int.png" />
+    <Resource Include="CustomImage\compressionRing_detail_b.png" />
+    <Resource Include="CustomImage\compressionRing_detail_d.png" />
+    <Resource Include="CustomImage\compressionRing_detail_e.png" />
+    <Resource Include="CustomImage\compressionRing_detail_i.png" />
+    <Resource Include="CustomImage\compressionRing_detail_k.png" />
+    <Resource Include="CustomImage\EarthLug.png" />
+    <Resource Include="CustomImage\NamePlate.png" />
+    <Resource Include="CustomImage\ScaffoldCableSupt.png" />
+    <Resource Include="CustomImage\SettlementCheckPiece.png" />
+    <Resource Include="CustomImage\ShapeSteel_Angle.png" />
+    <Resource Include="CustomImage\ShapeSteel_Channel.png" />
+    <Resource Include="CustomImage\ShapeSteel_Flatbar.png" />
+    <Resource Include="CustomImage\ShapeSteel_Hbeam.png" />
+    <Resource Include="CustomImage\Stiffening-ring_detail_c.png" />
+    <Resource Include="CustomImage\Stiffening-ring_detail_d.png" />
+    <Resource Include="CustomImage\Stiffening-ring_detail_e.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
