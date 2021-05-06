@@ -75,6 +75,8 @@
     <Compile Include="Commons\CommonGlobal.cs" />
     <Compile Include="Commons\CommonMethod.cs" />
     <Compile Include="Commons\SingletonData.cs" />
+    <Compile Include="DataServices\AssemblyDataService.cs" />
+    <Compile Include="DataServices\ExcelDataService.cs" />
     <Compile Include="DrawAreaServices\AreaService.cs" />
     <Compile Include="DrawAutomationServices\AutomationDimensionService.cs" />
     <Compile Include="DrawAutomationServices\AutomationLeaderService.cs" />
@@ -190,7 +192,10 @@
       <Project>{09af4a28-824a-4ea4-b217-98a964d4b112}</Project>
       <Name>DrawSettingLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ExcelDataLib\ExcelDataLib.csproj">
+      <Project>{135b58cb-c30c-4500-84c4-0a67a68c7812}</Project>
+      <Name>ExcelDataLib</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

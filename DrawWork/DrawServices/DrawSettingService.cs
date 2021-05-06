@@ -1533,7 +1533,7 @@ namespace DrawWork.DrawServices
 
             Line c1ss1 = new Line(new Point3D(0, 0, 0), new Point3D(50, 200, 0));
             //singleModel.Entities.Add(c1ss1,Color.Blue);
-            //Line c1ss2 = new Line(new Point3D(0, 10, 0), new Point3D(50, 10, 0));
+            Line c1ss2 = new Line(new Point3D(0, 10, 0), new Point3D(50, 10, 0));
             //singleModel.Entities.Add(c1ss2);
             Circle newCir = new Circle(0, 0, 0, 10);
             //singleModel.Entities.Add(newCir);
@@ -1559,8 +1559,46 @@ namespace DrawWork.DrawServices
             //CustomRenderedTriangle customArrow = new CustomRenderedTriangle(t);
             //singleModel.Entities.Add(customArrow);
 
+            List<Entity> arrowList = new List<Entity>();
+            double selArrowWidth = 2.5;
+            double selArrowHeight = 0.8;
+            double selArrowHeightHalf = selArrowHeight / 2;
 
-            //LinearPath sese = new LinearPath(t.Vertices);
+            Point3D selArrowPoint = new Point3D(30, 30);
+
+            // Arrow
+            List<Point3D> newPoint = new List<Point3D>();
+            newPoint.Add(selArrowPoint);
+            newPoint.Add(new Point3D(selArrowPoint.X+selArrowWidth, selArrowPoint.Y+selArrowHeightHalf));
+            newPoint.Add(new Point3D(selArrowPoint.X + selArrowWidth, selArrowPoint.Y - selArrowHeightHalf));
+            newPoint.Add(selArrowPoint);
+            LinearPath arrowPath = new LinearPath(newPoint);
+
+            arrowList.Add(arrowPath);
+
+
+
+            // Horizontal
+            int divHeightNumber = 8;
+            double divHeight = selArrowHeight / divHeightNumber;
+            for (int i = 1; i < divHeightNumber; i++)
+                arrowList.Add(new Line(selArrowPoint, new Point3D(selArrowPoint.X + selArrowWidth, selArrowPoint.Y - selArrowHeightHalf + (divHeight*i))));
+
+            // Vertical
+            int divWidthNumber = 9;
+            double divWidth = selArrowWidth / divWidthNumber;
+            for (int i = 1; i < divWidthNumber; i++)
+            {
+                Line tempVLine = new Line(new Point3D(selArrowPoint.X + (divWidth * i), selArrowPoint.Y + selArrowHeight), new Point3D(selArrowPoint.X + (divWidth * i), selArrowPoint.Y - selArrowHeight));
+                Point3D[] tempInterPoint = arrowPath.IntersectWith(tempVLine);
+                arrowList.Add(new Line(tempInterPoint[0], tempInterPoint[1]));
+
+            }
+
+
+            singleModel.Entities.AddRange(arrowList);
+
+
 
             //HatchRegion hatch = new HatchRegion(sese);
             //HatchRegion hatch = new HatchRegion(region.ContourList);
@@ -1572,7 +1610,7 @@ namespace DrawWork.DrawServices
             //singleModel.Entities.Add(hhh);
 
             // Mesh
-           // Mesh cc = new Mesh(4, 2, Mesh.natureType.ColorPlain);
+            // Mesh cc = new Mesh(4, 2, Mesh.natureType.ColorPlain);
             //cc.Color = Color.Red;
             //singleModel.Entities.Add(cc);
 

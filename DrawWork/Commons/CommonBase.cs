@@ -140,4 +140,13 @@ namespace DrawWork.Commons
     }
 
 
+    // Excel Data Model
+    public enum EXCELDATAMODEL_TYPE
+    {
+        NotSet,
+        SingleRowData,
+        MutilRowData,
+
+    }
+
 }
