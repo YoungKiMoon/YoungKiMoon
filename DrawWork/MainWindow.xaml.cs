@@ -26,6 +26,10 @@ using devDept.Graphics;
 using devDept.Eyeshot.Entities;
 using DrawWork.ImportServices;
 using DrawWork.DrawStyleServices;
+using ExcelDataLib.ExcelServices;
+using System.Collections.ObjectModel;
+using ExcelDataLib.ExcelModels;
+using System.Diagnostics;
 
 namespace DrawWork
 {
@@ -271,6 +275,35 @@ namespace DrawWork
 
             tempPaper = cc.testDraw;
             cc.Show();
+        }
+
+        private void btnCreateExcel_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            MainWindowViewModel selView = this.DataContext as MainWindowViewModel;
+            ObservableCollection<ExcelWorkSheetModel> newSheetList = new ObservableCollection<ExcelWorkSheetModel>();
+
+            Stopwatch stopWatch = new Stopwatch(); 
+            stopWatch.Start();
+
+            ExcelApplicationService eDataService = new ExcelApplicationService(-1);
+            stopWatch.Stop();
+            TimeSpan ts = stopWatch.Elapsed;
+            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+            MessageBox.Show(elapsedTime);
+
+            stopWatch.Start();
+            newSheetList = eDataService.GetSheetListAll("TankDesign_0428.xlsm");
+            stopWatch.Stop();
+            TimeSpan ts1 = stopWatch.Elapsed;
+            string elapsedTime1 = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts1.Hours, ts1.Minutes, ts1.Seconds, ts1.Milliseconds / 10);
+            MessageBox.Show(elapsedTime1);
+
+            stopWatch.Start();
+            eDataService.GetSheetData(selView.TankData, newSheetList);
+            stopWatch.Stop();
+            TimeSpan ts2 = stopWatch.Elapsed;
+            string elapsedTime2 = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts2.Hours, ts2.Minutes, ts2.Seconds, ts2.Milliseconds / 10);
+            MessageBox.Show(elapsedTime2);
         }
     }
 }

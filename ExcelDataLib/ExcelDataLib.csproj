@@ -46,6 +46,7 @@
     <Compile Include="ExcelModels\ExcelWorkSheetModel.cs" />
     <Compile Include="ExcelServices\ExcelApplicationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\CloneService.cs" />
     <Compile Include="Utils\Notifier.cs" />
   </ItemGroup>
   <ItemGroup />

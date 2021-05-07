@@ -56,7 +56,12 @@ namespace DrawWork.DrawServices
             shellSpacing.Bottom = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length);
 
             // Reference Position
-            double sizeNominalId = valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId);
+            int refFirstIndex = 0;
+
+            //string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
+            string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalId;
+
+            double sizeNominalId = valueService.GetDoubleValue(selSizeNominalId);
             CDPoint newCurPoint = new CDPoint();
             CDPoint centerTopPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref newCurPoint);
             double centerTopHeight = centerTopPoint.Y;
@@ -176,7 +181,12 @@ namespace DrawWork.DrawServices
             shellSpacing.Bottom = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length);
 
             // Reference Position
-            double sizeNominalId = valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId);
+            int refFirstIndex = 0;
+
+            //string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
+            string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalId;
+
+            double sizeNominalId = valueService.GetDoubleValue(selSizeNominalId);
             CDPoint newCurPoint = new CDPoint();
             CDPoint centerTopPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref newCurPoint);
             double centerTopHeight = centerTopPoint.Y;

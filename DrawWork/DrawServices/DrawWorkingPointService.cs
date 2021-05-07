@@ -54,6 +54,11 @@ namespace DrawWork.DrawServices
 
         private CDPoint WorkingPointOrigin(WORKINGPOINT_TYPE selPoint, double selPointValue, ref CDPoint refPoint, ref CDPoint curPoint)
         {
+            int refFirstIndex = 0;
+
+            string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
+            string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalId;
+
             CDPoint WPPoint = new CDPoint();
             switch (selPoint)
             {
@@ -72,7 +77,7 @@ namespace DrawWork.DrawServices
                     // top angle roof point
                     CDPoint topAngleRoofPoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
 
-                    double tempWidth3 = GetDistanceX(topAngleRoofPoint.X, refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2);
+                    double tempWidth3 = GetDistanceX(topAngleRoofPoint.X, refPoint.X + valueService.GetDoubleValue(selSizeNominalId) / 2);
                     double tempHeight3 = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, tempWidth3);
 
                     WPPoint = GetSumCDPoint(topAngleRoofPoint, tempWidth3, tempHeight3);
@@ -89,7 +94,7 @@ namespace DrawWork.DrawServices
                 case WORKINGPOINT_TYPE.PointCenterBottomDown:           // 2021-04-22 완료
                     CDPoint bottomleftpoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftBottomDown, ref refPoint, ref curPoint);
 
-                    double tempWidth2 = GetDistanceX(bottomleftpoint.X, refPoint.X + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2);
+                    double tempWidth2 = GetDistanceX(bottomleftpoint.X, refPoint.X + valueService.GetDoubleValue(selSizeNominalId) / 2);
                     double tempHeight2 = valueService.GetOppositeByWidth(assemblyData.BottomInput[0].BottomSlope, tempWidth2);
 
                     WPPoint = GetSumCDPoint(bottomleftpoint, tempWidth2, tempHeight2);
@@ -98,13 +103,13 @@ namespace DrawWork.DrawServices
 
                 case WORKINGPOINT_TYPE.PointCenterTop:                  // 2021-04-22 완료
                     WPPoint = GetSumCDPoint(refPoint,
-                                            valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2,
-                                            valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight));
+                                            valueService.GetDoubleValue(selSizeNominalId) / 2,
+                                            valueService.GetDoubleValue(selSizeTankHeight));
                     break;
 
                 case WORKINGPOINT_TYPE.PointCenterBottom:               // 2021-04-22 완료
                     WPPoint = GetSumCDPoint(refPoint, 
-                                            valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2,
+                                            valueService.GetDoubleValue(selSizeNominalId) / 2,
                                             0);
                     break;
 
@@ -138,7 +143,7 @@ namespace DrawWork.DrawServices
 
                 // Point : Shell
                 case WORKINGPOINT_TYPE.PointLeftShellTop:               // 2021-04-22 완료
-                    WPPoint = GetSumCDPoint(refPoint, 0, valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight));
+                    WPPoint = GetSumCDPoint(refPoint, 0, valueService.GetDoubleValue(selSizeTankHeight));
                     break;
 
                 case WORKINGPOINT_TYPE.PointLeftShellTopAdj:            // 2021-04-22 완료
@@ -152,16 +157,16 @@ namespace DrawWork.DrawServices
 
                 case WORKINGPOINT_TYPE.PointRightShellTop:              // 2021-04-22 완료
                     CDPoint tempLeftShellTop = WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTop, ref refPoint, ref curPoint);
-                    WPPoint = GetSumCDPoint(tempLeftShellTop, valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId), 0);
+                    WPPoint = GetSumCDPoint(tempLeftShellTop, valueService.GetDoubleValue(selSizeNominalId), 0);
                     break;
 
                 case WORKINGPOINT_TYPE.PointRightShellTopAdj:           // 2021-04-22 완료
                     CDPoint tempLeftShellTopAdj = WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTopAdj, ref refPoint, ref curPoint);
-                    WPPoint = GetSumCDPoint(tempLeftShellTopAdj, valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId), 0);
+                    WPPoint = GetSumCDPoint(tempLeftShellTopAdj, valueService.GetDoubleValue(selSizeNominalId), 0);
                     break;
                 case WORKINGPOINT_TYPE.PointRightShellBottom:           // 2021-04-22 완료
                     CDPoint tempLeftShellBottom = WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellBottom, ref refPoint, ref curPoint);
-                    WPPoint = GetSumCDPoint(tempLeftShellBottom, valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId), 0);
+                    WPPoint = GetSumCDPoint(tempLeftShellBottom, valueService.GetDoubleValue(selSizeNominalId), 0);
                     break;
 
 
@@ -181,14 +186,14 @@ namespace DrawWork.DrawServices
                     break;
 
                 case WORKINGPOINT_TYPE.AdjLeftRoofUp:                   // 2021-04-22 완료
-                    double tempTankWidthHalf2 = valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2 - selPointValue;
+                    double tempTankWidthHalf2 = valueService.GetDoubleValue(selSizeNominalId) / 2 - selPointValue;
                     CDPoint tempCenterRoofPoint4 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, tempTankWidthHalf2.ToString(), ref refPoint, ref curPoint);
 
                     WPPoint = GetSumCDPoint(tempCenterRoofPoint4, 0, 0);
                     break;
 
                 case WORKINGPOINT_TYPE.AdjLeftRoofDown:                 // 2021-04-22 완료
-                    double tempTankWidthHalf=  valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId) / 2 - selPointValue;
+                    double tempTankWidthHalf=  valueService.GetDoubleValue(selSizeNominalId) / 2 - selPointValue;
                     CDPoint tempCenterRoofPoint3 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, tempTankWidthHalf.ToString(), ref refPoint, ref curPoint);
 
                     WPPoint = GetSumCDPoint(tempCenterRoofPoint3, 0, 0);
@@ -241,9 +246,13 @@ namespace DrawWork.DrawServices
         }
         private CDPoint AdjRightShell(double selHeight, ref CDPoint refPoint, ref CDPoint curPoint)
         {
+            int refFirstIndex = 0;
+
+            //string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
+            string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalId;
             // Shell Bottom Y = 0
             double currentThickness = GetShellThicknessAccordingToHeight(selHeight);
-            double tankWidth = valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeNominalId);
+            double tankWidth = valueService.GetDoubleValue(selSizeNominalId);
 
             CDPoint newPoint = GetSumCDPoint(refPoint, tankWidth + currentThickness, selHeight);
             return newPoint;
@@ -277,6 +286,11 @@ namespace DrawWork.DrawServices
         #region Point : Roof
         private CDPoint PointTopAngleRoof(ref CDPoint refPoint, ref CDPoint curPoint)
         {
+            int refFirstIndex = 0;
+
+            string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
+            //string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalId;
+
             CDPoint newPoint = new CDPoint();
             // Angle Model
             AngleSizeModel eachAngle = assemblyData.RoofAngleOutput[0];
@@ -291,7 +305,7 @@ namespace DrawWork.DrawServices
                                              - valueService.GetDoubleValue(eachAngle.E)
                                              - valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].MinThk),
 
-                                             + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight));
+                                             + valueService.GetDoubleValue(selSizeTankHeight));
 
                     break;
 
@@ -300,7 +314,7 @@ namespace DrawWork.DrawServices
                     newPoint = GetSumCDPoint(refPoint,
                                              - valueService.GetDoubleValue(eachAngle.E),
 
-                                             + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight));
+                                             + valueService.GetDoubleValue(selSizeTankHeight));
 
 
                     break;
@@ -311,7 +325,7 @@ namespace DrawWork.DrawServices
                                              + valueService.GetDoubleValue(eachAngle.E)
                                              - valueService.GetDoubleValue(eachAngle.t),
 
-                                             + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight));
+                                             + valueService.GetDoubleValue(selSizeTankHeight));
 
 
                     break;
@@ -324,6 +338,12 @@ namespace DrawWork.DrawServices
 
         private CDPoint PointTopAngleShell(ref CDPoint refPoint, ref CDPoint curPoint)
         {
+
+            int refFirstIndex = 0;
+
+            string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
+            //string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalId;
+
             CDPoint newPoint = new CDPoint();
             // Angle Model
             AngleSizeModel eachAngle = assemblyData.RoofAngleOutput[0];
@@ -338,7 +358,7 @@ namespace DrawWork.DrawServices
                     newPoint = GetSumCDPoint(refPoint,
                                                    - valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].MinThk),
 
-                                                   + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight)
+                                                   + valueService.GetDoubleValue(selSizeTankHeight)
                                                    - valueService.GetDoubleValue(assemblyData.RoofOutput[0].TwoTcMax));
 
                     break;
@@ -350,7 +370,7 @@ namespace DrawWork.DrawServices
                     newPoint = GetSumCDPoint(refPoint,
                                                    0,
 
-                                                   + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight)
+                                                   + valueService.GetDoubleValue(selSizeTankHeight)
                                                    - valueService.GetDoubleValue(eachAngle.AB));
 
                     break;

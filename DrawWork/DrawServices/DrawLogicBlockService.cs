@@ -43,6 +43,9 @@ namespace DrawWork.DrawServices
         {
 
             int refFirstIndex = 0;
+
+            string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
+
             string selAngleType = assemblyData.RoofInput[refFirstIndex].TopAngleType;
             string selAngleSize = assemblyData.RoofInput[refFirstIndex].TopAngleSize;
 
@@ -61,7 +64,7 @@ namespace DrawWork.DrawServices
                                               - valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].MinThk), 
 
                                               - valueService.GetDoubleValue(selAngleModel.AB) 
-                                              + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight));
+                                              + valueService.GetDoubleValue(selSizeTankHeight));
 
                     break;
 
@@ -70,7 +73,7 @@ namespace DrawWork.DrawServices
                                               - valueService.GetDoubleValue(selAngleModel.AB), 
 
                                               - valueService.GetDoubleValue(selAngleModel.AB)
-                                              + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight));
+                                              + valueService.GetDoubleValue(selSizeTankHeight));
 
                     break;
 
@@ -80,7 +83,7 @@ namespace DrawWork.DrawServices
                                               - valueService.GetDoubleValue(selAngleModel.t),
 
                                               - valueService.GetDoubleValue(selAngleModel.AB)
-                                              + valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight));
+                                              + valueService.GetDoubleValue(selSizeTankHeight));
 
                     break;
 
@@ -412,7 +415,10 @@ namespace DrawWork.DrawServices
             double lrBoltHoleOnCenter = valueService.GetDoubleValue(lastRafter.BoltHoleOnCenter);
             double lrBoltHoleDia = valueService.GetDoubleValue(lastRafter.BoltHoleDia);
 
-            Point3D leftTankTop = GetSumPoint(refPoint, 0, valueService.GetDoubleValue(assemblyData.GeneralDesignData.SizeTankHeight));
+            int refFirstIndex = 0;
+
+            string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
+            Point3D leftTankTop = GetSumPoint(refPoint, 0, valueService.GetDoubleValue(selSizeTankHeight));
 
             double shellClipTopGap = 30;
             double shellClipPadWidth = 10;

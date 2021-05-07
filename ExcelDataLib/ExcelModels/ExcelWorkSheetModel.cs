@@ -11,16 +11,21 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ExcelDataLib.ExcelModels
 {
-    public class ExcelWorkSheetModel : Notifier
+	public class ExcelWorkSheetModel : Notifier
 	{
-        public ExcelWorkSheetModel()
-        {
-            ExcelApp = null;
-            ExcelWork = null;
-            ExcelSheet = null;
-            ExcelWorkName = "";
-            ExcelSheetName = "";
-        }
+		public ExcelWorkSheetModel()
+		{
+			ExcelApp = null;
+			ExcelWork = null;
+			ExcelSheet = null;
+			ExcelWorkName = "";
+			ExcelSheetName = "";
+
+			RowCount = 1;
+			ColumnCount = 1;
+			DataArray = null;
+
+		}
 
 		private Excel.Application _ExcelApp;
 		public Excel.Application ExcelApp
@@ -77,5 +82,41 @@ namespace ExcelDataLib.ExcelModels
 				OnPropertyChanged(nameof(ExcelSheetName));
 			}
 		}
+
+
+
+		public int ColumnCount
+		{
+			get { return _ColumnCount; }
+			set
+			{
+				_ColumnCount = value;
+				OnPropertyChanged(nameof(ColumnCount));
+			}
+		}
+		private int _ColumnCount;
+		public int RowCount
+		{
+			get { return _RowCount; }
+			set
+			{
+				_RowCount = value;
+				OnPropertyChanged(nameof(RowCount));
+			}
+		}
+		private int _RowCount;
+
+		public dynamic DataArray
+		{
+			get { return _DataArray; }
+			set
+			{
+				_DataArray = value;
+				OnPropertyChanged(nameof(DataArray));
+			}
+		}
+		private dynamic _DataArray;
+
+
 	}
 }
