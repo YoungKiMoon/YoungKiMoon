@@ -77,6 +77,7 @@
     <Compile Include="Commons\SingletonData.cs" />
     <Compile Include="DataServices\AssemblyDataService.cs" />
     <Compile Include="DataServices\ExcelDataService.cs" />
+    <Compile Include="DesignServices\DesignService.cs" />
     <Compile Include="DrawAreaServices\AreaService.cs" />
     <Compile Include="DrawAutomationServices\AutomationDimensionService.cs" />
     <Compile Include="DrawAutomationServices\AutomationLeaderService.cs" />
@@ -175,6 +176,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -187,6 +189,10 @@
     <ProjectReference Include="..\AssemblyLib\AssemblyLib.csproj">
       <Project>{0e54a176-e260-4436-ad95-d3a4f5c10b10}</Project>
       <Name>AssemblyLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DesignLib\DesignLib.csproj">
+      <Project>{1f7ff11e-e2d3-4c5c-b003-d7601ec118bc}</Project>
+      <Name>DesignLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\DrawSettingLib\DrawSettingLib.csproj">
       <Project>{09af4a28-824a-4ea4-b217-98a964d4b112}</Project>

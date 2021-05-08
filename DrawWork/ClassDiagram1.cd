@@ -1,0 +1,529 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DrawWork.App" Collapsed="true">
+    <Position X="27.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.MainWindow" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="29.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAUAABAAAABAAAAEEEAAAAABAASAAACAAAAAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawWork.AssemblyServices.FieldService" Collapsed="true">
+    <Position X="33" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AssemblyServices\FieldService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.CommandModels.BasicCommandModel" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="38.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAgAAAAAAAAAABAAAAgAoAAAAAAAAAQAJg=</HashCode>
+      <FileName>CommandModels\BasicCommandModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawWork.CommandModels.CommandFunctionModel" Collapsed="true">
+    <Position X="5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAIAQAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>CommandModels\CommandFunctionModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.CommandModels.CommandLineModel" Collapsed="true">
+    <Position X="29.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CommandModels\CommandLineModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.CommandModels.CommandPropertiyModel" Collapsed="true">
+    <Position X="16.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAIAQAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>CommandModels\CommandPropertiyModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.CommandServices.CommandBasicService" Collapsed="true">
+    <Position X="27.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AoABAIAAAEEAAAQAAACIAAAAAADQAAACAAAAAQAIBMA=</HashCode>
+      <FileName>CommandServices\CommandBasicService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.CommandServices.TranslateDataModelService" Collapsed="true">
+    <Position X="31.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>MNgKwAQAAGAEIgAwIEAJASEAUUBACQsAEIFAIDE0AkA=</HashCode>
+      <FileName>CommandServices\TranslateDataModelService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.CommandServices.TranslateDataOutputService" Collapsed="true">
+    <Position X="33" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CommandServices\TranslateDataOutputService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.CommandServices.TranslateDataService" Collapsed="true">
+    <Position X="34.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAEACABAABAAAgAQCAAAAAABCAFBSAAAQAAAUAEE=</HashCode>
+      <FileName>CommandServices\TranslateDataService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Commons.CommonGlobal" Collapsed="true">
+    <Position X="31.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAABAAwAAQAAIBAAAAAAAAAAEQCAAAAAACQ=</HashCode>
+      <FileName>Commons\CommonGlobal.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Commons.CommonMethod" Collapsed="true">
+    <Position X="33" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAQAAAAAAAAAQAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Commons\CommonMethod.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Commons.SingletonData" Collapsed="true">
+    <Position X="40" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commons\SingletonData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DataServices.AssemblyDataService" Collapsed="true">
+    <Position X="31.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DataServices\AssemblyDataService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DataServices.ExcelDataService" Collapsed="true">
+    <Position X="31.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DataServices\ExcelDataService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawAreaServices.AreaService" Collapsed="true">
+    <Position X="29.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DrawAreaServices\AreaService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawAutomationServices.AutomationDimensionService" Collapsed="true">
+    <Position X="34.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAEA=</HashCode>
+      <FileName>DrawAutomationServices\AutomationDimensionService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawAutomationService.AutomationLeaderService" Collapsed="true">
+    <Position X="36.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DrawAutomationServices\AutomationLeaderService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawBuilders.LogicBuilder" Collapsed="true">
+    <Position X="27.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAYAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>DrawBuilders\LogicBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawCustomObjectModels.CustomEntityModel" Collapsed="true">
+    <Position X="34.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAIAAAAAAAAAAAAAACBA=</HashCode>
+      <FileName>DrawCustomObjectModels\CustomEntityModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawCustomObjectModels.CustomLine" Collapsed="true">
+    <Position X="36.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DrawCustomObjectModels\CustomLine.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawCustomObjectModels.CustomRenderedHatch" Collapsed="true">
+    <Position X="38.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgABAAAAAAAAAIAAAAAACAAAAAAAAAEAACAAAAA=</HashCode>
+      <FileName>DrawCustomObjectModels\CustomRenderedHatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawCustomObjectModels.CustomRenderedMesh" Collapsed="true">
+    <Position X="40" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgABAAAAAAAAAIAAAAAACAAAAAAAAAEAACAAAAA=</HashCode>
+      <FileName>DrawCustomObjectModels\CustomRenderedMesh.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawCustomObjectModels.CustomRenderedTriangle" Collapsed="true">
+    <Position X="27.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgABAAAAAAAAAIAAAAAACAAAAAAAAAEAACAAAAA=</HashCode>
+      <FileName>DrawCustomObjectModels\CustomRenderedTriangle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawModels.CDPoint" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="40" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAgAAAAAAAQAAAAAAAAAAAAAYBE=</HashCode>
+      <FileName>DrawModels\CDPoint.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawWork.DrawModels.DrawDimStyle" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="31.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAABQAAAAAAAEAAAAAAwQAAAAAABA=</HashCode>
+      <FileName>DrawModels\DrawDimStyle.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawWork.DrawModels.DrawEntityModel" Collapsed="true">
+    <Position X="33" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ARAAQqQAAAAAAIAIAFAAgAAIgACASgAAAAEAAIIAzEA=</HashCode>
+      <FileName>DrawModels\DrawEntityModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawModels.DrawPointModel" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="27.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAABAAAAEAAAACAAAAAAAAAAAAABA=</HashCode>
+      <FileName>DrawModels\DrawPointModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawWork.DrawModels.DrawPositionValueModel" Collapsed="true">
+    <Position X="29.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAgAAAAQAAAAAAAKAAABCACAAAAAAAA=</HashCode>
+      <FileName>DrawModels\DrawPositionValueModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawModels.DrawScaleModel" Collapsed="true">
+    <Position X="33" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>DrawModels\DrawScaleModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawPaperServices.PaperPreviewService" Collapsed="true">
+    <Position X="33" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAIAAAAAAAAAAAQBAAAIAAAAAQQAAEQA=</HashCode>
+      <FileName>DrawPaperServices\PaperPreviewService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawPaperServices.ViewPortSettingModel" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABgAAAAAAAAAAABgAAIAAAIwAAAAAIAAAAAAABAAAAI=</HashCode>
+      <FileName>DrawPaperServices\ViewPortSettingModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawSacleServices.DrawScaleService" Collapsed="true">
+    <Position X="34.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAIAAAAAAAAAAAEAIAAAAgBAAAA=</HashCode>
+      <FileName>DrawSacleServices\DrawScaleService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawServices.DrawBoundaryService" Collapsed="true">
+    <Position X="29.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAAYAAAAAAAAQQABAAAAAAAAAAAAQAAg=</HashCode>
+      <FileName>DrawServices\DrawBoundaryService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawServices.DrawImportBlockService" Collapsed="true">
+    <Position X="34.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>DrawServices\DrawImportBlockService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawServices.DrawLogicBlockService" Collapsed="true">
+    <Position X="36.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAEAAAAAAAAAAAAAAAAAAARAABAAAAAEAACgAAIAAA=</HashCode>
+      <FileName>DrawServices\DrawLogicBlockService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawServices.DrawNozzleService" Collapsed="true">
+    <Position X="38.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEgkIICCEAEAAAAIAAgAAARAABAACAgAABAACAYQEI=</HashCode>
+      <FileName>DrawServices\DrawNozzleService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawServices.DrawObjectService" Collapsed="true">
+    <Position X="40" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIgIBCAAAkRMIQgABAiACAACAAEQEBAQA=</HashCode>
+      <FileName>DrawServices\DrawObjectService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawServices.DrawReferenceBlockService" Collapsed="true">
+    <Position X="31.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAABAAAAAAAAAAAAIAAAAABAQAAAAAAAAAAKAAA=</HashCode>
+      <FileName>DrawServices\DrawReferenceBlockService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawServices.DrawService" Collapsed="true">
+    <Position X="36.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAgAAAAEgAAAAAAAAAAEAABAEAAADAAABAAEARA=</HashCode>
+      <FileName>DrawServices\DrawService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawServices.DrawSettingService" Collapsed="true">
+    <Position X="38.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAQAAAgAAAAAAAAAAAAAAABBAAAEAEA=</HashCode>
+      <FileName>DrawServices\DrawSettingService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawServices.DrawWorkingPointService" Collapsed="true">
+    <Position X="40" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgABAAAEAAAAJAUAAAAACAABIAAEAAAAAgAAAAAA=</HashCode>
+      <FileName>DrawServices\DrawWorkingPointService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawStyleServices.EnvironmentStyleService" Collapsed="true">
+    <Position X="27.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAGgEAAAAAgAAACgAAgAAAAAAAAAAAAAAABQCQAAA=</HashCode>
+      <FileName>DrawStyleServices\EnvironmentStyleService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawStyleServices.LayerStyleService" Collapsed="true">
+    <Position X="38.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>DrawStyleServices\LayerStyleService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawStyleServices.LineStyleService" Collapsed="true">
+    <Position X="40" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>DrawStyleServices\LineStyleService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.DrawStyleServices.TextStyleService" Collapsed="true">
+    <Position X="29.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>DrawStyleServices\TextStyleService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.FileServices.TextFileService" Collapsed="true">
+    <Position X="27.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>FileServices\TextFileService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.ImportServices.ImportBlockModel" Collapsed="true">
+    <Position X="34.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAIAAAEAAAAAKAAAAAAEAIAgAAAAQAAAAAE=</HashCode>
+      <FileName>ImportServices\ImportBlockModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.ImportServices.ImportBlockService" Collapsed="true">
+    <Position X="36.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAIAAAAAAAAAAAABgAAAAAEAAQGAAAABgQ=</HashCode>
+      <FileName>ImportServices\ImportBlockService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Models.CustomBlockModel" Collapsed="true">
+    <Position X="2.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAoACAIAQAAAAAAAAAAAAIACAAAAA=</HashCode>
+      <FileName>Models\CustomBlockModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Models.CustomEntityModel" Collapsed="true">
+    <Position X="7.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAQAAAAAAAAAAQAAAAAABAA=</HashCode>
+      <FileName>Models\CustomEntityModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Models.CustomLayerModel" Collapsed="true">
+    <Position X="11.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAIwAAAAAIAQAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\CustomLayerModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Models.CustomLineModel" Collapsed="true">
+    <Position X="18.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAgAAAAAAAAIARQAAAAAAAGAAAAAAAAAAA=</HashCode>
+      <FileName>Models\CustomLineModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Models.CustomTextModel" Collapsed="true">
+    <Position X="20.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABABAgAAAAAAAAAAIAQAAAAAAAQAAAAAAABAEAA=</HashCode>
+      <FileName>Models\CustomTextModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Models.TreeNodeModel" Collapsed="true">
+    <Position X="25.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAUIAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\TreeNodeModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Properties.Resources" Collapsed="true">
+    <Position X="36.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Properties.Settings" Collapsed="true">
+    <Position X="38.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Utils.Notifier" Collapsed="true">
+    <Position X="12.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utils\Notifier.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DrawWork.ValueServices.ValueService" Collapsed="true">
+    <Position X="36.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEABAEAAAAAQAigAAAAAwAAAAAAAFAAAAAAA=</HashCode>
+      <FileName>ValueServices\ValueService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.ViewModels.AssemblyWindowViewModel" Collapsed="true">
+    <Position X="9.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAKAAQACAAAAAAAAAIAAAAAAACAAAAAQQAAAAAAAAA=</HashCode>
+      <FileName>ViewModels\AssemblyWindowViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.ViewModels.EnvironmentWindowViewModel" Collapsed="true">
+    <Position X="14" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAYQIAAAAAAACAAAAgCCABAAAAAAAAAAAAIAAQAEQAA=</HashCode>
+      <FileName>ViewModels\EnvironmentWindowViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.ViewModels.MainWindowViewModel" Collapsed="true">
+    <Position X="31.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAABAAAAAAAAAAAIAAAAAAAAAAAAAAAAKA=</HashCode>
+      <FileName>ViewModels\MainWindowViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.ViewModels.PreviewWindowViewModel" Collapsed="true">
+    <Position X="23" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAIgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModels\PreviewWindowViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawWork.Windows.AssemblyWindow" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="33" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Windows\AssemblyWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawWork.Windows.EnvironmentWindow" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="29.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Windows\EnvironmentWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawWork.Windows.PreviewWindow" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="34.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Windows\PreviewWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Enum Name="DrawWork.Commons.ENTITY_TYPE" Collapsed="true">
+    <Position X="27.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQQICAAQAACAAAAAAIAAAAAAAAQAAAAAAAAgAABA=</HashCode>
+      <FileName>Commons\CommonBase.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DrawWork.Commons.POSITION_TYPE" Collapsed="true">
+    <Position X="33" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAgAAABAAAAAAAAAAAAAgAAAAAAgAAAA=</HashCode>
+      <FileName>Commons\CommonBase.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DrawWork.Commons.TANKASS_TYPE" Collapsed="true">
+    <Position X="34.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAA=</HashCode>
+      <FileName>Commons\CommonBase.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DrawWork.Commons.TANKBOUNDARY_TYPE" Collapsed="true">
+    <Position X="36.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAEgQAAAABAAAAAACAEAAAABgAACAAAAhIAAA=</HashCode>
+      <FileName>Commons\CommonBase.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DrawWork.Commons.LINE_TYPE" Collapsed="true">
+    <Position X="31.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAABAIwAAQAAIAAAAAAAAAAAEQCAAAgAACQ=</HashCode>
+      <FileName>Commons\CommonBase.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DrawWork.Commons.WORKINGPOINT_TYPE" Collapsed="true">
+    <Position X="38.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAwQAABAJIAkAhAQAQAEAAQCCAgAQAEAQAAAAQgAABA=</HashCode>
+      <FileName>Commons\CommonBase.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DrawWork.Commons.EXCELDATAMODEL_TYPE" Collapsed="true">
+    <Position X="29.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>Commons\CommonBase.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="맑은 고딕" Size="9" />
+</ClassDiagram>

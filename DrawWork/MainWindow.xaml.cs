@@ -30,6 +30,7 @@ using ExcelDataLib.ExcelServices;
 using System.Collections.ObjectModel;
 using ExcelDataLib.ExcelModels;
 using System.Diagnostics;
+using DrawWork.DesignServices;
 
 namespace DrawWork
 {
@@ -304,6 +305,11 @@ namespace DrawWork
             TimeSpan ts2 = stopWatch.Elapsed;
             string elapsedTime2 = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts2.Hours, ts2.Minutes, ts2.Seconds, ts2.Milliseconds / 10);
             MessageBox.Show(elapsedTime2);
+
+
+            DesignService designS = new DesignService();
+            designS.CreateDesignCRTModel(selView.TankData);
+
         }
     }
 }

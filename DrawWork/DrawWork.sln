@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawSettingLib", "..\DrawSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDataLib", "..\ExcelDataLib\ExcelDataLib.csproj", "{135B58CB-C30C-4500-84C4-0A67A68C7812}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesignLib", "..\DesignLib\DesignLib.csproj", "{1F7FF11E-E2D3-4C5C-B003-D7601EC118BC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{135B58CB-C30C-4500-84C4-0A67A68C7812}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{135B58CB-C30C-4500-84C4-0A67A68C7812}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{135B58CB-C30C-4500-84C4-0A67A68C7812}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F7FF11E-E2D3-4C5C-B003-D7601EC118BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F7FF11E-E2D3-4C5C-B003-D7601EC118BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F7FF11E-E2D3-4C5C-B003-D7601EC118BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F7FF11E-E2D3-4C5C-B003-D7601EC118BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DrawSettingLib.Class1" Collapsed="true">
+    <Position X="7.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Class1.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawSettingLib.SettingModels.AreaBoxModel" Collapsed="true">
+    <Position X="2.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQABAAAAAAAAAAAAEBAAgAAAAEAAAAAAIAAABA=</HashCode>
+      <FileName>SettingModels\AreaBoxModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawSettingLib.SettingModels.AreaMarginModel" Collapsed="true">
+    <Position X="5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACIAAAAAAAAAAEgAAAA=</HashCode>
+      <FileName>SettingModels\AreaMarginModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawSettingLib.SettingModels.GAAreaModel" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAABAAAAhACAAAACAAAAAAAAIAQAAAABAAAAAACAA=</HashCode>
+      <FileName>SettingModels\GAAreaModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawSettingLib.Utils.Notifier" Collapsed="true">
+    <Position X="2.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utils\Notifier.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="맑은 고딕" Size="9" />
+</ClassDiagram>
