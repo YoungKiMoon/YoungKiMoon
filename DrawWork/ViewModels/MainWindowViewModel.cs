@@ -27,10 +27,10 @@ namespace DrawWork.ViewModels
 
 
             // Mapping Data
-            TankData.CreateMappingAssembly();
+            //TankData.CreateMappingAssembly();
 
             // Sample Data
-            //TankData.CreateSampleAssembly();
+            TankData.CreateSampleAssembly();
             //commandData.CreateSampleCommandModel();
 
         }
@@ -46,6 +46,8 @@ namespace DrawWork.ViewModels
             commandService.SetScaleData(selScale);
 
             commandService.SetCommandData(commandData.commandList);
+
+            // Create Entiti
             commandService.ExecuteCommand();
             LogicBuilder logicB = new LogicBuilder(commandService.commandEntities);
 

@@ -1,0 +1,232 @@
+// General
+using GeneralDD
+
+// Shell
+using ShellIn
+using ShellOut
+
+// Roof
+using RoofIn
+
+// Bottom
+using BottomIn
+using BottomOut
+
+// Structure
+using StructureIn
+using columnSideOut
+using StructureGirderIn
+
+// GA Drawing Point : 도면의 좌측 하단 
+// GA는 영역 설정이 Tank의 좌측 하단
+// Reference Point 는 변경이 없을 것
+
+refpoint xy 1000,2000
+
+
+#region Test
+#	line xy1 cp[pointleftroofdown].x,cp[pointleftroofdown].y xy2 cp[pointleftroofdown].x,@roofthickness+1000+cp[pointleftroofdown].y
+#endregion
+
+#region Tank Outline
+	point xy refpointx,refpointy
+	
+	line xy1 @,@ xy2 @,@cp[pointleftshelltopadj].y
+	line xy1 @sizenominalid,@ xy2 @sizenominalid,@cp[pointleftshelltopadj].y
+	
+#endregion
+
+#region Right Inner Outline : Structure
+	point xy @sizenominalid/2,@
+	
+	line xy1 @,@ xy2 @sizenominalid/2,@
+	for i=1 to CourseCount
+		line xy1 @startpoint[i],@ xy2 @startpoint[i],@width[i] sp @length[i],@ rep RepeatNo[i]
+		point xy refpointx,@
+		point xy @sizenominalid/2,@width[i]
+		line xy1 @,@ xy2 @sizenominalid/2,@
+	next i
+
+#endregion
+
+
+#region Shell Plate
+	// left
+	point xy refpointx,refpointy
+	for i=1 to CourseCount-1
+		line xy1 @-minthk[i],@ xy2 @-minthk[i],@width[i]
+		point xy @,@width[i]
+		line xy1 @-minthk[i],@ xy2 @,@
+	next i
+	line xy1 @-minthk[CourseCount-1],@ xy2 @-minthk[CourseCount-1],cp[pointleftshelltopadj].y
+	point xy @,cp[pointleftshelltopadj].y
+	line xy1 @-minthk[CourseCount-1],@ xy2 @,@
+	
+	// right
+	point xy @sizenominalid,refpointy
+	for i=1 to CourseCount-1
+		line xy1 @+minthk[i],@ xy2 @+minthk[i],@width[i]
+		point xy @,@width[i]
+		line xy1 @+minthk[i],@ xy2 @,@
+	next i
+	line xy1 @+minthk[CourseCount-1],@ xy2 @+minthk[CourseCount-1],cp[pointleftshelltopadj].y
+	point xy @,cp[pointleftshelltopadj].y
+	line xy1 @+minthk[CourseCount-1],@ xy2 @,@
+	
+	
+#endregion
+
+#region Top Angle
+	point xy refpointx,refpointy
+	logicblock name topangle xy @,@
+	logicblock name topangle xy @,@ mirror right
+#endregion
+
+
+#region Roof
+	point xy refpointx,refpointy
+	linedgree xy1 cp[pointleftroofdown].x,cp[pointleftroofdown].y xy2 @sizenominalid/2,@ degree roofslopeone direction x wp start
+	line xy1 @,@ xy2 @,@roofthickness wp end rotater roofslopeone
+	linedgree xy1 @,@ xy2 cp[pointcentertopdown].x,@ degree roofslopeone direction x
+	
+	point xy refpointx,refpointy
+	linedgree xy1 cp[pointleftroofdown].x,cp[pointleftroofdown].y xy2 @sizenominalid/2,@ degree roofslopeone direction x wp start mirror right
+	line xy1 @,@ xy2 @,@roofthickness rotater roofslopeone mirror right wp end
+	linedgree xy1 @,@ xy2 cp[pointcentertopdown].x,@ degree roofslopeone direction x 
+	// 검증
+#	point xy refpointx,refpointy
+#	line xy1 @-46,@sizetankheight xy2 @-46,@sizetankheight+100
+#	line xy1 @+46+sizenominalid,@sizetankheight xy2 @+46+sizenominalid,@sizetankheight+100
+	
+#endregion
+
+#region Tank Center Line
+	contactpoint pointcentertopdown
+	line xy1 @,@ xy2 @,refpointy
+#endregion
+
+#region Bottom : Left
+	point xy refpointx,refpointy
+	line xy1 @-shellthk-OutSideProjection,@ xy2 @-shellthk-OutSideProjection+AnnularPlateWidth,@ wp start
+	line xy1 @,@ xy2 @,@-AnnularPlateThickness wp end
+	line xy1 @,@ xy2 @AnnularPlateWidth,@ wp end
+	line xy1 @,@ xy2 @,@+AnnularPlateThickness wp end
+	
+	linedgree xy1 @-OverlapOfAnnular,@ xy2 cp[pointcenterbottomdown].x,@ degree BottomSlope direction x wp start
+	line xy1 @,@ xy2 @,@BottomThickness wp end rotater BottomSlope
+	linedgree xy1 @,@ xy2 cp[pointcenterbottomdown].x,@ degree BottomSlope direction x wp end
+	line xy1 @,@ xy2 @,@-BottomThickness
+#endregion
+
+#region Bottom : Right
+	point xy refpointx,refpointy
+	line xy1 @sizenominalid,@ xy2 @sizenominalid+shellthk+OutSideProjection,@ wp end
+	line xy1 @,@ xy2 @,@-AnnularPlateThickness wp end
+	line xy1 @,@ xy2 cp[pointcenterbottomdown].x,@ wp end
+	line xy1 @,@ xy2 @,@+AnnularPlateThickness wp end
+	
+#	검증
+#	contactpoint pointcenterbottomdown
+#	line xy1 @,@ xy2 @-1000,@
+	
+#	contactpoint pointleftbottomdown
+#	line xy1 @,@ xy2 @,@+1000
+#	//linedgree xy1 @,@ xy2 @+3000,@ degree BottomSlope direction x wp end
+#	line xy1 @,@ xy2 @-1000,@
+#endregion
+
+
+
+#region Column Top Support : Girder
+
+	point xy refpointx,refpointy
+	
+	logicblock name columnsupportside xy @,@
+
+#endregion
+
+
+#region AA : Nozzle
+	point xy refpointx,refpointy
+	nozzle  type bottom position shell nozzleposition left fontsize 160 leadercirclesize 800 multicolumn true
+#endregion
+
+
+#region Dimension
+	point xy refpointx,refpointy
+	dimline xy1 @,@ xy2 @sizenominalid,@ position bottom dimheight 5000 arrowsize 50 th 200 tg 100 
+	dimline xy1 @,@ xy2 @,@sizetankheight*0.6 position left dimheight 5000 arrowsize 50 th 200 tg 100 
+	dimline xy1 @,@sizetankheight*0.6 xy2 @,@sizetankheight*0.8 position left dimheight 5000 arrowsize 50 th 200 tg 100 
+	
+	
+	dimline xy1 @sizenominalid,@ xy2 @sizenominalid,@sizetankheight position right dimheight 7000 arrowsize 50 th 200 tg 100 
+
+#endregion
+
+
+#region Dimension
+	point xy refpointx,refpointy
+	point xy @sizenominalid,refpointy
+	for i=1 to CourseCount-1
+		dimline xy1 @,@ xy2 @,@width[i] position right dimheight 6000 arrowsize 50 th 200 tg 100 
+		point xy @,@width[i]
+	next i
+#endregion
+
+#region Dimension : Sample
+	point xy refpointx,refpointy
+	point xy @sizenominalid,refpointy
+	dimline xy1 @,@ xy2 @,@sizetankheight*0.3 position right dimheight 3000 arrowsize 50 th 200 tg 100 
+	dimline xy1 @,@sizetankheight*0.88 xy2 @,@sizetankheight*0.94 position right dimheight 3000 arrowsize 50 th 200 tg 100 
+	dimline xy1 @,@sizetankheight*0.81 xy2 @,@sizetankheight*0.88 position right dimheight 3000 arrowsize 50 th 200 tg 100 
+	dimline xy1 @,@sizetankheight*0.2 xy2 @,@sizetankheight*0.6 position right dimheight 2500 arrowsize 50 th 200 tg 100 
+	dimline xy1 @,@sizetankheight*0.6 xy2 @,@sizetankheight*0.85 position right dimheight 2500 arrowsize 50 th 200 tg 100 
+#endregion
+
+
+
+#region Leader : Sample
+	point xy refpointx,refpointy
+	leader xy @2000,@2000 position topleft length 2000 textheight 200 layerheight 600 text1 testLeader
+	leader xy @2500,@2000 position topright length 5000 textheight 200 layerheight 600 text1 testLeader
+	leader xy @2700,@6500 position topright length 4000 textheight 200 layerheight 600 text1 testLeader
+	
+
+#endregion
+
+#region Import Block
+	point xy refpointx,refpointy
+	importblock name FOAM_MAINTENANCE_PLATFORM xy @sizenominalid,@sizetankheight-500
+	
+	importblock name SPIRAL_STAIRWAY-1 xy @,@sizetankheight+100
+	
+#endregion
+
+#region Wind Girder
+	point xy refpointx,refpointy
+	
+	logicblock name windgirder xy @,@
+	
+	logicblock name windgirder xy @,@ mirror right
+	
+	point xy refpointx,refpointy
+	line xy1 @1000,@+16640 xy2 @-1000,@+16640
+	line xy1 @1000,@+13960 xy2 @-1000,@+13960
+#endregion
+
+
+
+#region Test
+	point xy refpointx,refpointy
+	contactpoint PointCenterBottomDown 
+	
+
+#endregion
+
+
+
+
+
+
+
+

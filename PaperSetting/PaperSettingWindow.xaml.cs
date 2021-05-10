@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using PaperSetting.Models;
 
 namespace PaperSetting
 {
@@ -109,5 +110,21 @@ namespace PaperSetting
             }
                 
         }
+        private void CheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+            bool flag = false;
+            foreach (PaperDwgModel row in selView.PaperList)
+            {
+                if(!row.Basic.View)
+                    flag = true;
+            }
+            foreach (PaperDwgModel row in selView.PaperList)
+            {
+                row.Basic.View = flag;
+            }
+            (sender as CheckBox).IsChecked = new bool?(flag);
+        }
+
     }
 }

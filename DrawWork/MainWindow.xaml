@@ -19,25 +19,37 @@
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <StackPanel Orientation="Horizontal">
-                <Button Content="Assembly Model" Width="100" Click="Button_Click_2" />
-                <Button Content="CAD Environment" Width="100" Click="Button_Click_3" />
-                <Button Content="Create Logic"  Width="100" Click="Button_Click_1" Background="#FFE6A1A1"/>
-                <Button Content="Create Sample" Width="100" Click="Button_Click"/>
+                <Button x:Name="btnTitleBlock" Content="TitleBlock" PreviewMouseLeftButtonUp="btnTitleBlock_PreviewMouseLeftButtonUp"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBox x:Name="inputScale" Width="50"/>
                 <Button x:Name="btnPreview" Content="Preview" Width="50" PreviewMouseLeftButtonUp="btnPreview_PreviewMouseLeftButtonUp" />
-                <Button x:Name="btnCreateBlock" Content="Create Block" Width="80" PreviewMouseLeftButtonUp="btnLoadDWG_PreviewMouseLeftButtonUp" />
+                <Button x:Name="btnCreateExcel" Content="Creat Excel Data"  PreviewMouseLeftButtonUp="btnCreateExcel_PreviewMouseLeftButtonUp"  />
+
+            </StackPanel>            
+        </Grid>
+        <Grid Grid.Row="1">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Assembly Model" Width="100" Click="Button_Click_2" />
+                <Button Content="CAD Environment" Width="100" Click="Button_Click_3" />
+                <Button Content="Create Logic"  Width="100" Click="Button_Click_1" Background="#FFE6A1A1"/>
+                <Button Content="Create Logic(New)"  Width="100" Background="#FFE6A1A1" Click="Button_Click_4"/>
+                <Button Content="Create Sample" Width="100" Click="Button_Click"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+
+                <Button x:Name="btnCreateBlock" Content="Load Block" Width="80" PreviewMouseLeftButtonUp="btnLoadDWG_PreviewMouseLeftButtonUp" />
                 <Button x:Name="btnCreateDwg" Content="Create DWG" Width="80" PreviewMouseLeftButtonUp="btnCreateDwg_PreviewMouseLeftButtonUp" />
-                <Button x:Name="btnCreateExcel" Content="C Excel" Width="50" PreviewMouseLeftButtonUp="btnCreateExcel_PreviewMouseLeftButtonUp"  />
+
 
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="1" >
+        <Grid Grid.Row="2" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition/>
@@ -46,7 +58,7 @@
             <TextBox x:Name="logicFile" Grid.Column="1"  Margin="0,2"/>
             
         </Grid>
-        <Grid Grid.Row="2" >
+        <Grid Grid.Row="3" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition/>
@@ -58,7 +70,7 @@
                 <Button x:Name="btnLoadDWG" Content="Load DWG" Width="100" PreviewMouseLeftButtonUp="btnLoadDWG_PreviewMouseLeftButtonUp" />
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="3">
+        <Grid Grid.Row="4">
             <ddes:Model x:Name="testModel" WorkCompleted="testModel_WorkCompleted" >
                 <ddes:Model.ProgressBar>
                     <ddes:ProgressBar Lighting="False"/>

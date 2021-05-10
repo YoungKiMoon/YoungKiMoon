@@ -78,6 +78,7 @@
     <Compile Include="DataServices\AssemblyDataService.cs" />
     <Compile Include="DataServices\ExcelDataService.cs" />
     <Compile Include="DesignServices\DesignService.cs" />
+    <Compile Include="DesignServices\IntergrationService.cs" />
     <Compile Include="DrawAreaServices\AreaService.cs" />
     <Compile Include="DrawAutomationServices\AutomationDimensionService.cs" />
     <Compile Include="DrawAutomationServices\AutomationLeaderService.cs" />
@@ -122,6 +123,7 @@
     <Compile Include="ViewModels\EnvironmentWindowViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\PreviewWindowViewModel.cs" />
+    <Compile Include="ViewModels\TitleBlockWindowViewModel.cs" />
     <Compile Include="Windows\AssemblyWindow.xaml.cs">
       <DependentUpon>AssemblyWindow.xaml</DependentUpon>
     </Compile>
@@ -130,6 +132,9 @@
     </Compile>
     <Compile Include="Windows\PreviewWindow.xaml.cs">
       <DependentUpon>PreviewWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\TitleBlockWindow.xaml.cs">
+      <DependentUpon>TitleBlockWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -154,6 +159,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\PreviewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\TitleBlockWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -194,6 +203,10 @@
       <Project>{1f7ff11e-e2d3-4c5c-b003-d7601ec118bc}</Project>
       <Name>DesignLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DrawLogicLib\DrawLogicLib.csproj">
+      <Project>{f83adbdc-13a0-4154-bb37-4c355e5f5643}</Project>
+      <Name>DrawLogicLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DrawSettingLib\DrawSettingLib.csproj">
       <Project>{09af4a28-824a-4ea4-b217-98a964d4b112}</Project>
       <Name>DrawSettingLib</Name>
@@ -202,6 +215,12 @@
       <Project>{135b58cb-c30c-4500-84c4-0a67a68c7812}</Project>
       <Name>ExcelDataLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\samsungengtitleblock.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DrawLogicFileService\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

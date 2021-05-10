@@ -62,6 +62,27 @@ namespace DrawWork.CommandServices
 
             scaleData = new DrawScaleModel();
         }
+        public CommandBasicService(AssemblyModel selAssembly, Object selModel)
+        {
+            assemblyData = new AssemblyModel();
+            commandData = new BasicCommandModel();
+
+            //SetCommandData(selCommandList);
+            SetAssemblyData(selAssembly);
+            SetModelData(selModel);
+
+            commandTranslate = new TranslateDataService(selAssembly);
+            commandOutput = new TranslateDataOutputService();
+
+            drawObject = new DrawObjectService(selAssembly, singleModel);
+            boundaryService = new DrawBoundaryService(selAssembly);
+
+
+            drawEntity = new DrawEntityModel();
+            commandEntities = new List<Entity>();
+
+            scaleData = new DrawScaleModel();
+        }
         #endregion
 
         #region CommandData
@@ -77,6 +98,14 @@ namespace DrawWork.CommandServices
             {
                 newCommandList.Add(new CommandLineModel(eachCommand.CommandText.ToLower()));
             }
+
+            return newCommandList;
+        }
+        public List<CommandLineModel> CommandTextToLower(string[] selCommandArray)
+        {
+            List<CommandLineModel> newCommandList = new List<CommandLineModel>();
+            foreach (string eachText in selCommandArray)
+                newCommandList.Add(new CommandLineModel(eachText.ToLower()));
 
             return newCommandList;
         }

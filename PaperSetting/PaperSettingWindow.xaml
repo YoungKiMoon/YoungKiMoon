@@ -46,6 +46,18 @@
                       HorizontalScrollBarVisibility="Visible"
                       VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24" CanUserDeleteRows="False" CanUserResizeRows="False" SelectionChanged="DataGrid_SelectionChanged">
                     <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Binding="{Binding Basic.View}">
+                            <DataGridCheckBoxColumn.ElementStyle>
+                                <Style>
+                                    <Setter Property="FrameworkElement.Margin" Value="0,1,0,0" />
+                                    <Setter Property="FrameworkElement.HorizontalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridCheckBoxColumn.ElementStyle>
+                            <DataGridCheckBoxColumn.Header>
+                                <CheckBox Name="customGridCheck" Click="CheckBox_Click" IsChecked="True" ></CheckBox>
+                            </DataGridCheckBoxColumn.Header>
+                        </DataGridCheckBoxColumn>
+
                         <DataGridTextColumn Header="No" Width="30" Binding="{Binding Basic.No}"/>
                         <DataGridTextColumn Header="TITLE" Width="100" Binding="{Binding Basic.Title}"/>
                         <DataGridTextColumn Header="DWG. No." Width="200" Binding="{Binding Basic.DwgNo}"/>

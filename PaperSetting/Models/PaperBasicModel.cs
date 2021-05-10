@@ -10,6 +10,7 @@ namespace PaperSetting.Models
     {
         public PaperBasicModel()
         {
+            View = true;
             No = "";
             Title = "";
             DwgNo = "";
@@ -19,11 +20,23 @@ namespace PaperSetting.Models
         public object Clone()
         {
             PaperBasicModel newModel = new PaperBasicModel();
+            newModel.View = View;
             newModel.No = No;
             newModel.Title = Title;
             newModel.DwgNo = DwgNo;
             newModel.StampName = StampName;
             return newModel;
+        }
+
+        private bool _View;
+        public bool View
+        {
+            get { return _View; }
+            set
+            {
+                _View = value;
+                OnPropertyChanged(nameof(View));
+            }
         }
 
         private string _No;

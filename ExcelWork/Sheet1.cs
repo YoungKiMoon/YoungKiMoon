@@ -30,11 +30,19 @@ namespace ExcelWork
         /// </summary>
         private void InternalStartup()
         {
-            this.Startup += new System.EventHandler(Sheet1_Startup);
-            this.Shutdown += new System.EventHandler(Sheet1_Shutdown);
+            this.SelectionChange += new Microsoft.Office.Interop.Excel.DocEvents_SelectionChangeEventHandler(this.Sheet1_SelectionChange);
+            this.Startup += new System.EventHandler(this.Sheet1_Startup);
+            this.Shutdown += new System.EventHandler(this.Sheet1_Shutdown);
+
         }
 
         #endregion
 
+        private void Sheet1_SelectionChange(Excel.Range Target)
+        {
+            if(Target.Column==3)
+                Globals.ThisWorkbook.ShowTaskPane();
+
+        }
     }
 }

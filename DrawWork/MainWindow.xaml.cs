@@ -31,6 +31,8 @@ using System.Collections.ObjectModel;
 using ExcelDataLib.ExcelModels;
 using System.Diagnostics;
 using DrawWork.DesignServices;
+using AssemblyLib.AssemblyModels;
+using DrawLogicLib.DrawLogicFileServices;
 
 namespace DrawWork
 {
@@ -309,6 +311,38 @@ namespace DrawWork
 
             DesignService designS = new DesignService();
             designS.CreateDesignCRTModel(selView.TankData);
+
+        }
+
+        private void btnTitleBlock_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            TitleBlockWindow cc = new TitleBlockWindow();
+            cc.Owner = this;
+            cc.ShowDialog();
+        }
+
+        // Test New
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            // Assembly
+            AssemblyModel newTankData = new AssemblyModel();
+            newTankData.CreateSampleAssembly();
+
+            // Logic
+            DrawLogicDBService newLogic = new DrawLogicDBService();
+
+
+
+            IntergrationService newInterService = new IntergrationService("CRT",newTankData,testModel);
+            string[] newLogicData = newLogic.GetLogicFile(DrawLogicLib.Commons.LogicFile_Type.GA);
+            if (newInterService.CreateLogic(90,newLogicData))
+            {
+                MessageBox.Show("완료");
+            }
+            else
+            {
+                MessageBox.Show("오류");
+            }
 
         }
     }

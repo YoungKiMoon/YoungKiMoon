@@ -12,18 +12,27 @@ namespace DrawWork.DrawModels
     {
         public DrawEntityModel()
         {
+            // Assembly
             outlineList = new List<Entity>();
             centerlineList = new List<Entity>();
+
+            // Dimension
             dimlineList = new List<Entity>();
             dimTextList = new List<Entity>();
             dimlineExtList = new List<Entity>();
             dimArrowList = new List<Entity>();
+
+            // Leader
             leaderlineList = new List<Entity>();
             leaderTextList = new List<Entity>();
             leaderArrowList = new List<Entity>();
+
+            // Nozzle
             nozzlelineList = new List<Entity>();
             nozzleMarkList = new List<Entity>();
             nozzleTextList = new List<Entity>();
+
+            // Block
             blockList = new List<Entity>();
         }
 

@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDataLib", "..\ExcelDat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesignLib", "..\DesignLib\DesignLib.csproj", "{1F7FF11E-E2D3-4C5C-B003-D7601EC118BC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaperSetting", "..\PaperSetting\PaperSetting.csproj", "{54646763-9077-4586-B318-6A50F28CDA15}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawLogicLib", "..\DrawLogicLib\DrawLogicLib.csproj", "{F83ADBDC-13A0-4154-BB37-4C355E5F5643}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{1F7FF11E-E2D3-4C5C-B003-D7601EC118BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F7FF11E-E2D3-4C5C-B003-D7601EC118BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F7FF11E-E2D3-4C5C-B003-D7601EC118BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54646763-9077-4586-B318-6A50F28CDA15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54646763-9077-4586-B318-6A50F28CDA15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54646763-9077-4586-B318-6A50F28CDA15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54646763-9077-4586-B318-6A50F28CDA15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F83ADBDC-13A0-4154-BB37-4C355E5F5643}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F83ADBDC-13A0-4154-BB37-4C355E5F5643}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F83ADBDC-13A0-4154-BB37-4C355E5F5643}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F83ADBDC-13A0-4154-BB37-4C355E5F5643}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

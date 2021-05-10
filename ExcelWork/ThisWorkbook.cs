@@ -20,7 +20,9 @@ namespace ExcelWork
 
         private void ThisWorkbook_Startup(object sender, System.EventArgs e)
         {
+            
         }
+
 
         private void ThisWorkbook_Shutdown(object sender, System.EventArgs e)
         {
@@ -50,7 +52,7 @@ namespace ExcelWork
             this.ActionsPane.Controls.Add(processActionPane);
             this.ActionsPane.Controls[0].Text = "Design Process";
             this.ActionsPane.Controls[0].Name = "Tank Process";
-            this.Application.CommandBars["Tank Process"].Position = Office.MsoBarPosition.msoBarTop;
+            this.Application.CommandBars["Tank Process"].Position = Office.MsoBarPosition.msoBarRight;
             this.Application.CommandBars["Tank Process"].accName = "aaa";
 
 
