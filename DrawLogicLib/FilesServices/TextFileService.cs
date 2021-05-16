@@ -55,7 +55,7 @@ namespace DrawLogicLib.FilesServices
         {
 
             string newStrAll = GetEmbeddedResource("DrawLogicLib.DrawLogicFiles.", selFilePath);
-            string newStr = newStrAll.Replace("\t", "");
+            string newStr = newStrAll.Replace("\t", "").ToLower();  // To Lower
             string[] newArray = newStr.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             return newArray;
             

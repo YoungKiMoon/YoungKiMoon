@@ -10,6 +10,8 @@ namespace DrawWork.DrawStyleServices
 {
     public class TextStyleService
     {
+        public string TextROMANS = "ROMANS";
+
         public TextStyleService()
         {
 

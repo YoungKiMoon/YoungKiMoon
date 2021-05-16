@@ -104,8 +104,9 @@ namespace DrawWork.CommandServices
         public List<CommandLineModel> CommandTextToLower(string[] selCommandArray)
         {
             List<CommandLineModel> newCommandList = new List<CommandLineModel>();
-            foreach (string eachText in selCommandArray)
-                newCommandList.Add(new CommandLineModel(eachText.ToLower()));
+            if (selCommandArray != null)
+                foreach (string eachText in selCommandArray)
+                    newCommandList.Add(new CommandLineModel(eachText.ToLower()));
 
             return newCommandList;
         }

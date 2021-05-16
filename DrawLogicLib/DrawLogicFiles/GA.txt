@@ -141,7 +141,7 @@ refpoint xy 1000,2000
 
 	point xy refpointx,refpointy
 	
-	logicblock name columnsupportside xy @,@
+	logicblock name structure xy @,@
 
 #endregion
 

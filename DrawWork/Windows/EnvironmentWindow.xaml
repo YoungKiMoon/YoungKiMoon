@@ -8,16 +8,16 @@
         xmlns:vm="clr-namespace:DrawWork.ViewModels"
         
         mc:Ignorable="d"
-        Title="EnvironmentWindow" Height="450" Width="800">
+        Title="TABAS" Height="450" Width="800" WindowStartupLocation="CenterOwner">
     <Window.DataContext>
         <vm:EnvironmentWindowViewModel/>
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="24"/>
+            <RowDefinition Height="0"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Visibility="Collapsed">
             <Button Content="Refresh" Click="Button_Click"/>
         </StackPanel>
         <TabControl Grid.Row="1" BorderThickness="0" Padding="0" SelectedIndex="0">

@@ -104,6 +104,99 @@ namespace DrawWork.DrawServices
 
             return customBlockList.ToArray();
         }
+
+        public Entity[] DrawReference_CompressionRingI(CDPoint selPoint1)
+        {
+            int firstIndex = 0;
+            double A = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingOutsideProjectionA);
+            double B = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingWidthB);
+            double C = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingOverlapC);
+            double t1 = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingThicknessT1);
+
+
+            // Roof Slope
+            string roofSlopeString = assemblyData.RoofInput[firstIndex].RoofSlopeOne;
+            double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
+
+            double outsideBottomX = valueService.GetAdjacentByHypotenuse(roofSlopeDegree, A);
+            double outsideBottomY = valueService.GetOppositeByHypotenuse(roofSlopeDegree, A);
+            double insideBottomX= valueService.GetAdjacentByHypotenuse(roofSlopeDegree, B);
+            double insideBottomY = valueService.GetOppositeByHypotenuse(roofSlopeDegree, B);
+
+            double thicknessY= valueService.GetAdjacentByHypotenuse(roofSlopeDegree, t1);
+            double thickneesX = valueService.GetOppositeByHypotenuse(roofSlopeDegree, t1);
+
+            // 좌측 상단을 기준으로 그림
+            Point3D drawPoint = new Point3D(selPoint1.X - outsideBottomX, selPoint1.Y - outsideBottomY, selPoint1.Z);
+
+            Line lineBa = new Line(GetSumPoint(drawPoint, 0, 0), GetSumPoint(drawPoint, insideBottomX, insideBottomY));
+            Line lineBb = new Line(GetSumPoint(drawPoint, -thickneesX, thicknessY), GetSumPoint(drawPoint, insideBottomX-thickneesX, insideBottomY+thicknessY));
+            Line lineTa = new Line(GetSumPoint(drawPoint, 0, 0), GetSumPoint(drawPoint, -thickneesX, thicknessY));
+            Line lineTb = new Line(GetSumPoint(drawPoint, insideBottomX, insideBottomY), GetSumPoint(drawPoint, insideBottomX - thickneesX, insideBottomY + thicknessY));
+
+
+
+            List<Entity> customBlockList = new List<Entity>();
+
+            customBlockList.Add(lineBa);
+            customBlockList.Add(lineBb);
+            customBlockList.Add(lineTa);
+            customBlockList.Add(lineTb);
+
+            return customBlockList.ToArray();
+        }
+        public Entity[] DrawReference_CompressionRingK(CDPoint selPoint1)
+        {
+            int firstIndex = 0;
+            double A = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingWidthThicknedA);
+            double B = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingDistanceB);
+            double C = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingThicknessC);
+            double D = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingWidthD);
+            double t1 = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingShellThicknessT1);
+
+
+            int maxCourse = valueService.GetIntValue(assemblyData.ShellInput[0].CourseCount) - 1;
+            double maxCourseThk = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].MinThk);
+
+            //
+            double t1Width = (t1 - maxCourseThk) / 2;
+
+            // Angle Slope
+            double angleSlopeDegree = valueService.GetDegreeOfSlope(1,4);
+            double thicknessY = valueService.GetAdjacentByHeight(angleSlopeDegree, t1Width);
+
+            // 우측 상단을 기준으로 그림
+            Point3D drawPoint = new Point3D(selPoint1.X + t1Width, selPoint1.Y, selPoint1.Z);
+
+            Line lineTa = new Line(GetSumPoint(drawPoint, 0, 0), GetSumPoint(drawPoint, -t1, 0));
+            Line lineTHa = new Line(GetSumPoint(drawPoint, -t1, 0), GetSumPoint(drawPoint, -t1, -A + thicknessY));
+            Line lineTHb = new Line(GetSumPoint(drawPoint, 0, 0), GetSumPoint(drawPoint, 0, -A + thicknessY));
+            Line lineTHaL = new Line(GetSumPoint(drawPoint, -t1, -A + thicknessY), GetSumPoint(drawPoint, -t1Width - maxCourseThk, -A));
+            Line lineTHbR = new Line(GetSumPoint(drawPoint, 0, -A + thicknessY), GetSumPoint(drawPoint, -t1Width, -A));
+
+            Line lineTb = new Line(GetSumPoint(drawPoint, -t1Width, -A), GetSumPoint(drawPoint, -t1Width-maxCourseThk, -A));
+
+            Line lineCa = new Line(GetSumPoint(drawPoint, -t1, -B), GetSumPoint(drawPoint, -t1 - D, -B));
+            Line lineCb = new Line(GetSumPoint(drawPoint, -t1, -B - C), GetSumPoint(drawPoint, -t1 - D, -B - C));
+            Line lineCh = new Line(GetSumPoint(drawPoint, -t1-D, -B - C), GetSumPoint(drawPoint, -t1 - D, -B ));
+
+
+
+            List<Entity> customBlockList = new List<Entity>();
+
+            customBlockList.Add(lineTa);
+            customBlockList.Add(lineTHa);
+            customBlockList.Add(lineTHb);
+            customBlockList.Add(lineTHaL);
+            customBlockList.Add(lineTHbR);
+            customBlockList.Add(lineTb);
+
+            customBlockList.Add(lineCa);
+            customBlockList.Add(lineCb);
+            customBlockList.Add(lineCh);
+
+            return customBlockList.ToArray();
+        }
         #endregion
 
         #region HBeam

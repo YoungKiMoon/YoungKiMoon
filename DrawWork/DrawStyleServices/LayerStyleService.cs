@@ -16,25 +16,40 @@ namespace DrawWork.DrawStyleServices
 
         }
 
+        public string LayerCenterLine = "LayerCenterLine";
+        public string LayerVirtualLine = "LayerVirtualLine";
+        public string LayerOutLine = "LayerOutLine";
+        public string LayerHiddenLine = "LayerHiddenLine";
+        public string LayerBasicLine = "LayerBasicLine";
+
+        public string LayerDimension = "LayerDimension";
+        public string LayerBlock = "LayerBlock";
+        public string LayerRevision = "LayerRevision";
+        public string LayerUncertain = "LayerUncertain";
+
+        public string LayerViewport = "LayerViewport";
+        public string LayerPaper = "LayerPaper";
+
+
         public List<Layer> GetDefaultStyle()
         {
             List<Layer> newList = new List<Layer>();
 
             // Model
-            newList.Add(GetLayer("LayerCenterLine", Color.Red, "CENTER2", 0.25f, true));
-            newList.Add(GetLayer("LayervirtualLine", Color.Green, "PHANTOM2", 0.25f, true));
-            newList.Add(GetLayer("LayerOutLine", Color.Yellow, "CONTINU", 0.25f, true));
-            newList.Add(GetLayer("LayerHiddenLine", Color.SkyBlue, "HIDDEN", 0.25f, true));
-            newList.Add(GetLayer("LayerBasicLine", Color.Black, "CONTINU", 0.25f, true));
+            newList.Add(GetLayer(LayerCenterLine, Color.Red, "CENTER2", 0.25f, true));
+            newList.Add(GetLayer(LayerVirtualLine, Color.Green, "PHANTOM2", 0.25f, true));
+            newList.Add(GetLayer(LayerOutLine, Color.Yellow, "CONTINU", 0.25f, true));
+            newList.Add(GetLayer(LayerHiddenLine, Color.SkyBlue, "HIDDEN", 0.25f, true));
+            newList.Add(GetLayer(LayerBasicLine, Color.White, "CONTINU", 0.25f, true));
 
-            newList.Add(GetLayer("LayerDimension", Color.Black, "CONTINU", 0.25f, true));
-            newList.Add(GetLayer("LayerBlock", Color.Black, null, 0.25f, true));
-            newList.Add(GetLayer("LayerRevision", Color.Black, "CONTINU", 0.25f, true));
-            newList.Add(GetLayer("LayerUncertain", Color.Black, "CONTINU", 0.25f, true));
+            newList.Add(GetLayer(LayerDimension, Color.White, "CONTINU", 0.25f, true));
+            newList.Add(GetLayer(LayerBlock, Color.White, null, 0.25f, true));
+            newList.Add(GetLayer(LayerRevision, Color.White, "CONTINU", 0.25f, true));
+            newList.Add(GetLayer(LayerUncertain, Color.White, "CONTINU", 0.25f, true));
 
             // Paper
-            newList.Add(GetLayer("LayerViewPort", Color.Black, "CONTINU", 0.25f, true));
-            newList.Add(GetLayer("LayerPaper", Color.Black, "CONTINU", 0.25f, true));
+            newList.Add(GetLayer(LayerViewport, Color.White, "CONTINU", 0.25f, true));
+            newList.Add(GetLayer(LayerPaper, Color.White, "CONTINU", 0.25f, true));
 
             return newList;
         }

@@ -319,7 +319,6 @@ namespace DrawWork.CommandServices
                     }
                     selCmd[i] = eachCmd;
                 }
-                Console.WriteLine(i.ToString());
             }
 
         }

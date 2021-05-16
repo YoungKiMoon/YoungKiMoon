@@ -12,11 +12,13 @@ namespace PaperSetting.Models
         {
             No = "";
             RevString = "";
-            DateString = "";
+
             Description = "";
-            PreparedName = "";
-            CheckedName = "";
-            ApprovedName = "";
+            DateString = "";
+            DRWN = "";
+            CHKD = "";
+            REVD = "";
+            APVD = "";
         }
 
         public object Clone()
@@ -24,11 +26,13 @@ namespace PaperSetting.Models
             PaperRevisionModel newModel = new PaperRevisionModel();
             newModel.No = No;
             newModel.RevString = RevString;
-            newModel.DateString = DateString;
+
             newModel.Description = Description;
-            newModel.PreparedName = PreparedName;
-            newModel.CheckedName = CheckedName;
-            newModel.ApprovedName = ApprovedName;
+            newModel.DateString = DateString;
+            newModel.DRWN = DRWN;
+            newModel.CHKD = CHKD;
+            newModel.REVD = REVD;
+            newModel.APVD = APVD;
             return newModel;
         }
 
@@ -55,17 +59,6 @@ namespace PaperSetting.Models
             }
         }
 
-        private string _DateString;
-        public string DateString
-        {
-            get { return _DateString; }
-            set
-            {
-                _DateString = value;
-                OnPropertyChanged(nameof(DateString));
-            }
-        }
-
         private string _Description;
         public string Description
         {
@@ -77,36 +70,60 @@ namespace PaperSetting.Models
             }
         }
 
-        private string _PreparedName;
-        public string PreparedName
+        private string _DateString;
+        public string DateString
         {
-            get { return _PreparedName; }
+            get { return _DateString; }
             set
             {
-                _PreparedName = value;
-                OnPropertyChanged(nameof(PreparedName));
+                _DateString = value;
+                OnPropertyChanged(nameof(DateString));
             }
         }
 
-        private string _CheckedName;
-        public string CheckedName
+        private string _DRWN;
+        public string DRWN
         {
-            get { return _CheckedName; }
+            get { return _DRWN; }
             set
             {
-                _CheckedName = value;
-                OnPropertyChanged(nameof(CheckedName));
+                _DRWN = value;
+                OnPropertyChanged(nameof(DRWN));
             }
         }
 
-        private string _ApprovedName;
-        public string ApprovedName
+
+
+        private string _CHKD;
+        public string CHKD
         {
-            get { return _ApprovedName; }
+            get { return _CHKD; }
             set
             {
-                _ApprovedName = value;
-                OnPropertyChanged(nameof(ApprovedName));
+                _CHKD = value;
+                OnPropertyChanged(nameof(CHKD));
+            }
+        }
+
+        private string _REVD;
+        public string REVD
+        {
+            get { return _REVD; }
+            set
+            {
+                _REVD = value;
+                OnPropertyChanged(nameof(REVD));
+            }
+        }
+
+        private string _APVD;
+        public string APVD
+        {
+            get { return _APVD; }
+            set
+            {
+                _APVD = value;
+                OnPropertyChanged(nameof(APVD));
             }
         }
 

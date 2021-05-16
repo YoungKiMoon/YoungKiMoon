@@ -972,8 +972,12 @@ namespace DrawWork.DrawServices
                     returnEntity = (DoBlockHBeam(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
 
-                case "columnsupportside":
-                    returnEntity = (DoBlockColumnSupportSide(eachCmd, ref refPoint, ref curPoint));
+                case "structure":
+                    returnEntity = (DoBlockStructure(eachCmd, ref refPoint, ref curPoint));
+                    goto case "allways";
+
+                case "bottom":
+                    returnEntity = (DoBlockBottom(eachCmd, ref refPoint, ref curPoint));
                     goto case "allways";
 
                 case "windgirder":
@@ -1162,7 +1166,7 @@ namespace DrawWork.DrawServices
             }
             return returnEntity;
         }
-        public Entity[] DoBlockColumnSupportSide(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        public Entity[] DoBlockStructure(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             // 0 : Object
             // 1 : Command
@@ -1197,7 +1201,82 @@ namespace DrawWork.DrawServices
 
             Entity[] returnEntity = null;
             // Create Line
-            returnEntity = drawLogicBlockService.DrawBlock_ColumnSupportSide(newPoint1);
+            returnEntity = drawLogicBlockService.DrawBlock_Structure(newPoint1);
+
+
+
+            // Mirror
+            if (returnEntity != null)
+            {
+                for (int j = refIndex; j < eachCmd.Length; j += 2)
+                {
+                    switch (eachCmd[j])
+                    {
+                        case "mirror":
+                            if (j + 1 <= eachCmd.Length)
+                            {
+                                switch (eachCmd[j + 1])
+                                {
+                                    case "right":
+
+                                        Plane pl1 = Plane.YZ;
+                                        pl1.Origin.X = newPoint1.X;
+                                        pl1.Origin.Y = newPoint1.Y;
+                                        Mirror customMirror = new Mirror(pl1);
+                                        foreach (Entity eachEntity in returnEntity)
+                                        {
+                                            eachEntity.TransformBy(customMirror);
+                                        }
+                                        break;
+                                }
+                            }
+
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            break;
+
+
+                    }
+                }
+            }
+            return returnEntity;
+        }
+
+        public Entity[] DoBlockBottom(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j])
+                {
+                    case "xy":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            Entity[] returnEntity = null;
+            // Create Line
+            returnEntity = drawLogicBlockService.DrawBlock_Structure(newPoint1);
 
 
 

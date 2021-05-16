@@ -21,5 +21,7 @@ namespace DrawWork.Commons
             get { return _GAArea; }
             set { _GAArea = value; }
         }
+
+        public static TANK_TYPE TankType = TANK_TYPE.CRT;
     }
 }

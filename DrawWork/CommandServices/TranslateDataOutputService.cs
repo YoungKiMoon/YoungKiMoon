@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AssemblyLib.AssemblyModels;
+using DrawWork.Commons;
+using DrawWork.DrawServices;
 using DrawWork.ValueServices;
 
 namespace DrawWork.CommandServices
@@ -47,8 +49,14 @@ namespace DrawWork.CommandServices
 
             #region Structure
 
+
+            // Type
+            DrawStructureService StructureDivService = new DrawStructureService();
+            StructureDivService.SetStructureData(SingletonData.TankType, selAssembly.StructureInput[0].SupportingType, selAssembly.RoofInput[0].TopAngleType);
+
             // Structure Column Rafter Output
             selAssembly.StructureColumnRafterOutput.Clear();
+            
             string acRafterSize = valueService.GetAllTrim(selAssembly.StructureInput[firstIndex].RafterSize);
             for (int i = 0; i < selAssembly.StructureRafterInput.Count ; i++)
             {
@@ -57,10 +65,13 @@ namespace DrawWork.CommandServices
                 {
                     foreach (StructureColumnRafterModel eachRafter in selAssembly.StructureColumnRafter)
                     {
-                        if (valueService.GetAllTrim(eachRafter.SIZE) == rafterSize)
+                        if (StructureDivService.topAngleType == eachRafter.Type) // top angle
                         {
-                            selAssembly.StructureColumnRafterOutput.Add(eachRafter);
-                            break;
+                            if (valueService.GetAllTrim(eachRafter.SIZE) == rafterSize)
+                            {
+                                selAssembly.StructureColumnRafterOutput.Add(eachRafter);
+                                break;
+                            }
                         }
                     }
                 }
@@ -72,10 +83,23 @@ namespace DrawWork.CommandServices
             string acRafterSizeLast = valueService.GetAllTrim(selAssembly.StructureRafterInput[selAssembly.StructureRafterInput.Count-1].RafterInSize);
             foreach (StructureColumnClipShellSideModel eachClip in selAssembly.StructureColumnClipShellSide)
             {
-                if (valueService.GetAllTrim(eachClip.SIZE) == acRafterSizeLast)
-                {
-                    selAssembly.StructureColumnClipShellSideOutput.Add(eachClip);
-                }
+                if (eachClip.TankType == StructureDivService.tankType)      // Tank Type
+                    if (eachClip.Type == StructureDivService.columnType)        // Column type
+                    {
+                        if (eachClip.Angle == StructureDivService.topAngleType)     // Top Angle
+                            if (valueService.GetAllTrim(eachClip.SIZE) == acRafterSizeLast)
+                            {
+                                selAssembly.StructureColumnClipShellSideOutput.Add(eachClip);
+                            }
+                    }
+                    else
+                    {
+                        if (valueService.GetAllTrim(eachClip.SIZE) == acRafterSizeLast)
+                        {
+                            selAssembly.StructureColumnClipShellSideOutput.Add(eachClip);
+                        }
+                    }
+
             }
 
 
@@ -169,7 +193,43 @@ namespace DrawWork.CommandServices
             }
 
 
+            // Structure : Centering
+            selAssembly.StructureCenteringOutput.Clear();
+            foreach(StructureCenteringModel eachCentering in selAssembly.StructureCentering)
+            {
+                if(eachCentering.InEx== StructureDivService.centeringInEx)
+                {
+                    if(selAssembly.StructureCenterRingInput[firstIndex].RafterSize==eachCentering.SIZE)
+                        selAssembly.StructureCenteringOutput.Add(eachCentering);
+                }
+            }
 
+            // Structure : ClipCenteringSide
+            selAssembly.StructureClipCenteringSideOutput.Clear();
+            foreach(StructureClipCenteringSideModel eachClip in selAssembly.StructureClipCenteringSide)
+            {
+                if (eachClip.SIZE == selAssembly.StructureCenterRingInput[firstIndex].RafterSize)
+                    selAssembly.StructureClipCenteringSideOutput.Add(eachClip);
+            }
+
+            // Structure : Centering Rafter
+            selAssembly.StructureCenteringRaterOutput.Clear();
+            foreach(StructureCenteringRafterModel eachRafter in selAssembly.StructureCenteringRafter)
+            {
+                if (eachRafter.TankType == StructureDivService.tankType)
+                    if (eachRafter.InEx == StructureDivService.centeringInEx)
+                        if (eachRafter.SIZE == selAssembly.StructureCenterRingInput[firstIndex].RafterSize)
+                            selAssembly.StructureCenteringRaterOutput.Add(eachRafter);
+
+            }
+
+            // Structure : Center Purlin
+            selAssembly.StructureCenteringPurlinOutput.Clear();
+            foreach(AngleSizeModel eachAngle in selAssembly.AngleIList)
+            {
+                if (eachAngle.SIZE == selAssembly.StructureCenterRingInput[firstIndex].PurlinSize)
+                    selAssembly.StructureCenteringPurlinOutput.Add(eachAngle);
+            }
 
             #endregion
         }

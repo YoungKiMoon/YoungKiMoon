@@ -11,24 +11,43 @@
         xmlns:vm="clr-namespace:PaperSetting.ViewModel"
         
         mc:Ignorable="d"
-        Title="PAPER SETTING" Height="600" Width="1100">
+        Title="TABAS" Height="600" Width="1100">
     <Window.DataContext>
         <vm:PaperSettingViewModel/>
     </Window.DataContext>
+    <Window.Resources>
+        <Style TargetType="Button" x:Key="customButton">
+            <Style.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="4"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="BorderBrush" Value="#FF63ADBD"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                </Style>
+            </Style.Resources>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="36"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Border Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Background="#FFDFE9F2">
             <StackPanel Orientation="Horizontal" >
                 <Image Source="Resources/papericon.png" Stretch="Fill" Height="16" Margin="6,0,0,0" />
-                <TextBlock Text="도면 설정" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#FF3F5072" FontWeight="Bold" Padding="6,0,0,0"/>
+                <TextBlock Text="DRAWING LIST" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#FF3F5072" FontWeight="Bold" Padding="6,0,0,0"/>
             </StackPanel>
         </Border>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Preview Rebuild" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Padding="10,0" Background="#FF90E0F1"/>
-            <Button x:Name="btnExport" Content="Create Sample File : DWG" Margin="10,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnExport_PreviewMouseLeftButtonUp"/>
+            <Border CornerRadius="4" Margin="2" Padding="0,4,0,0" BorderBrush="#FF63ADBD" BorderThickness="0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button x:Name="btnRebuild" Content="REBUILD" Style="{StaticResource customButton}" Margin="10,2,2,0" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Padding="10,0" Background="#FF90E0F1"/>
+                    <Button x:Name="btnEnvironment" Content="ENVIRONMENT" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnEnvironment_PreviewMouseLeftButtonUp"/>
+                    <Button x:Name="btnTitleBlock" Content="TITLE BLOCK" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnTitleBlock_PreviewMouseLeftButtonUp"/>
+                </StackPanel>
+            </Border>
+            <Button x:Name="btnExport" Content="CREATE DWG" Style="{StaticResource customButton}" Padding="10,2" FontWeight="Bold"  Margin="2,8,2,2" Background="#FF09A7C9"  BorderBrush="#FF63ADBD" PreviewMouseLeftButtonUp="btnExport_PreviewMouseLeftButtonUp"/>
+
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -183,12 +202,13 @@
                       ItemsSource="{Binding PaperListSelection.Revisions}" HorizontalScrollBarVisibility="Visible"
                       VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="REV." Width="100" Binding="{Binding RevString }"/>
-                                    <DataGridTextColumn Header="DATE" Width="100" Binding="{Binding DateString}"/>
+                                    <DataGridTextColumn Header="REV" Width="100" Binding="{Binding RevString }"/>
                                     <DataGridTextColumn Header="DESCRIPTION" Width="100" Binding="{Binding Description}"/>
-                                    <DataGridTextColumn Header="PREPARED" Width="100" Binding="{Binding PreparedName}"/>
-                                    <DataGridTextColumn Header="CHECKED" Width="100" Binding="{Binding CheckedName}"/>
-                                    <DataGridTextColumn Header="APPROVED" Width="100" Binding="{Binding ApprovedName}"/>
+                                    <DataGridTextColumn Header="DATE" Width="100" Binding="{Binding DateString}"/>
+                                    <DataGridTextColumn Header="DRWN" Width="100" Binding="{Binding DRWN}"/>
+                                    <DataGridTextColumn Header="CHKD" Width="100" Binding="{Binding CHKD}"/>
+                                    <DataGridTextColumn Header="REVD" Width="100" Binding="{Binding REVD}"/>
+                                    <DataGridTextColumn Header="APVD" Width="100" Binding="{Binding APVD}"/>
 
                                 </DataGrid.Columns>
 
@@ -282,7 +302,7 @@
                     <TabItem Header="NOTE" MinWidth="100" BorderThickness="0" >
                         <Grid>
                             <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
-                      ItemsSource="{Binding PaperListSelection.Tables}" HorizontalScrollBarVisibility="Visible"
+                      ItemsSource="{Binding PaperListSelection.Notes}" HorizontalScrollBarVisibility="Visible"
                       VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="No" Width="30" Binding="{Binding No}"/>

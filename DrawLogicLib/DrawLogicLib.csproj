@@ -43,6 +43,8 @@
     <Compile Include="Commons\CommonBase.cs" />
     <Compile Include="DrawLogicFileServices\DrawLogicDBService.cs" />
     <Compile Include="FilesServices\TextFileService.cs" />
+    <Compile Include="Models\DrawLogicModel.cs" />
+    <Compile Include="Models\DrawCommandModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

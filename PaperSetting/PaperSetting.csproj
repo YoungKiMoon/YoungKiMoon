@@ -95,6 +95,7 @@
     <Compile Include="CustomControl\CustomDataGrid.cs" />
     <Compile Include="EYEServices\EYECADService.cs" />
     <Compile Include="EYEServices\ModelDrawService.cs" />
+    <Compile Include="EYEServices\PaperBlockService.cs" />
     <Compile Include="EYEServices\PaperDrawService.cs" />
     <Compile Include="Models\DockModel.cs" />
     <Compile Include="Models\IBaseModel.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Models\SizeModel.cs" />
     <Compile Include="Models\ViewPortModel.cs" />
     <Compile Include="Services\PaperDockService.cs" />
+    <Compile Include="Services\PaperSettingService.cs" />
     <Compile Include="Services\SampleService.cs" />
     <Compile Include="Utils\Notifier.cs" />
     <Compile Include="ViewModel\PaperSettingViewModel.cs" />
@@ -159,6 +161,19 @@
   <ItemGroup>
     <Resource Include="Resources\papericon.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\AssemblyLib\AssemblyLib.csproj">
+      <Project>{0e54a176-e260-4436-ad95-d3a4f5c10b10}</Project>
+      <Name>AssemblyLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DrawLogicLib\DrawLogicLib.csproj">
+      <Project>{f83adbdc-13a0-4154-bb37-4c355e5f5643}</Project>
+      <Name>DrawLogicLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DrawWork\DrawWork.csproj">
+      <Project>{ab705c54-197d-4c70-a2a9-5525073f7240}</Project>
+      <Name>DrawWork</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

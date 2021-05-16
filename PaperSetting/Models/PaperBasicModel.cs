@@ -16,6 +16,14 @@ namespace PaperSetting.Models
             DwgNo = "";
             StampName = "";
         }
+        public PaperBasicModel(bool selView, string selNo, string selTitle, string selDwgNo, string selStampName)
+        {
+            View = selView;
+            No = selNo;
+            Title = selTitle;
+            DwgNo = selDwgNo;
+            StampName = selStampName;
+        }
 
         public object Clone()
         {

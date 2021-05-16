@@ -33,6 +33,7 @@ using System.Diagnostics;
 using DrawWork.DesignServices;
 using AssemblyLib.AssemblyModels;
 using DrawLogicLib.DrawLogicFileServices;
+using DrawLogicLib.Models;
 
 namespace DrawWork
 {
@@ -330,12 +331,23 @@ namespace DrawWork
 
             // Logic
             DrawLogicDBService newLogic = new DrawLogicDBService();
+            DrawLogicModel newLogicData = newLogic.GetLogicCommand(DrawLogicLib.Commons.LogicFile_Type.GA);
 
+            // Virtual Design
+            DesignService designS = new DesignService();
+            designS.CreateDesignCRTModel(newTankData);
 
+            // 시트 값을 가져와야 함 : Assembly.Create Mapping Data
 
-            IntergrationService newInterService = new IntergrationService("CRT",newTankData,testModel);
-            string[] newLogicData = newLogic.GetLogicFile(DrawLogicLib.Commons.LogicFile_Type.GA);
-            if (newInterService.CreateLogic(90,newLogicData))
+            // 버추얼 디자인의 True False
+
+            // Logic을 수동으로 연결
+
+            // 형상 그리는 것은 완료
+
+            string[] cc = null;
+            IntergrationService newInterService = new IntergrationService("CRT", newTankData, testModel);
+            if (newInterService.CreateLogic(90, cc))
             {
                 MessageBox.Show("완료");
             }

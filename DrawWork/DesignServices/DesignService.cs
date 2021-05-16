@@ -26,11 +26,12 @@ namespace DrawWork.DesignServices
             DesignStepModel newStepWindGirder = new DesignStepModel("WIND GIRDER", "", false);
             newStepShell.Options.Add(newStepWindGirder);
             // 1 : 2 : 3 
-            newStepWindGirder.Options.Add(new DesignStepModel("TYPE-1 (SINGLE ANGLE)", "", false));
-            newStepWindGirder.Options.Add(new DesignStepModel("TYPE-1 (DOUBLE ANGLE)", "", false));
+            newStepWindGirder.Options.Add(new DesignStepModel("detail C", "", false));
+            newStepWindGirder.Options.Add(new DesignStepModel("detail d", "", false));
             // 1 : 2
             DesignStepModel newStepInsulation = new DesignStepModel("INSULATION", "", false);
             newStepShell.Options.Add(newStepInsulation);
+            newStepInsulation.Options.Add(new DesignStepModel("Insulation", "", false));
             #endregion
 
             #region Roof
@@ -38,15 +39,18 @@ namespace DrawWork.DesignServices
             DesignStepModel newStepRoof = new DesignStepModel("ROOF", "", true);        // Multi
             newStepModel.Options.Add(newStepRoof);
             // 1 : 2 
-            DesignStepModel newStepTopJoint = new DesignStepModel("TOP JOINT", "", false);
+            DesignStepModel newStepTopJoint = new DesignStepModel("TOP JOINT", "", false,true);
             newStepRoof.Options.Add(newStepTopJoint);
             // 1 : 2 : 3 : 
-            newStepTopJoint.Options.Add(new DesignStepModel("TOP ANGLE", "", false));
-            newStepTopJoint.Options.Add(new DesignStepModel("SHELL COMPRESSION RING", "", false));
-            newStepTopJoint.Options.Add(new DesignStepModel("ROOF COMPRESSION RING", "", false));
+            newStepTopJoint.Options.Add(new DesignStepModel("detail b", "", false));
+            newStepTopJoint.Options.Add(new DesignStepModel("detail d", "", false));
+            newStepTopJoint.Options.Add(new DesignStepModel("detail e", "", false));
+            newStepTopJoint.Options.Add(new DesignStepModel("detail i", "", false));
+            newStepTopJoint.Options.Add(new DesignStepModel("detail k", "", false));
             // 1 : 2 
             DesignStepModel newStepRoofInsulation = new DesignStepModel("INSULATION", "", false);
             newStepRoof.Options.Add(newStepRoofInsulation);
+            newStepRoofInsulation.Options.Add(new DesignStepModel("INSULATION", "", false));
             #endregion
 
             #region Bottom
@@ -54,14 +58,20 @@ namespace DrawWork.DesignServices
             DesignStepModel newStepBottom = new DesignStepModel("BOTTOM", "", true);        // Multi
             newStepModel.Options.Add(newStepBottom);
             // 1 : 2 
-            DesignStepModel newStepBottomType = new DesignStepModel("BOTTOM TYPE", "", false);
-            newStepBottom.Options.Add(newStepBottomType);
+            DesignStepModel newStepAnnularPlate = new DesignStepModel("ANNULAR PLATE", "", false);
+            newStepBottom.Options.Add(newStepAnnularPlate);
             // 1 : 2 : 3 : 
-            newStepBottomType.Options.Add(new DesignStepModel("BOTTOM PLATE", "", false));
-            newStepBottomType.Options.Add(new DesignStepModel("ANNULAR PLATE", "", false));
+            newStepAnnularPlate.Options.Add(new DesignStepModel("ANNULAR PLATE", "", false));
+            // 1 : 2 
+            DesignStepModel newStepDripRing = new DesignStepModel("DRIP RING", "", false);
+            newStepBottom.Options.Add(newStepDripRing);
+            // 1 : 2 : 3 : 
+            newStepDripRing.Options.Add(new DesignStepModel("DRIP RING", "", false));
             // 1 : 2 
             DesignStepModel newStepAnchorChar = new DesignStepModel("ANCHOR CHAR", "", false);
             newStepBottom.Options.Add(newStepAnchorChar);
+            // 1 : 2 : 3 : 
+            newStepAnchorChar.Options.Add(new DesignStepModel("ANCHOR CHAR", "", false));
             #endregion
 
             #region Structure
@@ -69,18 +79,14 @@ namespace DrawWork.DesignServices
             DesignStepModel newStepStructure = new DesignStepModel("STRUCTURE", "", false);
             newStepModel.Options.Add(newStepStructure);
             // 1 : 2 
-            DesignStepModel newStepRafterCenterRing = new DesignStepModel("RAFTER CENTER RING", "", true);  // Multi
-            newStepStructure.Options.Add(newStepRafterCenterRing);
+            DesignStepModel newStepStructureType = new DesignStepModel("STRUCTURE TYPE", "", false,true);  // Multi
+            newStepStructure.Options.Add(newStepStructureType);
             // 1 : 2 : 3 : 
-            newStepRafterCenterRing.Options.Add(new DesignStepModel("INT. TYPE", "", false));
-            newStepRafterCenterRing.Options.Add(new DesignStepModel("EXT. TYPE", "", false));
-            newStepRafterCenterRing.Options.Add(new DesignStepModel("PURLIN", "", false));
-            // 1 : 2 
-            DesignStepModel newStepRafterColumn = new DesignStepModel("RAFTER COLUMN", "", false);
-            newStepStructure.Options.Add(newStepRafterColumn);
-            // 1 : 2 : 3 : 
-            newStepRafterCenterRing.Options.Add(new DesignStepModel("1st COLUMN", "", false));
-            newStepRafterCenterRing.Options.Add(new DesignStepModel("2nd COLUMN + GIRDER", "", false));
+            newStepStructureType.Options.Add(new DesignStepModel("Self-Supporting", "", false));
+            newStepStructureType.Options.Add(new DesignStepModel("Rafter Only(internal)", "", false));
+            newStepStructureType.Options.Add(new DesignStepModel("Rafter Only(external)", "", false));
+            newStepStructureType.Options.Add(new DesignStepModel("Rafter w/Column", "", false));
+            newStepStructureType.Options.Add(new DesignStepModel("Rafter w/Column & Girder", "", false));
             #endregion
 
             #region Nozzle
@@ -162,22 +168,21 @@ namespace DrawWork.DesignServices
             DesignStepModel newStepAccess = new DesignStepModel("ACCESS", "", true);        //Multi
             newStepModel.Options.Add(newStepAccess);
             // 1 : 2 
-            DesignStepModel newStepAccessShell = new DesignStepModel("SHELL", "", true);  // Multi
-            newStepAccess.Options.Add(newStepAccessShell);
+            DesignStepModel newStepAccessSSL = new DesignStepModel("Spiral Stairway vs Ladder", "", false,true);
+            newStepAccess.Options.Add(newStepAccessSSL);
             // 1 : 2 : 3 : 
-            DesignStepModel newStepAccessShellLadder = new DesignStepModel("LADDER", "", false);
-            newStepAccessShell.Options.Add(newStepAccessShellLadder);
-            // 1 : 2 : 3 : 4
-            newStepAccessShellLadder.Options.Add(new DesignStepModel("INT. TYPE", "", false));
-            newStepAccessShellLadder.Options.Add(new DesignStepModel("EXT. TYPE", "", false));
-            // 1 : 2 : 3 : 
-            newStepAccessShell.Options.Add(new DesignStepModel("SPIRAL STAIRWAY", "", false));
-            newStepAccessShell.Options.Add(new DesignStepModel("FOAM MAINTENANCE PLATFORM", "", false));
+            newStepAccessSSL.Options.Add(new DesignStepModel("LADDER", "", false));
+            newStepAccessSSL.Options.Add(new DesignStepModel("SPIRAL STAIRWAY", "", false));
             // 1 : 2 
-            DesignStepModel newStepAccessRoof = new DesignStepModel("ROOF", "", false);
-            newStepAccess.Options.Add(newStepAccessRoof);
+            DesignStepModel newStepAccessRoofPlatform = new DesignStepModel("ROOF PLATFORM", "", false);
+            newStepAccess.Options.Add(newStepAccessRoofPlatform);
             // 1 : 2 : 3 : 
-            newStepAccessRoof.Options.Add(new DesignStepModel("TOP PLATFORM", "", false));
+            newStepAccessRoofPlatform.Options.Add(new DesignStepModel("ROOF PLATFORM", "", false));
+            // 1 : 2 
+            DesignStepModel newStepAccessFMP = new DesignStepModel("FOAM MAINTENANCE PLATFORM", "", false);
+            newStepAccess.Options.Add(newStepAccessFMP);
+            // 1 : 2 : 3 : 
+            newStepAccessFMP.Options.Add(new DesignStepModel("FOAM MAINTENANCE PLATFORM", "", false));
             #endregion
 
             #region Appurtenances
@@ -185,17 +190,26 @@ namespace DrawWork.DesignServices
             DesignStepModel newStepAppurtenances = new DesignStepModel("APPURTENANCES", "", false);
             newStepModel.Options.Add(newStepAppurtenances);
             // 1 : 2
-            DesignStepModel newStepAppurtenancesShell = new DesignStepModel("SHELL", "", false);
-            newStepAppurtenances.Options.Add(newStepAppurtenancesShell);
+            DesignStepModel newStepAppurtenancesNamePlate = new DesignStepModel("NAME PLATE", "", false,true);
+            newStepAppurtenances.Options.Add(newStepAppurtenancesNamePlate);
             // 1 : 2 : 3
-            newStepAppurtenancesShell.Options.Add(new DesignStepModel("NAME PLATE", "", false));
-            newStepAppurtenancesShell.Options.Add(new DesignStepModel("EARTH LUG", "", false));
-            newStepAppurtenancesShell.Options.Add(new DesignStepModel("SETTLEMENT CHECK PIECE", "", false));
+            newStepAppurtenancesNamePlate.Options.Add(new DesignStepModel("NAME PLATE", "", false));
             // 1 : 2
-            DesignStepModel newStepAppurtenancesRoof = new DesignStepModel("ROOF", "", false);
-            newStepAppurtenances.Options.Add(newStepAppurtenancesRoof);
+            DesignStepModel newStepAppurtenancesEarthLug = new DesignStepModel("EARTH LUG", "", false, true);
+            newStepAppurtenances.Options.Add(newStepAppurtenancesEarthLug);
             // 1 : 2 : 3
-            newStepAppurtenancesRoof.Options.Add(new DesignStepModel("SCAFFOLD CABLE SUPPORT", "", false));
+            newStepAppurtenancesEarthLug.Options.Add(new DesignStepModel("EARTH LUG", "", false));
+            // 1 : 2
+            DesignStepModel newStepAppurtenancesSCP = new DesignStepModel("SETTLEMENT CHECK PIECE", "", false, true);
+            newStepAppurtenances.Options.Add(newStepAppurtenancesSCP);
+            // 1 : 2 : 3
+            newStepAppurtenancesSCP.Options.Add(new DesignStepModel("SETTLEMENT CHECK PIECE", "", false));
+            // 1 : 2
+            DesignStepModel newStepAppurtenancesSCS = new DesignStepModel("NAME PLATE", "", false, true);
+            newStepAppurtenances.Options.Add(newStepAppurtenancesSCS);
+            // 1 : 2 : 3
+            newStepAppurtenancesSCS.Options.Add(new DesignStepModel("NAME PLATE", "", false));
+
             #endregion
 
 

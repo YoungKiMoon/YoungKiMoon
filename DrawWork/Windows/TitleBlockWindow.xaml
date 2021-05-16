@@ -8,7 +8,7 @@
         xmlns:vm="clr-namespace:DrawWork.ViewModels"
         
         mc:Ignorable="d"
-        Title="Title Block" Height="510" Width="600" WindowStartupLocation="CenterOwner">
+        Title="TABAS" Height="510" Width="600" WindowStartupLocation="CenterOwner">
     <Window.DataContext>
         <vm:TitleBlockWindowViewModel/>
     </Window.DataContext>
@@ -23,6 +23,15 @@
                 <Image Source="Resources/papericon.png" Stretch="Fill" Height="16" Margin="6,0,0,0" />
                 -->
                 <TextBlock Text="Title Block" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#FF3F5072" FontWeight="Bold" Padding="10,0,0,0"/>
+                <ComboBox Width="200" Margin="20,6,0,6">
+                    <ComboBoxItem Content="Type01"/>
+                    <ComboBoxItem Content="Type02"/>
+                    <ComboBox.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="2"/>
+                        </Style>
+                    </ComboBox.Resources>
+                </ComboBox>
             </StackPanel>
         </Border>
         <Border Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2" Background="#FFC4D6E6"/>

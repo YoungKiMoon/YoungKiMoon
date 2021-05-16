@@ -131,7 +131,7 @@ namespace DrawWork.DrawServices
                 case WORKINGPOINT_TYPE.PointLeftRoofUp:                 // 2021-04-22 완료
                     CDPoint topleftpoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
                     WPPoint = GetSumCDPoint(topleftpoint,
-                                            valueService.GetOppositeByHypotenuse(assemblyData.RoofInput[0].RoofSlopeOne, assemblyData.RoofInput[0].RoofThickness),
+                                            - valueService.GetOppositeByHypotenuse(assemblyData.RoofInput[0].RoofSlopeOne, assemblyData.RoofInput[0].RoofThickness),
                                             valueService.GetAdjacentByHypotenuse(assemblyData.RoofInput[0].RoofSlopeOne, assemblyData.RoofInput[0].RoofThickness));
                     break;
 
@@ -286,9 +286,9 @@ namespace DrawWork.DrawServices
         #region Point : Roof
         private CDPoint PointTopAngleRoof(ref CDPoint refPoint, ref CDPoint curPoint)
         {
-            int refFirstIndex = 0;
+            int firstIndex = 0;
 
-            string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
+            string selSizeTankHeight = assemblyData.GeneralDesignData[firstIndex].SizeTankHeight;
             //string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalId;
 
             CDPoint newPoint = new CDPoint();
@@ -330,6 +330,41 @@ namespace DrawWork.DrawServices
 
                     break;
 
+                case "i":
+                    // Roof Slope
+                    string roofSlopeString = assemblyData.RoofInput[firstIndex].RoofSlopeOne;
+                    double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
+
+                    double A = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingOutsideProjectionA);
+                    double B = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingWidthB);
+                    double C = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingOverlapC);
+                    double t1 = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingThicknessT1);
+
+                    double insideX = valueService.GetAdjacentByHypotenuse(roofSlopeDegree, B - A - C);
+                    double insideY = valueService.GetOppositeByHypotenuse(roofSlopeDegree, B - A - C);
+                    double thicknessY = valueService.GetAdjacentByHypotenuse(roofSlopeDegree, t1);
+                    double thickneesX = valueService.GetOppositeByHypotenuse(roofSlopeDegree, t1);
+
+                    newPoint = GetSumCDPoint(refPoint,
+                                             - valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].MinThk)
+                                             - thickneesX
+                                             + insideX,
+
+                                             + valueService.GetDoubleValue(selSizeTankHeight)
+                                             + thicknessY
+                                             + insideY);
+                    break;
+
+                case "k":
+                    double t1Width = (valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingShellThicknessT1)
+                                      -valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].MinThk)
+                                     )/2;
+                    newPoint = GetSumCDPoint(refPoint,
+                                             + t1Width,
+
+                                             + valueService.GetDoubleValue(selSizeTankHeight)
+);
+                    break;
 
             }
 
@@ -339,9 +374,9 @@ namespace DrawWork.DrawServices
         private CDPoint PointTopAngleShell(ref CDPoint refPoint, ref CDPoint curPoint)
         {
 
-            int refFirstIndex = 0;
+            int firstIndex = 0;
 
-            string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
+            string selSizeTankHeight = assemblyData.GeneralDesignData[firstIndex].SizeTankHeight;
             //string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalId;
 
             CDPoint newPoint = new CDPoint();
@@ -373,6 +408,18 @@ namespace DrawWork.DrawServices
                                                    + valueService.GetDoubleValue(selSizeTankHeight)
                                                    - valueService.GetDoubleValue(eachAngle.AB));
 
+                    break;
+                case "i":
+                    newPoint = GetSumCDPoint(refPoint,
+                                                   0,
+                                                   valueService.GetDoubleValue(selSizeTankHeight));
+
+                    break;
+                case "k":
+                    newPoint = GetSumCDPoint(refPoint,
+                                                   0,
+                                                   + valueService.GetDoubleValue(selSizeTankHeight)
+                                                   - valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingWidthThicknedA));
                     break;
             }
 

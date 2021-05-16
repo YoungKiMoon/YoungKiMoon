@@ -88,6 +88,28 @@ namespace DrawWork.Commons
     }
 
 
+    // Layer Type
+    public enum LAYER_TYPE
+    {
+        NotSet,
+
+        LayerCenterLine,
+        LayerVirtualLine,
+        LayerOutLine,
+        LayerHiddenLine,
+        LayerBasicLine,
+
+        LayerDimension,
+        LayerBlock,
+        LayerRevision,
+        LayerUncertain,
+
+        LayerViewPort,
+        LayerPaper,
+
+    }
+
+
 
     // Working Point
     public enum WORKINGPOINT_TYPE 
@@ -149,4 +171,15 @@ namespace DrawWork.Commons
 
     }
 
+    // Tank Type
+    public enum TANK_TYPE
+    {
+        NoSet,
+        CRT,
+        DRT,
+        IFRT,
+        EFRTSingle,
+        EFRTDouble,
+
+    }
 }

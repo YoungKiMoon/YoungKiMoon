@@ -70,7 +70,10 @@
     <Compile Include="AssemblyModels\RoofOutputModel.cs" />
     <Compile Include="AssemblyModels\ShellInputModel.cs" />
     <Compile Include="AssemblyModels\ShellOutputModel.cs" />
+    <Compile Include="AssemblyModels\StructureCenteringModel.cs" />
+    <Compile Include="AssemblyModels\StructureCenteringRafterModel.cs" />
     <Compile Include="AssemblyModels\StructureCenterRingInputModel.cs" />
+    <Compile Include="AssemblyModels\StructureClipCenteringSideModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnBaseSupportModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnCenterModel.cs" />
     <Compile Include="AssemblyModels\StructureColumnClipShellSideModel.cs" />

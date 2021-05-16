@@ -99,6 +99,7 @@
     <Compile Include="DrawServices\DrawBoundaryService.cs" />
     <Compile Include="DrawServices\DrawImportBlockService.cs" />
     <Compile Include="DrawServices\DrawLogicBlockService.cs" />
+    <Compile Include="DrawServices\DrawStructureService.cs" />
     <Compile Include="DrawServices\DrawWorkingPointService.cs" />
     <Compile Include="DrawServices\DrawNozzleService.cs" />
     <Compile Include="DrawServices\DrawObjectService.cs" />

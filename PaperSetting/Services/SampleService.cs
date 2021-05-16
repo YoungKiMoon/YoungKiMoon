@@ -24,10 +24,12 @@ namespace PaperSetting.Services
             {
                 paperNo++;
                 PaperDwgModel newPaper = new PaperDwgModel();
-
                 // SheetSize
-                newPaper.SheetSize.Width = 420;
-                newPaper.SheetSize.Height = 297;
+                newPaper.SheetSize.Width = 841;
+                newPaper.SheetSize.Height = 594;
+
+                
+
 
                 // Basic
                 newPaper.Basic.No = paperNo.ToString();
@@ -44,9 +46,9 @@ namespace PaperSetting.Services
                     newRevision.RevString = i.ToString();
                     newRevision.DateString = "JAN." + i.ToString("00") + ".2021";
                     newRevision.Description = "FOR INFORMATION";
-                    newRevision.PreparedName = "J.Y.HAM";
-                    newRevision.CheckedName = "S.Y.PARK";
-                    newRevision.ApprovedName = "M.G.JEONG";
+                    newRevision.REVD = "J.Y.HAM";
+                    newRevision.CHKD = "S.Y.PARK";
+                    newRevision.APVD = "M.G.JEONG";
                     newPaper.Revisions.Add(newRevision);
 
                     // Table
@@ -83,11 +85,17 @@ namespace PaperSetting.Services
 
                     if (paperNo == 1)
                     {
-                        if (i < 2)
-                        {
-                            ViewPortCustom(newViewport, 0, tempX);
-                            newPaper.ViewPorts.Add(newViewport);
-                        }
+                        ViewPortModel cuView = new ViewPortModel();
+                        cuView.ScaleStr = "90";
+                        cuView.TargetX = "17000";
+                        cuView.TargetY = "14000";
+                        cuView.LocationX = "330";
+                        cuView.LocationY = "360";
+                        cuView.SizeX = "600";
+                        cuView.SizeY = "400";
+
+                        newViewport.ViewPort = cuView;
+                        newPaper.ViewPorts.Add(newViewport);
                     }
                     else
                     {

@@ -11,7 +11,6 @@ namespace PaperSetting.ViewModel
 {
     public class PaperSettingViewModel : Notifier
     {
-        private ObservableCollection<PaperDwgModel> _PaperList;
         public ObservableCollection<PaperDwgModel> PaperList
         {
             get { return _PaperList; }
@@ -21,8 +20,8 @@ namespace PaperSetting.ViewModel
                 OnPropertyChanged(nameof(PaperList));
             }
         }
+        private ObservableCollection<PaperDwgModel> _PaperList;
 
-        private ObservableCollection<PaperDwgModel> _PaperListSelectionColl;
         public ObservableCollection<PaperDwgModel> PaperListSelectionColl
         {
             get { return _PaperListSelectionColl; }
@@ -32,8 +31,8 @@ namespace PaperSetting.ViewModel
                 OnPropertyChanged(nameof(PaperListSelectionColl));
             }
         }
+        private ObservableCollection<PaperDwgModel> _PaperListSelectionColl;
 
-        private PaperDwgModel _PaperListSelection;
         public PaperDwgModel PaperListSelection
         {
             get { return _PaperListSelection; }
@@ -45,6 +44,7 @@ namespace PaperSetting.ViewModel
                 PaperListSelectionColl.Add(value);
             }
         }
+        private PaperDwgModel _PaperListSelection;
 
 
         public PaperSettingViewModel()
@@ -52,7 +52,13 @@ namespace PaperSetting.ViewModel
             PaperListSelectionColl = new ObservableCollection<PaperDwgModel>();
             PaperListSelection = new PaperDwgModel();
 
-            PaperList = SampleService.CreatePaperSample();
+
+            PaperSettingService newSetting = new PaperSettingService();
+            PaperList = newSetting.CreateDrawingCRTList();
+
+            //PaperList = SampleService.CreatePaperSample();
+
+            
         }
 
     }

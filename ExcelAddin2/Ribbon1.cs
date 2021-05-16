@@ -88,11 +88,11 @@ namespace ExcelAddIn
             }
             else if (control.Id == "cuGroupButton01")
             {
-                return "계산서 INFROM";
+                return "계산서 INFORM";
             }
             else if (control.Id == "cuGroupButton02")
             {
-                return "타공정 INFROM";
+                return "타공정 INFORM";
             }
             else if (control.Id == "cuGroupButton03")
             {
@@ -100,7 +100,7 @@ namespace ExcelAddIn
             }
             else if (control.Id == "cuGroupButton04")
             {
-                return "PAPER SETTING";
+                return "DRAWING LIST";
             }
             else if (control.Id == "cuGroupButton05")
             {
