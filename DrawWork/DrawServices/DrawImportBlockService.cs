@@ -12,23 +12,28 @@ using devDept.Geometry;
 using devDept.Serialization;
 using MColor = System.Windows.Media.Color;
 using DrawWork.DrawModels;
+using DrawWork.DrawStyleServices;
 
 namespace DrawWork.DrawServices
 {
     public class DrawImportBlockService
     {
         public Model singleModel;
+
+        private StyleFunctionService styleSerivce;
         public DrawImportBlockService(Model selModel)
         {
             singleModel = selModel;
         }
 
-        public BlockReference Draw_ImportBlock(CDPoint selPoint1, string selBlockName,double scaleFactor=1)
+        public BlockReference Draw_ImportBlock(CDPoint selPoint1, string selBlockName, string selLayerName, double scaleFactor=1)
         {
             if (singleModel.Blocks.Contains(selBlockName))
             {
                 BlockReference newBlock = new BlockReference(selPoint1.X, selPoint1.Y, 0, selBlockName.ToUpper(), 0);
                 newBlock.Scale(scaleFactor);
+
+                styleSerivce.SetLayer(ref newBlock, selLayerName);
                 return newBlock;
             }
             else

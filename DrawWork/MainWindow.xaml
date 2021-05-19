@@ -10,7 +10,7 @@
         xmlns:ddes="http://schemas.devdept.com/winfx/2008/xaml/control" xmlns:ddgr="http://schemas.devdept.com/winfx/2008/xaml/graphics" x:Class="DrawWork.MainWindow"
     
         mc:Ignorable="d"
-        Title="Draw Logic Preview" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+        Title="Draw Logic Preview" Height="450" Width="800" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
@@ -53,10 +53,11 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="Logic File :" VerticalAlignment="Center" HorizontalAlignment="Center" />
             <TextBox x:Name="logicFile" Grid.Column="1"  Margin="0,2"/>
-            
+            <TextBox x:Name="ExcelFile" Grid.Column="2"  Margin="0,2"/>
         </Grid>
         <Grid Grid.Row="3" >
             <Grid.ColumnDefinitions>

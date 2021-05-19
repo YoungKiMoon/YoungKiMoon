@@ -15,6 +15,7 @@ using xlWin = Microsoft.Office.Interop.Excel.Window;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Collections.ObjectModel;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace ExcelDataLib.ExcelServices
 {
@@ -253,8 +254,9 @@ namespace ExcelDataLib.ExcelServices
             {
                 foreach(PropertyInfo eachPro in selAssembly.GetType().GetProperties())
                 {
-                    var newModelObject = eachPro.GetValue(selAssembly, null);
+                    dynamic newModelObject = eachPro.GetValue(selAssembly, null);
                     ObservableCollection<object> newModelCollection = new ObservableCollection<object>(((ICollection)newModelObject).Cast<object>());
+                                        
                     if (IsSingleExcelData(newModelCollection))
                     {
                         GetExcelSingleData(selExcelData, newModelCollection);
@@ -262,10 +264,21 @@ namespace ExcelDataLib.ExcelServices
                     else
                     {
                         GetExcelMultiData(selExcelData, newModelCollection);
+                        IList cc = ((IList)newModelObject);
+                        foreach (var eachVar in newModelCollection)
+                            cc.Add(eachVar);
+
+                        eachPro.SetValue(selAssembly, newModelObject, null);
+                            
+                        
+                        
                     }
+                    
                 }
             }
         }
+
+
 
         private bool IsSingleExcelData(ObservableCollection<object> selModelCollection)
         {
@@ -437,6 +450,8 @@ namespace ExcelDataLib.ExcelServices
                             // rowCount
                             rowCount++;
 
+
+
                             // RowCount Command
                             if (RowCountCommnad > 0)
                             {
@@ -466,7 +481,9 @@ namespace ExcelDataLib.ExcelServices
                                 selModelCollection.Add(newModel);
                             }
 
-
+                            // Exit Roof
+                            if (rowCount >= eachSheet.RowCount)
+                                runSign = false; 
 
 
                         }

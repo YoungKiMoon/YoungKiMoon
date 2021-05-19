@@ -18,6 +18,7 @@ using DrawWork.ValueServices;
 using DrawWork.DrawModels;
 using DrawWork.Commons;
 using DrawWork.DrawCustomObjectModels;
+using DrawWork.DrawStyleServices;
 
 namespace DrawWork.DrawServices
 {
@@ -27,6 +28,7 @@ namespace DrawWork.DrawServices
 
         private ValueService valueService;
         private DrawWorkingPointService workingPointService;
+        private StyleFunctionService styleService;
 
         public DrawNozzleService(AssemblyModel selAssembly)
         {
@@ -34,6 +36,7 @@ namespace DrawWork.DrawServices
 
             valueService = new ValueService();
             workingPointService = new DrawWorkingPointService(selAssembly);
+            styleService = new StyleFunctionService();
         }
 
         public DrawEntityModel DrawNozzle_GA(ref CDPoint refPoint,
@@ -42,7 +45,8 @@ namespace DrawWork.DrawServices
                                       string selNozzlePosition,
                                       string selNozzleFontSize,
                                       string selLeaderCircleSize,
-                                      string selMultiColumn)
+                                      string selMultiColumn,
+                                      string selLayerName)
         {
 
             DrawEntityModel nozzleEntities = new DrawEntityModel();
@@ -59,12 +63,18 @@ namespace DrawWork.DrawServices
             int refFirstIndex = 0;
 
             //string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
-            string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalId;
+            string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalID;
 
             double sizeNominalId = valueService.GetDoubleValue(selSizeNominalId);
             CDPoint newCurPoint = new CDPoint();
             CDPoint centerTopPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref newCurPoint);
             double centerTopHeight = centerTopPoint.Y;
+
+
+            // Entity
+            List<Entity> customOutlineEntity = new List<Entity>();
+            List<Entity> customMarkEntity = new List<Entity>();
+            List<Entity> customTextEntity = new List<Entity>();
 
 
             // MutilColumn
@@ -83,8 +93,8 @@ namespace DrawWork.DrawServices
 
                 eachNozzle.ReinforcingPadType = eachNozzle.ReinforcingPadType.ToLower();
                 eachNozzle.InletOutlet = eachNozzle.InletOutlet.ToLower();
-                eachNozzle.Interal = eachNozzle.Interal.ToLower();
-                eachNozzle.Sump = eachNozzle.Sump.ToLower();
+                eachNozzle.Internal = eachNozzle.Internal.ToLower();
+                eachNozzle.DrainType = eachNozzle.DrainType.ToLower();
                 eachNozzle.OtherFlange = eachNozzle.OtherFlange.ToLower();
 
                 // Sort Value
@@ -106,7 +116,7 @@ namespace DrawWork.DrawServices
 
             // Nozzle Start Point List : Line
             List<Point3D> NozzleLinePointList = new List<Point3D>();
-
+             
             // Nozzle : Create Model
             foreach (NozzleInputModel eachNozzle in drawArrangeNozzle)
             {
@@ -120,9 +130,10 @@ namespace DrawWork.DrawServices
                 List<Entity> customEntity = CreateFlangeAll(refPoint, newNozzlePoint, eachNozzle, sizeNominalId, centerTopHeight);
 
                 // Create Model : OutLine
-                nozzleEntities.outlineList.AddRange(customEntity);
+                customOutlineEntity.AddRange(customEntity);
             }
-
+            styleService.SetLayerListEntity(ref customOutlineEntity, selLayerName);
+            nozzleEntities.outlineList.AddRange(customOutlineEntity);
 
             // Nozzel Mark Point List : Create Mark Position Arrangement 
             List<Point3D> leaderMarkPointList = GetArrangeLeaderMarkPosition(  drawArrangeNozzle, selLeaderCircleSize, multiColumnValue, sizeNominalId, centerTopHeight, shellSpacing, refPoint);
@@ -134,18 +145,23 @@ namespace DrawWork.DrawServices
                 indexArrange++;
                 Point3D drawPoint = leaderMarkPointList[indexArrange];
                 Dictionary<string, List<Entity>> customEntity = CreateNozzleLeader(drawPoint, eachNozzle, selNozzleFontSize, selLeaderCircleSize);
-                nozzleEntities.nozzleMarkList.AddRange(customEntity[CommonGlobal.NozzleMark]);
-                nozzleEntities.nozzleTextList.AddRange(customEntity[CommonGlobal.NozzleText]);
+                customMarkEntity.AddRange(customEntity[CommonGlobal.NozzleMark]);
+                customTextEntity.AddRange(customEntity[CommonGlobal.NozzleText]);
 
             }
+            styleService.SetLayerListEntity(ref customMarkEntity, selLayerName);
+            styleService.SetLayerListTextEntity(ref customTextEntity, selLayerName);
+            nozzleEntities.nozzleMarkList.AddRange(customMarkEntity);
+            nozzleEntities.nozzleTextList.AddRange(customTextEntity);
 
             // Nozzle : Create Line
             List<Entity> customLineEntity = CreateNozzleLeaderLine(refPoint, shellSpacing, drawArrangeNozzle, leaderMarkPointList, NozzleLinePointList);
             //List<Entity> customLineEntity = CreateNozzleLeaderLine(refPoint, shellSpacing, drawArrangeNozzle, leaderMarkPointList, NozzlePointList);
+            styleService.SetLayerListEntity(ref customLineEntity, selLayerName);
             nozzleEntities.nozzlelineList.AddRange(customLineEntity);
 
 
-           // CDPoint ccc = workingPointService.ContactPoint("topangleroofpoint",ref refPoint,ref newCurPoint);
+            // CDPoint ccc = workingPointService.ContactPoint("topangleroofpoint",ref refPoint,ref newCurPoint);
             //Line lineref01 = new Line(new Point3D(ccc.X,ccc.Y),new Point3D(ccc.X,ccc.Y+1000));
             //nozzleEntities.outlineList.Add(lineref01);
 
@@ -157,6 +173,7 @@ namespace DrawWork.DrawServices
             //CDPoint ccccc = workingPointService.ContactPoint("leftroofpoint", "3793.6", ref refPoint, ref newCurPoint);
             //Line lineref03 = new Line(new Point3D(ccccc.X, ccccc.Y), new Point3D(ccccc.X, ccccc.Y + 1000));
             //nozzleEntities.outlineList.Add(lineref03);
+            
 
             return nozzleEntities;
         }
@@ -184,7 +201,7 @@ namespace DrawWork.DrawServices
             int refFirstIndex = 0;
 
             //string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
-            string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalId;
+            string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalID;
 
             double sizeNominalId = valueService.GetDoubleValue(selSizeNominalId);
             CDPoint newCurPoint = new CDPoint();
@@ -208,8 +225,8 @@ namespace DrawWork.DrawServices
 
                 eachNozzle.ReinforcingPadType = eachNozzle.ReinforcingPadType.ToLower();
                 eachNozzle.InletOutlet = eachNozzle.InletOutlet.ToLower();
-                eachNozzle.Interal = eachNozzle.Interal.ToLower();
-                eachNozzle.Sump = eachNozzle.Sump.ToLower();
+                eachNozzle.Internal = eachNozzle.Internal.ToLower();
+                eachNozzle.DrainType = eachNozzle.DrainType.ToLower();
                 eachNozzle.OtherFlange = eachNozzle.OtherFlange.ToLower();
 
                 // Sort Value
@@ -399,8 +416,8 @@ namespace DrawWork.DrawServices
             {
                 if (selNozzle.Rating.Contains("150"))
                 {
-                    NozzleOHFSeriesAModel newNozzle = null;
-                    foreach (NozzleOHFSeriesAModel eachNozzle in assemblyData.NozzleOHFSeriesAList)
+                    FlangeOHFSeriesAModel newNozzle = null;
+                    foreach (FlangeOHFSeriesAModel eachNozzle in assemblyData.FlangeOHFSeriesAList)
                     {
                         if (eachNozzle.NPS == selNozzle.Size) 
                         {
@@ -412,8 +429,8 @@ namespace DrawWork.DrawServices
                 }
                 else if (selNozzle.Rating.Contains("300"))
                 {
-                    NozzleTHSeriesAModel newNozzle = null;
-                    foreach (NozzleTHSeriesAModel eachNozzle in assemblyData.NozzleTHSeriesAist)
+                    FlangeTHSeriesAModel newNozzle = null;
+                    foreach (FlangeTHSeriesAModel eachNozzle in assemblyData.FlangeTHSeriesAist)
                     {
                         if (eachNozzle.NPS == selNozzle.Size)
                         {
@@ -428,8 +445,8 @@ namespace DrawWork.DrawServices
             {
                 if (selNozzle.Rating.Contains("150"))
                 {
-                    NozzleOHFSeriesBModel newNozzle = null;
-                    foreach (NozzleOHFSeriesBModel eachNozzle in assemblyData.NozzleOHFSeriesBList)
+                    FlangeOHFSeriesBModel newNozzle = null;
+                    foreach (FlangeOHFSeriesBModel eachNozzle in assemblyData.FlangeOHFSeriesBList)
                     {
                         if (eachNozzle.NPS == selNozzle.Size)
                         {
@@ -441,8 +458,8 @@ namespace DrawWork.DrawServices
                 }
                 else if (selNozzle.Rating.Contains("300"))
                 {
-                    NozzleTHSeriesBModel newNozzle = null;
-                    foreach (NozzleTHSeriesBModel eachNozzle in assemblyData.NozzleTHSeriesBist)
+                    FlangeTHSeriesBModel newNozzle = null;
+                    foreach (FlangeTHSeriesBModel eachNozzle in assemblyData.FlangeTHSeriesBist)
                     {
                         if (eachNozzle.NPS == selNozzle.Size)
                         {
@@ -457,8 +474,8 @@ namespace DrawWork.DrawServices
             {
                 if (selNozzle.Rating.Contains("150"))
                 {
-                    NozzleOHFLWNModel newNozzle = null;
-                    foreach (NozzleOHFLWNModel eachNozzle in assemblyData.NozzleOHFLWNList)
+                    FlangeOHFLWNModel newNozzle = null;
+                    foreach (FlangeOHFLWNModel eachNozzle in assemblyData.FlangeOHFLWNList)
                     {
                         if (eachNozzle.NPS == selNozzle.Size)
                         {
@@ -470,8 +487,8 @@ namespace DrawWork.DrawServices
                 }
                 else if (selNozzle.Rating.Contains("300"))
                 {
-                    NozzleTHLWNModel newNozzle = null;
-                    foreach (NozzleTHLWNModel eachNozzle in assemblyData.NozzleTHLWNList)
+                    FlangeTHLWNModel newNozzle = null;
+                    foreach (FlangeTHLWNModel eachNozzle in assemblyData.FlangeTHLWNList)
                     {
                         if (eachNozzle.NPS == selNozzle.Size)
                         {
@@ -486,8 +503,8 @@ namespace DrawWork.DrawServices
             {
                 if (selNozzle.Rating.Contains("150"))
                 {
-                    NozzleOHFModel newNozzle = null;
-                    foreach (NozzleOHFModel eachNozzle in assemblyData.NozzleOHFList)
+                    FlangeOHFModel newNozzle = null;
+                    foreach (FlangeOHFModel eachNozzle in assemblyData.FlangeOHFList)
                     {
                         if (eachNozzle.NPS == selNozzle.Size)
                         {
@@ -499,8 +516,8 @@ namespace DrawWork.DrawServices
                 }
                 else if (selNozzle.Rating.Contains("300"))
                 {
-                    NozzleTHModel newNozzle = null;
-                    foreach (NozzleTHModel eachNozzle in assemblyData.NozzleTHList)
+                    FlangeTHModel newNozzle = null;
+                    foreach (FlangeTHModel eachNozzle in assemblyData.FlangeTHList)
                     {
                         if (eachNozzle.NPS == selNozzle.Size)
                         {
@@ -585,7 +602,7 @@ namespace DrawWork.DrawServices
             }
             return neckLength;
         }
-        private List<Entity> CreateFlangeSeriesA(CDPoint refPoint, Point3D drawPoint,NozzleInputModel selNozzle,NozzleOHFSeriesAModel drawNozzle, double selSizeNominalID, double selCenterTopHeight)
+        private List<Entity> CreateFlangeSeriesA(CDPoint refPoint, Point3D drawPoint,NozzleInputModel selNozzle,FlangeOHFSeriesAModel drawNozzle, double selSizeNominalID, double selCenterTopHeight)
         {
             List<Entity> customEntity = new List<Entity>();
 
@@ -601,7 +618,7 @@ namespace DrawWork.DrawServices
             double BBF = valueService.GetDoubleValue(drawNozzle.BBF);
             double C = valueService.GetDoubleValue(drawNozzle.C);
 
-            double gasketT = valueService.GetDoubleValue(assemblyData.NozzleEtcList[0].GasketThickness);
+            double gasketT = valueService.GetDoubleValue(assemblyData.FlangeEtcList[0].GasketThickness);
 
             // Facing
             if (selNozzle.Facing == "rf")
@@ -693,7 +710,7 @@ namespace DrawWork.DrawServices
                 Line lineNeckRight = null;
                 if (selNozzle.Position == "roof")
                 {
-                    double neckSlopeHeight = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne,G/2);
+                    double neckSlopeHeight = valueService.GetOppositeByWidth(assemblyData.RoofCRTInput[0].RoofSlope,G/2);
 
                     switch (selNozzle.LR)
                     {
@@ -759,19 +776,19 @@ namespace DrawWork.DrawServices
 
             return customEntity;
         }
-        private List<Entity> CreateFlangeSeriesB(CDPoint refPoint, Point3D drawPoint, NozzleInputModel selNozzle, NozzleOHFSeriesBModel drawNozzle, double selSizeNominalID, double selCenterTopHeight)
+        private List<Entity> CreateFlangeSeriesB(CDPoint refPoint, Point3D drawPoint, NozzleInputModel selNozzle, FlangeOHFSeriesBModel drawNozzle, double selSizeNominalID, double selCenterTopHeight)
         {
             List<Entity> customEntity = new List<Entity>();
 
             return customEntity;
         }
-        private List<Entity> CreateFlangeLWN(CDPoint refPoint, Point3D drawPoint, NozzleInputModel selNozzle, NozzleOHFLWNModel drawNozzle, double selSizeNominalID, double selCenterTopHeight)
+        private List<Entity> CreateFlangeLWN(CDPoint refPoint, Point3D drawPoint, NozzleInputModel selNozzle, FlangeOHFLWNModel drawNozzle, double selSizeNominalID, double selCenterTopHeight)
         {
             List<Entity> customEntity = new List<Entity>();
 
             return customEntity;
         }
-        private List<Entity> CreateFlange(CDPoint refPoint, Point3D drawPoint, NozzleInputModel selNozzle, NozzleOHFModel drawNozzle, double selSizeNominalID, double selCenterTopHeight)
+        private List<Entity> CreateFlange(CDPoint refPoint, Point3D drawPoint, NozzleInputModel selNozzle, FlangeOHFModel drawNozzle, double selSizeNominalID, double selCenterTopHeight)
         {
             List<Entity> customEntity = new List<Entity>();
 
@@ -790,7 +807,7 @@ namespace DrawWork.DrawServices
             double BBF = valueService.GetDoubleValue(drawNozzle.B);
             double C = valueService.GetDoubleValue(drawNozzle.C);
 
-            double gasketT = valueService.GetDoubleValue(assemblyData.NozzleEtcList[0].GasketThickness);
+            double gasketT = valueService.GetDoubleValue(assemblyData.FlangeEtcList[0].GasketThickness);
 
             // Facing
             if (selNozzle.Facing == "rf")
@@ -892,7 +909,7 @@ namespace DrawWork.DrawServices
                 Line lineNeckRight = null;
                 if (selNozzle.Position == "roof")
                 {
-                    double neckSlopeHeight = valueService.GetOppositeByWidth(assemblyData.RoofInput[0].RoofSlopeOne, G / 2);
+                    double neckSlopeHeight = valueService.GetOppositeByWidth(assemblyData.RoofCRTInput[0].RoofSlope, G / 2);
 
                     switch (selNozzle.LR)
                     {
@@ -927,9 +944,9 @@ namespace DrawWork.DrawServices
 
 
         // Translate TH to OHF
-        private NozzleOHFSeriesAModel TransNozzleATHtoOHF(NozzleTHSeriesAModel selNozzzle)
+        private FlangeOHFSeriesAModel TransNozzleATHtoOHF(FlangeTHSeriesAModel selNozzzle)
         {
-            NozzleOHFSeriesAModel newModel = new NozzleOHFSeriesAModel();
+            FlangeOHFSeriesAModel newModel = new FlangeOHFSeriesAModel();
             newModel.DN= selNozzzle.DN;
             newModel.NPS = selNozzzle.NPS;
             newModel.G = selNozzzle.G;
@@ -950,9 +967,9 @@ namespace DrawWork.DrawServices
 
             return newModel;
         }
-        private NozzleOHFSeriesBModel TransNozzleBTHtoOHF(NozzleTHSeriesBModel selNozzzle)
+        private FlangeOHFSeriesBModel TransNozzleBTHtoOHF(FlangeTHSeriesBModel selNozzzle)
         {
-            NozzleOHFSeriesBModel newModel = new NozzleOHFSeriesBModel();
+            FlangeOHFSeriesBModel newModel = new FlangeOHFSeriesBModel();
             newModel.DN = selNozzzle.DN;
             newModel.NPS = selNozzzle.NPS;
             newModel.G = selNozzzle.G;
@@ -973,9 +990,9 @@ namespace DrawWork.DrawServices
 
             return newModel;
         }
-        private NozzleOHFLWNModel TransNozzleLWNTHtoOHF(NozzleTHLWNModel selNozzzle)
+        private FlangeOHFLWNModel TransNozzleLWNTHtoOHF(FlangeTHLWNModel selNozzzle)
         {
-            NozzleOHFLWNModel newModel = new NozzleOHFLWNModel();
+            FlangeOHFLWNModel newModel = new FlangeOHFLWNModel();
             newModel.DN = selNozzzle.DN;
             newModel.NPS = selNozzzle.NPS;
             newModel.G = selNozzzle.G;
@@ -993,9 +1010,9 @@ namespace DrawWork.DrawServices
 
             return newModel;
         }
-        private NozzleOHFModel TransNozzleTHtoOHF(NozzleTHModel selNozzzle)
+        private FlangeOHFModel TransNozzleTHtoOHF(FlangeTHModel selNozzzle)
         {
-            NozzleOHFModel newModel = new NozzleOHFModel();
+            FlangeOHFModel newModel = new FlangeOHFModel();
             newModel.DN = selNozzzle.DN;
             newModel.NPS = selNozzzle.NPS;
             newModel.G = selNozzzle.G;
@@ -1502,7 +1519,7 @@ namespace DrawWork.DrawServices
                 case "roof":
 
                     // Roof Slope
-                    double roofSlopeHeight = valueService.GetHypotenuseByWidth(assemblyData.RoofInput[0].RoofSlopeOne, assemblyData.RoofInput[0].RoofThickness);
+                    double roofSlopeHeight = valueService.GetHypotenuseByWidth(assemblyData.RoofCRTInput[0].RoofSlope, assemblyData.RoofCRTInput[0].RoofPlateThickness);
                     //double roofSlopeHeight = roofThickness * Math.Cos(roofSlopeDegree);
 
                     switch (selLR)

@@ -38,8 +38,8 @@ namespace PaperSetting
             testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
 
             testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Wireframe;
+            testModel.ActiveViewport.Background.TopColor = new SolidColorBrush(Color.FromRgb(59, 68, 83));
 
-            
 
             // Create Setting
             DrawSettingService drawSetting = new DrawSettingService();

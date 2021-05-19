@@ -25,7 +25,7 @@ namespace DrawWork.CommandServices
         public BasicCommandModel commandData;
 
         public TranslateDataService commandTranslate;
-        public TranslateDataOutputService commandOutput;
+        
         public DrawObjectService drawObject;
 
         public DrawBoundaryService boundaryService;
@@ -51,7 +51,7 @@ namespace DrawWork.CommandServices
             SetModelData(selModel);
 
             commandTranslate = new TranslateDataService(selAssembly);
-            commandOutput = new TranslateDataOutputService();
+            
 
             drawObject = new DrawObjectService(selAssembly, singleModel);
             boundaryService = new DrawBoundaryService(selAssembly);
@@ -72,7 +72,7 @@ namespace DrawWork.CommandServices
             SetModelData(selModel);
 
             commandTranslate = new TranslateDataService(selAssembly);
-            commandOutput = new TranslateDataOutputService();
+            
 
             drawObject = new DrawObjectService(selAssembly, singleModel);
             boundaryService = new DrawBoundaryService(selAssembly);
@@ -152,9 +152,6 @@ namespace DrawWork.CommandServices
             commandTranslate.TranslateUsing(commandData.commandListTrans);
             commandData.commandListTransFunciton = commandTranslate.TranslateCommandFunction(commandData.commandListTrans);
             commandTranslate.TranslateModelData(commandData.commandListTransFunciton);
-
-            // Create OutputData
-            commandOutput.CreateOutputData(assemblyData);
 
 
             // Create ReferencePoint
@@ -303,7 +300,7 @@ namespace DrawWork.CommandServices
 
                 // Logic Block
                 case "logicblock":
-                    Entity[] newLogicBlock = drawObject.DoBlockLogic(eachCmd, ref refPoint, ref curPoint);
+                    Entity[] newLogicBlock = drawObject.DoBlockLogic(eachCmd, ref refPoint, ref curPoint, scaleData.Value);
                     if (newLogicBlock != null)
                         drawEntity.outlineList.AddRange(newLogicBlock);
                     goto case "allways";

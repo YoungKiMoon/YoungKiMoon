@@ -18,6 +18,8 @@ using AssemblyLib.AssemblyModels;
 
 using DrawWork.ValueServices;
 using DrawWork.DrawModels;
+using DrawWork.DrawStyleServices;
+using DrawWork.Commons;
 
 namespace DrawWork.DrawServices
 {
@@ -26,13 +28,19 @@ namespace DrawWork.DrawServices
         private AssemblyModel assemblyData;
 
         private ValueService valueService;
-        private DrawWorkingPointService contactService;
+        private DrawWorkingPointService workingPointService;
+
+        private StyleFunctionService styleService;
+        private LayerStyleService layerService;
 
         public DrawReferenceBlockService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
             valueService = new ValueService();
-            contactService = new DrawWorkingPointService(selAssembly);
+            workingPointService = new DrawWorkingPointService(selAssembly);
+
+            styleService = new StyleFunctionService();
+            layerService = new LayerStyleService();
         }
 
         #region Angle
@@ -64,22 +72,24 @@ namespace DrawWork.DrawServices
 
 
 
-            double AB = valueService.GetDoubleValue(selAngle.AB);
+            double A = valueService.GetDoubleValue(selAngle.A);
+            double B = valueService.GetDoubleValue(selAngle.B);
             double t = valueService.GetDoubleValue(selAngle.t);
             double R1 = valueService.GetDoubleValue(selAngle.R1);
             double R2 = valueService.GetDoubleValue(selAngle.R2);
-            double CD = valueService.GetDoubleValue(selAngle.CD);
+            double C = valueService.GetDoubleValue(selAngle.C);
+            double D = valueService.GetDoubleValue(selAngle.D);
             double E = valueService.GetDoubleValue(selAngle.E);
 
             // 좌측 상단을 기준으로 그림
             Point3D drawPoint = new Point3D(selPoint1.X, selPoint1.Y, selPoint1.Z);
 
-            Line lineA = new Line(GetSumPoint(drawPoint, 0, AB), GetSumPoint(drawPoint, AB, AB));
-            Line lineAa = new Line(GetSumPoint(drawPoint, 0, AB - t), GetSumPoint(drawPoint, AB - t, AB - t));
-            Line lineAt = new Line(GetSumPoint(drawPoint, 0, AB), GetSumPoint(drawPoint, 0, AB - t));
-            Line lineB = new Line(GetSumPoint(drawPoint, AB, AB), GetSumPoint(drawPoint, AB, 0));
-            Line lineBb = new Line(GetSumPoint(drawPoint, AB - t, AB - t), GetSumPoint(drawPoint, AB - t, 0));
-            Line lineBt = new Line(GetSumPoint(drawPoint, AB - t, 0), GetSumPoint(drawPoint, AB, 0));
+            Line lineA = new Line(GetSumPoint(drawPoint, 0, B), GetSumPoint(drawPoint, A, B));
+            Line lineAa = new Line(GetSumPoint(drawPoint, 0, B - t), GetSumPoint(drawPoint, A - t, B - t));
+            Line lineAt = new Line(GetSumPoint(drawPoint, 0, B), GetSumPoint(drawPoint, 0, B - t));
+            Line lineB = new Line(GetSumPoint(drawPoint, A, B), GetSumPoint(drawPoint, A, 0));
+            Line lineBb = new Line(GetSumPoint(drawPoint, A - t, B - t), GetSumPoint(drawPoint, A - t, 0));
+            Line lineBt = new Line(GetSumPoint(drawPoint, A - t, 0), GetSumPoint(drawPoint, A, 0));
 
 
             List<Entity> customBlockList = new List<Entity>();
@@ -102,20 +112,108 @@ namespace DrawWork.DrawServices
             customBlockList.Add(lineBb);
             customBlockList.Add(lineBt);
 
+            styleService.SetLayerListEntity(ref customBlockList, layerService.LayerOutLine);
+
+            return customBlockList.ToArray();
+        }
+
+        public Entity[] DrawReference_Angle_RightOuter(CDPoint selPoint1, AngleSizeModel selAngle,string selType, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+
+
+            if (selAngle == null)
+                return null;
+
+
+
+            double A = valueService.GetDoubleValue(selAngle.A);
+            double B = valueService.GetDoubleValue(selAngle.B);
+            double t = valueService.GetDoubleValue(selAngle.t);
+            double R1 = valueService.GetDoubleValue(selAngle.R1);
+            double R2 = valueService.GetDoubleValue(selAngle.R2);
+            double C = valueService.GetDoubleValue(selAngle.C);
+            double D = valueService.GetDoubleValue(selAngle.D);
+            double E = valueService.GetDoubleValue(selAngle.E);
+
+            // 좌측 상단을 기준으로 그림
+            Point3D drawPoint = new Point3D(selPoint1.X, selPoint1.Y, selPoint1.Z);
+
+            //Line lineA = new Line(GetSumPoint(drawPoint, 0, AB), GetSumPoint(drawPoint, AB, AB));
+            //Line lineAa = new Line(GetSumPoint(drawPoint, 0, AB - t), GetSumPoint(drawPoint, AB - t, AB - t));
+            //Line lineAt = new Line(GetSumPoint(drawPoint, 0, AB), GetSumPoint(drawPoint, 0, AB - t));
+            //Line lineB = new Line(GetSumPoint(drawPoint, AB, AB), GetSumPoint(drawPoint, AB, 0));
+            //Line lineBb = new Line(GetSumPoint(drawPoint, AB - t, AB - t), GetSumPoint(drawPoint, AB - t, 0));
+            //Line lineBt = new Line(GetSumPoint(drawPoint, AB - t, 0), GetSumPoint(drawPoint, AB, 0));
+
+            //CDPoint refPoint = new CDPoint() { X = drawPoint.X, Y = drawPoint.Y };
+            //CDPoint curPoint = (CDPoint)refPoint.Clone();
+            CDPoint wpPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTop,0, ref refPoint, ref curPoint);
+
+            double tankIDHalf = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID) / 2;
+            int maxCourse = assemblyData.ShellOutput.Count-1;
+            double topShellTh = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness);
+
+            Line line01=null;
+            Line line02 = null;
+            Line line03 = null;
+            switch (selType)
+            {
+                case "Detail b":
+                    line01 = new Line(new Point3D(wpPoint.X, drawPoint.Y + B), new Point3D(wpPoint.X + tankIDHalf + topShellTh, drawPoint.Y + B));
+                    line02 = new Line(new Point3D(wpPoint.X, drawPoint.Y + B - t), new Point3D(wpPoint.X + tankIDHalf + topShellTh + (t*2), drawPoint.Y + B -t));
+                    line03 = new Line(new Point3D(wpPoint.X, drawPoint.Y ), new Point3D(wpPoint.X + tankIDHalf + topShellTh , drawPoint.Y ));
+                    styleService.SetLayer(ref line01, layerService.LayerOutLine);
+                    styleService.SetLayer(ref line02, layerService.LayerOutLine);
+                    styleService.SetLayer(ref line03, layerService.LayerOutLine);
+                    break;
+                case "Detail d":
+                    line01 = new Line(new Point3D(wpPoint.X, drawPoint.Y + B), new Point3D(wpPoint.X + tankIDHalf , drawPoint.Y + B));
+                    line02 = new Line(new Point3D(wpPoint.X, drawPoint.Y + B - t), new Point3D(wpPoint.X + tankIDHalf  + (t * 2), drawPoint.Y + B - t));
+                    line03 = new Line(new Point3D(wpPoint.X, drawPoint.Y), new Point3D(wpPoint.X + tankIDHalf , drawPoint.Y));
+                    styleService.SetLayer(ref line01, layerService.LayerOutLine);
+                    styleService.SetLayer(ref line02, layerService.LayerOutLine);
+                    styleService.SetLayer(ref line03, layerService.LayerOutLine);
+                    break;
+                case "Detail e":
+                    line01 = new Line(new Point3D(wpPoint.X, drawPoint.Y + B), new Point3D(wpPoint.X + tankIDHalf -A + t, drawPoint.Y + B));
+                    line02 = new Line(new Point3D(wpPoint.X, drawPoint.Y + B - t), new Point3D(wpPoint.X + tankIDHalf +t - (t * 2), drawPoint.Y + B - t));
+                    line03 = new Line(new Point3D(wpPoint.X, drawPoint.Y), new Point3D(wpPoint.X + tankIDHalf +t, drawPoint.Y));
+                    styleService.SetLayer(ref line01, layerService.LayerOutLine);
+                    styleService.SetLayer(ref line02, layerService.LayerHiddenLine);
+                    styleService.SetLayer(ref line03, layerService.LayerOutLine);
+                    break;
+                case "Detail i":
+
+                    break;
+
+                case "Detail k":
+
+                    break;
+            }
+
+
+            List<Entity> customBlockList = new List<Entity>();
+
+
+            customBlockList.Add(line01);
+            customBlockList.Add(line03);
+            customBlockList.Add(line02);
+
+
             return customBlockList.ToArray();
         }
 
         public Entity[] DrawReference_CompressionRingI(CDPoint selPoint1)
         {
             int firstIndex = 0;
-            double A = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingOutsideProjectionA);
-            double B = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingWidthB);
-            double C = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingOverlapC);
-            double t1 = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingThicknessT1);
+            double A = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].OutsideProjectionA);
+            double B = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].WidthB);
+            double C = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].OverlapOfRoofAndCompRingC);
+            double t1 = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].ThicknessT1);
 
 
             // Roof Slope
-            string roofSlopeString = assemblyData.RoofInput[firstIndex].RoofSlopeOne;
+            string roofSlopeString = assemblyData.RoofCRTInput[firstIndex].RoofSlope;
             double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
 
             double outsideBottomX = valueService.GetAdjacentByHypotenuse(roofSlopeDegree, A);
@@ -143,42 +241,48 @@ namespace DrawWork.DrawServices
             customBlockList.Add(lineTa);
             customBlockList.Add(lineTb);
 
+            styleService.SetLayerListLine(ref customBlockList, layerService.LayerOutLine);
+
             return customBlockList.ToArray();
         }
         public Entity[] DrawReference_CompressionRingK(CDPoint selPoint1)
         {
             int firstIndex = 0;
-            double A = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingWidthThicknedA);
-            double B = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingDistanceB);
-            double C = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingThicknessC);
-            double D = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingWidthD);
-            double t1 = valueService.GetDoubleValue(assemblyData.RoofInput[firstIndex].ComRingShellThicknessT1);
+            //double A = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].ShellWidthThickenedA);
+            double B = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].DistanceFromShellTopCourseB);
+            double C = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].ThicknessC);
+            double D = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].WidthD);
+            //double t1 = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].ShellThicknessThickenedT1);
 
 
-            int maxCourse = valueService.GetIntValue(assemblyData.ShellInput[0].CourseCount) - 1;
-            double maxCourseThk = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].MinThk);
+            int maxCourse = assemblyData.ShellOutput.Count - 1;
+            double maxCourseThk = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness);
+            double maxCourseBeforeThk = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse-1].Thickness);
+            double maxCourseHeight= valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].PlateWidth);
+
+            
 
             //
-            double t1Width = (t1 - maxCourseThk) / 2;
+            double t1Width = (maxCourseThk - maxCourseBeforeThk) / 2;
 
             // Angle Slope
-            double angleSlopeDegree = valueService.GetDegreeOfSlope(1,4);
+            double angleSlopeDegree = valueService.GetDegreeOfSlope(1,4); // 고정
             double thicknessY = valueService.GetAdjacentByHeight(angleSlopeDegree, t1Width);
 
             // 우측 상단을 기준으로 그림
             Point3D drawPoint = new Point3D(selPoint1.X + t1Width, selPoint1.Y, selPoint1.Z);
 
-            Line lineTa = new Line(GetSumPoint(drawPoint, 0, 0), GetSumPoint(drawPoint, -t1, 0));
-            Line lineTHa = new Line(GetSumPoint(drawPoint, -t1, 0), GetSumPoint(drawPoint, -t1, -A + thicknessY));
-            Line lineTHb = new Line(GetSumPoint(drawPoint, 0, 0), GetSumPoint(drawPoint, 0, -A + thicknessY));
-            Line lineTHaL = new Line(GetSumPoint(drawPoint, -t1, -A + thicknessY), GetSumPoint(drawPoint, -t1Width - maxCourseThk, -A));
-            Line lineTHbR = new Line(GetSumPoint(drawPoint, 0, -A + thicknessY), GetSumPoint(drawPoint, -t1Width, -A));
+            Line lineTa = new Line(GetSumPoint(drawPoint, 0, 0), GetSumPoint(drawPoint, -maxCourseThk, 0));
+            Line lineTHa = new Line(GetSumPoint(drawPoint, -maxCourseThk, 0), GetSumPoint(drawPoint, -maxCourseThk, -maxCourseHeight + thicknessY));
+            Line lineTHb = new Line(GetSumPoint(drawPoint, 0, 0), GetSumPoint(drawPoint, 0, -maxCourseHeight + thicknessY));
+            Line lineTHaL = new Line(GetSumPoint(drawPoint, -maxCourseThk, -maxCourseHeight + thicknessY), GetSumPoint(drawPoint, -t1Width - maxCourseBeforeThk, -maxCourseHeight));
+            Line lineTHbR = new Line(GetSumPoint(drawPoint, 0, -maxCourseHeight + thicknessY), GetSumPoint(drawPoint, -t1Width, -maxCourseHeight));
 
-            Line lineTb = new Line(GetSumPoint(drawPoint, -t1Width, -A), GetSumPoint(drawPoint, -t1Width-maxCourseThk, -A));
+            Line lineTb = new Line(GetSumPoint(drawPoint, -t1Width, -maxCourseHeight), GetSumPoint(drawPoint, -t1Width- maxCourseBeforeThk, -maxCourseHeight));
 
-            Line lineCa = new Line(GetSumPoint(drawPoint, -t1, -B), GetSumPoint(drawPoint, -t1 - D, -B));
-            Line lineCb = new Line(GetSumPoint(drawPoint, -t1, -B - C), GetSumPoint(drawPoint, -t1 - D, -B - C));
-            Line lineCh = new Line(GetSumPoint(drawPoint, -t1-D, -B - C), GetSumPoint(drawPoint, -t1 - D, -B ));
+            Line lineCa = new Line(GetSumPoint(drawPoint, -maxCourseThk, -B), GetSumPoint(drawPoint, -maxCourseThk - D, -B));
+            Line lineCb = new Line(GetSumPoint(drawPoint, -maxCourseThk, -B - C), GetSumPoint(drawPoint, -maxCourseThk - D, -B - C));
+            Line lineCh = new Line(GetSumPoint(drawPoint, -maxCourseThk - D, -B - C), GetSumPoint(drawPoint, -maxCourseThk - D, -B ));
 
 
 
@@ -194,6 +298,8 @@ namespace DrawWork.DrawServices
             customBlockList.Add(lineCa);
             customBlockList.Add(lineCb);
             customBlockList.Add(lineCh);
+
+            styleService.SetLayerListLine(ref customBlockList, layerService.LayerOutLine);
 
             return customBlockList.ToArray();
         }
@@ -274,6 +380,8 @@ namespace DrawWork.DrawServices
             customBlockList.Add(lineBottomB3);
             customBlockList.Add(lineBottomB4);
             customBlockList.Add(lineBottomB5);
+
+            styleService.SetLayerListEntity(ref customBlockList, layerService.LayerOutLine);
 
             return customBlockList.ToArray();
         }

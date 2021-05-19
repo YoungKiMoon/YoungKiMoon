@@ -19,6 +19,7 @@ using DrawWork.ValueServices;
 using DrawWork.Commons;
 using AssemblyLib.AssemblyModels;
 using DrawWork.DrawSacleServices;
+using DrawWork.DrawStyleServices;
 
 namespace DrawWork.DrawServices
 {
@@ -31,6 +32,8 @@ namespace DrawWork.DrawServices
 
         private DrawScaleService scaleService;
 
+        private StyleFunctionService styleSerivce;
+
         public DrawService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
@@ -38,17 +41,18 @@ namespace DrawWork.DrawServices
 
             valueService = new ValueService();
             scaleService = new DrawScaleService();
+            styleSerivce = new StyleFunctionService();
+
         }
 
-        
 
-
-        public Line Draw_Line(CDPoint selPoint1, CDPoint selPoint2)
+        public Line Draw_Line(CDPoint selPoint1, CDPoint selPoint2, string selLayerName)
         {
             Line newLine = new Line(selPoint1.X, selPoint1.Y, selPoint2.X, selPoint2.Y);
+            styleSerivce.SetLayer(ref newLine, selLayerName);
             return newLine;
         }
-        public Line Draw_Line(CDPoint selPoint1, CDPoint selPoint2, double selDegree, string selDirection)
+        public Line Draw_Line(CDPoint selPoint1, CDPoint selPoint2, double selDegree, string selDirection,string selLayerName)
         {
             // arctan // X: 1로 고정
             double calDegree = valueService.GetDegreeOfSlope(1,selDegree);
@@ -68,30 +72,32 @@ namespace DrawWork.DrawServices
                 tempHeight = valueService.GetOppositeByWidth(calDegree, tempWidth);
                 newLine = new Line(selPoint1.X, selPoint1.Y, selPoint1.X + tempHeight, selPoint2.Y);
             }
-
+            styleSerivce.SetLayer(ref newLine, selLayerName);
             return newLine;
         }
 
-        public Line[] Draw_Rectangle(CDPoint selPoint1, double selWidth, double selHeight)
+        public Line[] Draw_Rectangle(CDPoint selPoint1, double selWidth, double selHeight,string selLayerName)
         {
             Line[] newLine = new Line[4];
             newLine[0] = new Line(selPoint1.X, selPoint1.Y, selPoint1.X + selWidth, selPoint1.Y);
             newLine[1] = new Line(selPoint1.X + selWidth, selPoint1.Y, selPoint1.X + selWidth, selPoint1.Y + selHeight);
             newLine[2] = new Line(selPoint1.X + selWidth, selPoint1.Y + selHeight, selPoint1.X, selPoint1.Y + selHeight);
             newLine[3] = new Line(selPoint1.X, selPoint1.Y + selHeight, selPoint1.X, selPoint1.Y);
+            styleSerivce.SetLayer(ref newLine, selLayerName);
             return newLine;
         }
 
 
 
-        public Arc Draw_Arc(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3)
+        public Arc Draw_Arc(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3,string selLayerName)
         {
             Arc newArc = new Arc(new Point3D(selPoint1.X, selPoint1.Y,0), new Point3D(selPoint2.X, selPoint2.Y, 0), new Point3D(selPoint3.X, selPoint3.Y, 0));
+            styleSerivce.SetLayer(ref newArc, selLayerName);
             return newArc;
         }
 
 
-        public Text Draw_Text(CDPoint selPoint1, string selText, double selHeight, string selAlign)
+        public Text Draw_Text(CDPoint selPoint1, string selText, double selHeight, string selAlign,string selLayerName)
         {
 
             Text newText = new Text(selPoint1.X, selPoint1.Y, 0, selText, selHeight);
@@ -102,6 +108,7 @@ namespace DrawWork.DrawServices
                     break;
             }
 
+            styleSerivce.SetLayer(ref newText, selLayerName);
             return newText;
         }
         
@@ -290,90 +297,92 @@ namespace DrawWork.DrawServices
         }
 
         // 사용 안함
-        public Entity[] Draw_DimensionOld(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3, 
-                                    string selPosition, double selDimHeight, double selTextHeight, double selTextGap, double selArrowSize, 
-                                    string selTextPrefix, string selTextSuffix, string selTextUserInput, 
-                                    double selRotate)
-        {
-            List<Entity> customEntityList = new List<Entity>();
+        //public Entity[] Draw_DimensionOld(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3, 
+        //                            string selPosition, double selDimHeight, double selTextHeight, double selTextGap, double selArrowSize, 
+        //                            string selTextPrefix, string selTextSuffix, string selTextUserInput, 
+        //                            double selRotate)
+        //{
+        //    List<Entity> customEntityList = new List<Entity>();
 
-            // selPoint3 : 쓰지 않음
+        //    // selPoint3 : 쓰지 않음
 
-            // Style
-            DrawDimStyle newDimStyle = new DrawDimStyle();
+        //    // Style
+        //    DrawDimStyle newDimStyle = new DrawDimStyle();
 
-            // Text Center
-            CDPoint textCenter = new CDPoint();
-            LinearDim newDim = null;
-
-
-            switch (selPosition)
-            {
-                case "top":
-                    textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
-                    textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) + selDimHeight;
-                    newDim = new LinearDim(Plane.XY, new Point3D(selPoint1.X, selPoint1.Y),
-                                            new Point3D(selPoint2.X, selPoint2.Y),
-                                            new Point3D(textCenter.X, textCenter.Y), selTextHeight);
-                    break;
-
-                case "left":
-                    textCenter.X = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
-                    textCenter.Y = Math.Min(selPoint1.X, selPoint2.X) - selDimHeight;
-                    Plane planeLeft = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
-                    newDim = new LinearDim(planeLeft, new Point3D(selPoint1.X, selPoint1.Y),
-                                            new Point3D(selPoint2.X, selPoint2.Y),
-                                            new Point3D(textCenter.Y, textCenter.X), selTextHeight);
-                    break;
-
-                case "right":
-                    textCenter.X = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
-                    textCenter.Y = Math.Max(selPoint1.X, selPoint2.X) + selDimHeight;
-                    Plane planeRight = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
-                    newDim = new LinearDim(planeRight, new Point3D(selPoint1.X, selPoint1.Y),
-                                            new Point3D(selPoint2.X, selPoint2.Y),
-                                            new Point3D(textCenter.Y, textCenter.X), selTextHeight);
-
-                    break;
-
-                case "bottom":
-                    textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
-                    textCenter.Y = Math.Min(selPoint1.Y, selPoint2.Y) - selDimHeight;
-                    newDim = new LinearDim(Plane.XY, new Point3D(selPoint1.X, selPoint1.Y),
-                                            new Point3D(selPoint2.X, selPoint2.Y),
-                                            new Point3D(textCenter.X, textCenter.Y), selTextHeight);
-                    break;
-            }
+        //    // Text Center
+        //    CDPoint textCenter = new CDPoint();
+        //    LinearDim newDim = null;
 
 
-            // Set Default
-            newDim.ArrowsLocation = elementPositionType.Inside;
-            newDim.TextLocation = elementPositionType.Inside;
+        //    switch (selPosition)
+        //    {
+        //        case "top":
+        //            textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
+        //            textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) + selDimHeight;
+        //            newDim = new LinearDim(Plane.XY, new Point3D(selPoint1.X, selPoint1.Y),
+        //                                    new Point3D(selPoint2.X, selPoint2.Y),
+        //                                    new Point3D(textCenter.X, textCenter.Y), selTextHeight);
+        //            break;
 
-            newDim.TextGap = newDimStyle.textGap;
-            newDim.ExtLineExt = newDimStyle.extensionLine;
-            newDim.ExtLineOffset = newDimStyle.extensionLinesOffset;
-            newDim.ArrowheadSize = newDimStyle.arrowheadSize;
-            if (selTextGap > 0)
-                //newDim.TextGap = selTextGap;
-                if (selArrowSize > 0)
-                    newDim.ArrowheadSize = selArrowSize;
+        //        case "left":
+        //            textCenter.X = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+        //            textCenter.Y = Math.Min(selPoint1.X, selPoint2.X) - selDimHeight;
+        //            Plane planeLeft = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
+        //            newDim = new LinearDim(planeLeft, new Point3D(selPoint1.X, selPoint1.Y),
+        //                                    new Point3D(selPoint2.X, selPoint2.Y),
+        //                                    new Point3D(textCenter.Y, textCenter.X), selTextHeight);
+        //            break;
+
+        //        case "right":
+        //            textCenter.X = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+        //            textCenter.Y = Math.Max(selPoint1.X, selPoint2.X) + selDimHeight;
+        //            Plane planeRight = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
+        //            newDim = new LinearDim(planeRight, new Point3D(selPoint1.X, selPoint1.Y),
+        //                                    new Point3D(selPoint2.X, selPoint2.Y),
+        //                                    new Point3D(textCenter.Y, textCenter.X), selTextHeight);
+
+        //            break;
+
+        //        case "bottom":
+        //            textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
+        //            textCenter.Y = Math.Min(selPoint1.Y, selPoint2.Y) - selDimHeight;
+        //            newDim = new LinearDim(Plane.XY, new Point3D(selPoint1.X, selPoint1.Y),
+        //                                    new Point3D(selPoint2.X, selPoint2.Y),
+        //                                    new Point3D(textCenter.X, textCenter.Y), selTextHeight);
+        //            break;
+        //    }
 
 
-            newDim.TextPrefix = selTextPrefix;
-            newDim.TextSuffix = selTextSuffix;
-            if(selTextUserInput!="")
-                newDim.TextOverride = selTextUserInput;
+        //    // Set Default
+        //    newDim.ArrowsLocation = elementPositionType.Inside;
+        //    newDim.TextLocation = elementPositionType.Inside;
 
-            customEntityList.Add(newDim);
+        //    newDim.TextGap = newDimStyle.textGap;
+        //    newDim.ExtLineExt = newDimStyle.extensionLine;
+        //    newDim.ExtLineOffset = newDimStyle.extensionLinesOffset;
+        //    newDim.ArrowheadSize = newDimStyle.arrowheadSize;
+        //    if (selTextGap > 0)
+        //        //newDim.TextGap = selTextGap;
+        //        if (selArrowSize > 0)
+        //            newDim.ArrowheadSize = selArrowSize;
 
-            return customEntityList.ToArray();
-        }
+
+        //    newDim.TextPrefix = selTextPrefix;
+        //    newDim.TextSuffix = selTextSuffix;
+        //    if(selTextUserInput!="")
+        //        newDim.TextOverride = selTextUserInput;
+
+        //    customEntityList.Add(newDim);
+
+        //    return customEntityList.ToArray();
+        //}
         public Dictionary<string,List<Entity>> Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3,
                                     string selPosition, double selDimHeight, double selTextHeight, double selTextGap, double selArrowSize,
                                     string selTextPrefix, string selTextSuffix, string selTextUserInput,
                                     double selRotate,
-                                    double selScale)
+                                    double selScale,
+                                    string selLayerName
+                                    )
         {
 
             Point3D textCenter = new Point3D();
@@ -507,14 +516,25 @@ namespace DrawWork.DrawServices
             List<Entity> dimlineExtList = new List<Entity>();
             List<Entity> dimArrowList = new List<Entity>();
 
+
+
             dimlineList.Add(arrowLine);
             dimArrowList.Add(tri1);
             dimArrowList.Add(tri2);
             dimTextList.Add(dimText);
             dimlineExtList.Add(dimLine1);
             dimlineExtList.Add(dimLine2);
+            
 
             Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
+
+            // Layer
+            styleSerivce.SetLayerListEntity(ref dimlineList, selLayerName);
+            styleSerivce.SetLayerListEntity(ref dimlineExtList, selLayerName);
+            styleSerivce.SetLayerListEntity(ref dimArrowList, selLayerName);
+            styleSerivce.SetLayerListTextEntity(ref dimTextList, selLayerName);
+
+
             customEntityList.Add(CommonGlobal.DimLine, dimlineList);
             customEntityList.Add(CommonGlobal.DimText, dimTextList);
             customEntityList.Add(CommonGlobal.DimLineExt, dimlineExtList);
@@ -528,7 +548,8 @@ namespace DrawWork.DrawServices
                                     string selLength, string selPostion,string selTextHeight,string selLayerHeight,
                                     List<string> selText, List<string> selTextSub, 
                                     Model ssModel,
-                                    double selScale)
+                                    double selScale,
+                                    string selLayerName)
 
         {
 
@@ -743,7 +764,13 @@ namespace DrawWork.DrawServices
             }
 
 
+
             Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
+
+            styleSerivce.SetLayerListEntity(ref leaderLine, selLayerName);
+            styleSerivce.SetLayerListEntity(ref leaderArrow, selLayerName);
+            styleSerivce.SetLayerListTextEntity(ref leaderText, selLayerName);
+
             customEntityList.Add(CommonGlobal.LeaderLine, leaderLine);
             customEntityList.Add(CommonGlobal.LeaderText, leaderText);
             customEntityList.Add(CommonGlobal.LeaderArrow, leaderArrow);

@@ -34,6 +34,8 @@ using DrawWork.DesignServices;
 using AssemblyLib.AssemblyModels;
 using DrawLogicLib.DrawLogicFileServices;
 using DrawLogicLib.Models;
+using DrawWork.CommandServices;
+using DrawWork.AssemblyServices;
 
 namespace DrawWork
 {
@@ -53,13 +55,18 @@ namespace DrawWork
             this.testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
             this.testModel.ActionMode = devDept.Eyeshot.actionType.SelectByPick;
 
+
+            BackgroundSettings cc = new BackgroundSettings();
+            this.testModel.ActiveViewport.Background.TopColor= new SolidColorBrush(Color.FromRgb(59, 68, 83));
             //this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Rendered;
             //this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Rendered;
 
             drawSetting = new DrawSettingService();
             drawSetting.SetModelSpace(testModel);
 
-            logicFile.Text = @"C:\Users\tree\Desktop\CAD\tabas\Sample_DrawLogic.txt";
+            //logicFile.Text = @"C:\Users\tree\Desktop\CAD\tabas\Sample_DrawLogic.txt";
+            logicFile.Text = Properties.Settings.Default.logicPath;
+            ExcelFile.Text = Properties.Settings.Default.excelPath;
             dwgFile.Text = @"C:\Users\tree\Desktop\CAD\tabas\Block_Sample.dwg";
 
             inputScale.Text = "90";
@@ -304,6 +311,7 @@ namespace DrawWork
 
             stopWatch.Start();
             eDataService.GetSheetData(selView.TankData, newSheetList);
+
             stopWatch.Stop();
             TimeSpan ts2 = stopWatch.Elapsed;
             string elapsedTime2 = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts2.Hours, ts2.Minutes, ts2.Seconds, ts2.Milliseconds / 10);
@@ -326,12 +334,16 @@ namespace DrawWork
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
             // Assembly
-            AssemblyModel newTankData = new AssemblyModel();
-            newTankData.CreateSampleAssembly();
+            AssemblyDataService assemblyService = new AssemblyDataService();
+            AssemblyModel newTankData = assemblyService.CreateMappingData(ExcelFile.Text);
 
             // Logic
             DrawLogicDBService newLogic = new DrawLogicDBService();
             DrawLogicModel newLogicData = newLogic.GetLogicCommand(DrawLogicLib.Commons.LogicFile_Type.GA);
+
+            // Ligic File
+            TextFileService newFileService = new TextFileService();
+            string[] newComData = newFileService.GetTextFileArray(logicFile.Text);
 
             // Virtual Design
             DesignService designS = new DesignService();
@@ -344,10 +356,16 @@ namespace DrawWork
             // Logic을 수동으로 연결
 
             // 형상 그리는 것은 완료
+            List<string> newAll = new List<string>();
+            newAll.AddRange(newLogicData.UsingList);
+            newAll.AddRange(newLogicData.ReferencePointList);
+            foreach (DrawCommandModel eachCommand in newLogicData.CommandList)
+                newAll.AddRange(eachCommand.Command);
 
-            string[] cc = null;
+            //newAll.ToArray()
+
             IntergrationService newInterService = new IntergrationService("CRT", newTankData, testModel);
-            if (newInterService.CreateLogic(90, cc))
+            if (newInterService.CreateLogic(90, newComData))
             {
                 MessageBox.Show("완료");
             }
@@ -355,6 +373,14 @@ namespace DrawWork
             {
                 MessageBox.Show("오류");
             }
+
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.logicPath = logicFile.Text;
+            Properties.Settings.Default.excelPath=ExcelFile.Text;
+            Properties.Settings.Default.Save();
 
         }
     }

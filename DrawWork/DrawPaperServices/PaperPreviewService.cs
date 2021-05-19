@@ -143,17 +143,19 @@ namespace DrawWork.DrawPaperServices
             CDPoint newPoint1 = new CDPoint();
             double scaleFactor = 1;
             string blockName = "DRAW_BLOCK";
-            Block newBlock = drawImportBlockService.GetImportBlock(blockName);
-            singleDraw.Blocks.Add(newBlock);
+            //Block newBlock = drawImportBlockService.GetImportBlock(blockName);
+            //singleDraw.Blocks.Add(newBlock);
 
-            BlockReference returnBlock = new BlockReference(0, 0, 0, blockName.ToUpper(),0);
-            returnBlock.Scale(scaleFactor);
+            //BlockReference returnBlock = new BlockReference(0, 0, 0, blockName.ToUpper(),0);
+            //returnBlock.Scale(scaleFactor);
 
-            returnBlock.LayerName = "LayerPaper";
+            //returnBlock.LayerName = "LayerPaper";
 
 
 
-            singleDraw.Sheets[0].Entities.Add(returnBlock);
+            //singleDraw.Sheets[0].Entities.Add(returnBlock);
+
+
 
             //ViewBuilder _viewBuilder = new ViewBuilder(singleModel, singleDraw, true, ViewBuilder.operatingType.Queue);
             //_viewBuilder.AddToQueue(singleDraw, true, selSheet);

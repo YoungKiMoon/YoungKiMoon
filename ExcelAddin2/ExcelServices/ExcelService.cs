@@ -501,10 +501,10 @@ namespace ExcelAddIn.ExcelServices
                         typeString = "IFRT";
                         break;
                     case ROOF_TYPE.EFRTSingle:
-                        typeString = "EFRT_singleDeck";
+                        typeString = "EFRT_SingleDeck";
                         break;
                     case ROOF_TYPE.EFRTDouble:
-                        typeString = "EFRT_doubleDeck";
+                        typeString = "EFRT_DoubleDeck";
                         break;
                 }
                 if (typeString != "")

@@ -27,10 +27,10 @@ namespace DrawWork.ViewModels
 
 
             // Mapping Data
-            //TankData.CreateMappingAssembly();
+            TankData.CreateMappingAssembly();
 
             // Sample Data
-            TankData.CreateSampleAssembly();
+            //TankData.CreateSampleAssembly();
             //commandData.CreateSampleCommandModel();
 
         }

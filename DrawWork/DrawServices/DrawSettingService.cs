@@ -22,13 +22,23 @@ using DrawWork.Commons;
 using DrawWork.DrawStyleServices;
 using DrawWork.DrawCustomObjectModels;
 
+using AssemblyLib.AssemblyModels;
+using DrawWork.ValueServices;
+
 namespace DrawWork.DrawServices
 {
     public class DrawSettingService
     {
+
+        private ValueService valueService;
+        private StyleFunctionService styleService;
+        private LayerStyleService layerService;
+
         public DrawSettingService()
         {
-
+            valueService = new ValueService();
+            styleService = new StyleFunctionService();
+            layerService = new LayerStyleService();
         }
         public void SetModelSpace(Model singleModel)
         {
@@ -1559,44 +1569,50 @@ namespace DrawWork.DrawServices
             //CustomRenderedTriangle customArrow = new CustomRenderedTriangle(t);
             //singleModel.Entities.Add(customArrow);
 
-            List<Entity> arrowList = new List<Entity>();
-            double selArrowWidth = 2.5;
-            double selArrowHeight = 0.8;
-            double selArrowHeightHalf = selArrowHeight / 2;
 
-            Point3D selArrowPoint = new Point3D(30, 30);
-
-            // Arrow
-            List<Point3D> newPoint = new List<Point3D>();
-            newPoint.Add(selArrowPoint);
-            newPoint.Add(new Point3D(selArrowPoint.X+selArrowWidth, selArrowPoint.Y+selArrowHeightHalf));
-            newPoint.Add(new Point3D(selArrowPoint.X + selArrowWidth, selArrowPoint.Y - selArrowHeightHalf));
-            newPoint.Add(selArrowPoint);
-            LinearPath arrowPath = new LinearPath(newPoint);
-
-            arrowList.Add(arrowPath);
-
-
-
-            // Horizontal
-            int divHeightNumber = 8;
-            double divHeight = selArrowHeight / divHeightNumber;
-            for (int i = 1; i < divHeightNumber; i++)
-                arrowList.Add(new Line(selArrowPoint, new Point3D(selArrowPoint.X + selArrowWidth, selArrowPoint.Y - selArrowHeightHalf + (divHeight*i))));
-
-            // Vertical
-            int divWidthNumber = 9;
-            double divWidth = selArrowWidth / divWidthNumber;
-            for (int i = 1; i < divWidthNumber; i++)
+            if (false)
             {
-                Line tempVLine = new Line(new Point3D(selArrowPoint.X + (divWidth * i), selArrowPoint.Y + selArrowHeight), new Point3D(selArrowPoint.X + (divWidth * i), selArrowPoint.Y - selArrowHeight));
-                Point3D[] tempInterPoint = arrowPath.IntersectWith(tempVLine);
-                arrowList.Add(new Line(tempInterPoint[0], tempInterPoint[1]));
+                List<Entity> arrowList = new List<Entity>();
+                double selArrowWidth = 2.5;
+                double selArrowHeight = 0.8;
+                double selArrowHeightHalf = selArrowHeight / 2;
 
+                Point3D selArrowPoint = new Point3D(30, 30);
+
+                // Arrow
+                List<Point3D> newPoint = new List<Point3D>();
+                newPoint.Add(selArrowPoint);
+                newPoint.Add(new Point3D(selArrowPoint.X + selArrowWidth, selArrowPoint.Y + selArrowHeightHalf));
+                newPoint.Add(new Point3D(selArrowPoint.X + selArrowWidth, selArrowPoint.Y - selArrowHeightHalf));
+                newPoint.Add(selArrowPoint);
+                LinearPath arrowPath = new LinearPath(newPoint);
+
+                arrowList.Add(arrowPath);
+
+
+
+                // Horizontal
+                int divHeightNumber = 8;
+                double divHeight = selArrowHeight / divHeightNumber;
+                for (int i = 1; i < divHeightNumber; i++)
+                    arrowList.Add(new Line(selArrowPoint, new Point3D(selArrowPoint.X + selArrowWidth, selArrowPoint.Y - selArrowHeightHalf + (divHeight * i))));
+
+                // Vertical
+                int divWidthNumber = 9;
+                double divWidth = selArrowWidth / divWidthNumber;
+                for (int i = 1; i < divWidthNumber; i++)
+                {
+                    Line tempVLine = new Line(new Point3D(selArrowPoint.X + (divWidth * i), selArrowPoint.Y + selArrowHeight), new Point3D(selArrowPoint.X + (divWidth * i), selArrowPoint.Y - selArrowHeight));
+                    Point3D[] tempInterPoint = arrowPath.IntersectWith(tempVLine);
+                    arrowList.Add(new Line(tempInterPoint[0], tempInterPoint[1]));
+
+                }
+
+                singleModel.Entities.AddRange(arrowList);
             }
 
 
-            singleModel.Entities.AddRange(arrowList);
+
 
 
 
@@ -1621,13 +1637,228 @@ namespace DrawWork.DrawServices
 
             //singleModel.Entities.Add(cuMesh);
 
-            singleModel.Entities.Regen();
+
+            // Elbow
+            ElbowModel newElbow = new ElbowModel() {OD="33.4",LRA="38.1",LRB="22.225",SRD="25.4" };
+            CDPoint refPoint1 = new CDPoint(100, 100,0);
+            Line newCen01 = new Line(0, 100, 200, 100);
+            Line newCen02 = new Line(100, 0, 100, 200);
+            singleModel.Entities.Add(newCen01);
+            singleModel.Entities.Add(newCen02);
+
+            List<Entity> elbowList = DrawReference_Nozzle_Elbow(refPoint1, newElbow, "sr", "90", Utility.DegToRad(45), new DrawCenterLineModel() { scaleValue = 90,endEx=true }) ;
+            singleModel.Entities.AddRange( elbowList);
+
+
+
+
+                singleModel.Entities.Regen();
             singleModel.ZoomFit();
             singleModel.SetView(viewType.Top);
 
 
 
         }
+
+
+
+
+        public List<Entity> DrawReference_Nozzle_Elbow(CDPoint selPoint1, ElbowModel selElbow, string selType = "lr", string selDegree = "90", double selRotate = 0, DrawCenterLineModel selCenterLine=null)
+        {
+
+            double OD = valueService.GetDoubleValue(selElbow.OD);
+            double A = valueService.GetDoubleValue(selElbow.LRA);
+            double B = valueService.GetDoubleValue(selElbow.LRB);
+            double D = valueService.GetDoubleValue(selElbow.SRD);
+
+            List<Entity> newList = new List<Entity>();
+
+            // 좌측하단
+            Point3D WP = new Point3D(selPoint1.X, selPoint1.Y);
+            
+            double AD = 0;
+            if (selType == "lr")
+                AD = A;
+            else if (selType == "sr")
+                AD = D;
+
+            double centerMiddle = OD / 2;
+            double boxWidth = centerMiddle + AD;
+            double boxHeight = boxWidth;
+            Point3D WPArc = GetSumPoint(WP, boxWidth, 0);
+            Point3D WPRotate = GetSumPoint(WP, boxWidth / 2, boxHeight / 2);
+
+
+            // 형상
+            if (selDegree == "90")
+            {
+                Line line01 = new Line(GetSumPoint(WP, 0, 0), GetSumPoint(WP, OD, 0));
+                Line line02 = new Line(GetSumPoint(WP, boxWidth, boxHeight), GetSumPoint(WP, boxWidth, boxHeight - OD));
+                line02.EntityData = WP;
+                Arc arc01 = new Arc(WPArc, line01.StartPoint, line02.StartPoint);
+                Arc arc02 = new Arc(WPArc, line01.EndPoint, line02.EndPoint);
+                newList.Add(line01);
+                newList.Add(line02);
+                newList.Add(arc01);
+                newList.Add(arc02);
+            }
+            else if (selDegree == "45")
+            {
+                Line line01 = new Line(GetSumPoint(WP, 0, 0), GetSumPoint(WP, OD, 0));
+                Line line02 = new Line(GetSumPoint(WP, boxWidth, boxHeight), GetSumPoint(WP, boxWidth, boxHeight - OD));
+                Arc arc01 = new Arc(WPArc, line01.StartPoint, line02.StartPoint);
+                Arc arc02 = new Arc(WPArc, line01.EndPoint, line02.EndPoint);
+                newList.Add(line01);
+                newList.Add(line02);
+                newList.Add(arc01);
+                newList.Add(arc02);
+            }
+
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+            // 중심선
+            if (selCenterLine != null)
+            {
+                if (selCenterLine.centerLine)
+                {
+                    // 기본 형상
+                    Point3D startPoint = GetSumPoint(WP, centerMiddle, 0);
+                    Point3D endPoint = GetSumPoint(WP, boxWidth, AD);
+                    Arc arcCenter = new Arc(WPArc, startPoint, endPoint);
+                    styleService.SetLayer(ref arcCenter, layerService.LayerCenterLine);
+                    newList.Add(arcCenter);
+
+                    // 시작쪽 길어지기
+                    if (selCenterLine.startEx)
+                    {
+                        Line startLine = new Line(startPoint, GetSumPoint(startPoint, 0, -selCenterLine.exLength * selCenterLine.scaleValue));
+                        styleService.SetLayer(ref startLine, layerService.LayerCenterLine);
+                        newList.Add(startLine);
+                    }
+
+                    // 종료쪽 길어지기
+                    if (selCenterLine.endEx)
+                    {
+                        Line endLine = new Line(endPoint, GetSumPoint(endPoint, selCenterLine.exLength * selCenterLine.scaleValue,0));
+                        styleService.SetLayer(ref endLine, layerService.LayerCenterLine);
+                        newList.Add(endLine);
+                    }
+                }
+            }
+
+            // 돌리기
+            if (selRotate != 0)
+            {
+                foreach (Entity eachEntity in newList)
+                    eachEntity.Rotate(selRotate, Vector3D.AxisZ, WPRotate);
+
+                List<Entity> cc = new List<Entity>();
+                foreach (Entity eachEntity in newList)
+                {
+                    if (eachEntity.EntityData != null)
+                    {
+                        Point3D refWP = (Point3D)eachEntity.EntityData;
+                        
+                        //Vector3D tempMovement = new Vector3D(, 100);
+                        //tempEntity.Translate(tempMovement);
+                        //cc.Add(tempEntity);
+                    }
+
+                }
+                foreach (Entity eachEntity in newList)
+                {
+                    Entity tempEntity = (Entity)eachEntity.Clone();
+                    Vector3D tempMovement = new Vector3D(100,100);
+                    tempEntity.Translate(tempMovement);
+                    cc.Add(tempEntity);
+                }
+                newList.AddRange(cc);
+            }
+
+            return newList;
+        }
+
+
+        public List<Entity> DrawReference_Nozzle_Elbow1(CDPoint selPoint1, ElbowModel selElbow, string selType = "lr", string selDegree = "90", double selRotate = 0, DrawCenterLineModel selCenterLine = null)
+        {
+
+            double OD = valueService.GetDoubleValue(selElbow.OD);
+            double A = valueService.GetDoubleValue(selElbow.LRA);
+            double B = valueService.GetDoubleValue(selElbow.LRB);
+            double D = valueService.GetDoubleValue(selElbow.SRD);
+
+            List<Entity> newList = new List<Entity>();
+
+            // 좌측하단
+            Point3D WP = new Point3D(selPoint1.X, selPoint1.Y);
+
+            double AD = 0;
+            if (selType == "lr")
+                AD = A;
+            else if (selType == "sr")
+                AD = D;
+
+            double centerMiddle = OD / 2;
+            double boxWidth = centerMiddle + AD;
+            double boxHeight = boxWidth;
+            Point3D WPArc = GetSumPoint(WP, boxWidth, 0);
+            Point3D WPRotate = GetSumPoint(WP, boxWidth / 2, boxHeight / 2);
+
+            // 형상
+            Line line01 = new Line(GetSumPoint(WP, 0, 0), GetSumPoint(WP, OD, 0));
+            Line line02 = new Line(GetSumPoint(WP, boxWidth, boxHeight), GetSumPoint(WP, boxWidth, boxHeight - OD));
+            Arc arc01 = new Arc(WPArc, line01.StartPoint, line02.StartPoint);
+            Arc arc02 = new Arc(WPArc, line01.EndPoint, line02.EndPoint);
+            newList.Add(line01);
+            newList.Add(line02);
+            newList.Add(arc01);
+            newList.Add(arc02);
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+            // 중심선
+            if (selCenterLine != null)
+            {
+                if (selCenterLine.centerLine)
+                {
+                    // 기본 형상
+                    Point3D startPoint = GetSumPoint(WP, centerMiddle, 0);
+                    Point3D endPoint = GetSumPoint(WP, boxWidth, AD);
+                    Arc arcCenter = new Arc(WPArc, startPoint, endPoint);
+                    styleService.SetLayer(ref arcCenter, layerService.LayerCenterLine);
+                    newList.Add(arcCenter);
+
+                    // 시작쪽 길어지기
+                    if (selCenterLine.startEx)
+                    {
+                        Line startLine = new Line(startPoint, GetSumPoint(startPoint, 0, -selCenterLine.exLength * selCenterLine.scaleValue));
+                        styleService.SetLayer(ref startLine, layerService.LayerCenterLine);
+                        newList.Add(startLine);
+                    }
+
+                    // 종료쪽 길어지기
+                    if (selCenterLine.endEx)
+                    {
+                        Line endLine = new Line(endPoint, GetSumPoint(endPoint, selCenterLine.exLength * selCenterLine.scaleValue, 0));
+                        styleService.SetLayer(ref endLine, layerService.LayerCenterLine);
+                        newList.Add(endLine);
+                    }
+                }
+            }
+
+            // 돌리기
+            if (selRotate != 0)
+            {
+                foreach (Entity eachEntity in newList)
+                    eachEntity.Rotate(selRotate, Vector3D.AxisZ, WPRotate);
+            }
+
+            return newList;
+        }
+
+
+
 
         public Point3D GetMinPointXY(Point3D[] selPointArray)
         {
@@ -1674,6 +1905,11 @@ namespace DrawWork.DrawServices
             }
 
             return returnValue;
+        }
+
+        private Point3D GetSumPoint(Point3D selPoint1, double X, double Y, double Z = 0)
+        {
+            return new Point3D(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
         }
 
         #region Dimension 최신

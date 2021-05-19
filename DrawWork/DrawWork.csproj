@@ -62,6 +62,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AssemblyServices\AssemblyDataService.cs" />
     <Compile Include="AssemblyServices\FieldService.cs" />
     <Compile Include="CommandModels\BasicCommandModel.cs" />
     <Compile Include="CommandModels\CommandFunctionModel.cs" />
@@ -75,7 +76,6 @@
     <Compile Include="Commons\CommonGlobal.cs" />
     <Compile Include="Commons\CommonMethod.cs" />
     <Compile Include="Commons\SingletonData.cs" />
-    <Compile Include="DataServices\AssemblyDataService.cs" />
     <Compile Include="DataServices\ExcelDataService.cs" />
     <Compile Include="DesignServices\DesignService.cs" />
     <Compile Include="DesignServices\IntergrationService.cs" />
@@ -88,6 +88,7 @@
     <Compile Include="DrawCustomObjectModels\CustomRenderedHatch.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedMesh.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedTriangle.cs" />
+    <Compile Include="DrawModels\DrawCenterLineModel.cs" />
     <Compile Include="DrawModels\DrawDimStyle.cs" />
     <Compile Include="DrawModels\DrawEntityModel.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="DrawServices\DrawBoundaryService.cs" />
     <Compile Include="DrawServices\DrawImportBlockService.cs" />
     <Compile Include="DrawServices\DrawLogicBlockService.cs" />
+    <Compile Include="DrawServices\DrawNozzleBlockService.cs" />
     <Compile Include="DrawServices\DrawStructureService.cs" />
     <Compile Include="DrawServices\DrawWorkingPointService.cs" />
     <Compile Include="DrawServices\DrawNozzleService.cs" />
@@ -108,6 +110,7 @@
     <Compile Include="DrawStyleServices\EnvironmentStyleService.cs" />
     <Compile Include="DrawStyleServices\LayerStyleService.cs" />
     <Compile Include="DrawStyleServices\LineStyleService.cs" />
+    <Compile Include="DrawStyleServices\StyleFunctionService.cs" />
     <Compile Include="DrawStyleServices\TextStyleService.cs" />
     <Compile Include="FileServices\TextFileService.cs" />
     <Compile Include="ImportServices\ImportBlockModel.cs" />

@@ -14,12 +14,19 @@ namespace DrawWork.DrawServices
         public string topAngleType = "";
         public string centeringInEx = "";
 
+        public TANK_TYPE originTankType = TANK_TYPE.NoSet;
+        public string originStructureType = "";
+        public string originTopAngleType = "";
+
         public DrawStructureService()
         {
 
         }
         public void SetStructureData(TANK_TYPE selTankType,string selStructureType,string selTopAngleType)
         {
+            originTankType = selTankType;
+            originStructureType = selStructureType;
+            originTopAngleType = selTopAngleType;
 
             switch (selTankType)
             {
@@ -54,13 +61,13 @@ namespace DrawWork.DrawServices
 
             switch (selTopAngleType)
             {
-                case "b":
-                case "d":
-                case "e":
+                case "Detail b":
+                case "Detail d":
+                case "Detail e":
                     topAngleType = "topangle";
                     break;
-                case "i":
-                case "k":
+                case "Detail i":
+                case "Detail k":
                     topAngleType = "compressionring";
                     break;
             }

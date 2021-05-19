@@ -89,6 +89,23 @@ namespace DrawWork.ValueServices
             return GetDegreeOfSlope(selHeight, selWidth);
         }
 
+        public double GetWidthOfSlope(string selSlope)
+        {
+            double selHeight = 0;
+            double selWidth = 0;
+            if (selSlope.Contains("/"))
+            {
+                string[] selArray = selSlope.Split(new char[] { '/' });
+                selHeight = GetDoubleValue(selArray[0]);
+                selWidth = GetDoubleValue(selArray[1]);
+            }
+            else
+            {
+                selHeight = 1;
+                selWidth = GetDoubleValue(selSlope);
+            }
+            return selWidth;
+        }
         public double GetDegreeOfSlope(double selHeight,double selWidth)
         {
             return Math.Atan2(selHeight, selWidth);
