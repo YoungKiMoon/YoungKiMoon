@@ -170,6 +170,10 @@ namespace DrawWork.CommandServices
                 if (eachCmd == null)
                     continue;
 
+
+                Console.WriteLine(string.Join("",eachCmd));
+
+
                 int dmRepeatCount = commandTranslate.DrawMethod_Repeat(eachCmd);
                 dmRepeatCount++;
                 for (int dmCount = 1; dmCount <= dmRepeatCount; dmCount++)

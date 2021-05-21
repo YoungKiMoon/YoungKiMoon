@@ -337,7 +337,9 @@ namespace DrawWork.DrawServices
 
             CDPoint newPoint = new CDPoint();
             // Angle Model
-            AngleSizeModel eachAngle = assemblyData.RoofAngleOutput[0];
+            AngleSizeModel eachAngle = new AngleSizeModel();
+            if(assemblyData.RoofAngleOutput.Count>0)
+                eachAngle=assemblyData.RoofAngleOutput[0];
             // Max course count
             int maxCourse = assemblyData.ShellOutput.Count - 1;
 
@@ -445,7 +447,9 @@ namespace DrawWork.DrawServices
 
             CDPoint newPoint = new CDPoint();
             // Angle Model
-            AngleSizeModel eachAngle = assemblyData.RoofAngleOutput[0];
+            AngleSizeModel eachAngle = new AngleSizeModel();
+            if (assemblyData.RoofAngleOutput.Count>0)
+                eachAngle = assemblyData.RoofAngleOutput[0];
             // Max course count
             int maxCourse = assemblyData.ShellOutput.Count - 1;
 

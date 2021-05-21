@@ -255,7 +255,12 @@ namespace DrawWork.DrawServices
             string roofSlopeString = assemblyData.RoofCRTInput[firstIndex].RoofSlope;
             double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
 
-            StructureCRTColumnBaseSupportModel eachColumnBase = assemblyData.StructureCRTColumnBaseSupportOutput[firstIndex];
+
+
+            StructureCRTColumnBaseSupportModel eachColumnBase = new StructureCRTColumnBaseSupportModel();
+            if(assemblyData.StructureCRTColumnBaseSupportOutput.Count>0)
+                eachColumnBase = assemblyData.StructureCRTColumnBaseSupportOutput[firstIndex];
+
             double bA = valueService.GetDoubleValue(assemblyData.BottomInput[firstIndex].BottomPlateThickness); //-> Bottom Thickness
             double bB = bA; //-> Bottom Thickness 으로 대체
             double bC = valueService.GetDoubleValue(eachColumnBase.D1); //-> D1 으로 대체
@@ -274,8 +279,11 @@ namespace DrawWork.DrawServices
             //double bE1 = valueService.GetDoubleValue(eachColumnBase.E1);
 
 
-            // Basic
-            PipeModel centerPipe = assemblyData.StructureCRTColumnPipeOutput[0]; // Center
+            // Basic : Center
+            PipeModel centerPipe = new PipeModel();
+            if (assemblyData.StructureCRTColumnPipeOutput.Count > 0)
+                centerPipe = assemblyData.StructureCRTColumnPipeOutput[firstIndex];
+
             double centerPipeOD = valueService.GetDoubleValue(centerPipe.OD);
             double centerPipeODHalf = centerPipeOD / 2;
             double centerRadius = 0; // Center
@@ -296,12 +304,24 @@ namespace DrawWork.DrawServices
             if (StructureDivService.columnType == "column")
             {
                 #region Column Side
+
+                // Girder Count = Column Count -1
                 for (int i = 0; i < assemblyData.StructureCRTGirderInput.Count; i++)
                 {
                     #region Column Basic
-                    HBeamModel eachHBeam = assemblyData.StructureCRTColumnHBeamOutput[i];
-                    StructureCRTColumnSideModel eachColumnSide = assemblyData.StructureCRTColumnSideOutput[i];
-                    PipeModel eachPipe = assemblyData.StructureCRTColumnPipeOutput[i + 1]; // Start = 2 Column
+
+                    HBeamModel eachHBeam = new HBeamModel();
+                    if (assemblyData.StructureCRTColumnHBeamOutput.Count > i)
+                        eachHBeam = assemblyData.StructureCRTColumnHBeamOutput[i];
+
+                    StructureCRTColumnSideModel eachColumnSide = new StructureCRTColumnSideModel();
+                    if (assemblyData.StructureCRTColumnSideOutput.Count > i+1)
+                        eachColumnSide = assemblyData.StructureCRTColumnSideOutput[i+1];
+
+                    PipeModel eachPipe = new PipeModel();
+                    if (assemblyData.StructureCRTColumnPipeOutput.Count > i+1)
+                        eachPipe = assemblyData.StructureCRTColumnPipeOutput[i + 1];// Start = 2 Column
+
 
                     string Size = eachColumnSide.SIZE;
                     double B = valueService.GetDoubleValue(eachColumnSide.B);
@@ -321,8 +341,17 @@ namespace DrawWork.DrawServices
                     #endregion
 
                     #region HBream
+
+                    // Structure A Size
+                    double structureSizeABefore = 0;
+                    double structureSizeA = 0;
+                    if (assemblyData.StructureCRTColumnSideOutput.Count > i)
+                        structureSizeABefore = valueService.GetDoubleValue(assemblyData.StructureCRTColumnSideOutput[i].B);
+                    structureSizeA = Math.Max(structureSizeABefore, B);
+
                     CDPoint eachHBeamPoint = (CDPoint)eachColumnPoint.Clone();
-                    eachHBeamPoint.Y = eachHBeamPoint.Y - B;
+                    //eachHBeamPoint.Y = eachHBeamPoint.Y - B;
+                    eachHBeamPoint.Y = eachHBeamPoint.Y - structureSizeA;
                     Entity[] eachHBeamEntity = refBlockService.DrawReference_HBeam(eachHBeamPoint, eachHBeam);
                     customBlockList.AddRange(eachHBeamEntity);
                     #endregion
@@ -410,7 +439,10 @@ namespace DrawWork.DrawServices
 
                 #region Column Center
 
-                StructureCRTColumnCenterModel centerTopSupport = assemblyData.StructureCRTColumnCenterOutput[firstIndex];
+                StructureCRTColumnCenterModel centerTopSupport = new StructureCRTColumnCenterModel();
+                if (assemblyData.StructureCRTColumnCenterOutput.Count > 0)
+                    centerTopSupport = assemblyData.StructureCRTColumnCenterOutput[firstIndex];
+
                 double tsSize = valueService.GetDoubleValue(centerTopSupport.COLUMN);
                 double tsA = valueService.GetDoubleValue(centerTopSupport.A);
                 double tsB = valueService.GetDoubleValue(centerTopSupport.B);
@@ -433,7 +465,10 @@ namespace DrawWork.DrawServices
                 double boltHoleHeight = valueService.GetDoubleValue(centerTopSupport.SlotHoleWidth);
                 double boltHoleWidth = valueService.GetDoubleValue(centerTopSupport.SlotHoleLength);
 
-                StructureCRTColumnRafterModel centerFirstRafter = assemblyData.StructureCRTColumnRafterOutput[firstIndex];
+                StructureCRTColumnRafterModel centerFirstRafter = new StructureCRTColumnRafterModel();
+                if (assemblyData.StructureCRTColumnRafterOutput.Count > 0)
+                    centerFirstRafter = assemblyData.StructureCRTColumnRafterOutput[firstIndex];
+
                 double rA = valueService.GetDoubleValue(centerFirstRafter.A);
                 double rB = valueService.GetDoubleValue(centerFirstRafter.B);
                 double rC = valueService.GetDoubleValue(centerFirstRafter.C);
@@ -569,8 +604,14 @@ namespace DrawWork.DrawServices
             else if (StructureDivService.columnType == "centering")
             {
 
-                StructureCRTCenteringInputModel centeringInput = assemblyData.StructureCRTCenterRingInput[firstIndex];
-                StructureCenteringModel centeringOutput = assemblyData.StructureCRTCenteringOutput[firstIndex];
+                StructureCRTCenteringInputModel centeringInput = new StructureCRTCenteringInputModel();
+                if (assemblyData.StructureCRTCenterRingInput.Count > 0)
+                    centeringInput = assemblyData.StructureCRTCenterRingInput[firstIndex];
+
+                StructureCenteringModel centeringOutput = new StructureCenteringModel();
+                if (assemblyData.StructureCRTCenteringOutput.Count > 0)
+                    centeringOutput = assemblyData.StructureCRTCenteringOutput[firstIndex];
+
                 double centeringOD = valueService.GetDoubleValue(centeringInput.CenteringOD);
                 double centeringID = 0;// 계산함
                 double centeringA = valueService.GetDoubleValue(centeringOutput.A);
@@ -608,8 +649,13 @@ namespace DrawWork.DrawServices
 
                     customBlockList.AddRange(new Line[] { cLine01, cLine02, cLine03, cLine04, cLineV01, cLineV02, cLineV03, cLineV04, cLineLongV01, cLineLongV02 });
                     #endregion
+
+
                     #region Clip Center Side
-                    StructureClipCenteringSideModel centeringSideClip = assemblyData.StructureCRTClipCenteringSideOutput[firstIndex];
+                    StructureClipCenteringSideModel centeringSideClip = new StructureClipCenteringSideModel();
+                    if (assemblyData.StructureCRTClipCenteringSideOutput.Count > 0)
+                        centeringSideClip = assemblyData.StructureCRTClipCenteringSideOutput[firstIndex];
+
                     double cClipA = valueService.GetDoubleValue(centeringSideClip.A);
                     double cClipB = valueService.GetDoubleValue(centeringSideClip.B);
                     double cClipC = valueService.GetDoubleValue(centeringSideClip.C);
@@ -756,7 +802,10 @@ namespace DrawWork.DrawServices
                     #endregion
 
                     #region Rafter : Centering : external
-                    StructureCenteringRafterModel centeringRafter = assemblyData.StructureCRTCenteringRaterOutput[firstIndex];
+                    StructureCenteringRafterModel centeringRafter = new StructureCenteringRafterModel();
+                    if (assemblyData.StructureCRTCenteringRaterOutput.Count > 0)
+                        centeringRafter = assemblyData.StructureCRTCenteringRaterOutput[firstIndex];
+
                     double cRafterA = valueService.GetDoubleValue(centeringRafter.A);
                     double cRafterA1 = valueService.GetDoubleValue(centeringRafter.A1);
                     double cRafterB1 = valueService.GetDoubleValue(centeringRafter.B1);
@@ -794,7 +843,10 @@ namespace DrawWork.DrawServices
             {
                 // Clip Shell Side : Colum type, Centering Type
                 #region Support Clip Shell Side
-                StructureClipShellSideModel eachSupportClip = assemblyData.StructureCRTClipShellSideOutput[firstIndex];
+                StructureClipShellSideModel eachSupportClip = new StructureClipShellSideModel();
+                if (assemblyData.StructureCRTClipShellSideOutput.Count > 0)
+                    eachSupportClip = assemblyData.StructureCRTClipShellSideOutput[firstIndex];
+
                 double scA = valueService.GetDoubleValue(eachSupportClip.A);
                 double scB = valueService.GetDoubleValue(eachSupportClip.B);
                 double scC = valueService.GetDoubleValue(eachSupportClip.C);
@@ -807,7 +859,10 @@ namespace DrawWork.DrawServices
                 double boltHoleHeight = valueService.GetDoubleValue(eachSupportClip.SlotholeHt);
                 double boltHoleWidth = valueService.GetDoubleValue(eachSupportClip.SlotholeWd);
 
-                StructureCRTColumnRafterModel lastRafter = assemblyData.StructureCRTColumnRafterOutput[assemblyData.StructureCRTColumnRafterOutput.Count - 1];
+                StructureCRTColumnRafterModel lastRafter = new StructureCRTColumnRafterModel();
+                if (assemblyData.StructureCRTColumnRafterOutput.Count - 1 >= 0)
+                    lastRafter = assemblyData.StructureCRTColumnRafterOutput[assemblyData.StructureCRTColumnRafterOutput.Count - 1];
+
                 double lrA = valueService.GetDoubleValue(lastRafter.A);
                 double lrB = valueService.GetDoubleValue(lastRafter.B);
                 double lrC = valueService.GetDoubleValue(lastRafter.C);
@@ -820,7 +875,10 @@ namespace DrawWork.DrawServices
 
                 if(StructureDivService.columnType == "centering")
                 {
-                    StructureCenteringRafterModel centeringLastRafter=assemblyData.StructureCRTCenteringRaterOutput[0];// 무조건 1개
+                    StructureCenteringRafterModel centeringLastRafter = new StructureCenteringRafterModel();
+                    if (assemblyData.StructureCRTCenteringRaterOutput.Count >0)
+                        centeringLastRafter = assemblyData.StructureCRTCenteringRaterOutput[0];// 무조건 1개
+
                     double ceA = valueService.GetDoubleValue(centeringLastRafter.A);
                     double ceC = valueService.GetDoubleValue(centeringLastRafter.C);
                     double ceD = valueService.GetDoubleValue(centeringLastRafter.D);
@@ -1125,7 +1183,10 @@ namespace DrawWork.DrawServices
                     if (StructureDivService.centeringInEx == "internal")
                     {
                         #region Rafter : Centering
-                        StructureCenteringRafterModel centeringRafter = assemblyData.StructureCRTCenteringRaterOutput[firstIndex];
+                        StructureCenteringRafterModel centeringRafter = new StructureCenteringRafterModel();
+                        if (assemblyData.StructureCRTCenteringRaterOutput.Count > 0)
+                            centeringRafter = assemblyData.StructureCRTCenteringRaterOutput[firstIndex];
+
                         double cRafterA = valueService.GetDoubleValue(centeringRafter.A);
                         double cRafterB = valueService.GetDoubleValue(centeringRafter.B);
                         double cRafterC = valueService.GetDoubleValue(centeringRafter.C);
@@ -1168,6 +1229,27 @@ namespace DrawWork.DrawServices
             }
 
             styleService.SetLayerListEntity(ref customBlockList, layerService.LayerOutLine);
+
+
+
+            // Centering : External : Right : Mirror
+            if(StructureDivService.columnType=="centering" && StructureDivService.centeringInEx == "external")
+            {
+
+                CDPoint mirrorPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTop,0, ref refPoint, ref curPoint);
+                Plane pl1 = Plane.YZ;
+                pl1.Origin.X = mirrorPoint.X;
+                pl1.Origin.Y = mirrorPoint.Y;
+                Mirror customMirror = new Mirror(pl1);
+                List<Entity> newMirrorList = new List<Entity>();
+                foreach (Entity eachEntity in customBlockList)
+                {
+                    Entity newEntity = (Entity)eachEntity.Clone();
+                    newEntity.TransformBy(customMirror);
+                    newMirrorList.Add(newEntity);
+                }
+                customBlockList.AddRange(newMirrorList);
+            }
 
             return customBlockList.ToArray();
         }
@@ -1468,7 +1550,8 @@ namespace DrawWork.DrawServices
 
             string selAngleSize = assemblyData.RoofCompressionRing[firstIndex].AngleSize;
             AngleSizeModel selAngleModel = refBlockService.GetAngleSizeModel(selAngleSize);
-
+            if (selAngleModel == null)
+                selAngleModel = new AngleSizeModel();
 
             double A = valueService.GetDoubleValue(selAngleModel.A); // X
             double B = valueService.GetDoubleValue(selAngleModel.B); // Y

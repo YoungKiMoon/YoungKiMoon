@@ -12,8 +12,9 @@ namespace DrawWork.DrawModels
         {
             centerLine = true;
             exLength = 0.5;
-            startEx = false;
-            endEx = false;
+            zeroEx = false;
+            oneEx = false;
+            twoEx = false;
             scaleValue = 1;
         }
 
@@ -32,18 +33,24 @@ namespace DrawWork.DrawModels
         }
         private double _exLength;
 
-        public bool startEx
+        public bool zeroEx
         {
-            get { return _startEx; }
-            set { _startEx = value; }
+            get { return _zeroEx; }
+            set { _zeroEx = value; }
         }
-        private bool _startEx;
-        public bool endEx
+        private bool _zeroEx;
+        public bool oneEx
         {
-            get { return _endEx; }
-            set { _endEx = value; }
+            get { return _oneEx; }
+            set { _oneEx = value; }
         }
-        private bool _endEx;
+        private bool _oneEx;
+        public bool twoEx
+        {
+            get { return _twoEx; }
+            set { _twoEx = value; }
+        }
+        private bool _twoEx;
         public double scaleValue
         {
             get { return _scaleValue; }

@@ -469,7 +469,7 @@ namespace DrawWork.AssemblyServices
 
                 // Structure : Column Side Top Support : Column Count -1
                 selAssembly.StructureCRTColumnSideOutput.Clear();
-                for (int i = 1; i < selAssembly.StructureCRTRafterInput.Count; i++) // 1 에서 부터 시작
+                for (int i = 0; i < selAssembly.StructureCRTRafterInput.Count; i++) // 0 에서 부터 시작
                 {
                     string rafterSize = valueService.GetAllTrim(selAssembly.StructureCRTRafterInput[i].Size);
                     if (rafterSize != "")

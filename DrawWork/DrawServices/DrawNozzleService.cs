@@ -1514,6 +1514,10 @@ namespace DrawWork.DrawServices
                             adjPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjRightShell, newValue, ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X + convergenceValue, adjPoint.Y, 0);
                             break;
+                        case "center":
+                            adjPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottom, newValue, ref refPoint, ref curPoint);
+                            newPoint = new Point3D(adjPoint.X , adjPoint.Y, 0);
+                            break;
                     }
                     break;
                 case "roof":
@@ -1532,6 +1536,11 @@ namespace DrawWork.DrawServices
                             adjPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, newValue, ref refPoint, ref curPoint);
                             newPoint = new Point3D(adjPoint.X + (newValue*2), adjPoint.Y + roofSlopeHeight + convergenceValue, 0);
                             break;
+                        case "center":
+                            adjPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, newValue, ref refPoint, ref curPoint);
+                            newPoint = new Point3D(adjPoint.X , adjPoint.Y , 0);
+                            break;
+                           
                     }
                     break;
 

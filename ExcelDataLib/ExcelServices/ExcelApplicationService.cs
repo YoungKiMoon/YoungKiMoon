@@ -263,8 +263,15 @@ namespace ExcelDataLib.ExcelServices
                     }
                     else
                     {
+                        //if (eachPro.Name == "NozzleInputModel")
+                        //{
+                        //    double a = 1;
+                        //}
+
+
                         GetExcelMultiData(selExcelData, newModelCollection);
                         IList cc = ((IList)newModelObject);
+                        cc.Clear();
                         foreach (var eachVar in newModelCollection)
                             cc.Add(eachVar);
 
@@ -420,7 +427,8 @@ namespace ExcelDataLib.ExcelServices
                             {
                                 if (eachRow.Item1==0 && eachRow.Item2 == 0)
                                 {
-                                    newRow.Add("!@#$%");
+                                    //newRow.Add("!@#$%");
+                                    newRow.Add("");
                                 }
                                 else
                                 {
@@ -472,7 +480,9 @@ namespace ExcelDataLib.ExcelServices
                                 int i = 0;
                                 foreach(PropertyInfo eachPro in newModel.GetType().GetProperties())
                                 {
-                                    if(newRow[i]!= "!@#$%")
+                                    //if(newRow[i]!= "!@#$%")
+                                    //    eachPro.SetValue(newModel, newRow[i], null);
+                                    if(eachPro.PropertyType.Name!="Double")
                                         eachPro.SetValue(newModel, newRow[i], null);
                                     i++;
                                     if (newRow.Count == i)

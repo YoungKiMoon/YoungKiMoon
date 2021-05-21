@@ -371,7 +371,7 @@ namespace DrawWork
             }
             else
             {
-                MessageBox.Show("오류");
+                //MessageBox.Show("오류");
             }
 
         }

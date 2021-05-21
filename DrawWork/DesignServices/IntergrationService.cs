@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 using devDept.Eyeshot;
 using DrawWork.Commons;
+using System.Windows;
 
 namespace DrawWork.DesignServices
 {
@@ -105,6 +106,7 @@ namespace DrawWork.DesignServices
             catch(Exception ex)
             {
 				Console.WriteLine(ex.Message);
+				MessageBox.Show(ex.Message);
 				returnValue = false;
 			}
 

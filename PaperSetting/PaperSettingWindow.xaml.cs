@@ -21,6 +21,9 @@ using DrawWork.DrawServices;
 using AssemblyLib.AssemblyModels;
 using DrawLogicLib.DrawLogicFileServices;
 using DrawWork.DesignServices;
+using DrawWork.AssemblyServices;
+using DrawLogicLib.Models;
+using DrawWork.FileServices;
 
 namespace PaperSetting
 {
@@ -96,7 +99,8 @@ namespace PaperSetting
         private void Button_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             //SampleDraw();
-            CreateDraw();
+            //CreateDraw();
+            CreateDrawSample();
         }
 
         public void CreateDraw()
@@ -122,6 +126,51 @@ namespace PaperSetting
             SampleDraw();
         }
 
+
+        public void CreateDrawSample()
+        {
+            // Assembly
+            AssemblyDataService assemblyService = new AssemblyDataService();
+            AssemblyModel newTankData = assemblyService.CreateMappingData("TankDesign_0520_TEST.xlsm");
+
+            // Logic
+            DrawLogicDBService newLogic = new DrawLogicDBService();
+            DrawLogicModel newLogicData = newLogic.GetLogicCommand(DrawLogicLib.Commons.LogicFile_Type.GA);
+
+            // Ligic File
+            TextFileService newFileService = new TextFileService();
+            string[] newComData = newFileService.GetTextFileArray(@"C:\Users\tree\Desktop\CAD\tabas\Sample_DrawLogic.txt");
+
+            // Virtual Design
+            //DesignService designS = new DesignService();
+            //designS.CreateDesignCRTModel(newTankData);
+
+            // 시트 값을 가져와야 함 : Assembly.Create Mapping Data
+
+            // 버추얼 디자인의 True False
+
+            // Logic을 수동으로 연결
+
+            // 형상 그리는 것은 완료
+            List<string> newAll = new List<string>();
+            newAll.AddRange(newLogicData.UsingList);
+            newAll.AddRange(newLogicData.ReferencePointList);
+            foreach (DrawCommandModel eachCommand in newLogicData.CommandList)
+                newAll.AddRange(eachCommand.Command);
+
+            //newAll.ToArray()
+
+            IntergrationService newInterService = new IntergrationService("CRT", newTankData, testModel);
+            if (newInterService.CreateLogic(90, newComData))
+            {
+                MessageBox.Show("완료");
+            }
+            else
+            {
+                //MessageBox.Show("오류");
+            }
+            SampleDraw();
+        }
 
         #region Sample Draw
         public void SampleDraw()
