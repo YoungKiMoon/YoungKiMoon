@@ -54,6 +54,12 @@ namespace DrawWork.ValueServices
                 doubleValue = 0;
             return doubleValue;
         }
+
+        public double IntRound(double Value, int Digit)
+        {
+            double Temp = Math.Pow(10.0, Digit);
+            return Math.Round(Value * Temp) / Temp;
+        }
         public double Evaluate(string expression)
         {
             try

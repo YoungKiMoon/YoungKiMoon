@@ -98,15 +98,7 @@ namespace DrawWork.ImportServices
                 
                 foreach (Entity eachEntity in blockSpareList)
                 {
-                    if(eachEntity is Text)
-                    {
-                        Text eachEntityText = eachEntity as Text;
-                        if (UtilityEx.PointInRect(eachEntityText.InsertionPoint, lowerLeftPoint, upperRightPoint))
-                        {
-                            eachBlock.BlockEntities.Add(eachEntityText);
-                        }
-                    }
-                    else if(eachEntity is Circle)
+                    if(eachEntity is Circle)
                     {
                         Circle eachEntityCircle = eachEntity as Circle;
                         if (UtilityEx.PointInRect(eachEntityCircle.StartPoint, lowerLeftPoint, upperRightPoint))
@@ -149,7 +141,7 @@ namespace DrawWork.ImportServices
                     else if (eachEntity is Text)
                     {
                         Text eachEntityText = eachEntity as Text;
-                        if (UtilityEx.PointInRect(eachEntityText.Vertices[0], lowerLeftPoint, upperRightPoint))
+                        if (UtilityEx.PointInRect(eachEntityText.InsertionPoint, lowerLeftPoint, upperRightPoint))
                         {
                             eachEntityText.StyleName = "ROMANS";
                             eachBlock.BlockEntities.Add(eachEntityText);
@@ -177,10 +169,11 @@ namespace DrawWork.ImportServices
                     }
                     else
                     {
-                        if (UtilityEx.PointInRect(eachEntity.Vertices[0], lowerLeftPoint, upperRightPoint))
-                        {
-                            eachBlock.BlockEntities.Add(eachEntity);
-                        }
+                        if(eachEntity.Vertices!=null)
+                            if (UtilityEx.PointInRect(eachEntity.Vertices[0], lowerLeftPoint, upperRightPoint))
+                            {
+                                eachBlock.BlockEntities.Add(eachEntity);
+                            }
                     }
 
 
@@ -210,7 +203,7 @@ namespace DrawWork.ImportServices
             foreach(Entity eachEntity in selEntityList)
             {
                 eachEntity.LayerName = "LayerBlock";
-                eachEntity.ColorMethod = colorMethodType.byLayer;
+                eachEntity.ColorMethod = colorMethodType.byEntity;
                 newBlock.Entities.Add(eachEntity);
             }
             newBlock.BasePoint = selBasePoint;

@@ -33,7 +33,8 @@ namespace DrawWork.DrawServices
                 BlockReference newBlock = new BlockReference(selPoint1.X, selPoint1.Y, 0, selBlockName.ToUpper(), 0);
                 newBlock.Scale(scaleFactor);
 
-                styleSerivce.SetLayer(ref newBlock, selLayerName);
+                newBlock.LayerName = selLayerName;
+                //styleSerivce.SetLayer(ref newBlock, selLayerName);
                 return newBlock;
             }
             else

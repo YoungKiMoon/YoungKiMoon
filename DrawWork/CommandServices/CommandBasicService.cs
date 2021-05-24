@@ -311,11 +311,12 @@ namespace DrawWork.CommandServices
 
                 // Nozzle
                 case "nozzle":
-                    DrawEntityModel newNozzle = drawObject.DoNozzle(eachCmd, ref refPoint, ref curPoint);
+                    DrawEntityModel newNozzle = drawObject.DoNozzle(eachCmd, ref refPoint, ref curPoint, scaleData.Value);
                     drawEntity.outlineList.AddRange(newNozzle.outlineList);
                     drawEntity.nozzlelineList.AddRange(newNozzle.nozzlelineList);
                     drawEntity.nozzleMarkList.AddRange(newNozzle.nozzleMarkList);
                     drawEntity.nozzleTextList.AddRange(newNozzle.nozzleTextList);
+                    drawEntity.blockList.AddRange(newNozzle.blockList);
                     goto case "allways";
 
 

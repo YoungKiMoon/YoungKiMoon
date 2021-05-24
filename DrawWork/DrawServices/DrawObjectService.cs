@@ -20,6 +20,7 @@ using AssemblyLib.AssemblyModels;
 using System.Diagnostics;
 using DrawWork.Commons;
 using DrawWork.DrawStyleServices;
+using DrawWork.CutomModels;
 
 namespace DrawWork.DrawServices
 {
@@ -52,7 +53,7 @@ namespace DrawWork.DrawServices
 
             drawService = new DrawService(selAssembly);
 
-            drawNozzleService = new DrawNozzleService(selAssembly);
+            drawNozzleService = new DrawNozzleService(selAssembly,selModel);
 
             drawLogicBlockService = new DrawLogicBlockService(selAssembly);
             drawImportBlockService = new DrawImportBlockService(singleModel);
@@ -649,7 +650,7 @@ namespace DrawWork.DrawServices
 
 
         // Nozzle
-        public DrawEntityModel DoNozzle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        public DrawEntityModel DoNozzle(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,double scaleValue)
         {
             // 0 : Object
             // 1 : Command
@@ -727,7 +728,7 @@ namespace DrawWork.DrawServices
             DrawEntityModel returnEntity = new DrawEntityModel();
             // Create Line
             if (newNozzleType != "" && newNozzlePosition != "")
-                returnEntity = drawNozzleService.DrawNozzle_GA(ref refPoint, newPosition,newNozzleType, newNozzlePosition, newNozzleFontSize, newReaderCircleSize,newMultiColumn,layerName);
+                returnEntity = drawNozzleService.DrawNozzle_GA(ref refPoint, newPosition,newNozzleType, newNozzlePosition, newNozzleFontSize, newReaderCircleSize,newMultiColumn,layerName,scaleValue);
 
             return returnEntity;
         }

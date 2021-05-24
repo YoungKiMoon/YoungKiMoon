@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyModels\AccessInputModel.cs" />
+    <Compile Include="AssemblyModels\AirFoamNozzleModel.cs" />
     <Compile Include="AssemblyModels\AnchorageInputModel.cs" />
     <Compile Include="AssemblyModels\AnchorBoltModel.cs" />
     <Compile Include="AssemblyModels\AnchorChairModel.cs" />
@@ -51,6 +52,9 @@
     <Compile Include="AssemblyModels\AssemblyModel.cs" />
     <Compile Include="AssemblyModels\BottomInputModel.cs" />
     <Compile Include="AssemblyModels\ChannelModel.cs" />
+    <Compile Include="AssemblyModels\DrainInternalModel.cs" />
+    <Compile Include="AssemblyModels\DrainLowerModel.cs" />
+    <Compile Include="AssemblyModels\DrainSumpModel.cs" />
     <Compile Include="AssemblyModels\DrawingListCRTInputModel.cs" />
     <Compile Include="AssemblyModels\DrawingListDRTInputModel.cs" />
     <Compile Include="AssemblyModels\DrawingListEFRTInputModel.cs" />
@@ -72,6 +76,8 @@
     <Compile Include="AssemblyModels\GeneralSeismicModel.cs" />
     <Compile Include="AssemblyModels\GeneralWindModel.cs" />
     <Compile Include="AssemblyModels\HBeamModel.cs" />
+    <Compile Include="AssemblyModels\InOutInternalPipe.cs" />
+    <Compile Include="AssemblyModels\InternalBendedTypeModel.cs" />
     <Compile Include="AssemblyModels\LeaderListCRTInputModel.cs" />
     <Compile Include="AssemblyModels\LeaderListDRTInputModel.cs" />
     <Compile Include="AssemblyModels\LeaderListEFRTInputModel.cs" />
@@ -80,10 +86,13 @@
     <Compile Include="AssemblyModels\NotesDRTInputModel.cs" />
     <Compile Include="AssemblyModels\NotesEFRTInputModel.cs" />
     <Compile Include="AssemblyModels\NotesIFRTInputModel.cs" />
-    <Compile Include="AssemblyModels\NozzleInputModel.cs" />
+    <Compile Include="AssemblyModels\NozzleFRTRoofInputModel.cs" />
+    <Compile Include="AssemblyModels\NozzleRoofInputModel.cs" />
+    <Compile Include="AssemblyModels\NozzleShellInputModel.cs" />
     <Compile Include="AssemblyModels\PipeModel.cs" />
     <Compile Include="AssemblyModels\PipeScheduleModel.cs" />
     <Compile Include="AssemblyModels\ReducerModel.cs" />
+    <Compile Include="AssemblyModels\ReinforcingPadModel.cs" />
     <Compile Include="AssemblyModels\RoofCompressionRingModel.cs" />
     <Compile Include="AssemblyModels\RoofCRTInputModel.cs" />
     <Compile Include="AssemblyModels\RoofDRTInputModel.cs" />
@@ -91,7 +100,11 @@
     <Compile Include="AssemblyModels\RoofEFRTSingleDeckInputModel.cs" />
     <Compile Include="AssemblyModels\RoofIFRTInputModel.cs" />
     <Compile Include="AssemblyModels\RoofInsulationModel.cs" />
+    <Compile Include="AssemblyModels\RoofManholeModel.cs" />
+    <Compile Include="AssemblyModels\RoofProjectionReinfPadModel.cs" />
+    <Compile Include="AssemblyModels\ShellCleanOutModel.cs" />
     <Compile Include="AssemblyModels\ShellInputModel.cs" />
+    <Compile Include="AssemblyModels\ShellManholeModel.cs" />
     <Compile Include="AssemblyModels\ShellOutputModel.cs" />
     <Compile Include="AssemblyModels\StructureCenteringModel.cs" />
     <Compile Include="AssemblyModels\StructureCenteringRafterModel.cs" />
@@ -121,7 +134,10 @@
     <Compile Include="AssemblyModels\StructureIFRTInputModel.cs" />
     <Compile Include="AssemblyModels\StructureIFRTStiffenerInputModel.cs" />
     <Compile Include="AssemblyModels\TeeModel.cs" />
+    <Compile Include="AssemblyModels\ThreadedRoofModel.cs" />
     <Compile Include="AssemblyModels\UBoltModel.cs" />
+    <Compile Include="AssemblyModels\VentModel.cs" />
+    <Compile Include="AssemblyModels\WaterSprayNozzleModel.cs" />
     <Compile Include="AssemblyModels\WeldingInputModel.cs" />
     <Compile Include="AssemblyModels\WindGirderInputModel.cs" />
     <Compile Include="AssemblyModels\WindGirderOutputModel.cs" />

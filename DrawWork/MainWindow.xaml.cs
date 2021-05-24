@@ -168,6 +168,8 @@ namespace DrawWork
 
             }
 
+            this.testModel.ActiveViewport.Background.TopColor = new SolidColorBrush(Color.FromRgb(59, 68, 83));
+
 
         }
 

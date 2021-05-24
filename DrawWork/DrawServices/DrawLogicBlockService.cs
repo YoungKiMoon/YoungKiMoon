@@ -35,6 +35,8 @@ namespace DrawWork.DrawServices
         private StyleFunctionService styleService;
         private LayerStyleService layerService;
 
+        private DrawPublicFunctionService publicFunService;
+
         public DrawLogicBlockService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
@@ -44,6 +46,8 @@ namespace DrawWork.DrawServices
 
             styleService = new StyleFunctionService();
             layerService = new LayerStyleService();
+
+            publicFunService = new DrawPublicFunctionService();
         }
 
         public Entity[] DrawBlock_TopAngle(CDPoint selPoint1, ref CDPoint refPoint, ref CDPoint curPoint)
@@ -1278,12 +1282,13 @@ namespace DrawWork.DrawServices
             // 확인 필요
             double overLap = 70;
 
-            double outsideProjection = 0;
-            double weldingLeg = 9;
-            if (bottomBase.AnnularPlate=="Yes")
-                outsideProjection = 60 + weldingLeg;
-            else
-                outsideProjection = 30 + weldingLeg;
+            double outsideProjection = publicFunService.GetBottomFocuntionOD(bottomBase.AnnularPlate);
+            outsideProjection += bottomThk;
+            //double weldingLeg = 9;
+            //if (bottomBase.AnnularPlate=="Yes")
+            //    outsideProjection = 60 + weldingLeg;
+            //else
+            //    outsideProjection = 30 + weldingLeg;
 
 
             CDPoint BottomLeftUp = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointLeftBottomUp, 0, ref refPoint, ref curPoint);
@@ -1297,10 +1302,10 @@ namespace DrawWork.DrawServices
             if (bottomBase.AnnularPlate == "Yes")
             {
                 CDPoint wpPoint= workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellBottom, 0, ref refPoint, ref curPoint);
-                customBlockList.Add(new Line(GetSumPoint(wpPoint, -bottomThk - outsideProjection, 0), GetSumPoint(wpPoint, annularThickWidth - bottomThk - outsideProjection, 0)));
-                customBlockList.Add(new Line(GetSumPoint(wpPoint, -bottomThk - outsideProjection, -annularThickness), GetSumPoint(wpPoint, annularThickWidth - bottomThk - outsideProjection, -annularThickness)));
-                customBlockList.Add(new Line(GetSumPoint(wpPoint, -bottomThk - outsideProjection, 0), GetSumPoint(wpPoint, -bottomThk - outsideProjection, -annularThickness)));
-                customBlockList.Add(new Line(GetSumPoint(wpPoint, annularThickWidth - bottomThk - outsideProjection, -annularThickness), GetSumPoint(wpPoint, annularThickWidth - bottomThk - outsideProjection, 0)));
+                customBlockList.Add(new Line(GetSumPoint(wpPoint,  - outsideProjection, 0), GetSumPoint(wpPoint, annularThickWidth - outsideProjection, 0)));
+                customBlockList.Add(new Line(GetSumPoint(wpPoint,  - outsideProjection, -annularThickness), GetSumPoint(wpPoint, annularThickWidth - outsideProjection, -annularThickness)));
+                customBlockList.Add(new Line(GetSumPoint(wpPoint,  - outsideProjection, 0), GetSumPoint(wpPoint,  - outsideProjection, -annularThickness)));
+                customBlockList.Add(new Line(GetSumPoint(wpPoint, annularThickWidth - outsideProjection, -annularThickness), GetSumPoint(wpPoint, annularThickWidth - outsideProjection, 0)));
             }
             else
             {

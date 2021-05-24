@@ -118,6 +118,8 @@ namespace DrawWork.Commons
 
         // Point : Reference
         PointReference =100,
+        // Point : Bottom : Annular
+        PointReferenceBottom =101,
 
         // Point : Center
         PointCenterTopUp = 1,
@@ -159,6 +161,8 @@ namespace DrawWork.Commons
         // Adj : Shell
         AdjLeftShell = 23,
         AdjRightShell = 24,
+
+
     }
 
 
@@ -181,5 +185,13 @@ namespace DrawWork.Commons
         EFRTSingle,
         EFRTDouble,
 
+    }
+
+    public enum NozzleBlock_Type
+    {
+        NoSet,
+        OnlyBlock,
+        Flange,
+        Other,
     }
 }

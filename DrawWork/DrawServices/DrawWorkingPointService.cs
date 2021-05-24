@@ -89,6 +89,21 @@ namespace DrawWork.DrawServices
 
 
                 // Point : Center
+                case WORKINGPOINT_TYPE.PointReferenceBottom:
+                    double lastPlateHeight = 0;
+                    if (assemblyData.BottomInput[refFirstIndex].AnnularPlate.ToLower() == "yes")
+                    {
+                        lastPlateHeight = valueService.GetDoubleValue(assemblyData.BottomInput[refFirstIndex].AnnularPlateThickness);
+                    }
+                    else
+                    {
+                        lastPlateHeight = valueService.GetDoubleValue(assemblyData.BottomInput[refFirstIndex].BottomPlateThickness);
+                    }
+
+                    WPPoint = GetSumCDPoint(refPoint, 0, -lastPlateHeight);
+                    break;
+
+
 
                 case WORKINGPOINT_TYPE.PointCenterTopUp:                // 2021-04-22 완료
                     CDPoint topcenterpoint = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
@@ -109,13 +124,13 @@ namespace DrawWork.DrawServices
                     break;
 
 
-                case WORKINGPOINT_TYPE.PointCenterBottomUp:             // 2021-04-22 완료
+                case WORKINGPOINT_TYPE.PointCenterBottomUp:             // 2021-04-22 완료 : 문제 있음
                     CDPoint bottomcenterpoint = WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottomDown, ref refPoint, ref curPoint);
                     double verticalHeight = valueService.GetHypotenuseByWidth(bottomSlope, bottomThickness);
                     WPPoint = GetSumCDPoint(bottomcenterpoint, 0, verticalHeight);
                     break;
 
-                case WORKINGPOINT_TYPE.PointCenterBottomDown:           // 2021-04-22 완료
+                case WORKINGPOINT_TYPE.PointCenterBottomDown:           // 2021-04-22 완료 : 문제 있음
                     CDPoint bottomleftpoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftBottomDown, ref refPoint, ref curPoint);
 
                     double tempWidth2 = GetDistanceX(bottomleftpoint.X, refPoint.X + valueService.GetDoubleValue(selSizeNominalId) / 2);
@@ -538,8 +553,11 @@ namespace DrawWork.DrawServices
                 newPoint = GetSumCDPoint(refPoint,
                                         - bottomThk
                                         - outsideProjection,
-                                        0);
 
+                                        - valueService.GetOppositeByWidth(bottomSlopeDegree, bottomThk+ outsideProjection));
+                newPoint = GetSumCDPoint(newPoint,
+                                        +valueService.GetOppositeByHypotenuse(bottomSlopeDegree, bottomThickness),
+                                        -valueService.GetAdjacentByHypotenuse(bottomSlopeDegree, bottomThickness));
             }
 
 
