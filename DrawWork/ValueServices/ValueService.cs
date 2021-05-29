@@ -209,5 +209,24 @@ namespace DrawWork.ValueServices
 
 
 
+        public string GetOrdinalNumber(int selNumber)
+        {
+            return GetOrdinalNumber(Convert.ToDouble(selNumber));
+        }
+        public string GetOrdinalNumber(double selNumber)
+        {
+            string returnValue = "";
+            if (selNumber == 1)
+                returnValue = "st";
+            else if (selNumber == 2)
+                returnValue = "nd";
+            else if (selNumber == 3)
+                returnValue = "rd";
+            else 
+                returnValue = "th";
+
+
+            return selNumber + returnValue;
+        }
     }
 }

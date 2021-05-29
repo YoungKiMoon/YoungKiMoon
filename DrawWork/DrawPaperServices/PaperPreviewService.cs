@@ -41,7 +41,7 @@ namespace DrawWork.DrawPaperServices
         public void SetModelObject(Model selModel)
         {
             singleModel = selModel;
-            drawImportBlockService = new DrawImportBlockService(selModel);
+            //drawImportBlockService = new DrawImportBlockService(selModel);
         }
         public void SetDrawingsObject(Drawings selDraw)
         {
@@ -68,39 +68,54 @@ namespace DrawWork.DrawPaperServices
             {
                 Sheet selSheet = singleDraw.Sheets[0];
 
-                Camera newCamera = new Camera();
-
-                newCamera.FocalLength = 0;
-                newCamera.ProjectionMode = projectionType.Orthographic;
-
-                newCamera.Rotation.X = 0.5;
-                newCamera.Rotation.Y = 0.5;
-                newCamera.Rotation.Z = 0.5;
-                newCamera.Rotation.W = 0.5;
-
-                // 표적 중앙
-                newCamera.Target.X = valueService.GetDoubleValue(selViewPort.TargetX);
-                newCamera.Target.Y = valueService.GetDoubleValue(selViewPort.TargetY);
-                newCamera.Target.Z = 0;
-
-
-                
                 double extensionAmount = Math.Min(selSheet.Width, selSheet.Height) / 400;
 
-                VectorView newView = new VectorView(valueService.GetDoubleValue(selViewPort.LocationX),
-                                                    valueService.GetDoubleValue(selViewPort.LocationY),
-                                                    newCamera,
-                                                    valueService.GetDoubleValue(selViewPort.Scale),
-                                                    "newView",
-                                                    valueService.GetDoubleValue(selViewPort.SizeX),
-                                                    valueService.GetDoubleValue(selViewPort.SizeY));
-                
-                newView.CenterlinesExtensionAmount = extensionAmount;
-                //newView.CenterlinesExtensionAmount = 0;
-                //newView.FillRegions = false;
-                //newView.FillTexts = false;
+                if (false)
+                {
+                    Camera newCamera = new Camera();
 
-                //selSheet.AddViewPlaceHolder(newView, singleModel, singleDraw, "GAPlaceHolder");
+                    newCamera.FocalLength = 0;
+                    newCamera.ProjectionMode = projectionType.Orthographic;
+
+                    newCamera.Rotation.X = 0.5;
+                    newCamera.Rotation.Y = 0.5;
+                    newCamera.Rotation.Z = 0.5;
+                    newCamera.Rotation.W = 0.5;
+
+                    // 표적 중앙
+                    newCamera.Target.X = valueService.GetDoubleValue(selViewPort.TargetX);
+                    newCamera.Target.Y = valueService.GetDoubleValue(selViewPort.TargetY);
+                    newCamera.Target.Z = 0;
+
+
+                    VectorView newView = new VectorView(valueService.GetDoubleValue(selViewPort.LocationX),
+                                                        valueService.GetDoubleValue(selViewPort.LocationY),
+                                                        newCamera,
+                                                        valueService.GetDoubleValue(selViewPort.Scale),
+                                                        "newView",
+                                                        valueService.GetDoubleValue(selViewPort.SizeX),
+                                                        valueService.GetDoubleValue(selViewPort.SizeY));
+
+                    newView.CenterlinesExtensionAmount = extensionAmount;
+                    //newView.CenterlinesExtensionAmount = 0;
+                    //newView.FillRegions = false;
+                    //newView.FillTexts = false;
+
+                    //selSheet.AddViewPlaceHolder(newView, singleModel, singleDraw, "GAPlaceHolder");
+                }
+
+
+                //ViewPortSettingModel viewPortSet = new ViewPortSettingModel();
+
+                //viewPortSet.Scale = "10";
+                //viewPortSet.TargetX = "0";
+                //viewPortSet.TargetY = "0";
+                //viewPortSet.LocationX = "330";
+                //viewPortSet.LocationY = "360";
+                //viewPortSet.SizeX = "600";
+                //viewPortSet.SizeY = "400";
+
+                //selViewPort = viewPortSet; ;
 
                 Camera newnewCamera = new Camera(new Point3D(valueService.GetDoubleValue(selViewPort.TargetX), valueService.GetDoubleValue(selViewPort.TargetY), 0),
                                 0,
@@ -128,9 +143,15 @@ namespace DrawWork.DrawPaperServices
             {
                 Sheet newSheet = singleDraw.Sheets[0];
                 VectorView newView = newSheet.Entities[0] as VectorView;
+
+                newView.X = valueService.GetDoubleValue(selViewPort.LocationX);
+                newView.Y = valueService.GetDoubleValue(selViewPort.LocationY);
+
                 newView.Camera.Target.X = valueService.GetDoubleValue(selViewPort.TargetX);
                 newView.Camera.Target.Y = valueService.GetDoubleValue(selViewPort.TargetY);
                 newView.Scale = valueService.GetDoubleValue(selViewPort.Scale);
+
+                newView.CenterlinesExtensionAmount = selViewPort.ExtensionAmount;
                 //newView.X= valueService.GetDoubleValue(selViewPort.LocationX);
                 //newView.Y = valueService.GetDoubleValue(selViewPort.LocationY);
                 //newView.Window.Width= Convert.ToSingle( valueService.GetDoubleValue(selViewPort.SizeX));

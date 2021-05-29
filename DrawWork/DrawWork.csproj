@@ -15,7 +15,7 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -35,8 +35,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="devDept.Eyeshot.Control.Wpf.v2020, Version=2020.3.528.0, Culture=neutral, PublicKeyToken=5385d83d2fb4d7d9, processorArchitecture=MSIL" />
-    <Reference Include="devDept.Eyeshot.Control.x86.Wpf.v2020">
-      <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\x86\devDept.Eyeshot.Control.x86.Wpf.v2020.dll</HintPath>
+    <Reference Include="devDept.Eyeshot.Control.x64.Wpf.v2020">
+      <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\x64\devDept.Eyeshot.Control.x64.Wpf.v2020.dll</HintPath>
     </Reference>
     <Reference Include="devDept.Geometry.v2020, Version=2020.3.528.0, Culture=neutral, PublicKeyToken=9440825e8b4733bc, processorArchitecture=MSIL" />
     <Reference Include="devDept.Graphics.Shaders.v2020, Version=2020.3.528.0, Culture=neutral, PublicKeyToken=54ce5f5f803e4b42, processorArchitecture=MSIL" />
@@ -76,6 +76,8 @@
     <Compile Include="Commons\CommonGlobal.cs" />
     <Compile Include="Commons\CommonMethod.cs" />
     <Compile Include="Commons\SingletonData.cs" />
+    <Compile Include="CutomModels\DimensionPointModel.cs" />
+    <Compile Include="CutomModels\LeaderPointModel.cs" />
     <Compile Include="CutomModels\NozzleInputModel.cs" />
     <Compile Include="DataServices\ExcelDataService.cs" />
     <Compile Include="DesignServices\DesignService.cs" />
@@ -99,7 +101,10 @@
     <Compile Include="DrawPaperServices\ViewPortSettingModel.cs" />
     <Compile Include="DrawSacleServices\DrawScaleService.cs" />
     <Compile Include="DrawServices\DrawBoundaryService.cs" />
+    <Compile Include="DrawServices\DrawEditingService.cs" />
     <Compile Include="DrawServices\DrawImportBlockService.cs" />
+    <Compile Include="DrawServices\DrawLeaderPublicService.cs" />
+    <Compile Include="DrawServices\DrawLeaderService.cs" />
     <Compile Include="DrawServices\DrawLogicBlockService.cs" />
     <Compile Include="DrawServices\DrawNozzleBlockService.cs" />
     <Compile Include="DrawServices\DrawPipeService.cs" />
@@ -115,6 +120,9 @@
     <Compile Include="DrawStyleServices\LineStyleService.cs" />
     <Compile Include="DrawStyleServices\StyleFunctionService.cs" />
     <Compile Include="DrawStyleServices\TextStyleService.cs" />
+    <Compile Include="DrawWorkingPointSevices\CRTWorkingPointModel.cs" />
+    <Compile Include="DrawWorkingPointSevices\DRTWorkingPointModel.cs" />
+    <Compile Include="DWGFileServices\DWGFileService.cs" />
     <Compile Include="FileServices\TextFileService.cs" />
     <Compile Include="ImportServices\ImportBlockModel.cs" />
     <Compile Include="ImportServices\ImportBlockService.cs" />
@@ -197,6 +205,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Resource Include="Resources\BLOCK_20210527.dwg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

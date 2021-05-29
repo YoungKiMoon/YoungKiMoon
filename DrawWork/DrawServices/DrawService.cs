@@ -376,12 +376,16 @@ namespace DrawWork.DrawServices
 
         //    return customEntityList.ToArray();
         //}
-        public Dictionary<string,List<Entity>> Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3,
+        public Dictionary<string, List<Entity>> Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3,
                                     string selPosition, double selDimHeight, double selTextHeight, double selTextGap, double selArrowSize,
                                     string selTextPrefix, string selTextSuffix, string selTextUserInput,
                                     double selRotate,
                                     double selScale,
-                                    string selLayerName
+                                    string selLayerName,
+                                    bool leftArrowVisible = true,
+                                    bool rightArrowVisible = true,
+                                    bool extVisible = true,
+                                    double middleValue=0
                                     )
         {
 
@@ -425,13 +429,14 @@ namespace DrawWork.DrawServices
             Triangle tri2 = null;
             Text dimText = null;
 
-
+            double middleDistanceH = (selPoint2.X - selPoint1.X) / 2;
+            double middleDistanceV = (selPoint2.Y - selPoint1.Y) / 2;
 
             // Top
             switch (selPosition)
             {
                 case "top":
-                    textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
+                    textCenter.X = selPoint1.X + middleDistanceH + (middleDistanceH * middleValue/100);
                     textCenter.Y = Math.Min(selPoint1.Y, selPoint2.Y) + selDimHeight;
                     selDimtext = Point3D.Distance(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y)).ToString();
 
@@ -440,13 +445,14 @@ namespace DrawWork.DrawServices
                     dimLine2 = new Line(new Point3D(selPoint2.X, selPoint2.Y + scalePointGapLine2), new Point3D(selPoint2.X, textCenter.Y + scaleExtLine2));
                     dimText = new Text(new Point3D(textCenter.X, textCenter.Y + scaleTextGap), selDimtext, scaleTextHeight);
                     dimText.Alignment = Text.alignmentType.BaselineCenter;
+                    
                     tri1 = new Triangle(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint1.X + scaleArrowWidth, textCenter.Y + scaleArrowHeight / 2), new Point3D(selPoint1.X + scaleArrowWidth, textCenter.Y - scaleArrowHeight / 2));
                     tri2 = new Triangle(new Point3D(selPoint2.X, textCenter.Y), new Point3D(selPoint2.X - scaleArrowWidth, textCenter.Y + scaleArrowHeight / 2), new Point3D(selPoint2.X - scaleArrowWidth, textCenter.Y - scaleArrowHeight / 2));
 
                     break;
 
                 case "bottom":
-                    textCenter.X = selPoint1.X + (selPoint2.X - selPoint1.X) / 2;
+                    textCenter.X = selPoint1.X + middleDistanceH + (middleDistanceH * middleValue / 100);
                     textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) - selDimHeight;
                     selDimtext = Point3D.Distance(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y)).ToString();
 
@@ -463,7 +469,7 @@ namespace DrawWork.DrawServices
 
                 case "left":
                     textCenter.X = Math.Max(selPoint1.X, selPoint2.X) - selDimHeight;
-                    textCenter.Y = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+                    textCenter.Y = selPoint1.Y + middleDistanceV +(middleDistanceV*middleValue/100);
                     selDimtext = Point3D.Distance(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y)).ToString();
 
                     arrowLine = new Line(new Point3D(textCenter.X, selPoint1.Y+1), new Point3D(textCenter.X, selPoint2.Y-1));
@@ -480,7 +486,7 @@ namespace DrawWork.DrawServices
 
                 case "right":
                     textCenter.X = Math.Min(selPoint1.X, selPoint2.X) + selDimHeight;
-                    textCenter.Y = selPoint1.Y + (selPoint2.Y - selPoint1.Y) / 2;
+                    textCenter.Y = selPoint1.Y + middleDistanceV + (middleDistanceV * middleValue / 100);
                     selDimtext = Point3D.Distance(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y)).ToString();
 
                     arrowLine = new Line(new Point3D(textCenter.X, selPoint1.Y+1), new Point3D(textCenter.X, selPoint2.Y-1));
@@ -519,11 +525,17 @@ namespace DrawWork.DrawServices
 
 
             dimlineList.Add(arrowLine);
-            dimArrowList.Add(tri1);
-            dimArrowList.Add(tri2);
+            if(leftArrowVisible)
+                dimArrowList.Add(tri1);
+            if(rightArrowVisible)
+                dimArrowList.Add(tri2);
+
             dimTextList.Add(dimText);
-            dimlineExtList.Add(dimLine1);
-            dimlineExtList.Add(dimLine2);
+
+            if (extVisible)
+                dimlineExtList.Add(dimLine1);
+            if (extVisible)
+                dimlineExtList.Add(dimLine2);
             
 
             Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
@@ -613,6 +625,7 @@ namespace DrawWork.DrawServices
                     {
                         // Text
                         Text newText01 = new Text(new Point3D(centerPoint.X + scaleTextGap, centerPoint.Y + currentTextLayerHeight + scaleTextGap), eachString, scaleTextHeight);
+                        styleSerivce.SetLayer(ref newText01, selLayerName);
                         newText01.Regen(new RegenParams(0, ssModel));
                         newText01.Alignment = Text.alignmentType.BaselineLeft;
 
@@ -654,6 +667,7 @@ namespace DrawWork.DrawServices
                     {
                         // Text
                         Text newText01 = new Text(new Point3D(centerPoint.X + scaleTextGap, centerPoint.Y + currentTextLayerHeight + scaleTextGap), eachString, scaleTextHeight);
+                        styleSerivce.SetLayer(ref newText01, selLayerName);
                         newText01.Regen(new RegenParams(0, ssModel));
                         newText01.Alignment = Text.alignmentType.BaselineLeft;
 
@@ -695,6 +709,7 @@ namespace DrawWork.DrawServices
                     {
                         // Text
                         Text newText01 = new Text(new Point3D(centerPoint.X - scaleTextGap, centerPoint.Y + currentTextLayerHeight + scaleTextGap), eachString, scaleTextHeight);
+                        styleSerivce.SetLayer(ref newText01, selLayerName);
                         newText01.Regen(new RegenParams(0, ssModel));
                         newText01.Alignment = Text.alignmentType.BaselineRight;
 
@@ -737,6 +752,7 @@ namespace DrawWork.DrawServices
                     {
                         // Text
                         Text newText01 = new Text(new Point3D(centerPoint.X - scaleTextGap, centerPoint.Y + currentTextLayerHeight + scaleTextGap), eachString, scaleTextHeight);
+                        styleSerivce.SetLayer(ref newText01, selLayerName);
                         newText01.Regen(new RegenParams(0, ssModel));
                         newText01.Alignment = Text.alignmentType.BaselineRight;
 
@@ -769,7 +785,7 @@ namespace DrawWork.DrawServices
 
             styleSerivce.SetLayerListEntity(ref leaderLine, selLayerName);
             styleSerivce.SetLayerListEntity(ref leaderArrow, selLayerName);
-            styleSerivce.SetLayerListTextEntity(ref leaderText, selLayerName);
+            //styleSerivce.SetLayerListTextEntity(ref leaderText, selLayerName);
 
             customEntityList.Add(CommonGlobal.LeaderLine, leaderLine);
             customEntityList.Add(CommonGlobal.LeaderText, leaderText);

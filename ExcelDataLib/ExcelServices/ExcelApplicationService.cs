@@ -174,6 +174,45 @@ namespace ExcelDataLib.ExcelServices
             return newDic;
         }
 
+        public bool CheckTABASExcel(string selWorkbook)
+        {
+            bool returnValue = false;
+            List<object> newWork = GetExcelWorkbookList();
+            foreach (Excel.Workbook eachWork in newWork)
+            {
+                if (eachWork.Name == selWorkbook)
+                {
+                    ObservableCollection<ExcelWorkSheetModel> newSheets = GetSheetList(eachWork);
+                    foreach (ExcelWorkSheetModel eachSheet in newSheets)
+                    {
+                        if (eachSheet.ExcelSheetName == "AMEdata")
+                        {
+                            returnValue = true;
+                        }
+                    }
+                        
+                }
+            }
+            return returnValue;
+        }
+
+        public bool CheckTABASExcel2(object selWorkbook)
+        {
+            bool returnValue = false;
+
+            ObservableCollection<ExcelWorkSheetModel> newSheets = GetSheetList(selWorkbook);
+            foreach (ExcelWorkSheetModel eachSheet in newSheets)
+            {
+                if (eachSheet.ExcelSheetName == "AMEdata")
+                {
+                    returnValue = true;
+                }
+            }
+                
+            return returnValue;
+        }
+
+
         public List<object> GetExcelWorkbookList()
         {
             List<object> newExcelWorkList = new List<object>();

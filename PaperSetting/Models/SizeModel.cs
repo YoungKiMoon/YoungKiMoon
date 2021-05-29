@@ -12,7 +12,7 @@ namespace PaperSetting.Models
         public SizeModel()
         {
             Name = "";
-            PaperType = PAPERFORMAT_TYPE.A2_ISO; // Default
+            PaperType = PAPERFORMAT_TYPE.A1_ISO; // Default
 
             Width = 0;
             Height = 0;

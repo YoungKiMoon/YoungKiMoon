@@ -6,11 +6,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using AssemblyLib.AssemblyModels;
 
 namespace PaperSetting.ViewModel
 {
     public class PaperSettingViewModel : Notifier
     {
+        public AssemblyModel newTankData;
+
         public ObservableCollection<PaperDwgModel> PaperList
         {
             get { return _PaperList; }
@@ -47,19 +50,40 @@ namespace PaperSetting.ViewModel
         private PaperDwgModel _PaperListSelection;
 
 
+        #region Progress
+        private string _bContents;
+        public string BContents
+        {
+            get { return _bContents; }
+            set
+            {
+                _bContents = value;
+                OnPropertyChanged(nameof(BContents));
+            }
+        }
+        #endregion
+
+
         public PaperSettingViewModel()
         {
             PaperListSelectionColl = new ObservableCollection<PaperDwgModel>();
             PaperListSelection = new PaperDwgModel();
 
 
-            PaperSettingService newSetting = new PaperSettingService();
-            PaperList = newSetting.CreateDrawingCRTList();
+
 
             //PaperList = SampleService.CreatePaperSample();
 
             
         }
+
+        //public void CreateDrawingList(AssemblyModel selAssembly)
+        //{
+        //    PaperSettingService newSetting = new PaperSettingService();
+        //    PaperList = newSetting.CreateDrawingCRTList(selAssembly);
+        //    //PaperList = newSetting.CreateDrawingCRTList();
+        //}
+
 
     }
 }

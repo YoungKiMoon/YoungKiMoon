@@ -37,6 +37,7 @@ namespace PaperSetting.EYEServices
         public void CreatePaperBlock()
         {
             singleDraw.Blocks.Add(BuildPaperFRAME_A1("PAPER_FRAME_A1"));
+            singleDraw.Blocks.Add(BuildPaperFRAME_A2("PAPER_FRAME_A2"));
             singleDraw.Blocks.Add(BuildPaperTitle_Type01("PAPER_TITLE_TYPE01"));
 
         }
@@ -98,6 +99,82 @@ namespace PaperSetting.EYEServices
             }
 
             foreach(Entity eachEntity in newLinst)
+            {
+                eachEntity.LayerName = layerStyle.LayerPaper;
+                eachEntity.LineTypeMethod = colorMethodType.byLayer;
+                eachEntity.ColorMethod = colorMethodType.byEntity;
+                eachEntity.Color = frameBlue;
+                eachEntity.LineWeightMethod = colorMethodType.byLayer;
+            }
+
+            foreach (Entity eachEntity in FrameList)
+            {
+                eachEntity.LayerName = layerStyle.LayerPaper;
+                eachEntity.ColorMethod = colorMethodType.byEntity;
+                eachEntity.Color = frameBlue;
+            }
+
+            newBL.Entities.AddRange(newLinst);
+            newBL.Entities.AddRange(FrameList);
+
+            return newBL;
+        }
+
+        private Block BuildPaperFRAME_A2(string selName)
+        {
+
+            SizeModel selSize = new SizeModel("", Commons.PAPERFORMAT_TYPE.A2_ISO, 594, 420);
+
+            double paperWidth = selSize.Width;
+            double paperHeight = selSize.Height;
+            double paperOuterLineMargin = 0;
+            double PaperInnerLineMargin = 7;
+
+            Color frameBlue = Color.FromArgb(0, 255, 255);// 하늘
+
+            Block newBL = new Block(selName);
+
+            List<Entity> newLinst = new List<Entity>();
+
+            newLinst.Add(new LinearPath(0, 0, paperWidth - (paperOuterLineMargin * 2), paperHeight - (paperOuterLineMargin * 2)));
+            newLinst.Add(new LinearPath(PaperInnerLineMargin, PaperInnerLineMargin, paperWidth - (paperOuterLineMargin * 2) - (PaperInnerLineMargin * 2), paperHeight - (paperOuterLineMargin * 2) - (PaperInnerLineMargin * 2)));
+
+            List<Entity> FrameList = new List<Entity>();
+
+            //Vertical
+            double[] lineArrayY = new double[] { 0, 93.5, 82.2, 82.2, 82.2, 86.6 };
+            string[] textArrayY = new string[] { "1", "2", "3", "4", "5" };
+
+            double lineSumY = 0;
+            for (int i = 0; i < lineArrayY.Length - 1; i++)
+            {
+                lineSumY += lineArrayY[i];
+                if (lineSumY > 0)
+                {
+                    newLinst.Add(new Line(0, lineSumY, PaperInnerLineMargin, lineSumY));
+                    newLinst.Add(new Line(paperWidth - PaperInnerLineMargin, lineSumY, paperWidth, lineSumY));
+                }
+                FrameList.Add(new Text(3.5, lineSumY + lineArrayY[i + 1] / 2, textArrayY[i], 2.5) { Alignment = Text.alignmentType.MiddleCenter, StyleName = textStyle.TextROMANS });
+                FrameList.Add(new Text(paperWidth - 3.5, lineSumY + lineArrayY[i + 1] / 2, textArrayY[i], 2.5) { Alignment = Text.alignmentType.MiddleCenter, StyleName = textStyle.TextROMANS });
+
+            }
+            //Horizontal
+            double[] lineArrayX = new double[] { 0, 91.5, 82.2, 82.2, 82.2, 82.2, 82.2,91.5};
+            string[] textArrayX = new string[] { "A", "B", "C", "D", "E", "F", "G" };
+            double lineSumX = 0;
+            for (int i = 0; i < lineArrayX.Length - 1; i++)
+            {
+                lineSumX += lineArrayX[i];
+                if (lineSumX > 0)
+                {
+                    newLinst.Add(new Line(lineSumX, 0, lineSumX, PaperInnerLineMargin));
+                    newLinst.Add(new Line(lineSumX, paperHeight - PaperInnerLineMargin, lineSumX, paperHeight));
+                }
+                FrameList.Add(new Text(lineSumX + lineArrayX[i + 1] / 2, paperHeight - 3.5, textArrayX[i], 2.5) { Alignment = Text.alignmentType.MiddleCenter, StyleName = textStyle.TextROMANS });
+                FrameList.Add(new Text(lineSumX + lineArrayX[i + 1] / 2, 3.5, textArrayX[i], 2.5) { Alignment = Text.alignmentType.MiddleCenter, StyleName = textStyle.TextROMANS });
+            }
+
+            foreach (Entity eachEntity in newLinst)
             {
                 eachEntity.LayerName = layerStyle.LayerPaper;
                 eachEntity.LineTypeMethod = colorMethodType.byLayer;

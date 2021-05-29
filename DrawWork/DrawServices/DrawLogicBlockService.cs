@@ -12,7 +12,7 @@ using devDept.Geometry;
 using devDept.Serialization;
 using MColor = System.Windows.Media.Color;
 
-//using Color = System.Drawing.Color;
+using Color = System.Drawing.Color;
 
 using AssemblyLib.AssemblyModels;
 
@@ -20,6 +20,8 @@ using DrawWork.ValueServices;
 using DrawWork.DrawModels;
 using DrawWork.Commons;
 using DrawWork.DrawStyleServices;
+using DrawWork.CutomModels;
+using DrawWork.DrawSacleServices;
 
 namespace DrawWork.DrawServices
 {
@@ -37,8 +39,22 @@ namespace DrawWork.DrawServices
 
         private DrawPublicFunctionService publicFunService;
 
-        public DrawLogicBlockService(AssemblyModel selAssembly)
+        private DrawLeaderPublicService leaderDataService;
+
+        private DrawImportBlockService blockImportService;
+
+        private DrawEditingService editingService;
+
+        private DrawService drawService;
+
+        private Model singleModel;
+
+        private DrawScaleService scaleService;
+
+        public DrawLogicBlockService(AssemblyModel selAssembly, Object selModel)
         {
+            singleModel = selModel as Model;
+
             assemblyData = selAssembly;
             valueService = new ValueService();
             workingPointService = new DrawWorkingPointService(selAssembly);
@@ -48,6 +64,16 @@ namespace DrawWork.DrawServices
             layerService = new LayerStyleService();
 
             publicFunService = new DrawPublicFunctionService();
+
+            leaderDataService = new DrawLeaderPublicService(selAssembly);
+            blockImportService = new DrawImportBlockService(selAssembly,selModel as Model);
+
+            editingService = new DrawEditingService();
+
+
+            drawService = new DrawService(selAssembly);
+
+            scaleService = new DrawScaleService();
         }
 
         public Entity[] DrawBlock_TopAngle(CDPoint selPoint1, ref CDPoint refPoint, ref CDPoint curPoint)
@@ -108,7 +134,7 @@ namespace DrawWork.DrawServices
                                               -valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness),
 
                                                valueService.GetDoubleValue(selSizeTankHeight));
-                    angleEntityAll.AddRange(refBlockService.DrawReference_CompressionRingI(drawPoint));
+                    angleEntityAll.AddRange(refBlockService.DrawReference_CompressionRingI(drawPoint,ref refPoint));
                     break;
 
                 case "Detail k":
@@ -215,13 +241,16 @@ namespace DrawWork.DrawServices
         }
 
 
-        public Entity[] DrawBlock_Structure(CDPoint selPoint1)
+        
+
+
+        public Entity[] DrawBlock_Structure(CDPoint selPoint1,double scaleValue)
         {
             Entity[] returnValue = null;
             switch (SingletonData.TankType)
             {
                 case TANK_TYPE.CRT:
-                    returnValue = DrawBlock_Structure_CRT(selPoint1);
+                    returnValue = DrawBlock_Structure_CRT(selPoint1,scaleValue);
                     break;
                 case TANK_TYPE.DRT:
                     // 아직
@@ -240,12 +269,14 @@ namespace DrawWork.DrawServices
             return returnValue;
         }
 
-        public Entity[] DrawBlock_Structure_CRT(CDPoint selPoint1)
+
+
+        public Entity[] DrawBlock_Structure_CRT(CDPoint selPoint1,double scaleValue)
         {
             // Sturcutre Type
             // Type
             DrawStructureService StructureDivService = new DrawStructureService();
-            StructureDivService.SetStructureData(SingletonData.TankType, assemblyData.StructureCRTInput[0].SupportingType, assemblyData.RoofCRTInput[0].CompressionRingType);
+            StructureDivService.SetStructureData(SingletonData.TankType, assemblyData.StructureCRTInput[0].SupportingType, assemblyData.RoofCompressionRing[0].CompressionRingType);
 
 
             int firstIndex = 0;
@@ -255,8 +286,10 @@ namespace DrawWork.DrawServices
 
             List<Entity> customBlockList = new List<Entity>();
 
+            List<Entity> customLine = new List<Entity>();
+
             // Roof Slope
-            string roofSlopeString = assemblyData.RoofCRTInput[firstIndex].RoofSlope;
+            string roofSlopeString = assemblyData.RoofCompressionRing[firstIndex].RoofSlope;
             double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
 
 
@@ -310,6 +343,7 @@ namespace DrawWork.DrawServices
                 #region Column Side
 
                 // Girder Count = Column Count -1
+                double columnHeightFordimension = 0;
                 for (int i = 0; i < assemblyData.StructureCRTGirderInput.Count; i++)
                 {
                     #region Column Basic
@@ -359,6 +393,17 @@ namespace DrawWork.DrawServices
                     Entity[] eachHBeamEntity = refBlockService.DrawReference_HBeam(eachHBeamPoint, eachHBeam);
                     customBlockList.AddRange(eachHBeamEntity);
                     #endregion
+
+                    // Leader
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumCDPoint(eachHBeamPoint, 0,0),
+                        lineTextList = new List<string>() {valueService.GetOrdinalNumber(i+1) + " " + assemblyData.StructureCRTGirderInput[i].Qty + "-GIRDERS",
+                                                            assemblyData.StructureCRTGirderInput[i].Size },
+
+                        Position = "bottomleft"
+                    });
+
 
                     #region Side Top Support
                     eachColumnPoint.Y = eachHBeamPoint.Y - valueService.GetDoubleValue(eachHBeam.A);
@@ -438,6 +483,46 @@ namespace DrawWork.DrawServices
                     Line columnRight = new Line(GetSumPoint(eachColumnPoint, pipeODHalf, -D - E), GetSumPoint(eachColumnBasePoint, pipeODHalf, +bA + bB + bE - bH));
                     customBlockList.AddRange(new Line[] { columnLeft, columnRight });
                     #endregion
+
+                    // 중심선
+                    CDPoint eachColumnPointCenterLine = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, radius, ref refPoint, ref curPoint);
+                    CDPoint eachColumnBasePointCenterLine = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, radius, ref refPoint, ref curPoint);
+                    Line centerLine01 = new Line(GetSumPoint(eachColumnPointCenterLine, 0, 0), GetSumPoint(eachColumnBasePointCenterLine, 0, 0));
+                    DrawCenterLineModel centerLineScale = new DrawCenterLineModel();
+                    Line centerLine02 = new Line(GetSumPoint(eachColumnPointCenterLine, 0, 0), GetSumPoint(eachColumnPointCenterLine,0, centerLineScale.exLength * scaleValue));
+                    Line centerLine03 = new Line(GetSumPoint(eachColumnBasePointCenterLine, 0, 0), GetSumPoint(eachColumnBasePointCenterLine,0, -centerLineScale.exLength * scaleValue));
+                    styleService.SetLayer(ref centerLine01, layerService.LayerCenterLine);
+                    styleService.SetLayer(ref centerLine02, layerService.LayerCenterLine);
+                    styleService.SetLayer(ref centerLine03, layerService.LayerCenterLine);
+
+                    customLine.AddRange(new Line[] { centerLine01, centerLine02, centerLine03 });
+
+                    // Leader
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumCDPoint(columnLeft.EndPoint, 0, columnLeft.Length()*85/100,0),
+                        lineTextList = new List<string>() {valueService.GetOrdinalNumber(i+2) + " " + assemblyData.StructureCRTColumnInput[i].Qty + "-Columns",
+                                                            assemblyData.StructureCRTColumnInput[i].Size + "\"" + " SCH." + assemblyData.StructureCRTColumnInput[i].Schedule},
+                        lineLength = -50,
+                        Position = "bottomleft"
+                    });
+
+                    if(columnHeightFordimension==0)
+                        columnHeightFordimension = columnRight.Length() * 75 / 100;
+                    CDPoint columnDimPoint = new CDPoint(columnRight.EndPoint.X -pipeODHalf, refPoint.Y + columnHeightFordimension,0);
+                    // Dimension
+                    SingletonData.DimPublicList.Add(new DimensionPointModel()
+                    {
+                        leftPoint = GetSumCDPoint(columnDimPoint, 0, 0),
+                        rightPoint = GetSumCDPoint(columnDimPoint, scaleValue * 30, 0),
+                        dimHeight=0,
+                        Text= "R" + radius,
+                        Position="top",
+                        leftArrowVisible=true,
+                        rightArrowVisible=false,
+                        extVisible=false,
+                        middleValue= 0
+                    });
                 }
                 #endregion
 
@@ -465,6 +550,7 @@ namespace DrawWork.DrawServices
                 double triEdge = valueService.GetDoubleValue(centerTopSupport.C1);
                 double padHeight = valueService.GetDoubleValue(centerTopSupport.D1);
                 double smallTri = valueService.GetDoubleValue(centerTopSupport.chamferLength);
+                smallTri = 0;
 
                 double boltHoleHeight = valueService.GetDoubleValue(centerTopSupport.SlotHoleWidth);
                 double boltHoleWidth = valueService.GetDoubleValue(centerTopSupport.SlotHoleLength);
@@ -532,9 +618,14 @@ namespace DrawWork.DrawServices
                 leftBolt2.Rotate(roofSlopeDegree, Vector3D.AxisZ, centerEllipseRight);
                 customBlockList.AddRange(new CompositeCurve[] { leftBolt1, leftBolt2 });
 
-                Circle leftBoltcircle1 = new Circle(centerEllipseLeft, boltHoleHeight / 2);
-                Circle leftBoltcircle2 = new Circle(centerEllipseRight, boltHoleHeight / 2);
-                customBlockList.AddRange(new Circle[] { leftBoltcircle1, leftBoltcircle2 });
+                //Circle leftBoltcircle1 = new Circle(centerEllipseLeft, boltHoleHeight / 2);
+                //Circle leftBoltcircle2 = new Circle(centerEllipseRight, boltHoleHeight / 2);
+                //customBlockList.AddRange(new Circle[] { leftBoltcircle1, leftBoltcircle2 });
+
+                List<Entity> circle01 = DrawReference_Hole(centerEllipseLeft, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                List<Entity> circle02 = DrawReference_Hole(centerEllipseRight, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                customLine.AddRange(circle01);
+                customLine.AddRange(circle02);
 
                 if (rBoltHoleOnCenter == 4)
                 {
@@ -547,9 +638,14 @@ namespace DrawWork.DrawServices
                     leftBolt21.Rotate(roofSlopeDegree, Vector3D.AxisZ, centerEllipseRight1);
                     customBlockList.AddRange(new CompositeCurve[] { leftBolt11, leftBolt21 });
 
-                    Circle leftBoltcircle11 = new Circle(centerEllipseLeft1, boltHoleHeight / 2);
-                    Circle leftBoltcircle21 = new Circle(centerEllipseRight1, boltHoleHeight / 2);
-                    customBlockList.AddRange(new Circle[] { leftBoltcircle11, leftBoltcircle21 });
+                    //Circle leftBoltcircle11 = new Circle(centerEllipseLeft1, boltHoleHeight / 2);
+                    //Circle leftBoltcircle21 = new Circle(centerEllipseRight1, boltHoleHeight / 2);
+                    //customBlockList.AddRange(new Circle[] { leftBoltcircle11, leftBoltcircle21 });
+
+                    List<Entity> circle03 = DrawReference_Hole(centerEllipseLeft1, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                    List<Entity> circle04 = DrawReference_Hole(centerEllipseRight1, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                    customLine.AddRange(circle03);
+                    customLine.AddRange(circle04);
                 }
 
                 // Center Top Support : Pad
@@ -563,6 +659,9 @@ namespace DrawWork.DrawServices
                 Line topTriLeft1 = new Line(GetSumPoint(centerTopLeft, padPushWidth, -padHeight), GetSumPoint(centerTopLeft, padPushWidth, -padHeight - triEdge));
                 Line topTriLeft2 = new Line(GetSumPoint(centerTopLeft, padPushWidth + tsG - smallTri, -padHeight), GetSumPoint(centerTopLeft, padPushWidth + tsG, -padHeight - smallTri));
                 Line topTriLeft3 = new Line(GetSumPoint(centerTopLeft, padPushWidth + tsG, -padHeight - smallTri), GetSumPoint(centerTopLeft, padPushWidth + tsG, -padHeight - tsH));
+
+
+
                 Line topTriLeft4 = new Line(GetSumPoint(centerTopLeft, padPushWidth + tsG - triEdge, -padHeight - tsH), GetSumPoint(centerTopLeft, padPushWidth + tsG, -padHeight - tsH)); // center column top
                 Line topTriLeft5 = new Line(GetSumPoint(centerTopLeft, padPushWidth + tsG - triEdge, -padHeight - tsH), GetSumPoint(centerTopLeft, padPushWidth, -padHeight - triEdge));
 
@@ -604,6 +703,18 @@ namespace DrawWork.DrawServices
                 customBlockList.AddRange(new Line[] { centerColumnLeft });
 
                 #endregion
+
+
+                // Leader
+                SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                {
+                    leaderPoint = GetSumCDPoint(centerColumnLeft.EndPoint, 0, centerColumnLeft.Length() * 85 / 100, 0),
+                    lineTextList = new List<string>() {valueService.GetOrdinalNumber(1) + " " + assemblyData.StructureCRTColumnInput[0].Qty + "-Columns",
+                                                            assemblyData.StructureCRTColumnInput[0].Size + "\"" + " SCH." + assemblyData.StructureCRTColumnInput[0].Schedule},
+                    lineLength = -50,
+                    Position = "bottomleft"
+                });
+
             }
             else if (StructureDivService.columnType == "centering")
             {
@@ -653,6 +764,17 @@ namespace DrawWork.DrawServices
 
                     customBlockList.AddRange(new Line[] { cLine01, cLine02, cLine03, cLine04, cLineV01, cLineV02, cLineV03, cLineV04, cLineLongV01, cLineLongV02 });
                     #endregion
+
+                    // Leader
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumCDPoint(cLine01.EndPoint, 0, 0),
+                        lineTextList = new List<string>() {"C350x100x11x11",
+                                                            "CENTER RING"
+                                                             },
+                        lineLength = 30,
+                        Position = "topleft"
+                    });
 
 
                     #region Clip Center Side
@@ -724,9 +846,14 @@ namespace DrawWork.DrawServices
                         clipSideBoltFirst2.Rotate(roofSlopeDegree, Vector3D.AxisZ, clipSideHoleFirstPoint3);
                         customBlockList.AddRange(new CompositeCurve[] { clipSideBoltFirst1, clipSideBoltFirst2 });
 
-                        Circle ClipSideBoltFirstCicle1 = new Circle(clipSideHoleFirstPoint2, boltHoleHeight / 2);
-                        Circle ClipSideBoltFirstCicle2 = new Circle(clipSideHoleFirstPoint3, boltHoleHeight / 2);
-                        customBlockList.AddRange(new Circle[] { ClipSideBoltFirstCicle1, ClipSideBoltFirstCicle2 });
+                        //Circle ClipSideBoltFirstCicle1 = new Circle(clipSideHoleFirstPoint2, boltHoleHeight / 2);
+                        //Circle ClipSideBoltFirstCicle2 = new Circle(clipSideHoleFirstPoint3, boltHoleHeight / 2);
+                        //customBlockList.AddRange(new Circle[] { ClipSideBoltFirstCicle1, ClipSideBoltFirstCicle2 });
+                        List<Entity> circle01 = DrawReference_Hole(clipSideHoleFirstPoint2, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                        List<Entity> circle02 = DrawReference_Hole(clipSideHoleFirstPoint3, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                        customLine.AddRange(circle01);
+                        customLine.AddRange(circle02);
+
                     }
                     else if (cClipHoleQty == 4)
                     {
@@ -744,9 +871,14 @@ namespace DrawWork.DrawServices
                         clipSideBoltFirst2.Rotate(roofSlopeDegree, Vector3D.AxisZ, clipSideHoleFirstPoint3);
                         customBlockList.AddRange(new CompositeCurve[] { clipSideBoltFirst1, clipSideBoltFirst2 });
 
-                        Circle ClipSideBoltFirstCicle1 = new Circle(clipSideHoleFirstPoint2, boltHoleHeight / 2);
-                        Circle ClipSideBoltFirstCicle2 = new Circle(clipSideHoleFirstPoint3, boltHoleHeight / 2);
-                        customBlockList.AddRange(new Circle[] { ClipSideBoltFirstCicle1, ClipSideBoltFirstCicle2 });
+                        //Circle ClipSideBoltFirstCicle1 = new Circle(clipSideHoleFirstPoint2, boltHoleHeight / 2);
+                        //Circle ClipSideBoltFirstCicle2 = new Circle(clipSideHoleFirstPoint3, boltHoleHeight / 2);
+                        //customBlockList.AddRange(new Circle[] { ClipSideBoltFirstCicle1, ClipSideBoltFirstCicle2 });
+                        List<Entity> circle01 = DrawReference_Hole(clipSideHoleFirstPoint2, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                        List<Entity> circle02 = DrawReference_Hole(clipSideHoleFirstPoint3, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                        customLine.AddRange(circle01);
+                        customLine.AddRange(circle02);
+
 
                         // 직각 방향 이동: 아래쪽
                         Point3D clipSideHoleFirstPoint11 = GetSumPoint(centeringClipRight, +valueService.GetOppositeByHypotenuse(roofSlopeDegree, cClipC + cClipD),
@@ -762,9 +894,13 @@ namespace DrawWork.DrawServices
                         clipSideBoltFirst21.Rotate(roofSlopeDegree, Vector3D.AxisZ, clipSideHoleFirstPoint31);
                         customBlockList.AddRange(new CompositeCurve[] { clipSideBoltFirst11, clipSideBoltFirst21 });
 
-                        Circle ClipSideBoltFirstCicle11 = new Circle(clipSideHoleFirstPoint21, boltHoleHeight / 2);
-                        Circle ClipSideBoltFirstCicle21 = new Circle(clipSideHoleFirstPoint31, boltHoleHeight / 2);
-                        customBlockList.AddRange(new Circle[] { ClipSideBoltFirstCicle11, ClipSideBoltFirstCicle21 });
+                        //Circle ClipSideBoltFirstCicle11 = new Circle(clipSideHoleFirstPoint21, boltHoleHeight / 2);
+                        //Circle ClipSideBoltFirstCicle21 = new Circle(clipSideHoleFirstPoint31, boltHoleHeight / 2);
+                        //customBlockList.AddRange(new Circle[] { ClipSideBoltFirstCicle11, ClipSideBoltFirstCicle21 });
+                        List<Entity> circle011 = DrawReference_Hole(clipSideHoleFirstPoint21, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                        List<Entity> circle021 = DrawReference_Hole(clipSideHoleFirstPoint31, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                        customLine.AddRange(circle011);
+                        customLine.AddRange(circle021);
                     }
                     #endregion
                 }
@@ -805,10 +941,26 @@ namespace DrawWork.DrawServices
                     customBlockList.AddRange(new Line[] { cLine01, cLine02, cLine03, cLine04, cLineV01, cLineV02, cLineV03, cLineV04, cLineLongV01, cLineLongV02 });
                     #endregion
 
+                    // Leader
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumCDPoint(cLine01.EndPoint, 0, 0),
+                        lineTextList = new List<string>() {"C350x100x11x11",
+                                                            "CENTER RING"
+                                                             },
+                        lineLength = 30,
+                        Position = "topleft"
+                    });
+
+
                     #region Rafter : Centering : external
                     StructureCenteringRafterModel centeringRafter = new StructureCenteringRafterModel();
+                    ChannelModel eachChannel = new ChannelModel();
                     if (assemblyData.StructureCRTCenteringRaterOutput.Count > 0)
+                    {
                         centeringRafter = assemblyData.StructureCRTCenteringRaterOutput[firstIndex];
+                        eachChannel = GetChannel(assemblyData.StructureCRTCenteringRaterOutput[firstIndex].SIZE);
+                    }
 
                     double cRafterA = valueService.GetDoubleValue(centeringRafter.A);
                     double cRafterA1 = valueService.GetDoubleValue(centeringRafter.A1);
@@ -837,7 +989,88 @@ namespace DrawWork.DrawServices
                     Line rLine08 = new Line(GetSumPoint(centeringRafterRightDown, 0, 0), GetSumPoint(centeringRafterLeftDown, 0, 0));
 
                     customBlockList.AddRange(new Line[] { rLine01, rLine02, rLine03, rLine04, rLine05, rLine06, rLine07, rLine08 });
+
+
+
+                    double tankIDHalf = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID) / 2;
+                    Point3D leftRafterCenter = GetSumPoint(centeringRafterLeftUP,
+                                                  valueService.GetOppositeByHypotenuse(roofSlopeDegree, cRafterA / 2), -valueService.GetAdjacentByHypotenuse(roofSlopeDegree, cRafterA / 2));
+                    Line rafterCenter01temp = new Line(leftRafterCenter,
+                                                  GetSumPoint(leftRafterCenter,
+                                                  valueService.GetAdjacentByHypotenuse(roofSlopeDegree, tankIDHalf), +valueService.GetOppositeByHypotenuse(roofSlopeDegree, tankIDHalf)));
+                    Point3D[] centerInter = rafterCenter01temp.IntersectWith(rLine05);
+                    if (centerInter.Length>0)
+                    {
+                        Line rafterCenter01 = new Line(leftRafterCenter, centerInter[0]);
+                        styleService.SetLayer(ref rafterCenter01, layerService.LayerCenterLine);
+                        customLine.Add(rafterCenter01);
+                    }
+
+                    // 숨은선
+                    if (eachChannel != null)
+                    {
+                        double channelT2 = valueService.GetDoubleValue(eachChannel.t2);
+
+                        // 위
+                        Point3D leftUpPoint = GetSumPoint(centeringRafterLeftUP,
+                                                      valueService.GetOppositeByHypotenuse(roofSlopeDegree, channelT2), -valueService.GetAdjacentByHypotenuse(roofSlopeDegree, channelT2));
+                        Line rafterHidden01temp= new Line(leftUpPoint,
+                                                  GetSumPoint(leftUpPoint,
+                                                  valueService.GetAdjacentByHypotenuse(roofSlopeDegree, tankIDHalf), +valueService.GetOppositeByHypotenuse(roofSlopeDegree, tankIDHalf)));
+                        Point3D[] leftUpInter01 = rafterHidden01temp.IntersectWith(rLine03);
+                        Point3D[] leftUpInter02 = rafterHidden01temp.IntersectWith(rLine04);
+                        Point3D[] leftUpInter03 = rafterHidden01temp.IntersectWith(rLine05);
+                        Point3D[] leftUpInter00 = leftUpInter01;
+                        if (leftUpInter02.Length > 0)
+                            leftUpInter00 = leftUpInter02;
+                        if (leftUpInter03.Length > 0)
+                            leftUpInter00 = leftUpInter03;
+                        if (leftUpInter00.Length > 0)
+                        {
+                            Line rafterCenter01 = new Line(leftUpPoint, leftUpInter00[0]);
+                            styleService.SetLayer(ref rafterCenter01, layerService.LayerHiddenLine);
+                            customLine.Add(rafterCenter01);
+                        }
+
+                        // 아래
+                        Point3D leftDonwPoint = GetSumPoint(centeringRafterLeftDown,
+                                                      -valueService.GetOppositeByHypotenuse(roofSlopeDegree, channelT2), +valueService.GetAdjacentByHypotenuse(roofSlopeDegree, channelT2));
+                        Line rafterHidden02temp = new Line(leftDonwPoint,
+                                                  GetSumPoint(leftDonwPoint,
+                                                  valueService.GetAdjacentByHypotenuse(roofSlopeDegree, tankIDHalf), +valueService.GetOppositeByHypotenuse(roofSlopeDegree, tankIDHalf)));
+                        Point3D[] leftDownInter01 = rafterHidden02temp.IntersectWith(rLine07);
+                        Point3D[] leftDownInter02 = rafterHidden02temp.IntersectWith(rLine06);
+                        Point3D[] leftDownInter03 = rafterHidden02temp.IntersectWith(rLine05);
+                        Point3D[] leftDownInter00 = leftDownInter01;
+                        if (leftDownInter02.Length > 0)
+                            leftDownInter00 = leftDownInter02;
+                        if (leftDownInter03.Length > 0)
+                            leftDownInter00 = leftDownInter03;
+                        if (leftDownInter00.Length > 0)
+                        {
+                            Line rafterCenter01 = new Line(leftDonwPoint, leftDownInter00[0]);
+                            styleService.SetLayer(ref rafterCenter01, layerService.LayerHiddenLine);
+                            customLine.Add(rafterCenter01);
+                        }
+
+
+                    }
+
+
+
+
                     #endregion
+
+                    // Leader
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumCDPoint(rLine02.MidPoint, 0, -30),
+                        lineTextList = new List<string>() {assemblyData.StructureCRTRafterInput[firstIndex].Size,
+                                                            valueService.GetOrdinalNumber(1) + " " + assemblyData.StructureCRTRafterInput[firstIndex].Qty + "-RAFTERS"
+                                                             },
+                        lineLength = 30,
+                        Position = "topleft"
+                    });
                 }
 
             }
@@ -1001,9 +1234,14 @@ namespace DrawWork.DrawServices
                     clipSideBoltFirst2.Rotate(roofSlopeDegree, Vector3D.AxisZ, clipSideHoleFirstPoint3);
                     customBlockList.AddRange(new CompositeCurve[] { clipSideBoltFirst1, clipSideBoltFirst2 });
 
-                    Circle ClipSideBoltFirstCicle1 = new Circle(clipSideHoleFirstPoint2, boltHoleHeight / 2);
-                    Circle ClipSideBoltFirstCicle2 = new Circle(clipSideHoleFirstPoint3, boltHoleHeight / 2);
-                    customBlockList.AddRange(new Circle[] { ClipSideBoltFirstCicle1, ClipSideBoltFirstCicle2 });
+                    //Circle ClipSideBoltFirstCicle1 = new Circle(clipSideHoleFirstPoint2, boltHoleHeight / 2);
+                    //Circle ClipSideBoltFirstCicle2 = new Circle(clipSideHoleFirstPoint3, boltHoleHeight / 2);
+                    //customBlockList.AddRange(new Circle[] { ClipSideBoltFirstCicle1, ClipSideBoltFirstCicle2 });
+
+                    List<Entity> circle01 = DrawReference_Hole(clipSideHoleFirstPoint2, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                    List<Entity> circle02 = DrawReference_Hole(clipSideHoleFirstPoint3, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                    customLine.AddRange(circle01);
+                    customLine.AddRange(circle02);
                 }
                 else if (scHoleQty == 4)
                 {
@@ -1052,11 +1290,21 @@ namespace DrawWork.DrawServices
                     customBlockList.AddRange(new CompositeCurve[] { clipSideBoltSecond3, clipSideBoltSecond4 });
 
 
-                    Circle ClipSideBoltSecondCicle1 = new Circle(clipSideHoleSecondPoint2, boltHoleHeight / 2);
-                    Circle ClipSideBoltSecondCicle2 = new Circle(clipSideHoleSecondPoint3, boltHoleHeight / 2);
-                    Circle ClipSideBoltSecondCicle3 = new Circle(clipSideHoleSecondPoint5, boltHoleHeight / 2);
-                    Circle ClipSideBoltsecondCicle4 = new Circle(clipSideHoleSecondPoint6, boltHoleHeight / 2);
-                    customBlockList.AddRange(new Circle[] { ClipSideBoltSecondCicle1, ClipSideBoltSecondCicle2, ClipSideBoltSecondCicle3, ClipSideBoltsecondCicle4 });
+                    //Circle ClipSideBoltSecondCicle1 = new Circle(clipSideHoleSecondPoint2, boltHoleHeight / 2);
+                    //Circle ClipSideBoltSecondCicle2 = new Circle(clipSideHoleSecondPoint3, boltHoleHeight / 2);
+                    //Circle ClipSideBoltSecondCicle3 = new Circle(clipSideHoleSecondPoint5, boltHoleHeight / 2);
+                    //Circle ClipSideBoltsecondCicle4 = new Circle(clipSideHoleSecondPoint6, boltHoleHeight / 2);
+                    //customBlockList.AddRange(new Circle[] { ClipSideBoltSecondCicle1, ClipSideBoltSecondCicle2, ClipSideBoltSecondCicle3, ClipSideBoltsecondCicle4 });
+
+
+                    List<Entity> circle01 = DrawReference_Hole(clipSideHoleSecondPoint2, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                    List<Entity> circle02 = DrawReference_Hole(clipSideHoleSecondPoint3, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                    customLine.AddRange(circle01);
+                    customLine.AddRange(circle02);
+                    List<Entity> circle011 = DrawReference_Hole(clipSideHoleSecondPoint5, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                    List<Entity> circle021 = DrawReference_Hole(clipSideHoleSecondPoint6, boltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                    customLine.AddRange(circle011);
+                    customLine.AddRange(circle021);
                 }
 
                     #endregion
@@ -1160,7 +1408,21 @@ namespace DrawWork.DrawServices
 
                         customBlockList.AddRange(new Line[] { rafterSquare1, rafterSquare2, rafterSquare3, rafterSquare4 });
 
-                        // Center Line
+
+                        // Leader
+                        SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                        {
+                            leaderPoint = GetSumCDPoint(rafterSquare1.MidPoint, 0, -30),
+                            lineTextList = new List<string>() {assemblyData.StructureCRTRafterInput[i].Size,
+                                                            valueService.GetOrdinalNumber(i+1) + " " + assemblyData.StructureCRTRafterInput[i].Qty + "-RAFTERS"
+                                                             },
+                            lineLength = 30,
+                            Position = "topleft"
+                        });
+
+
+
+                        // Center Line : 중심선
                         double rafterWidthHalf = valueService.GetDoubleValue(assemblyData.StructureCRTColumnRafterOutput[i].A) / 2;
                         double rafterStartSlope2 = rafterWidthHalf;
                         double rafterStartWidth2 = rafterStartWidth / 2;
@@ -1173,7 +1435,30 @@ namespace DrawWork.DrawServices
                         Point3D rafterCurrentColumnPoint4 = GetSumPoint(rafterCurrentColumnPoint, rafterCurrentHeight2, -rafterCurrentWidth2);
 
                         Line rafterSquareCenter1 = new Line(rafterStartColumnPoint3, rafterCurrentColumnPoint4);
-                        customBlockList.Add(rafterSquareCenter1);
+                        styleService.SetLayer(ref rafterSquareCenter1, layerService.LayerCenterLine);
+                        customLine.Add(rafterSquareCenter1);
+
+                        // 숨은선
+                        ChannelModel eachChannel = GetChannel(assemblyData.StructureCRTColumnRafterOutput[i].SIZE);
+                        if (eachChannel != null)
+                        {
+                            double channelT2 = valueService.GetDoubleValue(eachChannel.t2);
+                            Line rafterHidden01 = new Line(GetSumPoint(rafterStartColumnPoint,
+                                                          valueService.GetOppositeByHypotenuse(roofSlopeDegree, channelT2), -valueService.GetAdjacentByHypotenuse(roofSlopeDegree, channelT2)),
+                                                          GetSumPoint(rafterCurrentColumnPoint,
+                                                          valueService.GetOppositeByHypotenuse(roofSlopeDegree, channelT2), -valueService.GetAdjacentByHypotenuse(roofSlopeDegree, channelT2)));
+                            Line rafterHidden02 = new Line(GetSumPoint(rafterStartColumnPoint2,
+                                                          -valueService.GetOppositeByHypotenuse(roofSlopeDegree, channelT2), +valueService.GetAdjacentByHypotenuse(roofSlopeDegree, channelT2)),
+                                                          GetSumPoint(rafterCurrentColumnPoint2,
+                                                          -valueService.GetOppositeByHypotenuse(roofSlopeDegree, channelT2), +valueService.GetAdjacentByHypotenuse(roofSlopeDegree, channelT2)));
+                            styleService.SetLayer(ref rafterHidden01, layerService.LayerHiddenLine);
+                            styleService.SetLayer(ref rafterHidden02, layerService.LayerHiddenLine);
+                            customLine.Add(rafterHidden01);
+                            customLine.Add(rafterHidden02);
+                        }
+
+
+
 
                         // Current -> Start
                         rafterTempColumnPoint.X = rafterCurrentColumnPoint.X;
@@ -1188,8 +1473,12 @@ namespace DrawWork.DrawServices
                     {
                         #region Rafter : Centering
                         StructureCenteringRafterModel centeringRafter = new StructureCenteringRafterModel();
+                        ChannelModel eachChannel = new ChannelModel();
                         if (assemblyData.StructureCRTCenteringRaterOutput.Count > 0)
+                        {
                             centeringRafter = assemblyData.StructureCRTCenteringRaterOutput[firstIndex];
+                            eachChannel = GetChannel(assemblyData.StructureCRTCenteringRaterOutput[firstIndex].SIZE);
+                        }
 
                         double cRafterA = valueService.GetDoubleValue(centeringRafter.A);
                         double cRafterB = valueService.GetDoubleValue(centeringRafter.B);
@@ -1223,10 +1512,46 @@ namespace DrawWork.DrawServices
                         Line centeringRafterSquare2 = new Line(rightCenteringRafterStart01, rightCenteringRafterStart02);
                         Line centeringRafterSquare3 = new Line(leftCenteringRafterEnd01, rightCenteringRafterStart01);
                         Line centeringRafterSquare4 = new Line(leftCenteringRafterEnd02, rightCenteringRafterStart02);
+
+                        customBlockList.AddRange(new Line[] { centeringRafterSquare1, centeringRafterSquare2, centeringRafterSquare3, centeringRafterSquare4 });
+
+                        // 중심선
                         Line centeringRafterMiddle = new Line(leftCenteringRafterEndMiddle, rightCenteringRafterStartMiddle);
-                        customBlockList.AddRange(new Line[] { centeringRafterSquare1, centeringRafterSquare2, centeringRafterSquare3, centeringRafterSquare4, centeringRafterMiddle });
+                        styleService.SetLayer(ref centeringRafterMiddle, layerService.LayerCenterLine);
+                        customLine.Add(centeringRafterMiddle);
+
+                        // 숨은선
+                        if (eachChannel != null)
+                        {
+                            double channelT2 = valueService.GetDoubleValue(eachChannel.t2);
+                            Line rafterHidden01 = new Line(GetSumPoint(leftCenteringRafterEnd01,
+                                                          valueService.GetOppositeByHypotenuse(roofSlopeDegree, channelT2), -valueService.GetAdjacentByHypotenuse(roofSlopeDegree, channelT2)),
+                                                          GetSumPoint(rightCenteringRafterStart01,
+                                                          valueService.GetOppositeByHypotenuse(roofSlopeDegree, channelT2), -valueService.GetAdjacentByHypotenuse(roofSlopeDegree, channelT2)));
+                            Line rafterHidden02 = new Line(GetSumPoint(leftCenteringRafterEnd02,
+                                                          -valueService.GetOppositeByHypotenuse(roofSlopeDegree, channelT2), +valueService.GetAdjacentByHypotenuse(roofSlopeDegree, channelT2)),
+                                                          GetSumPoint(rightCenteringRafterStart02,
+                                                          -valueService.GetOppositeByHypotenuse(roofSlopeDegree, channelT2), +valueService.GetAdjacentByHypotenuse(roofSlopeDegree, channelT2)));
+                            styleService.SetLayer(ref rafterHidden01, layerService.LayerHiddenLine);
+                            styleService.SetLayer(ref rafterHidden02, layerService.LayerHiddenLine);
+                            customLine.Add(rafterHidden01);
+                            customLine.Add(rafterHidden02);
+                        }
+
+
 
                         #endregion
+
+                        // Leader
+                        SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                        {
+                            leaderPoint = GetSumCDPoint(centeringRafterSquare3.MidPoint, 0, -30),
+                            lineTextList = new List<string>() {assemblyData.StructureCRTRafterInput[firstIndex].Size,
+                                                            valueService.GetOrdinalNumber(1) + " " + assemblyData.StructureCRTRafterInput[firstIndex].Qty + "-RAFTERS"
+                                                             },
+                            lineLength = 30,
+                            Position = "topleft"
+                        });
 
                     }
                 }
@@ -1234,10 +1559,10 @@ namespace DrawWork.DrawServices
 
             styleService.SetLayerListEntity(ref customBlockList, layerService.LayerOutLine);
 
-
+            customBlockList.AddRange(customLine);
 
             // Centering : External : Right : Mirror
-            if(StructureDivService.columnType=="centering" && StructureDivService.centeringInEx == "external")
+            if (StructureDivService.columnType=="centering" && StructureDivService.centeringInEx == "external")
             {
 
                 CDPoint mirrorPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTop,0, ref refPoint, ref curPoint);
@@ -1258,6 +1583,61 @@ namespace DrawWork.DrawServices
             return customBlockList.ToArray();
         }
 
+
+
+        public Entity[] DrawBlock_Roof(CDPoint selPoint1, ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            int firstIndex = 0;
+            Point3D drawPoint = new Point3D(selPoint1.X, selPoint1.Y, selPoint1.Z);
+
+
+            List<Entity> customBlockList = new List<Entity>();
+
+
+
+            if (SingletonData.TankType == TANK_TYPE.CRT)
+            {
+                CDPoint LeftUp = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofUp, ref refPoint, ref curPoint);
+                CDPoint LeftDown = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
+                CDPoint CenterUp = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref curPoint);
+                CDPoint CenterDown = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
+
+                customBlockList.Add(new Line(GetSumPoint(LeftUp, 0, 0), GetSumPoint(CenterUp, 0, 0)));
+                customBlockList.Add(new Line(GetSumPoint(LeftUp, 0, 0), GetSumPoint(LeftDown, 0, 0)));
+                customBlockList.Add(new Line(GetSumPoint(LeftDown, 0, 0), GetSumPoint(CenterDown, 0, 0)));
+
+                Plane pl1 = Plane.YZ;
+                pl1.Origin.X = CenterUp.X;
+                pl1.Origin.Y = CenterUp.Y;
+                List<Entity> customBlockMirrorList = editingService.GetEntityByMirror(pl1, customBlockList);
+                customBlockList.AddRange(customBlockMirrorList);
+            }
+            else if (SingletonData.TankType == TANK_TYPE.DRT)
+            {
+                CDPoint LeftUp = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofUp, ref refPoint, ref curPoint);
+                CDPoint LeftDown = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
+                CDPoint CenterUp = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref curPoint);
+                CDPoint CenterDown = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
+                customBlockList.Add(new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, GetSumPoint(LeftUp, 0, 0), GetSumPoint(CenterUp, 0, 0)));
+                customBlockList.Add(new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, GetSumPoint(LeftDown, 0, 0), GetSumPoint(CenterDown, 0, 0)));
+                customBlockList.Add(new Line(GetSumPoint(LeftUp, 0, 0), GetSumPoint(LeftDown, 0, 0)));
+
+                Plane pl1 = Plane.YZ;
+                pl1.Origin.X = CenterUp.X;
+                pl1.Origin.Y = CenterUp.Y;
+                List<Entity> customBlockMirrorList = editingService.GetEntityByMirror(pl1, customBlockList);
+                customBlockList.AddRange(customBlockMirrorList);
+            }
+
+
+
+
+            styleService.SetLayerListEntity(ref customBlockList, layerService.LayerOutLine);
+
+
+
+            return customBlockList.ToArray();
+        }
 
         public Entity[] DrawBlock_Bottom(CDPoint selPoint1,ref CDPoint refPoint, ref CDPoint curPoint)
         {
@@ -1324,7 +1704,7 @@ namespace DrawWork.DrawServices
 
             styleService.SetLayerListLine(ref customBlockList, layerService.LayerOutLine);
 
-            // Drawing : Right\
+            // Drawing : Right
             CDPoint BottomOuterLeft = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottom, 0, ref refPoint, ref curPoint);
             CDPoint BottomOuterRight = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointRightShellBottom, 0, ref refPoint, ref curPoint);
             Line outerUp = new Line(GetSumPoint(BottomOuterLeft, 0, 0), GetSumPoint(BottomOuterRight, bottomThk + outsideProjection, 0));
@@ -1337,6 +1717,20 @@ namespace DrawWork.DrawServices
             customBlockList.Add(outerUp);
             customBlockList.Add(outerDown);
             customBlockList.Add(outerRight);
+
+            if (bottomBase.AnnularPlate == "Yes")
+            {
+                // Leader
+                SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                {
+                    leaderPoint = new CDPoint(outerRight.EndPoint.X, outerRight.EndPoint.Y, 0),
+                    lineTextList = new List<string>() { "ANNULAR PLATE", "(" + assemblyData.GeneralMaterialSpecifications[0].AnnularPlate + ")" },
+
+                    //lineTextList = leaderDataService.GetLeaderLineTextByName("shellinsulation"),
+                    //emptyTextList = leaderDataService.GetLeaderEmptyLineTextByName("shellinsulation"),
+                    Position = "bottomright"
+                });
+            }
 
 
 
@@ -1353,7 +1747,7 @@ namespace DrawWork.DrawServices
 
             // Top Angle
             DrawStructureService StructureDivService = new DrawStructureService();
-            StructureDivService.SetStructureData(SingletonData.TankType, assemblyData.StructureCRTInput[0].SupportingType, assemblyData.RoofCRTInput[0].CompressionRingType);
+            StructureDivService.SetStructureData(SingletonData.TankType, assemblyData.StructureCRTInput[0].SupportingType, assemblyData.RoofCompressionRing[0].CompressionRingType);
 
 
             // Thank
@@ -1549,7 +1943,7 @@ namespace DrawWork.DrawServices
 
             // 마지막 Course
             DrawStructureService StructureDivService = new DrawStructureService();
-            StructureDivService.SetStructureData(SingletonData.TankType, assemblyData.StructureCRTInput[0].SupportingType, assemblyData.RoofCRTInput[0].CompressionRingType);
+            StructureDivService.SetStructureData(SingletonData.TankType, assemblyData.StructureCRTInput[0].SupportingType, assemblyData.RoofCompressionRing[0].CompressionRingType);
 
             CDPoint wpShellTop = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTop, 0, ref refPoint, ref curPoint);
 
@@ -1633,15 +2027,17 @@ namespace DrawWork.DrawServices
 
 
 
-        public Entity[] DrawBlock_WindGirder(CDPoint selPoint1, ref CDPoint refPoint, ref CDPoint curPoint)
+        public Entity[] DrawBlock_WindGirder(CDPoint selPoint1, ref CDPoint refPoint, ref CDPoint curPoint,string mirrorSign)
         {
 
             int refFirstIndex = 0;
             int selwindGirderCount = valueService.GetIntValue(assemblyData.WindGirderInput[refFirstIndex].Qty);
             List<Entity> windGirderEntity = new List<Entity>();
 
+            int windGirderCount = 0;
             foreach (WindGirderOutputModel eachWindGirder in assemblyData.WindGirderOutput)
             {
+                windGirderCount++;
 
                 AngleSizeModel selAngleModel = refBlockService.GetAngleSizeModel(eachWindGirder.Size);
 
@@ -1658,6 +2054,16 @@ namespace DrawWork.DrawServices
 
                     windGirderEntity.AddRange(angleEntity);
 
+
+                    // Leader
+                    if(mirrorSign=="")
+                        SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                        {
+                            leaderPoint = GetMirrorPoint(GetSumPoint(drawPoint,0, -valueService.GetDoubleValue(selAngleModel.B)), ref refPoint, ref curPoint, mirrorSign),
+                            lineTextList = new List<string>() { windGirderCount + "-WIND GIRDER", eachWindGirder.Size },
+
+                            Position = mirrorSign == "right" ? "bottomright": "bottomleft"
+                        }); 
 
                 }
                 else if (eachWindGirder.Type == "Detail d")
@@ -1677,15 +2083,27 @@ namespace DrawWork.DrawServices
                         Plane pl1 = Plane.YZ;
                         pl1.Origin.X = mirrorRefPoint.X;
                         pl1.Origin.Y = mirrorRefPoint.Y;
-                        leftAngleList.AddRange(GetEntityByMirror(pl1,leftAngleList));
+                        leftAngleList.AddRange(editingService.GetEntityByMirror(pl1,leftAngleList));
                     }
 
                     windGirderEntity.AddRange(leftAngleList);
+
+                    // Leader
+                    if (mirrorSign == "")
+                        SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                        {
+                            leaderPoint = GetMirrorPoint(GetSumPoint(drawPoint, -valueService.GetDoubleValue(selAngleModel.A), 0), ref refPoint, ref curPoint, mirrorSign),
+                            lineTextList = new List<string>() { windGirderCount + "-WIND GIRDER", eachWindGirder.Size },
+
+                            Position = mirrorSign == "right" ? "bottomright" : "bottomleft"
+                        });
                 }
                 else if (eachWindGirder.Type == "Detail e")
                 {
                     // 아직 구현 안됨
                 }
+
+
 
             }
 
@@ -1694,6 +2112,29 @@ namespace DrawWork.DrawServices
 
 
             return windGirderEntity.ToArray();
+        }
+
+
+        public CDPoint GetMirrorPoint(Point3D selPoint, ref CDPoint refPoint, ref CDPoint curPoint, string mirrorSign)
+        {
+            CDPoint newMirrorPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottomUp, ref refPoint, ref curPoint);
+
+            Point3D newPoint = GetSumPoint(selPoint, 0, 0);
+            //Line newLinew = new Line(newPoint, GetSumPoint(newPoint, 0, 10));
+            switch (mirrorSign)
+            {
+                case "right":
+
+                    Plane pl1 = Plane.YZ;
+                    pl1.Origin.X = newMirrorPoint.X;
+                    pl1.Origin.Y = newMirrorPoint.Y;
+                    Mirror customMirror = new Mirror(pl1);
+                    newPoint.TransformBy(customMirror);
+                    break;
+            }
+
+            return new CDPoint(newPoint.X, newPoint.Y,0);
+
         }
 
         public Entity[] DrawBlock_WindGirderRightOuter(CDPoint selPoint1, ref CDPoint refPoint, ref CDPoint curPoint)
@@ -1805,6 +2246,18 @@ namespace DrawWork.DrawServices
             foreach (Entity eachEntity in newList)
                 eachEntity.Rotate(roofSlopeDegree, Vector3D.AxisZ, roofInsulationPointOrigin);
 
+
+            // Leader
+            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+            {
+                leaderPoint = new CDPoint(line03.MidPoint.X, line03.MidPoint.Y, 0),
+                lineTextList = new List<string>() { "t" + assemblyData.RoofCRTInput[0].InsulationThickness + " INSULATION" },
+                //lineTextList = leaderDataService.GetLeaderLineTextByName("roofinsulation"),
+                //emptyTextList = leaderDataService.GetLeaderEmptyLineTextByName("roofinsulation"),
+                Position = "topleft",
+                lineLength = -20
+            }); 
+
             return newList.ToArray();
         }
 
@@ -1852,25 +2305,598 @@ namespace DrawWork.DrawServices
             styleService.SetLayerListLine(ref newList, layerService.LayerVirtualLine);
 
 
+            // Leader
+            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+            {
+                leaderPoint = new CDPoint(line02.MidPoint.X, line02.MidPoint.Y, 0),
+                lineTextList = new List<string>() { "t" + assemblyData.ShellInput[0].InsulationThickness + " INSULATION" },
+                //lineTextList = leaderDataService.GetLeaderLineTextByName("shellinsulation"),
+                //emptyTextList = leaderDataService.GetLeaderEmptyLineTextByName("shellinsulation"),
+                Position = "bottomleft"
+            });
+
+
             return newList.ToArray();
         }
 
 
 
-
-
-        private List<Entity> GetEntityByMirror(Plane selPlane,List<Entity> selEntity)
+        public Entity[] DrawBlock_AnchorChair(CDPoint selPoint1, ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
         {
-            List<Entity> newEntity = new List<Entity>();
-            Mirror customMirror = new Mirror(selPlane);
-            foreach (Entity eachEntity in selEntity)
+
+
+
+            List<Entity> customEntity = new List<Entity>();
+            List<Entity> customLine = new List<Entity>();
+
+            
+            if(assemblyData.AnchorageInput[0].AnchorChairBlot.ToLower() == "yes")
             {
-                Entity newEachEntity = (Entity)eachEntity.Clone();
-                newEachEntity.TransformBy(customMirror);
-                newEntity.Add(newEachEntity);
+                AnchorChairModel newAnchor = null;
+                string boltSize = assemblyData.AnchorageInput[0].AnchorSize;
+                foreach (AnchorChairModel eachModel in assemblyData.AnchorChairList)
+                {
+                    if (eachModel.Size == boltSize)
+                    {
+                        newAnchor = eachModel;
+                        break;
+                    }
+                }
+                if (newAnchor != null)
+                {
+
+
+                    double A = valueService.GetDoubleValue(newAnchor.A);
+                    double A1 = valueService.GetDoubleValue(newAnchor.A1);
+                    double B = valueService.GetDoubleValue(newAnchor.B);
+                    double E = valueService.GetDoubleValue(newAnchor.E);
+                    double F = valueService.GetDoubleValue(newAnchor.F);
+                    double T = valueService.GetDoubleValue(newAnchor.T);
+                    double T1 = valueService.GetDoubleValue(newAnchor.T1);
+                    double H = valueService.GetDoubleValue(newAnchor.H);
+                    double I = valueService.GetDoubleValue(newAnchor.I);
+                    double W = valueService.GetDoubleValue(newAnchor.W);
+                    double P = valueService.GetDoubleValue(newAnchor.P);
+                    double T2 = valueService.GetDoubleValue(newAnchor.T2);
+
+                    double C1 = valueService.GetDoubleValue(newAnchor.C1);
+                    double B1 = valueService.GetDoubleValue(newAnchor.B1);
+                    double H1 = valueService.GetDoubleValue(newAnchor.H1);
+                    double G1 = valueService.GetDoubleValue(newAnchor.G1);
+                    double C = valueService.GetDoubleValue(newAnchor.C);
+
+                    //A = 80;
+                    //A1 = 40;
+                    //B = 120;
+                    //E = 80;
+                    //F = 135;
+                    //T = 25;
+                    //T1 = 12;
+                    //H = 250;
+                    //I = 27;
+                    //W = 110;
+                    //P = 70;
+                    //T2 = 12;
+                    //C1 = 50;
+                    //B1 = 50;
+                    //H1 = 15;
+                    //G1 = 15;
+                    //C = 36;
+
+
+
+                    double shellThickness = 0;
+                    if (assemblyData.ShellOutput.Count > 0)
+                    {
+                        shellThickness = valueService.GetDoubleValue(assemblyData.ShellOutput[0].Thickness);
+                    }
+
+                    double bottomThickness = 8;
+                    if (assemblyData.BottomInput[0].AnnularPlate.ToLower() == "yes")
+                    {
+                        bottomThickness = valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateThickness);
+                    }
+                    else
+                    {
+                        bottomThickness = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateThickness);
+                    }
+
+
+                    double anchorHeight = H - bottomThickness;
+                    double padHeight = anchorHeight + B1;
+                    double anchorCenterWidth = shellThickness + A;
+
+                    double tankNominalID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+
+                    List<Entity> newList = new List<Entity>();
+
+
+                    Point3D refCenterPoint = GetSumPoint(refPoint, tankNominalID + shellThickness, 0);
+
+                    Point3D PadLeftDown = GetSumPoint(refCenterPoint, 0, C1);
+                    Point3D PadRightDown = GetSumPoint(refCenterPoint, shellThickness, C1);
+                    Point3D PadLeftUp = GetSumPoint(refCenterPoint, 0, padHeight);
+                    Point3D PadRightUp = GetSumPoint(refCenterPoint, shellThickness, padHeight);
+
+                    Point3D TopPadLeftUp = GetSumPoint(PadRightUp, 0, -B1);
+                    Point3D TopPadLeftDown = GetSumPoint(TopPadLeftUp, 0, -T);
+                    Point3D TopPadRightUp = GetSumPoint(TopPadLeftUp, B, 0);
+                    Point3D TopPadRightDown = GetSumPoint(TopPadLeftUp, B, -T);
+
+
+                    Point3D TopSmallTriUpRight = GetSumPoint(TopPadLeftDown, H1, 0);
+                    Point3D TopSmallTriDownLeft = GetSumPoint(TopPadLeftDown, 0, -H1);
+
+                    Point3D TopSmallPadLeftUp = GetSumPoint(TopPadLeftUp, A - P / 2, T2);
+                    Point3D TopSmallPadLeftDown = GetSumPoint(TopSmallPadLeftUp, 0, -T2);
+                    Point3D TopSmallPadRightUp = GetSumPoint(TopSmallPadLeftUp, P, 0);
+                    Point3D TopSmallPadDown = GetSumPoint(TopSmallPadRightUp, 0, -T2);
+
+                    Point3D bigTriLeft = GetSumPoint(refCenterPoint, shellThickness + G1, 0);
+                    Point3D bigTriRight = GetSumPoint(refCenterPoint, shellThickness + C, 0);
+
+                    Point3D CenterTop = GetSumPoint(TopSmallPadLeftUp, P / 2, 0);
+                    Point3D CenterDown = GetSumPoint(refCenterPoint, shellThickness + A, -bottomThickness);
+
+
+                    newList.Add(new Line(PadLeftDown, PadRightDown));
+                    newList.Add(new Line(PadLeftDown, PadLeftUp));
+                    newList.Add(new Line(PadLeftUp, PadRightUp));
+                    newList.Add(new Line(PadRightDown, PadRightUp));
+
+                    newList.Add(new Line(TopPadLeftUp, TopPadRightUp));
+                    newList.Add(new Line(TopPadRightDown, TopPadRightUp));
+                    newList.Add(new Line(TopPadLeftDown, TopPadRightDown));
+
+                    newList.Add(new Line(TopSmallPadLeftUp, TopSmallPadLeftDown));
+                    newList.Add(new Line(TopSmallPadLeftUp, TopSmallPadRightUp));
+                    newList.Add(new Line(TopSmallPadDown, TopSmallPadRightUp));
+
+                    newList.Add(new Line(TopSmallTriUpRight, TopSmallTriDownLeft));
+
+
+                    newList.Add(new Line(PadRightDown, bigTriLeft));
+                    newList.Add(new Line(bigTriLeft, bigTriRight));
+                    newList.Add(new Line(bigTriRight, TopPadRightDown));
+
+                    styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+
+
+                    // Center LIne
+                    DrawCenterLineModel centerModel = new DrawCenterLineModel();
+                    customLine.Add(new Line(CenterTop, CenterDown));
+                    customLine.Add(new Line(CenterTop, GetSumPoint(CenterTop, 0, centerModel.exLength * scaleValue)));
+                    customLine.Add(new Line(CenterDown, GetSumPoint(CenterDown, 0, -centerModel.exLength * scaleValue)));
+
+                    styleService.SetLayerListEntity(ref customLine, layerService.LayerCenterLine);
+                    
+                    // Verical
+                    newList.AddRange(customLine);
+
+                    // Mirror
+
+                    CDPoint mirroPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottom,0, ref refPoint, ref curPoint);
+
+                    List<Entity> newEntity = new List<Entity>();
+                    Plane pl1 = Plane.YZ;
+                    pl1.Origin.X = mirroPoint.X;
+                    pl1.Origin.Y = mirroPoint.Y;
+                    Mirror customMirror = new Mirror(pl1);
+                    foreach (Entity eachEntity in newList)
+                    {
+                        Entity newEachEntity = (Entity)eachEntity.Clone();
+                        newEachEntity.TransformBy(customMirror);
+                        newEntity.Add(newEachEntity);
+                    }
+
+                    customEntity.AddRange(newEntity);
+                    customEntity.AddRange(newList);
+                }
             }
-            return newEntity;
+
+
+
+
+
+
+
+
+            return customEntity.ToArray();
         }
+
+
+        public Entity[] DrawBlock_Leader(CDPoint selPoint1, ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
+        {
+
+            int firstIndex = 0;
+
+            double refLength = 15 * scaleValue;
+            double refOverFit = 2;
+
+            double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[firstIndex].SizeTankHeight);
+            double tankHeightHalf = tankHeight / 2;
+
+            double tankNominalID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[firstIndex].SizeNominalID);
+            double tankNominalIDHalf = tankNominalID / 2;
+            //double roofSlopeDegree = valueService.GetDegreeOfSlope(assemblyData.RoofCRTInput[firstIndex].RoofSlope);
+
+            double insulationThickness = valueService.GetDoubleValue(assemblyData.ShellInput[firstIndex].InsulationThickness);
+
+
+
+            CDPoint leftTopPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjLeftShell, tankHeightHalf + refLength / 2, ref refPoint, ref curPoint);
+            CDPoint leftMiddlePoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjLeftShell, tankHeightHalf, ref refPoint, ref curPoint);
+            CDPoint leftBottomPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjLeftShell, tankHeightHalf + refLength / 2, ref refPoint, ref curPoint);
+
+            if (leftTopPoint.X != leftBottomPoint.X)
+            {
+                // 한번 위로 올리기
+                leftTopPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjLeftShell, tankHeightHalf + refLength / 2 + refLength, ref refPoint, ref curPoint);
+                leftMiddlePoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjLeftShell, tankHeightHalf + refLength, ref refPoint, ref curPoint);
+                leftBottomPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjLeftShell, tankHeightHalf + refLength / 2 + refLength, ref refPoint, ref curPoint);
+            }
+
+            Line line01 = new Line(GetSumPoint(leftTopPoint, 0, 0), GetSumPoint(leftTopPoint, -insulationThickness - refOverFit, 0));
+            Line line03 = new Line(GetSumPoint(leftTopPoint, 0, -refLength), GetSumPoint(leftTopPoint, -insulationThickness - refOverFit, -refLength));
+            Line line02 = new Line(GetSumPoint(leftTopPoint, -insulationThickness, 0), GetSumPoint(leftTopPoint, -insulationThickness, -refLength));
+
+
+            List<Entity> newList = new List<Entity>();
+            newList.Add(line01);
+            newList.Add(line02);
+            newList.Add(line03);
+
+            styleService.SetLayerListLine(ref newList, layerService.LayerVirtualLine);
+
+
+            return newList.ToArray();
+        }
+
+
+        public Entity[] DrawBlock_CenterLine(CDPoint selPoint1, ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
+        {
+            // 사용 안함
+
+            List<Entity> newList = new List<Entity>();
+
+            double bottomThickness = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateThickness);
+            CDPoint basePoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottom, 0, ref refPoint, ref curPoint);
+            CDPoint topPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, 0, ref refPoint, ref curPoint);
+
+            Line newCenter = new Line(GetSumPoint(basePoint, 0, -bottomThickness), GetSumPoint(topPoint, 0, 0));
+            DrawCenterLineModel centerModel = new DrawCenterLineModel();
+
+            Line newCenterUp = new Line(GetSumPoint(newCenter.EndPoint, 0, 0), GetSumPoint(newCenter.EndPoint, 0, -centerModel.centerLength * scaleValue));
+            Line newCenterDown = new Line(GetSumPoint(newCenter.StartPoint, 0, 0), GetSumPoint(newCenter.StartPoint, 0, -centerModel.centerLength*scaleValue));
+
+            newList.Add(newCenter);
+            newList.Add(newCenterUp);
+            newList.Add(newCenterDown);
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerCenterLine);
+
+
+
+            return newList.ToArray();
+        }
+
+
+        public Entity[] DrawBlock_EtcBlock(CDPoint selPoint1, ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
+        {
+            // 사용 안함
+
+            List<Entity> newList = new List<Entity>();
+
+            double bottomThickness = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateThickness);
+            CDPoint etcBasePoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottom, 0, ref refPoint, ref curPoint);
+
+            string earthLugName = "EARTH_LUG";
+            Entity earthLug = blockImportService.Draw_ImportBlock(GetSumCDPoint(etcBasePoint,0,0), earthLugName, layerService.LayerBlock);
+            if (earthLug !=null)
+                newList.Add(earthLug);
+
+
+
+            return newList.ToArray();
+        }
+
+        public Entity[] DrawBlock_EtcText(CDPoint selPoint1, ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
+        {
+            // 사용 안함
+
+            List<Entity> newList = new List<Entity>();
+
+            double bottomThickness = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateThickness);
+            CDPoint etcBasePoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottom, 0, ref refPoint, ref curPoint);
+
+
+            // HLL
+            double tankHeight =valueService.GetDoubleValue( assemblyData.GeneralDesignData[0].SizeTankHeight);
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double tankIDHalf = tankID / 2;
+            double tankIDHalfHalf = tankIDHalf/ 2;
+            double tankIDHalfThree = (tankIDHalfHalf) / 3;
+            double leftOne = tankIDHalfHalf + tankIDHalfThree;
+            double leftTwo = tankIDHalfHalf + tankIDHalfThree + tankIDHalfThree;
+
+            double currentLeft = tankIDHalfHalf;
+
+            //string HHLL ="HHLL " + assemblyData.GeneralLiquidCapacityWeight[0].HighHIghLiquidLevel;
+
+            //Point3D HHLLPoint=GetSumPoint(refPoint, left)
+
+            //Text newText01 = new Text(new Point3D(centerPoint.X + scaleTextGap, centerPoint.Y + currentTextLayerHeight + scaleTextGap), eachString, scaleTextHeight);
+            //styleSerivce.SetLayer(ref newText01, selLayerName);
+            //newText01.Regen(new RegenParams(0, ssModel));
+            //newText01.Alignment = Text.alignmentType.BaselineLeft;
+
+            //Text newText = new Text(selPoint1.X, selPoint1.Y, 0, HHLL, selHeight);
+            //switch (selAlign)
+            //{
+            //    case "c":
+            //        newText.Alignment = Text.alignmentType.MiddleCenter;
+            //        break;
+            //}
+
+            //styleSerivce.SetLayer(ref newText, selLayerName);
+
+
+
+            return newList.ToArray();
+        }
+
+
+
+        public Dictionary<string, List<Entity>> DrawBlock_CustomDimension(ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
+        {
+
+            int firstIndex = 0;
+
+
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            string newPosition = "top";
+            double newDimHeight = 100;
+            double newTextHeight = -1;
+            double newTextGap = 1;
+            double newArrowSize = 2.5;
+
+            string newPrefix = "";
+            string newSuffix = "";
+            string newText = "";
+
+            string layerName = layerService.LayerDimension;
+
+            Dictionary<string, List<Entity>> returnEntity = new Dictionary<string, List<Entity>>();
+
+            List<Entity> dimLineList = new List<Entity>();
+            List<Entity> dimTextList = new List<Entity>();
+            List<Entity> dimLineExtList = new List<Entity>();
+            List<Entity> dimArrowList = new List<Entity>();
+
+
+            List<Dictionary<string, List<Entity>>> allDimensionList = new List<Dictionary<string, List<Entity>>>();
+
+
+            // Basic Data
+            double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double tankIDHalf = tankID / 2;
+
+
+
+
+            // Shell Course
+
+            double shellMaxThickness = 0;
+            foreach (ShellOutputModel eachShell in assemblyData.ShellOutput)
+            {
+                double eachThk = valueService.GetDoubleValue(eachShell.Thickness);
+                if (shellMaxThickness < eachThk)
+                    shellMaxThickness = eachThk;
+            }
+            double beforeHeight = 0;
+            double currentHeight = 0;
+            double currentCourse = 0;
+
+            double shellDistance = 5000;
+            double ShellCourseDistance = 11000;
+            double scaleTextHeight = scaleService.GetOriginValueOfScale(scaleValue, newArrowSize);
+            CDPoint shellCoursePoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointRightShellBottom, 0, ref refPoint, ref curPoint);
+            foreach(ShellOutputModel eachShell in assemblyData.ShellOutput)
+            {
+                currentCourse++;
+                double courseHeight = valueService.GetDoubleValue(eachShell.PlateWidth);
+                currentHeight = beforeHeight + courseHeight;
+                newPoint1 = GetSumCDPoint(shellCoursePoint, shellMaxThickness, beforeHeight);
+                newPoint2 = GetSumCDPoint(shellCoursePoint, shellMaxThickness, currentHeight);
+                newPoint3 = GetSumCDPoint(shellCoursePoint, shellDistance, beforeHeight + currentHeight / 2);
+                newPosition = "right";
+                newDimHeight = shellDistance;
+
+
+                allDimensionList.Add(drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newPosition, newDimHeight, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, newText, 0, scaleValue, layerName));
+
+                // text
+                double middleLineWidth = 0;
+                Point3D newCoursePoint = GetSumPoint(shellCoursePoint, ShellCourseDistance, beforeHeight + courseHeight / 2);
+                string courseString1 = valueService.GetOrdinalNumber(currentCourse).ToUpper() + " COURSE " + "t" + eachShell.Thickness;
+                Text newText01 = new Text(GetSumPoint(newCoursePoint,0,scaleTextHeight*0.6), courseString1, scaleTextHeight);
+                newText01.Regen(new RegenParams(0, singleModel));
+                newText01.Alignment = Text.alignmentType.BaselineLeft;
+                newText01.ColorMethod = colorMethodType.byEntity;
+                newText01.Color = Color.Yellow;
+                newText01.LayerName = layerService.LayerDimension;
+                middleLineWidth = newText01.BoxSize.X;
+
+                string courseString2 = "(MAT'L : " + eachShell.Material +")";
+                Text newText02 = new Text(GetSumPoint( newCoursePoint,0, -scaleTextHeight*0.6 ), courseString2, scaleTextHeight);
+                newText02.Regen(new RegenParams(0, singleModel));
+                newText02.Alignment = Text.alignmentType.TopLeft;
+                newText02.ColorMethod = colorMethodType.byEntity;
+                newText02.Color = Color.Yellow;
+                newText02.LayerName = layerService.LayerDimension;
+
+                if (newText02.BoxSize.X > middleLineWidth)
+                    middleLineWidth = newText02.BoxSize.X;
+                Line newCourseLine = new Line(GetSumPoint(newCoursePoint, -scaleTextHeight / 2, 0), GetSumPoint(newCoursePoint, middleLineWidth + scaleTextHeight / 2, 0));
+                styleService.SetLayer(ref newCourseLine, layerService.LayerDimension);
+                newCourseLine.ColorMethod = colorMethodType.byEntity;
+                newCourseLine.Color = Color.Yellow;
+
+                dimTextList.Add(newText01);
+                dimTextList.Add(newText02);
+                dimLineList.Add(newCourseLine);
+
+                //current Height
+                beforeHeight += courseHeight;
+
+            }
+
+
+
+            // ID
+            string idString = "TANK I.D " + assemblyData.GeneralDesignData[0].SizeNominalID;
+            allDimensionList.Add( drawService.Draw_Dimension(
+                GetSumCDPoint(refPoint,0,tankHeight/2), 
+                GetSumCDPoint(refPoint, tankID, tankHeight/2), null, "top", 0, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, idString, 0, scaleValue, layerName));
+
+            // Thank Height
+            string heightString = "TANK HEIGHT " + assemblyData.GeneralDesignData[0].SizeTankHeight;
+            allDimensionList.Add(drawService.Draw_Dimension(
+                GetSumCDPoint(refPoint, tankID + shellMaxThickness, tankHeight ),
+                GetSumCDPoint(refPoint, tankID + shellMaxThickness, 0), null, "right", shellDistance + 1000, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, heightString, 0, scaleValue, layerName));
+
+            // Winder Girder
+            if (assemblyData.WindGirderInput[0].WindGirderRequired.ToLower() == "yes")
+            {
+                double currentElevation = 0;
+                foreach (WindGirderOutputModel eachWind in assemblyData.WindGirderOutput)
+                {
+                    double eachElevation = valueService.GetDoubleValue(eachWind.Elevation);
+                    allDimensionList.Add(drawService.Draw_Dimension(
+                        GetSumCDPoint(refPoint, - shellMaxThickness, currentElevation),
+                        GetSumCDPoint(refPoint, - shellMaxThickness, eachElevation), null, "left", shellDistance , newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, "", 0, scaleValue, layerName));
+                    currentElevation = eachElevation;
+                }
+            }
+
+
+
+            // Base Elevation
+            //double baseElevationHeight = scaleValue * 1;
+            //double 
+
+
+
+
+
+
+            // public Logic
+            foreach(DimensionPointModel eachDim in SingletonData.DimPublicList)
+            {
+                allDimensionList.Add(drawService.Draw_Dimension(
+                        eachDim.leftPoint,
+                        eachDim.rightPoint, null, eachDim.Position, eachDim.dimHeight, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, eachDim.Text, 0, scaleValue, layerName,eachDim.leftArrowVisible,eachDim.rightArrowVisible,eachDim.extVisible, eachDim.middleValue));
+            }
+
+
+
+
+            foreach (Dictionary<string, List<Entity>> eachDime in allDimensionList)
+            {
+                dimLineList.AddRange(eachDime[CommonGlobal.DimLine]);
+                dimTextList.AddRange(eachDime[CommonGlobal.DimText]);
+                dimLineExtList.AddRange(eachDime[CommonGlobal.DimLineExt]);
+                dimArrowList.AddRange(eachDime[CommonGlobal.DimArrow]);
+            }
+
+            returnEntity.Add(CommonGlobal.DimLine, dimLineList);
+            returnEntity.Add(CommonGlobal.DimText, dimTextList);
+            returnEntity.Add(CommonGlobal.DimLineExt, dimLineExtList);
+            returnEntity.Add(CommonGlobal.DimArrow, dimArrowList);
+
+            return returnEntity;
+
+
+        }
+
+
+
+        private ChannelModel GetChannel(string channelSize)
+        {
+            ChannelModel returnValue = null;
+            foreach (ChannelModel eachChannel in assemblyData.ChannelList)
+            {
+                if (eachChannel.SIZE == channelSize) 
+                {
+                    returnValue = eachChannel;
+                    break;
+                }
+            }
+            return returnValue;
+        }
+
+
+        public List<Entity> DrawReference_Hole(Point3D selPoint1, double selRadius, double selRotate = 0, DrawCenterLineModel selCenterLine = null)
+        {
+
+
+
+            List<Entity> newList = new List<Entity>();
+
+            // WP : Left Lower
+            Point3D WP = new Point3D(selPoint1.X, selPoint1.Y);
+            Point3D WPRotate = WP;
+
+
+            // Drawing Shape
+            Circle newCir01 = new Circle(GetSumPoint(WP, 0, 0), selRadius);
+
+            newList.Add(newCir01);
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+            // Center Line
+            if (selCenterLine != null)
+            {
+                if (selCenterLine.centerLine)
+                {
+                    // 기본 형상
+                    Point3D centerPoint = newCir01.Center;
+                    Line centerLine01 = new Line(GetSumPoint(centerPoint, -selRadius - selCenterLine.exLength * selCenterLine.scaleValue, 0),
+                                                 GetSumPoint(centerPoint, +selRadius + selCenterLine.exLength * selCenterLine.scaleValue, 0));
+                    Line centerLine02 = new Line(GetSumPoint(centerPoint, 0, -selRadius - selCenterLine.exLength * selCenterLine.scaleValue),
+                                                 GetSumPoint(centerPoint, 0, +selRadius + selCenterLine.exLength * selCenterLine.scaleValue));
+
+                    styleService.SetLayer(ref centerLine01, layerService.LayerCenterLine);
+                    styleService.SetLayer(ref centerLine02, layerService.LayerCenterLine);
+
+
+                    newList.Add(centerLine01);
+                    newList.Add(centerLine02);
+
+                }
+            }
+
+            // Rotate
+            if (selRotate != 0)
+            {
+                foreach (Entity eachEntity in newList)
+                    eachEntity.Rotate(selRotate, Vector3D.AxisZ, WPRotate);
+            }
+
+            return newList;
+        }
+
+
 
 
         private Point3D GetSumPoint(Point3D selPoint1, double X, double Y, double Z = 0)
@@ -1882,6 +2908,10 @@ namespace DrawWork.DrawServices
             return new Point3D(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
         }
         private CDPoint GetSumCDPoint(CDPoint selPoint1, double X, double Y, double Z = 0)
+        {
+            return new CDPoint(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
+        }
+        private CDPoint GetSumCDPoint(Point3D selPoint1, double X, double Y, double Z = 0)
         {
             return new CDPoint(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
         }

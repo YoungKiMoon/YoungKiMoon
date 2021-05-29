@@ -32,6 +32,7 @@ namespace DrawWork.DrawServices
         private DrawWorkingPointService workingPointService;
         private StyleFunctionService styleService;
         private LayerStyleService layerService;
+        private DrawEditingService editingService;
 
         private DrawPublicFunctionService publicFunService;
 
@@ -46,11 +47,12 @@ namespace DrawWork.DrawServices
             workingPointService = new DrawWorkingPointService(selAssembly);
             styleService = new StyleFunctionService();
             layerService = new LayerStyleService();
+            editingService = new DrawEditingService();
 
             publicFunService = new DrawPublicFunctionService();
 
             nozzleBlock = new DrawNozzleBlockService();
-            blockImportService = new DrawImportBlockService((Model)selModel);
+            blockImportService = new DrawImportBlockService(selAssembly,(Model)selModel);
         }
 
         #region Nozzle : Intergration : Shell, Roof, FRTRoof
@@ -346,8 +348,9 @@ namespace DrawWork.DrawServices
                 }
                 else if (eachNozzle.Position == "roof")
                 {
-                    eachNozzle.HRSort = eachNozzle.HRSort - bottomPlateHeight;
-                    eachNozzle.R = eachNozzle.HRSort.ToString();
+                    //eachNozzle.HRSort = eachNozzle.HRSort - bottomPlateHeight;
+                    //eachNozzle.R = eachNozzle.HRSort.ToString();
+                    eachNozzle.H = (valueService.GetDoubleValue(eachNozzle.H) - bottomPlateHeight).ToString();
                 }
 
 
@@ -372,7 +375,7 @@ namespace DrawWork.DrawServices
             double cleanoutWidth = 0;
             double manholeSize = 0;
             if(CheckManholeCleanout(drawArrangeNozzle,out manholeSize))
-                cleanoutWidth = manholeSize + 1000; // Default gap
+                cleanoutWidth = manholeSize + 4000; // Default gap
 
             // Nozzle : Create Model
             foreach (NozzleInputModel eachNozzle in drawArrangeNozzle)
@@ -384,11 +387,6 @@ namespace DrawWork.DrawServices
                 Point3D newNozzleLinePoint =GetPositionLinePoint(refPoint,newNozzlePoint,eachNozzle, eachNozzle.Position, eachNozzle.LR, eachNozzle.HRSort, 0, sizeNominalId, centerTopHeight, shellSpacing);
 
                 NozzleLinePointList.Add(newNozzleLinePoint);
-
-                // Start Point : Adjust : Drain Type : Lower
-                //if (eachNozzle.DrainType=="lower")
-                //    SetDrainLowerPoint(eachNozzle, refPoint, ref newNozzlePoint, ref newNozzleLinePoint);
-
 
                 List<Entity> customEntity = CreateFlangeAll(ref nozzleEntities, refPoint, newNozzlePoint,newNozzleLinePoint, eachNozzle, sizeNominalId, centerTopHeight,selScaleValue, cleanoutWidth);
 
@@ -721,7 +719,10 @@ namespace DrawWork.DrawServices
 
             // Block Add
             if (newBlock != null)
+            {
                 selDrawEntities.blockList.Add(newBlock);
+            }
+               
 
 
             return customEntity;
@@ -795,7 +796,8 @@ namespace DrawWork.DrawServices
                 R = RRF;
             }
 
-            // Type : Nothing
+            // Internal Point
+            Point3D currentInternalPoint = GetSumPoint(drawStartPoint, 0, -Point3D.Distance(drawPoint, drawStartPoint));// 아래쪽으로 이동
 
             List<Entity> customEntity = new List<Entity>();
 
@@ -812,6 +814,30 @@ namespace DrawWork.DrawServices
             // Neck
             customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_Neck(out currentPoint, currentPoint[0], 1, G, H, A - BWN, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true }));
 
+
+            // PipeNeck
+            double flangeLength = A;
+            double neckLength = Point3D.Distance(drawStartPoint, drawPoint) - flangeLength;
+            double pipeSlope = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
+
+            if (selNozzle.Position == "roof")
+            {
+                if (selNozzle.LR == "right")
+                {
+                    pipeSlope = -pipeSlope;
+                }
+            }
+            else if (selNozzle.Position == "shell")
+                pipeSlope = 0;
+
+            // Internal 전용
+            if (selNozzle.InternalPipe == "yes" || selNozzle.DrainType != "")
+            {
+                double newNeckLength = GetInternalPipeLengthAll(selNozzle, refPoint, drawPoint);
+                neckLength += newNeckLength;
+                pipeSlope = 0;
+            }
+
             // Reinf Pady -> 먼저 그릴 것 : Neck 길이 조절
             double couplingHeight = 0;
             if (selNozzle.RePadType != "")
@@ -819,21 +845,18 @@ namespace DrawWork.DrawServices
                 customEntity.AddRange(CreateReinforcingPAD(refPoint, drawPoint, selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
             }
 
-            // PipeNeck
-            double flangeLength = A;
-            double neckLength = Point3D.Distance(drawStartPoint, drawPoint) - flangeLength;
-            if (selNozzle.Position == "roof")
+            if (selNozzle.LR == "center")
             {
-                double pipeSlope = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
-                if (selNozzle.LR == "left")
-                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
-                else if (selNozzle.LR == "right")
-                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, -pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, twoEx = true }));
+                // Neck
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out currentPoint, currentPoint[0], 1, G, neckLength, false, true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
             }
-            else if (selNozzle.Position == "shell")
+            else
             {
-                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, 0, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+
+                // Neck
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
             }
+
 
             // Cover : Blind Flange
             if (selNozzle.Cover == "yes")
@@ -847,6 +870,60 @@ namespace DrawWork.DrawServices
             }
 
 
+            // Internal : Pipe Joint // SO, RF 
+            if (selNozzle.PipeJoint != "")
+            {
+                List<Entity> pipeJointList = new List<Entity>();
+                List<Point3D> pipeJointPoint = new List<Point3D>();
+
+                // joint Gap
+                double jointGap = GetPipeJointAll(selNozzle);
+                Point3D jointRealPoint = GetSumPoint(currentInternalPoint, 0, -jointGap);
+                pipeJointPoint.Add(jointRealPoint);
+
+                // Facing : RF
+                if (facingAdd)
+                    pipeJointList.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out pipeJointPoint, pipeJointPoint[0], 1, R, C, true, true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                // Flange
+                pipeJointList.AddRange(nozzleBlock.DrawReference_Nozzle_Flange(out pipeJointPoint, pipeJointPoint[0], 1, BCD, OD, BWN - C, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = !facingAdd, twoEx = true }));
+                // Neck
+                pipeJointList.AddRange(nozzleBlock.DrawReference_Nozzle_Neck(out pipeJointPoint, pipeJointPoint[0], 1, G, H, A - BWN, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true }));
+                // Mirror : 위로
+                List<Entity> pipeJointListMirror = new List<Entity>();
+                pipeJointListMirror.AddRange(editingService.GetMirrorEntity(Plane.XZ, pipeJointList, jointRealPoint.X, jointRealPoint.Y, true));
+
+                customEntity.AddRange(pipeJointList);
+                customEntity.AddRange(pipeJointListMirror);
+            }
+
+
+            // Goose Neck
+            if (selNozzle.GooseNeckBirdScreen == "yes")
+            {
+                List<Entity> upperNozzleList = new List<Entity>();
+                List<Point3D> upperCurrentPoint = new List<Point3D>();
+
+                double upperGap = 4.5;
+                double upperGapHalf = upperGap / 2;
+                Point3D upperRealPoint = GetSumPoint(drawStartPoint, 0, upperGap);
+
+                upperCurrentPoint.Add(GetSumPoint(upperRealPoint, 0, 0));
+
+                // Facing 
+                if (facingAdd)
+                    upperNozzleList.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out upperCurrentPoint, upperCurrentPoint[0], 1, R, facingC, true, true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                // Flange
+                upperNozzleList.AddRange(nozzleBlock.DrawReference_Nozzle_Flange(out upperCurrentPoint, upperCurrentPoint[0], 1, BCD, OD, BWN - facingC, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = !facingAdd, twoEx = true }));
+                // Neck
+                upperNozzleList.AddRange(nozzleBlock.DrawReference_Nozzle_Neck(out upperCurrentPoint, upperCurrentPoint[0], 1, G, H, A - BWN, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true }));
+
+
+                // Mirror : 위로
+                editingService.GetMirrorEntity(Plane.XZ, upperNozzleList, upperRealPoint.X, upperRealPoint.Y, false);
+                customEntity.AddRange(upperNozzleList);
+
+                customEntity.AddRange(CreateGooseNeck(refPoint, upperRealPoint, GetSumPoint(upperRealPoint, 0, upperRealPoint.Y - upperCurrentPoint[0].Y), selNozzle, couplingHeight, selScaleValue));
+            }
 
             return customEntity;
         }
@@ -880,7 +957,8 @@ namespace DrawWork.DrawServices
                 R = RRF;
             }
 
-            // Type : Nothing
+            // Internal Point
+            Point3D currentInternalPoint = GetSumPoint(drawStartPoint, 0, -Point3D.Distance(drawPoint, drawStartPoint));// 아래쪽으로 이동
 
             List<Entity> customEntity = new List<Entity>();
 
@@ -897,6 +975,33 @@ namespace DrawWork.DrawServices
             // Neck
             customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_Neck(out currentPoint, currentPoint[0], 1, G, H, A-BWN, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx=true }));
 
+
+            // PipeNeck
+            double flangeLength = A;
+            double neckLength = Point3D.Distance(drawStartPoint, drawPoint) - flangeLength;
+            double pipeSlope = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
+
+            if (selNozzle.Position == "roof")
+            {
+                if (selNozzle.LR == "right")
+                {
+                    pipeSlope = -pipeSlope;
+                }
+            }
+            else if (selNozzle.Position == "shell")
+                pipeSlope = 0;
+
+            // Internal 전용
+            if (selNozzle.InternalPipe == "yes" || selNozzle.DrainType != "")
+            {
+                double newNeckLength = GetInternalPipeLengthAll(selNozzle, refPoint, drawPoint);
+                neckLength += newNeckLength;
+                pipeSlope = 0;
+            }
+
+
+
+
             // Reinf Pady -> 먼저 그릴 것 : Neck 길이 조절
             double couplingHeight = 0;
             if (selNozzle.RePadType != "")
@@ -904,21 +1009,18 @@ namespace DrawWork.DrawServices
                 customEntity.AddRange(CreateReinforcingPAD(refPoint, drawPoint, selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
             }
 
-            // PipeNeck
-            double flangeLength = A;
-            double neckLength = Point3D.Distance(drawStartPoint, drawPoint) - flangeLength;
-            if (selNozzle.Position == "roof")
+            if (selNozzle.LR == "center")
             {
-                double pipeSlope = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
-                if (selNozzle.LR == "left")
-                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
-                else if (selNozzle.LR == "right")
-                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, -pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, twoEx = true }));
+                // Neck
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out currentPoint, currentPoint[0], 1, G, neckLength, false, true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
             }
-            else if (selNozzle.Position == "shell")
+            else
             {
-                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, 0, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+
+                // Neck
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
             }
+
 
             // Cover : Blind Flange
             if (selNozzle.Cover == "yes")
@@ -931,8 +1033,59 @@ namespace DrawWork.DrawServices
                 customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_Flange(out coverPoint, coverPoint[1], 0, BCD, OD, BBF - facingC, 0, new DrawCenterLineModel() { scaleValue = selScaleValue,oneEx=true, twoEx = true }));
             }
 
+            // Internal : Pipe Joint // SO, RF 
+            if (selNozzle.PipeJoint != "")
+            {
+                List<Entity> pipeJointList = new List<Entity>();
+                List<Point3D> pipeJointPoint = new List<Point3D>();
+
+                // joint Gap
+                double jointGap = GetPipeJointAll(selNozzle);
+                Point3D jointRealPoint = GetSumPoint(currentInternalPoint, 0, -jointGap);
+                pipeJointPoint.Add(jointRealPoint);
+
+                // Facing : RF
+                if (facingAdd)
+                    pipeJointList.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out pipeJointPoint, pipeJointPoint[0], 1, R, C, true, true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                // Flange
+                pipeJointList.AddRange(nozzleBlock.DrawReference_Nozzle_Flange(out pipeJointPoint, pipeJointPoint[0], 1, BCD, OD, BWN - C, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = !facingAdd, twoEx = true }));
+                // Neck
+                pipeJointList.AddRange(nozzleBlock.DrawReference_Nozzle_Neck(out pipeJointPoint, pipeJointPoint[0], 1, G, H, A - BWN, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true }));
+                // Mirror : 위로
+                List<Entity> pipeJointListMirror = new List<Entity>();
+                pipeJointListMirror.AddRange(editingService.GetMirrorEntity(Plane.XZ, pipeJointList, jointRealPoint.X, jointRealPoint.Y, true));
+
+                customEntity.AddRange(pipeJointList);
+                customEntity.AddRange(pipeJointListMirror);
+            }
+
+            // Goose Neck
+            if (selNozzle.GooseNeckBirdScreen == "yes")
+            {
+                List<Entity> upperNozzleList = new List<Entity>();
+                List<Point3D> upperCurrentPoint = new List<Point3D>();
+
+                double upperGap = 4.5;
+                double upperGapHalf = upperGap / 2;
+                Point3D upperRealPoint = GetSumPoint(drawStartPoint, 0, upperGap);
+
+                upperCurrentPoint.Add(GetSumPoint(upperRealPoint, 0, 0));
+
+                // Facing 
+                if (facingAdd)
+                    upperNozzleList.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out upperCurrentPoint, upperCurrentPoint[0], 1, R, facingC, true, true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                // Flange
+                upperNozzleList.AddRange(nozzleBlock.DrawReference_Nozzle_Flange(out upperCurrentPoint, upperCurrentPoint[0], 1, BCD, OD, BWN - facingC, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = !facingAdd, twoEx = true }));
+                // Neck
+                upperNozzleList.AddRange(nozzleBlock.DrawReference_Nozzle_Neck(out upperCurrentPoint, upperCurrentPoint[0], 1, G, H, A - BWN, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true }));
 
 
+                // Mirror : 위로
+                editingService.GetMirrorEntity(Plane.XZ, upperNozzleList, upperRealPoint.X, upperRealPoint.Y, false);
+                customEntity.AddRange(upperNozzleList);
+
+                customEntity.AddRange(CreateGooseNeck(refPoint, upperRealPoint, GetSumPoint(upperRealPoint, 0, upperRealPoint.Y - upperCurrentPoint[0].Y), selNozzle, couplingHeight, selScaleValue));
+            }
 
 
             return customEntity;
@@ -983,7 +1136,7 @@ namespace DrawWork.DrawServices
 
 
             // PipeNeck
-            double flangeLength = A;
+            double flangeLength = B;
             double neckLength = Point3D.Distance(drawStartPoint, drawPoint) - flangeLength;
             double pipeSlope = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
 
@@ -1013,24 +1166,18 @@ namespace DrawWork.DrawServices
                 customEntity.AddRange(CreateReinforcingPAD(refPoint, drawPoint, selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
             }
 
-            // Neck
-            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+            if (selNozzle.LR == "center")
+            {
+                // Neck
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out currentPoint, currentPoint[0], 1, H, neckLength, false, true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+            }
+            else
+            {
+                // Neck
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, H, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+            }
 
-            // PipeNeck
-            double flangeLength = B;
-            double neckLength = Point3D.Distance(drawStartPoint, drawPoint)-flangeLength;
-            if (selNozzle.Position == "roof")
-            {
-                double pipeSlope = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
-                if (selNozzle.LR == "left")
-                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, H, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
-                else if(selNozzle.LR=="right")
-                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, H, neckLength, -pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, twoEx=true }));
-            }
-            else if (selNozzle.Position == "shell")
-            {
-                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, H, neckLength, 0, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
-            }
+
 
             // Cover : Blind Flange
             if (selNozzle.Cover == "yes")
@@ -1043,9 +1190,55 @@ namespace DrawWork.DrawServices
                 customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_Flange(out coverPoint, coverPoint[1], 0, BCD, OD, B - facingC, 0, new DrawCenterLineModel() { scaleValue = selScaleValue,oneEx=true, twoEx = true }));
             }
 
+            // Internal : Pipe Joint // SO, RF 
+            if (selNozzle.PipeJoint != "")
+            {
+                List<Entity> pipeJointList = new List<Entity>();
+                List<Point3D> pipeJointPoint = new List<Point3D>();
+
+                // joint Gap
+                double jointGap = GetPipeJointAll(selNozzle);
+                Point3D jointRealPoint = GetSumPoint(currentInternalPoint, 0, -jointGap);
+                pipeJointPoint.Add(jointRealPoint);
+
+                // Facing : RF
+                pipeJointList.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out pipeJointPoint, pipeJointPoint[0], 1, R, C, true, true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                // Flange
+                pipeJointList.AddRange(nozzleBlock.DrawReference_Nozzle_Flange(out pipeJointPoint, pipeJointPoint[0], 1, BCD, OD, B - C, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = !facingAdd, twoEx = true }));
+
+                // Mirror : 위로
+                List<Entity> pipeJointListMirror = new List<Entity>();
+                pipeJointListMirror.AddRange(editingService.GetMirrorEntity(Plane.XZ, pipeJointList, jointRealPoint.X, jointRealPoint.Y, true));
+
+                customEntity.AddRange(pipeJointList);
+                customEntity.AddRange(pipeJointListMirror);
+            }
+
+            // Goose Neck
+            if (selNozzle.GooseNeckBirdScreen == "yes")
+            {
+                List<Entity> upperNozzleList = new List<Entity>();
+                List<Point3D> upperCurrentPoint = new List<Point3D>();
+
+                double upperGap = 4.5;
+                double upperGapHalf = upperGap / 2;
+                Point3D upperRealPoint = GetSumPoint(drawStartPoint, 0, upperGap);
+
+                upperCurrentPoint.Add(GetSumPoint(upperRealPoint, 0, 0));
+
+                // Facing : RF
+                if (facingAdd)
+                    upperNozzleList.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out upperCurrentPoint, upperCurrentPoint[0], 1, R, facingC, true, true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                // Flange
+                upperNozzleList.AddRange(nozzleBlock.DrawReference_Nozzle_Flange(out upperCurrentPoint, upperCurrentPoint[0], 1, BCD, OD, B - facingC, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = !facingAdd, twoEx = true }));
 
 
+                // Mirror : 위로
+                editingService.GetMirrorEntity(Plane.XZ, upperNozzleList, upperRealPoint.X, upperRealPoint.Y, false);
+                customEntity.AddRange(upperNozzleList);
 
+                customEntity.AddRange(CreateGooseNeck(refPoint, upperRealPoint, GetSumPoint(upperRealPoint, 0, upperRealPoint.Y - upperCurrentPoint[0].Y), selNozzle, couplingHeight, selScaleValue));
+            }
 
             return customEntity;
         }
@@ -1139,8 +1332,19 @@ namespace DrawWork.DrawServices
                 customEntity.AddRange(CreateReinforcingPAD(refPoint, GetSumPoint(currentInternalPoint, 0,0), selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
             }
 
-            // Neck
-            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+
+            if (selNozzle.LR == "center")
+            {
+                // Neck
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out currentPoint, currentPoint[0], 1, G, neckLength,false,true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+            }
+            else
+            {
+                // Neck
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+            }
+
+
 
             // Cover : Blind Flange
             if (selNozzle.Cover == "yes")
@@ -1166,7 +1370,8 @@ namespace DrawWork.DrawServices
                 pipeJointPoint.Add(jointRealPoint);
 
                 // Facing : RF
-                pipeJointList.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out pipeJointPoint, pipeJointPoint[0], 1, R, C, true, true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                if (facingAdd)
+                    pipeJointList.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out pipeJointPoint, pipeJointPoint[0], 1, R, C, true, true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
                 // Flange
                 pipeJointList.AddRange(nozzleBlock.DrawReference_Nozzle_Flange(out pipeJointPoint, pipeJointPoint[0], 1, BCD, OD, B - C, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = !facingAdd, twoEx = true }));
                 // Neck
@@ -1174,10 +1379,37 @@ namespace DrawWork.DrawServices
 
                 // Mirror : 위로
                 List<Entity> pipeJointListMirror = new List<Entity>();
-                pipeJointListMirror.AddRange(SetMirrorFunction(Plane.XZ, pipeJointList, jointRealPoint.X, jointRealPoint.Y, true));
+                pipeJointListMirror.AddRange(editingService.GetMirrorEntity(Plane.XZ, pipeJointList, jointRealPoint.X, jointRealPoint.Y, true));
 
                 customEntity.AddRange(pipeJointList);
                 customEntity.AddRange(pipeJointListMirror);
+            }
+
+            // Goose Neck
+            if (selNozzle.GooseNeckBirdScreen == "yes")
+            {
+                List<Entity> upperNozzleList = new List<Entity>();
+                List<Point3D> upperCurrentPoint = new List<Point3D>();
+
+                double upperGap = 4.5;
+                double upperGapHalf = upperGap / 2;
+                Point3D upperRealPoint = GetSumPoint(drawStartPoint, 0, upperGap);
+
+                upperCurrentPoint.Add(GetSumPoint(upperRealPoint, 0, 0));
+
+                // Facing : RF
+                if (facingAdd)
+                    upperNozzleList.AddRange(nozzleBlock.DrawReference_Nozzle_Pipe(out upperCurrentPoint, upperCurrentPoint[0], 1, R, facingC, true, true, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                // Flange
+                upperNozzleList.AddRange(nozzleBlock.DrawReference_Nozzle_Flange(out upperCurrentPoint, upperCurrentPoint[0], 1, BCD, OD, B - facingC, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = !facingAdd, twoEx = true }));
+                // Neck
+                upperNozzleList.AddRange(nozzleBlock.DrawReference_Nozzle_Neck(out upperCurrentPoint, upperCurrentPoint[0], 1, G, H, A - B, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true }));
+
+                // Mirror : 위로
+                editingService.GetMirrorEntity(Plane.XZ, upperNozzleList, upperRealPoint.X, upperRealPoint.Y,false);
+                customEntity.AddRange(upperNozzleList);
+
+                customEntity.AddRange(CreateGooseNeck(refPoint,upperRealPoint,GetSumPoint(upperRealPoint,0, upperRealPoint.Y- upperCurrentPoint[0].Y), selNozzle, couplingHeight, selScaleValue));
             }
 
 
@@ -1457,6 +1689,20 @@ namespace DrawWork.DrawServices
             }
             return returnValue;
         }
+        private VentModel GetVent(NozzleInputModel selNozzle)
+        {
+            VentModel returnValue = null;
+            string pipeSize = selNozzle.Size;
+            foreach (VentModel eachPipe in assemblyData.VentList)
+            {
+                if (pipeSize == eachPipe.NPS)
+                {
+                    returnValue = eachPipe;
+                    break;
+                }
+            }
+            return returnValue;
+        }
 
         private UBoltModel GetUBolt(NozzleInputModel selNozzle)
         {
@@ -1726,6 +1972,9 @@ namespace DrawWork.DrawServices
 
             List<Entity> customEntity = new List<Entity>();
 
+
+            List<Entity> customLine = new List<Entity>();
+
             string nozzleSize = selNozzle.Size;
             ShellCleanOutModel newCleanout = null;
             foreach (ShellCleanOutModel eachCleanout in assemblyData.ShellCleanOutList)
@@ -1842,8 +2091,14 @@ namespace DrawWork.DrawServices
                     customEntity.Add(lineAdd1);
                 }
 
-
-
+                //오른쪽 중심선
+                DrawCenterLineModel centerLineModel = new DrawCenterLineModel();
+                Line horizontalCenterLine = new Line(GetSumPoint(newDrawPoint, 0, H-R1), GetSumPoint(newDrawPoint,B/2 +F3 , H - R1));
+                Line horizontalCenterLine2 = new Line(GetSumPoint(newDrawPoint, B / 2 + F3, H - R1), GetSumPoint(newDrawPoint, B / 2 + F3 + centerLineModel.exLength*selScaleValue, H - R1));
+                styleService.SetLayer(ref horizontalCenterLine, layerService.LayerCenterLine);
+                styleService.SetLayer(ref horizontalCenterLine2, layerService.LayerCenterLine);
+                customLine.Add(horizontalCenterLine);
+                customLine.Add(horizontalCenterLine2);
 
                 //Mirror
                 if (selCleanoutWidth>0)
@@ -1860,8 +2115,31 @@ namespace DrawWork.DrawServices
                         mirrorList.Add(newEntity);
                     }
                     customEntity.AddRange(mirrorList);
+
+                    List<Entity> mirrorCenterList = new List<Entity>();
+                    foreach (Entity eachEntity in customLine)
+                    {
+                        Entity newEntity = (Entity)eachEntity.Clone();
+                        newEntity.TransformBy(customMirror);
+                        mirrorCenterList.Add(newEntity);
+                    }
+
+                    customLine.AddRange(mirrorCenterList);
                 }
 
+
+                // 중앙선
+                Line verticalCenterLine01 = new Line(GetSumPoint(newDrawPoint, 0, 0), GetSumPoint(newDrawPoint, 0,L));
+                Line verticalCenterLine02 = new Line(GetSumPoint(newDrawPoint, 0, L), GetSumPoint(newDrawPoint, 0, L + centerLineModel.exLength * selScaleValue));
+                Line verticalCenterLine03 = new Line(GetSumPoint(newDrawPoint, 0, 0), GetSumPoint(newDrawPoint, 0, 0 - centerLineModel.exLength * selScaleValue));
+                styleService.SetLayer(ref verticalCenterLine01, layerService.LayerCenterLine);
+                styleService.SetLayer(ref verticalCenterLine02, layerService.LayerCenterLine);
+                styleService.SetLayer(ref verticalCenterLine03, layerService.LayerCenterLine);
+                customLine.Add(verticalCenterLine01);
+                customLine.Add(verticalCenterLine02);
+                customLine.Add(verticalCenterLine03);
+
+                customEntity.AddRange(customLine);
             }
 
             return customEntity;
@@ -1885,61 +2163,93 @@ namespace DrawWork.DrawServices
 
             if (newManhole != null)
             {
+                
+
+
                 double D1 = valueService.GetDoubleValue(newManhole.D1);
                 double BCD = valueService.GetDoubleValue(newManhole.BCD);
                 double D2 = valueService.GetDoubleValue(newManhole.D2);
                 double L = valueService.GetDoubleValue(newManhole.L);
 
 
-                //List<Point3D> currentPoint = new List<Point3D>();
-                //currentPoint.Add(GetSumPoint(drawStartPoint, 0, 0));
-
-                //Line lineBottom = new Line(GetSumPoint(drawPoint, 0, 0), GetSumPoint(drawPoint, W / 2, 0));
-                //customEntity.Add(lineBottom);
-                //styleService.SetLayer(ref lineBottom, layerService.LayerOutLine);
-
-                ////01
-                //Line lineTop1 = new Line(GetSumPoint(drawPoint, 0, L), GetSumPoint(drawPoint, W / 2, L));
-                //Line lineRight1 = new Line(GetSumPoint(drawPoint, W / 2, L), GetSumPoint(drawPoint, W / 2, 0));
-                //Arc arcFillet1;
-                //if (Curve.Fillet(lineTop1, lineRight1, R2, false, false, true, true, out arcFillet1))
-                //    customEntity.Add(arcFillet1);
-                //styleService.SetLayer(ref arcFillet1, layerService.LayerOutLine);
-                //if (arcFillet1.StartPoint.X > drawPoint.X)
-                //{
-                //    Line lineAdd1 = new Line(GetSumPoint(drawPoint, 0, L), arcFillet1.StartPoint);
-                //    styleService.SetLayer(ref lineAdd1, layerService.LayerOutLine);
-                //    customEntity.Add(lineAdd1);
-                //}
-                //if (arcFillet1.EndPoint.Y > drawPoint.Y)
-                //{
-                //    Line lineAdd1 = new Line(GetSumPoint(drawPoint, W / 2, 0), arcFillet1.EndPoint);
-                //    styleService.SetLayer(ref lineAdd1, layerService.LayerOutLine);
-                //    customEntity.Add(lineAdd1);
-                //}
+                double LHalf = L / 2;
+                double R = D1 / 2;
+                double LCross = valueService.GetAdjacentByHypotenuse(valueService.GetDegreeOfSlope("1"), LHalf);
 
 
-                //Line lineTop2 = new Line(GetSumPoint(drawPoint, 0, H + F3), GetSumPoint(drawPoint, B / 2 + F3, H + F3));
-                //Line lineRight2 = new Line(GetSumPoint(drawPoint, B / 2 + F3, H + F3), GetSumPoint(drawPoint, B / 2 + F3, 0));
-                //Arc arcFillet2;
-                //if (Curve.Fillet(lineTop2, lineRight2, R1, false, false, true, true, out arcFillet2))
-                //    customEntity.Add(arcFillet2);
-                //styleService.SetLayer(ref arcFillet2, layerService.LayerOutLine);
-                //if (arcFillet2.StartPoint.X > drawPoint.X)
-                //{
-                //    Line lineAdd1 = new Line(GetSumPoint(drawPoint, 0, H + F3), arcFillet2.StartPoint);
-                //    styleService.SetLayer(ref lineAdd1, layerService.LayerOutLine);
-                //    customEntity.Add(lineAdd1);
-                //}
-                //if (arcFillet2.EndPoint.Y > drawPoint.Y)
-                //{
-                //    Line lineAdd1 = new Line(GetSumPoint(drawPoint, B / 2 + F3, 0), arcFillet2.EndPoint);
-                //    styleService.SetLayer(ref lineAdd1, layerService.LayerOutLine);
-                //    customEntity.Add(lineAdd1);
-                //}
+                List<Entity> newList = new List<Entity>();
+
+                CDPoint curPoint = new CDPoint();
+                CDPoint bottomPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottomUp, 0, ref refPoint, ref curPoint);
+
+                double tankNominalID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+                double bottomThickness = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateThickness);
+                double manholeHeight = valueService.GetDoubleValue(selNozzle.H);
+                Point3D refCenterPoint = GetSumPoint(refPoint, tankNominalID/2, -bottomThickness+ manholeHeight);
+
+                Line vLine01 = new Line(GetSumPoint(refCenterPoint, 0, LHalf), GetSumPoint(refCenterPoint, L * 10, LHalf));
+                Line vLine02 = new Line(GetSumPoint(refCenterPoint, -L * 100, 0), GetSumPoint(refCenterPoint, L * 10, 0));
+                vLine02.Rotate(Utility.DegToRad(-45), Vector3D.AxisZ, refCenterPoint);
+                vLine02.Translate(new Vector3D(LCross, LCross));
+                Line vLine03 = new Line(GetSumPoint(refCenterPoint, 0, -LHalf), GetSumPoint(refCenterPoint, L * 10, -LHalf));
+                Line vLine04 = new Line(GetSumPoint(refCenterPoint, -L * 100, 0), GetSumPoint(refCenterPoint, L * 10, 0));
+                vLine04.Rotate(Utility.DegToRad(45), Vector3D.AxisZ, refCenterPoint);
+                vLine04.Translate(new Vector3D(LCross, -LCross));
+
+                Arc arcFillet01;
+                Curve.Fillet(vLine01, vLine02, R, false, false, true, true, out arcFillet01);
+                Arc arcFillet03;
+                Curve.Fillet(vLine03, vLine04, R, false, false, true, true, out arcFillet03);
+                Arc arcFillet02;
+                Curve.Fillet(vLine02, vLine04, R, true, false, true, true, out arcFillet02);
+
+                Line vLine05 = new Line(GetSumPoint(refCenterPoint, 0, 0), GetSumPoint(refCenterPoint, L * 10, 0));
+                Point3D[] pointInter01 = vLine05.IntersectWith(arcFillet02);
 
 
+                Arc newArc01 = new Arc(refCenterPoint, D2 / 2, Utility.DegToRad(90), Utility.DegToRad(-90));
+                Arc newArc02 = new Arc(refCenterPoint, BCD / 2, Utility.DegToRad(90), Utility.DegToRad(-90));
+                Arc newArc03 = new Arc(refCenterPoint, D1 / 2, Utility.DegToRad(90), Utility.DegToRad(-90));
 
+                newList.AddRange(new Entity[] { vLine01, vLine02, vLine03, vLine04 });
+                newList.AddRange(new Entity[] { arcFillet01, arcFillet02, arcFillet03 });
+                newList.AddRange(new Entity[] { newArc01, newArc03 });
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+                styleService.SetLayer(ref newArc02, layerService.LayerCenterLine);
+                newList.Add(newArc02);
+
+
+                // Center LIne
+                DrawCenterLineModel centerModel = new DrawCenterLineModel();
+                if (pointInter01.Length > 0)
+                {
+
+                    Line centerLine01 = new Line(GetSumPoint(refCenterPoint, 0, 0), GetSumPoint(pointInter01[0], 0, 0));
+                    Line centerLine02 = new Line(GetSumPoint(pointInter01[0], 0, 0), GetSumPoint(pointInter01[0], centerModel.exLength * selScaleValue, 0));
+                    styleService.SetLayer(ref centerLine01, layerService.LayerCenterLine);
+                    styleService.SetLayer(ref centerLine02, layerService.LayerCenterLine);
+                    newList.Add(centerLine01);
+                    newList.Add(centerLine02);
+                }
+
+                // Mirror
+
+                // Verical
+
+                Line centerVLine01 = new Line(GetSumPoint(refCenterPoint, 0, LHalf), GetSumPoint(refCenterPoint, 0, -LHalf));
+                Line centerVLine02 = new Line(GetSumPoint(refCenterPoint, 0, LHalf), GetSumPoint(refCenterPoint, 0, LHalf + centerModel.exLength * selScaleValue));
+                Line centerVLine03 = new Line(GetSumPoint(refCenterPoint, 0, -LHalf), GetSumPoint(refCenterPoint, 0, -LHalf - centerModel.exLength * selScaleValue));
+                styleService.SetLayer(ref centerVLine01, layerService.LayerCenterLine);
+                styleService.SetLayer(ref centerVLine02, layerService.LayerCenterLine);
+                styleService.SetLayer(ref centerVLine03, layerService.LayerCenterLine);
+                newList.Add(centerVLine01);
+                newList.Add(centerVLine02);
+                newList.Add(centerVLine03);
+
+
+                customEntity.AddRange(newList);
             }
 
             return customEntity;
@@ -1984,6 +2294,10 @@ namespace DrawWork.DrawServices
 
 
             // Neck 아래 부분에 위치
+            double OD = 0;
+            double padWidth =0;
+            double ODHalfHeight = 0;
+            double ODHalfHeight2 = 0;
             List<Point3D> padPoint = new List<Point3D>();
             padPoint.Add(GetSumPoint(drawPoint, 0, 0));
             List<Entity> customEntity = new List<Entity>();
@@ -1993,17 +2307,42 @@ namespace DrawWork.DrawServices
                 {
                     if (eachPad.Pipe == selNozzle.Size)
                     {
-                        customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PadSlopeFlange(out padPoint, GetSumPoint(padPoint[0],0, padBottomGap), 0,valueService.GetDoubleValue( eachPad.DR),valueService.GetDoubleValue( eachPad.L), padThickness,true, roofDegreeValue, new DrawCenterLineModel() { scaleValue = selScaleValue }));
+                        if (selNozzle.LR == "center")
+                        {
+                            OD = valueService.GetDoubleValue(eachPad.OD);
+                            padWidth = (valueService.GetDoubleValue(eachPad.W)-OD)/2;
+                            ODHalfHeight = valueService.GetOppositeByWidth(roofDegreeValue, OD / 2);
+                            ODHalfHeight2 = valueService.GetHypotenuseByWidth(roofDegreeValue, padThickness);
+                            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out padPoint, GetSumPoint(drawPoint, -OD/2, padBottomGap - ODHalfHeight+ ODHalfHeight2/2), 0, padThickness, padWidth, -roofDegreeValue, 0 , roofDegreeValue +Utility.DegToRad(90), null));
+                            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out padPoint, GetSumPoint(drawPoint, OD / 2, padBottomGap - ODHalfHeight + ODHalfHeight2 / 2), 0, padThickness, padWidth, roofDegreeValue, 0, -roofDegreeValue + Utility.DegToRad(-90), null));
+                        }
+                        else
+                        {
+                            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PadSlopeFlange(out padPoint, GetSumPoint(padPoint[0], 0, padBottomGap), 0, valueService.GetDoubleValue(eachPad.DR), valueService.GetDoubleValue(eachPad.W), padThickness, true, roofDegreeValue, new DrawCenterLineModel() { scaleValue = selScaleValue }));
+                        }
                         break;
                     }
                 }
-            }else if (selNozzle.RePadType.Contains("cir"))
+            }
+            else if (selNozzle.RePadType.Contains("cir"))
             {
                 foreach (ReinforcingPadModel eachPad in assemblyData.ReinforcingPadList)
                 {
                     if (eachPad.Pipe == selNozzle.Size)
                     {
-                        customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PadSlopeFlange(out padPoint, GetSumPoint(padPoint[0], 0, padBottomGap), 0, valueService.GetDoubleValue(eachPad.DR), valueService.GetDoubleValue(eachPad.L), padThickness,true, roofDegreeValue, new DrawCenterLineModel() { scaleValue = selScaleValue }));
+                        if (selNozzle.LR == "center")
+                        {
+                            OD = valueService.GetDoubleValue(eachPad.OD);
+                            padWidth = (valueService.GetDoubleValue(eachPad.L) - OD) / 2;
+                            ODHalfHeight = valueService.GetOppositeByWidth(roofDegreeValue, OD / 2);
+                            ODHalfHeight2 = valueService.GetHypotenuseByWidth(roofDegreeValue, padThickness);
+                            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out padPoint, GetSumPoint(drawPoint, -OD / 2, padBottomGap - ODHalfHeight + ODHalfHeight2 / 2), 0, padThickness, padWidth, -roofDegreeValue, 0, roofDegreeValue + Utility.DegToRad(90), null));
+                            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out padPoint, GetSumPoint(drawPoint, OD / 2, padBottomGap - ODHalfHeight + ODHalfHeight2 / 2), 0, padThickness, padWidth, roofDegreeValue, 0, -roofDegreeValue + Utility.DegToRad(-90), null));
+                        }
+                        else
+                        {
+                            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PadSlopeFlange(out padPoint, GetSumPoint(padPoint[0], 0, padBottomGap), 0, valueService.GetDoubleValue(eachPad.DR), valueService.GetDoubleValue(eachPad.L), padThickness, true, roofDegreeValue, new DrawCenterLineModel() { scaleValue = selScaleValue }));
+                        }
                         break;
                     }
                 }
@@ -2057,11 +2396,29 @@ namespace DrawWork.DrawServices
                 //Flange 7 : Combi : 1
                 if (selNozzle.Mixer == checkValue)
                 {
-                    blockName = string.Format("BLOCK-MIXER-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                    string seriesValue = selNozzle.ASMESeries.Replace(" ", "").ToLower().Replace("series", "");
+                    if (seriesValue.Contains("a"))
+                    {
+                        blockName = string.Format("BLOCK-MIXER_A_{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                    }
+                    else
+                    {
+                        blockName = string.Format("BLOCK-MIXER_B_{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                    }
+
                 }
                 else  if (selNozzle.GaugeHatch == checkValue)
                 {
                     blockName = string.Format("BLOCK-GQUGE_HATCH-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+
+                    // Leader
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumOutputCDPoint(drawPoint, 0, 0),
+                        lineTextList = new List<string>() { "GAUGE HATCH" },
+                        Position = "topleft"
+                    });
+
                 }
                 else if (selNozzle.GooseNeckBirdScreen == checkValue)
                 {
@@ -2070,22 +2427,59 @@ namespace DrawWork.DrawServices
                 else if (selNozzle.FlameArrestor == checkValue && selNozzle.BreatherValve==checkValue)
                 {
                     blockName = string.Format("BLOCK-FLAME_ARRESTOR&BREATHER_VALVE-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                    // Leader
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumOutputCDPoint(drawPoint, 0, 0),
+                        lineTextList = new List<string>() {"& BREATHER VALVE", "FLAME ARRESTER" },
+                        Position = "topleft"
+                    });
                 }
                 else if (selNozzle.FlameArrestor == checkValue)
                 {
                     blockName = string.Format("BLOCK-FLAME_ARRESTOR-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                    // Leader
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumOutputCDPoint(drawPoint, 0, 0),
+                        lineTextList = new List<string>() { "FLAME ARRESTER" },
+                        Position = "topleft"
+                    });
                 }
                 else if (selNozzle.BreatherValve == checkValue)
                 {
                     blockName = string.Format("BLOCK-BREATHER_VALVE-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                    // Leader
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumOutputCDPoint(drawPoint, 0, 0),
+                        lineTextList = new List<string>() { "BREATHER VALVE" },
+                        Position = "topleft"
+                    });
                 }
                 else if (selNozzle.VacuumReliefValve == checkValue)
                 {
                     blockName = string.Format("BLOCK-VACUUM_RELIEF_VALVE-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+
+                    // Leader
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumOutputCDPoint(drawPoint, 0, 0),
+                        lineTextList = new List<string>() {"RELIEF VALVE", "PRESSURE VACUUM/" },
+                        Position = "topleft"
+                    });
                 }
                 else if (selNozzle.EmergencyVent == checkValue)
                 {
-                    blockName = string.Format("BLOCK-EMERGENCY_VENT-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                    blockName = string.Format("BLOCK-EMERGENCY_VENT-{0}\"_#150", selNozzle.Size);
+                    // Leader
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumOutputCDPoint(drawPoint, 0, 0),
+                        lineTextList = new List<string>() { "EMERGENCY VENT", "PRESSURE VACUUM/" },
+                        Position = "topleft"
+                    });
+
                 }
                 else
                 {
@@ -2101,6 +2495,7 @@ namespace DrawWork.DrawServices
             blockEntity = null;
             if (drawPoint!=null)
                 blockEntity=blockImportService.Draw_ImportBlock(new CDPoint(drawPoint.X,drawPoint.Y,0), blockName, layerService.LayerBlock, scaleFactor);
+            
             return returnValue;
         }
 
@@ -2121,7 +2516,7 @@ namespace DrawWork.DrawServices
                             customEntity.AddRange(CreateDrainSump(refPoint, drawPoint, selNozzle, couplingHeight, selScaleValue));
                             
                         }
-                        else if (selNozzle.DrainType == "internal pipe")
+                        else if (selNozzle.DrainType == "int.pipe")
                         {
                             // Drain Internal Pipe
                             customEntity.AddRange(CreateDrainInternalPipe(refPoint, drawPoint, selNozzle, couplingHeight, selScaleValue));
@@ -2153,6 +2548,7 @@ namespace DrawWork.DrawServices
                     {
                         // Straight Type
                         // 아래쪽 패드
+                        customEntity.AddRange(CreateInternalRoof(refPoint, drawPoint, selNozzle, couplingHeight, selScaleValue));
                     }
                 }
             }
@@ -2186,7 +2582,7 @@ namespace DrawWork.DrawServices
                 double tankNominalHalf = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID)/2;
                 double bottonThickness = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateThickness);
                 currentPointList.Add(GetSumPoint(bottomPoint, B - elbowA, -C));
-                List<Entity> elbowList0 = nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 1, newElbow, "lr", "90", Utility.DegToRad(180), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                List<Entity> elbowList0 = nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 1, newElbow, "lr", "90", Utility.DegToRad(180), new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true, oneEx = true });
                 customEntity.AddRange(elbowList0);
 
                 double pipeLength = 0;
@@ -2208,7 +2604,7 @@ namespace DrawWork.DrawServices
                 }
                 else
                 {
-                    pipeSlope = pipeSlope;
+                    //pipeSlope = pipeSlope;
                     CDPoint bottomPointDown = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, tankNominalHalf - B, ref refPoint, ref curPoint);
                     pipeLength = bottomPointDown.Y - currentPointList[0].Y;
 
@@ -2271,7 +2667,7 @@ namespace DrawWork.DrawServices
                 double tankNominalHalf = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID) / 2;
                 double bottonThickness = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateThickness);
                 currentPointList.Add(GetSumPoint(drawPoint, newNeckLength, 0));
-                List<Entity> elbowList0 = nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 0, newElbow, "lr", "90", Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true });
+                List<Entity> elbowList0 = nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 0, newElbow, "lr", "90", Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true });
                 customEntity.AddRange(elbowList0);
 
 
@@ -2301,7 +2697,8 @@ namespace DrawWork.DrawServices
 
 
                 // Bottom
-                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out nothingList, GetSumPoint(bottomPointDownMiddle,0,-B), 1, A, bottonThickness, 0, 0, 0, null));
+                List<Point3D> bottomPointList = new List<Point3D>();
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out bottomPointList, GetSumPoint(bottomPointDownMiddle,0,-B), 1, A, bottonThickness, 0, 0, 0, null));
                 //Bottom Left
                 Point3D leftBottomDownPoint =new Point3D(bottomPointLeft.X, GetSumPoint(bottomPointDownMiddle, 0, -B).Y);
                 double leftBottonHeight =bottomPointLeft.Y - leftBottomDownPoint.Y;
@@ -2314,6 +2711,26 @@ namespace DrawWork.DrawServices
                 // Pad
                 CDPoint bottomPadPointUp = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterBottomUp, tankNominalHalf - newNeckLength - elbowA, ref refPoint, ref curPoint);
                 customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PadSlope(out nothingList,GetSumPoint(bottomPadPointUp,0,0), 0, OD, A+A1*2, bottonThickness, true, pipeSlope, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+
+
+                // Leader
+                SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                {
+                    leaderPoint = GetSumOutputCDPoint(drawPoint, 0, 0),
+                    lineTextList = new List<string>() { "RELIEF VALVE", "DRAW-OFF SUMP" },
+                    Position = "bottomleft"
+                });
+
+                // Dimension
+                SingletonData.DimPublicList.Add(new DimensionPointModel()
+                {
+                    leftPoint = GetSumOutputCDPoint(GetSumCDPoint(refPoint, 0, 0), 0, 0),
+                    rightPoint = GetSumOutputCDPoint(bottomPointList[0],0, 0),
+                    dimHeight = 3000,
+                    Text = "",
+                    Position = "bottom"
+                }); 
+
             }
 
 
@@ -2350,7 +2767,7 @@ namespace DrawWork.DrawServices
                 double tankNominalHalf = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID) / 2;
                 double bottonThickness = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateThickness);
                 currentPointList.Add(GetSumPoint(drawPoint, newNeckLength, 0));
-                List<Entity> elbowList0 = nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 0, newElbow, "lr", "90", Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true });
+                List<Entity> elbowList0 = nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 0, newElbow, "lr", "90", Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true });
                 customEntity.AddRange(elbowList0);
 
 
@@ -2422,7 +2839,7 @@ namespace DrawWork.DrawServices
 
                 currentPointList.Add(GetSumPoint(drawPoint, 0, -newNeckLength));
 
-                List<Entity> elbowList0 = nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 0, newElbow, "lr", "45", Utility.DegToRad(-180), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true });
+                List<Entity> elbowList0 = nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 0, newElbow, "lr", "45", Utility.DegToRad(-180), new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true });
                 customEntity.AddRange(elbowList0);
 
                 double shellDistance = currentPointList[1].X - refPoint.X;
@@ -2497,23 +2914,43 @@ namespace DrawWork.DrawServices
                 if (selNozzle.OutletDirection == "upward")
                 {
                     // Outlet : 위로
-                    List<Entity> elbowList0 = nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 1, newElbow, "lr", "90", Utility.DegToRad(180), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true });
+                    List<Entity> elbowList0 = nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 1, newElbow, "lr", "90", Utility.DegToRad(180), new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true });
                     customEntity.AddRange(elbowList0);
 
 
                     // Riquid Level
                     double HLL = valueService.GetDoubleValue(assemblyData.GeneralLiquidCapacityWeight[0].HighLiquidLevel);
-                    double pipeLength = (refPoint.X + HLL) - currentPointList[0].Y;
+                    double pipeLength = (refPoint.Y + HLL) - currentPointList[0].Y;
 
 
                     customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPointList, currentPointList[0], 1, OD, pipeLength, 0, 0, Utility.DegToRad(180), new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true }));
+
+
+
+                    // UBolt
+                    Point3D lowerEndPoint = new Point3D(refPoint.X, drawPoint.Y + A1);
+                    Point3D UpperStartPoint = new Point3D(refPoint.X,  (refPoint.Y + HLL) - B1/2 ); // B1/2
+                    double uboltDistance = currentPointList[0].X - refPoint.X;
+
+                    List<Point3D> ublotOutList = new List<Point3D>();
+                    customEntity.AddRange(CreateUBlot(out ublotOutList, GetSumPoint(UpperStartPoint, 0, 0), 0, selNozzle, uboltDistance, shellHeightThk, C1, Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                    customEntity.AddRange(CreateUBlot(out ublotOutList, GetSumPoint(lowerEndPoint, 0, 0), 0, selNozzle, uboltDistance, shellHeightThk, C1, Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                    double maxGap = 2500;
+                    double middleHeight = UpperStartPoint.Y - lowerEndPoint.Y;
+                    double middleDiv = Math.Ceiling(middleHeight / maxGap);
+                    double middleDivLength = valueService.IntRound(middleHeight / middleDiv, -1);
+                    // 아래 방향
+                    for (int i = 1; i < middleDiv; i++)
+                    {
+                        customEntity.AddRange(CreateUBlot(out ublotOutList, GetSumPoint(UpperStartPoint, 0, -middleDivLength * i), 0, selNozzle, uboltDistance, shellHeightThk, C1, Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                    }
 
                 }
                 else if (selNozzle.OutletDirection == "downward")
                 {
                     // 아래로
 
-                    List<Entity> elbowList0 = nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 0, newElbow, "lr", "90", Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true });
+                    List<Entity> elbowList0 = nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 0, newElbow, "lr", "90", Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true });
                     customEntity.AddRange(elbowList0);
 
                     double tankNominalHalf = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID) / 2;
@@ -2549,6 +2986,165 @@ namespace DrawWork.DrawServices
                 // Bottom
                 //customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPointList, GetSumPoint(currentPointList[1], -shellDistance, -shellDistance), 0, C, shellHeightThk, 0, 0, Utility.DegToRad(-90), null));
 
+            }
+
+
+
+            return customEntity;
+        }
+
+        public List<Entity> CreateInternalRoof(CDPoint refPoint, Point3D drawPoint, NozzleInputModel selNozzle, double couplingHeight, double selScaleValue)
+        {
+            CDPoint curPoint = new CDPoint();
+            CDPoint bottomPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointReferenceBottom, 0, ref refPoint, ref curPoint);
+
+            List<Entity> customEntity = new List<Entity>();
+            List<Point3D> currentPointList = new List<Point3D>();
+
+
+            double newNeckLength = GetInternalPipeLengthAll(selNozzle, refPoint, drawPoint);
+
+
+            InOutInternalPipe newBended = GetInletOutletPipe(selNozzle);
+            ElbowModel newElbow = GetElbow(selNozzle);
+            if (newBended != null && newElbow != null)
+            {
+                // 무조건 90
+                double elbowA = valueService.GetDoubleValue(newElbow.LRA);
+                double OD = valueService.GetDoubleValue(newElbow.OD);
+
+                double BD = valueService.GetDoubleValue(newBended.OD);
+                double A = valueService.GetDoubleValue(newBended.A);
+                double B = valueService.GetDoubleValue(newBended.B);
+                double C = valueService.GetDoubleValue(newBended.C);
+                double D = valueService.GetDoubleValue(newBended.D);
+                double E = valueService.GetDoubleValue(newBended.E);
+                double F = valueService.GetDoubleValue(newBended.F);
+                double FlatBarH = valueService.GetDoubleValue(newBended.FlatBarH);
+
+                double A3 = valueService.GetDoubleValue(newBended.A3);
+                double B3 = valueService.GetDoubleValue(newBended.B3);
+                double C3 = valueService.GetDoubleValue(newBended.C3);
+
+                double A1 = valueService.GetDoubleValue(newBended.A1);
+                double B1 = valueService.GetDoubleValue(newBended.B1);
+                double C1 = valueService.GetDoubleValue(newBended.C1);
+                double A2 = valueService.GetDoubleValue(newBended.A2);
+                double B2 = valueService.GetDoubleValue(newBended.B2);
+                double C2 = valueService.GetDoubleValue(newBended.C2);
+
+
+                double shellHeightThk = 8; //default 마지막 셀 두께
+                if (assemblyData.ShellOutput.Count > 0)
+                {
+                    shellHeightThk = valueService.GetDoubleValue(assemblyData.ShellOutput[assemblyData.ShellOutput.Count - 1].Thickness);
+                }
+
+                double tankNominalHalf = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID) / 2;
+                double shellDistance = drawPoint.X - refPoint.X;
+
+                if (shellDistance <= C)
+                {
+
+
+
+                    CDPoint bottomPointUp = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterBottomUp, tankNominalHalf - shellDistance, ref refPoint, ref curPoint);
+
+                    currentPointList.Add(GetSumPoint(drawPoint, newNeckLength, 0));
+
+                    // UBolt
+                    Point3D UpperStartPoint = new Point3D(refPoint.X, drawPoint.Y - A1);
+                    Point3D lowerEndPoint = new Point3D(refPoint.X, bottomPointUp.Y + B1);
+                    double uboltDistance = bottomPointUp.X - refPoint.X;
+
+                    List<Point3D> ublotOutList = new List<Point3D>();
+                    customEntity.AddRange(CreateUBlot(out ublotOutList, GetSumPoint(UpperStartPoint, 0, 0), 0, selNozzle, uboltDistance, shellHeightThk, C1, Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                    customEntity.AddRange(CreateUBlot(out ublotOutList, GetSumPoint(lowerEndPoint, 0, 0), 0, selNozzle, uboltDistance, shellHeightThk, C1, Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                    double maxGap = 2500;
+                    double middleHeight = UpperStartPoint.Y - lowerEndPoint.Y;
+                    double middleDiv = Math.Ceiling(middleHeight / maxGap);
+                    double middleDivLength = valueService.IntRound(middleHeight / middleDiv, -1);
+                    // 아래 방향
+                    for (int i = 1; i < middleDiv; i++)
+                    {
+                        customEntity.AddRange(CreateUBlot(out ublotOutList, GetSumPoint(UpperStartPoint, 0, -middleDivLength * i), 0, selNozzle, uboltDistance, shellHeightThk, C1, Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                    }
+
+
+                }
+
+
+
+                // Bottom
+                //customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPointList, GetSumPoint(currentPointList[1], -shellDistance, -shellDistance), 0, C, shellHeightThk, 0, 0, Utility.DegToRad(-90), null));
+
+            }
+
+
+
+            return customEntity;
+        }
+
+        public List<Entity> CreateGooseNeck(CDPoint refPoint, Point3D drawPoint, Point3D startDrawPoint, NozzleInputModel selNozzle, double couplingHeight, double selScaleValue)
+        {
+            CDPoint curPoint = new CDPoint();
+            CDPoint bottomPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointReferenceBottom, 0, ref refPoint, ref curPoint);
+
+            List<Entity> customEntity = new List<Entity>();
+            List<Point3D> currentPointList = new List<Point3D>();
+
+
+            VentModel newVent = GetVent(selNozzle);
+            ElbowModel newElbow = GetElbow(selNozzle);
+            if (newVent != null && newElbow != null)
+            {
+                // 무조건 90
+                double elbowA = valueService.GetDoubleValue(newElbow.LRA);
+                double OD = valueService.GetDoubleValue(newElbow.OD);
+
+                double ventOD = valueService.GetDoubleValue(newVent.OD);
+                double A = valueService.GetDoubleValue(newVent.A);
+                double B = valueService.GetDoubleValue(newVent.B);
+                double C = valueService.GetDoubleValue(newVent.C);
+                double Q = valueService.GetDoubleValue(newVent.Q);
+                double H = valueService.GetDoubleValue(newVent.H);
+                double m = valueService.GetDoubleValue(newVent.m);
+
+                double A1 = valueService.GetDoubleValue(newVent.A1);
+                double B1 = valueService.GetDoubleValue(newVent.B1);
+                double flangeGapForGA = valueService.GetDoubleValue(newVent.FlangeGapForGA);
+
+
+                double gooseLastGap = 4.5;
+                double neckLength = 0;
+                if (selNozzle.Type == "wn")
+                {
+                    neckLength = A1;
+                }
+                else
+                {
+                    neckLength = A1-(startDrawPoint.Y-drawPoint.Y);
+                }
+
+
+                currentPointList.Add(GetSumPoint(startDrawPoint, 0, 0));
+
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPointList, currentPointList[0], 0, OD, neckLength, 0, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue }));
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[1], 1, newElbow, "lr", "90", Utility.DegToRad(-90), new DrawCenterLineModel() { scaleValue = selScaleValue }));
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_Elbow(out currentPointList, currentPointList[0], 1, newElbow, "lr", "90", 0, new DrawCenterLineModel() { scaleValue = selScaleValue,zeroEx=true }));
+
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_Flange(out currentPointList, currentPointList[0], 1,C, A, B1, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, twoEx = true }));
+                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_Flange(out currentPointList,GetSumPoint(currentPointList[0],0,-gooseLastGap), 1, C, A, B1, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, zeroEx = true,twoEx = true }));
+
+
+                // Leader
+                SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                {
+                    leaderPoint = GetSumOutputCDPoint(currentPointList[0], 0, 0),
+                    lineTextList = new List<string>() { "& BIRD SCREEN", "GOOSE NECK" },
+                    lineLength = 30,
+                    Position = "topleft"
+                });
             }
 
 
@@ -2724,6 +3320,21 @@ namespace DrawWork.DrawServices
                                 convergenceXY = convergencePosition.Right;
                                 arrangeMaxHeightValue = arrangeMaxHeight.Right;
                                 break;
+
+                            case "center":
+                                convergenceValue = GetConvergenceValue(newHeight, beforeValue.Left, convergenceHeight);
+                                beforeValue.Left = eachNozzle.HRSort;
+                                if (multiColumnValue && convergenceValue)
+                                    convergencePosition.Left -= circleSize;
+                                else
+                                    convergencePosition.Left = 0;
+
+                                positionCount.Left++;
+                                positionCountValue = positionCount.Left;
+                                convergenceXY = convergencePosition.Left;
+                                arrangeMaxHeightValue = arrangeMaxHeight.Left;
+                                break;
+
                         }
                         break;
                     case "roof":
@@ -2744,6 +3355,20 @@ namespace DrawWork.DrawServices
                                 break;
 
                             case "right":
+                                convergenceValue = GetConvergenceValue(newHeight, beforeValue.Bottom, convergenceHeight);
+                                beforeValue.Bottom = eachNozzle.HRSort;
+                                if (multiColumnValue && convergenceValue)
+                                    convergencePosition.Bottom += circleSize;
+                                else
+                                    convergencePosition.Bottom = 0;
+
+                                positionCount.Bottom++;
+                                positionCountValue = positionCount.Bottom;
+                                convergenceXY = convergencePosition.Bottom;
+                                arrangeMaxHeightValue = arrangeMaxHeight.Bottom;
+                                break;
+
+                            case "center":
                                 convergenceValue = GetConvergenceValue(newHeight, beforeValue.Bottom, convergenceHeight);
                                 beforeValue.Bottom = eachNozzle.HRSort;
                                 if (multiColumnValue && convergenceValue)
@@ -2810,6 +3435,10 @@ namespace DrawWork.DrawServices
                                     arrangeMaxHeight.Right = newHeight + circleSize / 2 + arrangeGapHeight;
                                     arrangeMaxHeightValue = arrangeMaxHeight.Right;
                                     break;
+                                case "center":
+                                    arrangeMaxHeight.Left = newHeight + circleSize / 2 + arrangeGapHeight;
+                                    arrangeMaxHeightValue = arrangeMaxHeight.Left;
+                                    break;
                             }
                             break;
 
@@ -2821,6 +3450,10 @@ namespace DrawWork.DrawServices
                                     arrangeMaxHeightValue = arrangeMaxHeight.Top;
                                     break;
                                 case "right":
+                                    arrangeMaxHeight.Bottom = newHeight + circleSize / 2 + arrangeGapHeight;
+                                    arrangeMaxHeightValue = arrangeMaxHeight.Bottom;
+                                    break;
+                                case "center":
                                     arrangeMaxHeight.Bottom = newHeight + circleSize / 2 + arrangeGapHeight;
                                     arrangeMaxHeightValue = arrangeMaxHeight.Bottom;
                                     break;
@@ -2879,6 +3512,10 @@ namespace DrawWork.DrawServices
                             drawPoint.X = refPoint.X;
                             drawPoint.Y = refPoint.Y - cirRadius;
                             break;
+                        case "center":
+                            drawPoint.X = refPoint.X - cirDiameter;
+                            drawPoint.Y = refPoint.Y - cirRadius;
+                            break;
                     }
                     break;
                 case "roof":
@@ -2889,6 +3526,10 @@ namespace DrawWork.DrawServices
                             drawPoint.Y = refPoint.Y;
                             break;
                         case "right":
+                            drawPoint.X = refPoint.X - cirRadius;
+                            drawPoint.Y = refPoint.Y;
+                            break;
+                        case "center":
                             drawPoint.X = refPoint.X - cirRadius;
                             drawPoint.Y = refPoint.Y;
                             break;
@@ -3092,6 +3733,32 @@ namespace DrawWork.DrawServices
                                 }
                                 beforeEndPoint.Bottom = markPoint.X;
                                 break;
+
+                            case "center":
+                                if (beforeEndPoint.Bottom == markPoint.X)
+                                    continue;
+
+                                if (nozzlePoint.X == markPoint.X)
+                                {
+                                    // 직선
+                                    customEntity.AddRange(CreateBrokenLIne(GetSumPoint(nozzlePoint, 0, +nozzleLength), markPoint));
+                                    if (midPoint.Bottom < markPoint.Y)
+                                        midPoint.Bottom = markPoint.Y;
+                                }
+                                else if (nozzlePoint.X > markPoint.X)
+                                {
+
+                                }
+                                else if (nozzlePoint.X < markPoint.X)
+                                {
+                                    // 위로
+                                    if (beforeEndPoint.Bottom != markPoint.X)
+                                        midPoint.Bottom -= midPointXGap; // 위쪽으로 이동
+                                    customEntity.AddRange(CreateBrokenLIne(GetSumPoint(nozzlePoint, 0, +nozzleLength), markPoint, new Point3D(nozzlePoint.X, midPoint.Bottom), new Point3D(markPoint.X, midPoint.Bottom)));
+
+                                }
+                                beforeEndPoint.Bottom = markPoint.X;
+                                break;
                         }
                         break;
                 }
@@ -3258,6 +3925,10 @@ namespace DrawWork.DrawServices
                             //newPoint.X += selShellSpacing.Right;
                             newPoint.X = refPoint.X + selSizeNominalID + selShellSpacing.Left + convergenceValue;
                             break;
+                        case "center":
+                            //newPoint.X += selShellSpacing.Right;
+                            newPoint.X = refPoint.X - selShellSpacing.Left + convergenceValue;
+                            break;
                     }
                     break;
 
@@ -3270,6 +3941,9 @@ namespace DrawWork.DrawServices
                             break;
                         case "right":
                             //newPoint.Y += selShellSpacing.Top;
+                            newPoint.Y = selCenterTopHeight + selShellSpacing.Top + convergenceValue;
+                            break;
+                        case "center":
                             newPoint.Y = selCenterTopHeight + selShellSpacing.Top + convergenceValue;
                             break;
                     }
@@ -3366,36 +4040,13 @@ namespace DrawWork.DrawServices
         {
             return new Point3D(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
         }
-
-
-
-        private List<Entity> SetMirrorFunction(Plane selPlane, List<Entity> selList, double X, double Y,bool copyCmd=false)
+        private CDPoint GetSumOutputCDPoint(Point3D selPoint1, double X, double Y, double Z = 0)
         {
-            Plane pl1 = selPlane;
-            pl1.Origin.X = X;
-            pl1.Origin.Y = Y;
-            Mirror customMirror = new Mirror(pl1);
-            List<Entity> mirrorList = new List<Entity>();
-            if (copyCmd)
-            {
-                foreach (Entity eachEntity in selList)
-                {
-                    Entity newEntity = (Entity)eachEntity.Clone();
-                    newEntity.TransformBy(customMirror);
-                    mirrorList.Add(newEntity);
-                }
-            }
-            else
-            {
-                foreach (Entity eachEntity in selList)
-                {
-                    eachEntity.TransformBy(customMirror);
-                }
-            }
+            return new CDPoint(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
 
-
-            return mirrorList;
         }
+
+
 
 
 

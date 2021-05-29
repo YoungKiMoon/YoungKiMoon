@@ -38,6 +38,9 @@ namespace ExcelAddIn.Commons
                 case EXCELSHEET_LIST.SHEET_APPURTENANCES:
                     returnValue = "appurtenances";
                     break;
+                case EXCELSHEET_LIST.SHEET_ACCESS:
+                    returnValue = "access";
+                    break;
                 case EXCELSHEET_LIST.SHEET_NOZZLE:
                     returnValue = "nozzle";
                     break;
@@ -46,7 +49,7 @@ namespace ExcelAddIn.Commons
                     break;
 
                 case EXCELSHEET_LIST.SHEET_DWGLIST:
-                    returnValue = "dwglist";
+                    returnValue = "drawinglist";
                     break;
                 case EXCELSHEET_LIST.SHEET_NOTES:
                     returnValue = "notes";

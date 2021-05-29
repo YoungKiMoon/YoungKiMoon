@@ -130,6 +130,21 @@
   <data name="CreatePlan" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\CreatePlan.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="icon_CRT" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_CRT.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="icon_DRT" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_DRT.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="icon_EFRT_double_deck" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_EFRT_double_deck.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="icon_EFRT_single_deck" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_EFRT_single_deck.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="icon_IFRT_single_deck" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_IFRT_single_deck.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="iTank2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\iTank2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

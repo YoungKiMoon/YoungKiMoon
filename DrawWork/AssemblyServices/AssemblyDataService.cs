@@ -22,14 +22,22 @@ namespace DrawWork.AssemblyServices
             valueService = new ValueService();
         }
 
-        public AssemblyModel CreateMappingData(string selFileName)
+        public AssemblyModel CreateMappingData(string selFileName,object activeWork=null)
         {
 
             AssemblyModel selAssembly = new AssemblyModel();
             selAssembly.CreateMappingAssembly();
 
+            ObservableCollection<ExcelWorkSheetModel> newSheetList = new ObservableCollection<ExcelWorkSheetModel>();
             ExcelApplicationService eDataService = new ExcelApplicationService(-1);
-            ObservableCollection<ExcelWorkSheetModel> newSheetList= eDataService.GetSheetListAll(selFileName);
+            if (activeWork == null)
+            {
+                newSheetList = eDataService.GetSheetListAll(selFileName);
+            }
+            else
+            {
+                newSheetList = eDataService.GetSheetList(activeWork);
+            }
 
             eDataService.GetSheetData(selAssembly, newSheetList);
 

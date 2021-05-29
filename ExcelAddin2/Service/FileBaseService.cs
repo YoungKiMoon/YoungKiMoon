@@ -40,10 +40,10 @@ namespace ExcelAddIn.Service
         public string CreateFile()
         {
             string downloadPath = "";
-            SaveFileDialog newFiledialog = new SaveFileDialog();
-            newFiledialog.Title = "TAnk (*.DWG) 파일 저장";
+            OpenFileDialog newFiledialog = new OpenFileDialog();
+            newFiledialog.Title = "TAnk (*.DWG) 파일 열기";
             //newFiledialog.InitialDirectory = selPath;
-            newFiledialog.FileName = "TAnkDraw_" + DateTime.Now.ToString("yyyyMMdd") +".DWG";
+            //newFiledialog.FileName = "TAnkDraw_" + DateTime.Now.ToString("yyyyMMdd") +".DWG";
             newFiledialog.Filter = "AutoCAD File|*.DWG";
 
             if (newFiledialog.ShowDialog() == true)

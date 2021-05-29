@@ -203,7 +203,7 @@ namespace DrawWork.DrawServices
             return customBlockList.ToArray();
         }
 
-        public Entity[] DrawReference_CompressionRingI(CDPoint selPoint1)
+        public Entity[] DrawReference_CompressionRingI(CDPoint selPoint1, ref CDPoint refPoint)
         {
             int firstIndex = 0;
             double A = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].OutsideProjectionA);
@@ -212,9 +212,16 @@ namespace DrawWork.DrawServices
             double t1 = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].ThicknessT1);
 
 
+
+
             // Roof Slope
             string roofSlopeString = assemblyData.RoofCRTInput[firstIndex].RoofSlope;
             double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
+
+            if (assemblyData.RoofCompressionRing[firstIndex].CompressionRingType == "Detail i")
+            {
+                roofSlopeDegree = workingPointService.DRTWorkingData.CompressionRingDegree;
+            }
 
             double outsideBottomX = valueService.GetAdjacentByHypotenuse(roofSlopeDegree, A);
             double outsideBottomY = valueService.GetOppositeByHypotenuse(roofSlopeDegree, A);
@@ -223,6 +230,10 @@ namespace DrawWork.DrawServices
 
             double thicknessY= valueService.GetAdjacentByHypotenuse(roofSlopeDegree, t1);
             double thickneesX = valueService.GetOppositeByHypotenuse(roofSlopeDegree, t1);
+
+
+
+
 
             // 좌측 상단을 기준으로 그림
             Point3D drawPoint = new Point3D(selPoint1.X - outsideBottomX, selPoint1.Y - outsideBottomY, selPoint1.Z);

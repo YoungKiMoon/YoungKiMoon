@@ -38,7 +38,7 @@ namespace ExcelAddIn.Panes
             this.elementHost1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.elementHost1.Location = new System.Drawing.Point(0, 0);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(150, 150);
+            this.elementHost1.Size = new System.Drawing.Size(80, 80);
             this.elementHost1.TabIndex = 0;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = this.elementHost1WPF;
@@ -51,7 +51,7 @@ namespace ExcelAddIn.Panes
             this.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "ProcessPane";
-            this.Size = new System.Drawing.Size(150, 188);
+            this.Size = new System.Drawing.Size(80, 80);
             this.ResumeLayout(false);
 
         }

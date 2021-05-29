@@ -36,6 +36,9 @@ using DrawLogicLib.DrawLogicFileServices;
 using DrawLogicLib.Models;
 using DrawWork.CommandServices;
 using DrawWork.AssemblyServices;
+using DrawWork.Commons;
+using DrawWork.DrawSacleServices;
+using DrawWork.DWGFileServices;
 
 namespace DrawWork
 {
@@ -55,12 +58,13 @@ namespace DrawWork
             this.testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
             this.testModel.ActionMode = devDept.Eyeshot.actionType.SelectByPick;
 
+            this.testModel.Renderer = rendererType.OpenGL;
 
             BackgroundSettings cc = new BackgroundSettings();
             this.testModel.ActiveViewport.Background.TopColor= new SolidColorBrush(Color.FromRgb(59, 68, 83));
             //this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Rendered;
-            //this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Rendered;
-
+            this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Wireframe;
+            this.testModel.Wireframe.SilhouettesDrawingMode = silhouettesDrawingType.LastFrame;
             drawSetting = new DrawSettingService();
             drawSetting.SetModelSpace(testModel);
 
@@ -335,6 +339,14 @@ namespace DrawWork
         // Test New
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
+
+            DWGFileService dwgService = new DWGFileService();
+            string dwgFilePath= dwgService.FileFilecopy();
+
+            // SingletonData Reset
+            SingletonData.LeaderPublicList.Clear();
+            SingletonData.DimPublicList.Clear();
+
             // Assembly
             AssemblyDataService assemblyService = new AssemblyDataService();
             AssemblyModel newTankData = assemblyService.CreateMappingData(ExcelFile.Text);
@@ -366,8 +378,22 @@ namespace DrawWork
 
             //newAll.ToArray()
 
+            DrawScaleService scaleService = new DrawScaleService();
+
+            double autoScale = 1;
+            if (inputScale.Text == "")
+            {
+                autoScale = scaleService.GetAIScale(newTankData);
+                inputScale.Text = autoScale.ToString();
+            }
+            else
+            {
+                autoScale = Convert.ToDouble(inputScale.Text);
+            }
+
+
             IntergrationService newInterService = new IntergrationService("CRT", newTankData, testModel);
-            if (newInterService.CreateLogic(90, newComData))
+            if (newInterService.CreateLogic(Convert.ToDouble(autoScale), newComData))
             {
                 MessageBox.Show("완료");
             }

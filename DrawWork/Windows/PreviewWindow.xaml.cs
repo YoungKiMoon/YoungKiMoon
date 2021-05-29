@@ -35,8 +35,16 @@ namespace DrawWork.Windows
         private void btnRefresh_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             PreviewWindowViewModel selView = this.DataContext as PreviewWindowViewModel;
-            selView.previewService.CreateVectorView(selView.viewPortSet);
-            MessageBox.Show("Update");
+            try
+            {
+                selView.previewService.CreateVectorView(selView.viewPortSet);
+                MessageBox.Show("Update");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
         }
     }
 }

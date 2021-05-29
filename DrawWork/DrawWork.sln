@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaperSetting", "..\PaperSet
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawLogicLib", "..\DrawLogicLib\DrawLogicLib.csproj", "{F83ADBDC-13A0-4154-BB37-4C355E5F5643}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelAddIn", "..\ExcelAddin2\ExcelAddIn.csproj", "{3EEFD937-52DB-446A-9D5C-89701DB83392}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ExcelAddinSetup", "..\ExcelAddinSetup\ExcelAddinSetup.vdproj", "{F2081318-BDA8-40E3-8079-0D6DA3599DEA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{F83ADBDC-13A0-4154-BB37-4C355E5F5643}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F83ADBDC-13A0-4154-BB37-4C355E5F5643}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F83ADBDC-13A0-4154-BB37-4C355E5F5643}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EEFD937-52DB-446A-9D5C-89701DB83392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EEFD937-52DB-446A-9D5C-89701DB83392}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EEFD937-52DB-446A-9D5C-89701DB83392}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EEFD937-52DB-446A-9D5C-89701DB83392}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2081318-BDA8-40E3-8079-0D6DA3599DEA}.Debug|Any CPU.ActiveCfg = Debug
+		{F2081318-BDA8-40E3-8079-0D6DA3599DEA}.Debug|Any CPU.Build.0 = Debug
+		{F2081318-BDA8-40E3-8079-0D6DA3599DEA}.Release|Any CPU.ActiveCfg = Release
+		{F2081318-BDA8-40E3-8079-0D6DA3599DEA}.Release|Any CPU.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,14 +15,18 @@ using Color = System.Drawing.Color;
 using Environment = devDept.Eyeshot.Environment;
 using DrawWork.Commons;
 using DrawWork.DrawModels;
+using DrawWork.DrawStyleServices;
 
 namespace DrawWork.DrawAutomationServices
 {
     public class AutomationDimensionService
     {
+        private StyleFunctionService styleService;
+        private LayerStyleService layerService;
         public AutomationDimensionService()
         {
-
+            styleService = new StyleFunctionService();
+            layerService = new LayerStyleService();
         }
 
         public bool GetDimensionBreak(string targetLine, string referenceLine)
@@ -767,6 +771,9 @@ namespace DrawWork.DrawAutomationServices
                 {
                     foreach (ICurve targetLine in eachTargetList)
                     {
+                        string layerName = ((Entity)targetLine).LayerName;
+                        List<Entity> newEachTargetLastList = new List<Entity>();
+
                         // 1. 겹치는 점 찾기
                         Dictionary<Point3D, int> intersectPointDic = new Dictionary<Point3D, int>();
                         for (int j = 0; j < allEntityName.Count; j++)
@@ -828,14 +835,18 @@ namespace DrawWork.DrawAutomationServices
                                         // 3. 추가
                                         if (addLine)
                                         {
-                                            newEachTargetList.Add(eachICurve as Entity);
+                                            newEachTargetLastList.Add(eachICurve as Entity);
                                         }
                                     }
                                 }
                             }
+
+                            styleService.SetLayerListEntity(ref newEachTargetLastList, layerName);
+                            newEachTargetList.AddRange(newEachTargetLastList);
                         }
                         else
                         {
+                            // 겹치는 것 없으니 추가
                             newEachTargetList.Add(targetLine as Entity);
                         }
                     }

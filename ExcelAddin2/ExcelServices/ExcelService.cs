@@ -49,6 +49,7 @@ namespace ExcelAddIn.ExcelServices
             if (newSelectSheet != null)
             {
                 newSelectSheet.Select();
+                newSelectSheet.Cells[1, 1].Select();
                 Globals.ThisAddIn.ActionActiveSheet = GetActionActiveSheet(selSheetType, newSelectSheet);
             }
 
@@ -137,11 +138,11 @@ namespace ExcelAddIn.ExcelServices
                         case ROOF_TYPE.IFRT:
                         case ROOF_TYPE.EFRTSingle:
                             SetInformationWindowArea(true, false);
-                            AddInformationImage(new List<ImageModel> { new ImageModel("Roof_FRTsingleDeck", "Roof_FRTsingleDeck") });
+                            //AddInformationImage(new List<ImageModel> { new ImageModel("Roof_FRTsingleDeck", "Roof_FRTsingleDeck") });
                             break;
                         case ROOF_TYPE.EFRTDouble:
                             SetInformationWindowArea(true, false);
-                            AddInformationImage(new List<ImageModel> { new ImageModel("Roof_FRTdoubleDeck", "Roof_FRTdoubleDeck") });
+                            //AddInformationImage(new List<ImageModel> { new ImageModel("Roof_FRTdoubleDeck", "Roof_FRTdoubleDeck") });
                             break;
                     }
                     break;
@@ -164,11 +165,11 @@ namespace ExcelAddIn.ExcelServices
                         case ROOF_TYPE.IFRT:
                         case ROOF_TYPE.EFRTSingle:
                             SetInformationWindowArea(true, false);
-                            AddInformationImage(new List<ImageModel> { new ImageModel("Structure_FRTsingleDeck", "Structure_FRTsingleDeck") });
+                            //AddInformationImage(new List<ImageModel> { new ImageModel("Structure_FRTsingleDeck", "Structure_FRTsingleDeck") });
                             break;
                         case ROOF_TYPE.EFRTDouble:
                             SetInformationWindowArea(true, false);
-                            AddInformationImage(new List<ImageModel> { new ImageModel("Structure_FRTdoubleDeck", "Structure_FRTdoubleDeck") });
+                            //AddInformationImage(new List<ImageModel> { new ImageModel("Structure_FRTdoubleDeck", "Structure_FRTdoubleDeck") });
                             break;
                     }
                     break;
@@ -189,7 +190,7 @@ namespace ExcelAddIn.ExcelServices
 
             if (Target.Column == 6)
             {
-                if (Target.Row == 8)
+                if (Target.Row == 11)
                 {
                     // Name Plate
                     List<ImageModel> newImage = new List<ImageModel>();
@@ -197,17 +198,21 @@ namespace ExcelAddIn.ExcelServices
 
                     AddInformationImage(newImage);
                 }
-                else if (Target.Row == 15)
+                else if (Target.Row == 23)
                 {
                     // Earth Lug
                     AddInformationImage(new List<ImageModel> { new ImageModel("EarthLug", "Earth Lug") });
                 }
-                else if (Target.Row == 31)
+
+            }
+            else if (Target.Column == 13)
+            {
+                if (Target.Row == 11)
                 {
                     // Settlement
                     AddInformationImage(new List<ImageModel> { new ImageModel("SettlementCheckPiece", "Settlement Check Piece") });
                 }
-                else if (Target.Row == 40)
+                else if (Target.Row == 12)
                 {
                     // Scaffold Cable 
                     AddInformationImage(new List<ImageModel> { new ImageModel("ScaffoldCableSupt", "Scaffold Cable Support") });
@@ -219,42 +224,26 @@ namespace ExcelAddIn.ExcelServices
         {
             SetInformationWindowArea(true, false);
 
-            if (Target.Column == 6)
+            if (Target.Column == 14)
             {
-                if (Target.Row == 41)
+                if (Target.Row == 14)
                 {
                     // Centering position
                     List<ImageModel> newImage = new List<ImageModel>();
-                    newImage.Add(new ImageModel("Centering_int", "Internal"));
-                    newImage.Add(new ImageModel("Centering_ext", "External"));
+                    newImage.Add(new ImageModel("CRT_Centering_int", "Internal"));
+                    newImage.Add(new ImageModel("CRT_Centering_ext", "External"));
 
                     AddInformationImage(newImage);
                 }
-                else if (Target.Row == 47)
+                else if (Target.Row == 22)
                 {
                     AddInformationImage(new List<ImageModel> { new ImageModel("ShapeSteel_Angle", "Purlin Size") });
                 }
-                else if (Target.Row == 48)
-                {
-                    AddInformationImage(new List<ImageModel> { new ImageModel("ShapeSteel_Channel", "Rafter Size") });
-                }
+
             }
-            else if (Target.Column == 18)
+            else if (Target.Column == 6)
             {
-                if (Target.Row == 32)
-                {
-                    // Centering position
-                    List<ImageModel> newImage = new List<ImageModel>();
-                    newImage.Add(new ImageModel("Centering_int", "Internal"));
-                    newImage.Add(new ImageModel("Centering_ext", "External"));
-
-                    AddInformationImage(newImage);
-                }
-                else if (Target.Row == 38)
-                {
-                    AddInformationImage(new List<ImageModel> { new ImageModel("ShapeSteel_Angle", "Purlin Size") });
-                }
-                else if (Target.Row == 39)
+                if (Target.Row >=35 && Target.Row <=39)
                 {
                     AddInformationImage(new List<ImageModel> { new ImageModel("ShapeSteel_Channel", "Rafter Size") });
                 }
@@ -265,14 +254,13 @@ namespace ExcelAddIn.ExcelServices
         {
             SetInformationWindowArea(true, false);
 
-            if (Target.Column == 6)
+            if (Target.Column == 16)
             {
-                if (Target.Row == 22)
+                if (Target.Row == 6)
                 {
                     // Anchor Chair
                     List<ImageModel> newImage = new List<ImageModel>();
-                    newImage.Add(new ImageModel("Anchor_type1", "TYPE I"));
-                    newImage.Add(new ImageModel("Anchor_type2", "TYPE II"));
+                    newImage.Add(new ImageModel("AnchorChair", "TYPE I, TYPE II"));
                     AddInformationImage(newImage);
                 }
             }
@@ -282,9 +270,9 @@ namespace ExcelAddIn.ExcelServices
         {
             SetInformationWindowArea(true, false);
 
-            if (Target.Column == 18)
+            if (Target.Column == 14)
             {
-                if (Target.Row == 8)
+                if (Target.Row >=23 && Target.Row <36)
                 {
 
                     // Stiffening ring
@@ -297,7 +285,7 @@ namespace ExcelAddIn.ExcelServices
                 else if (Target.Row == 14 || Target.Row == 15 || Target.Row == 16)
                 {
                     // Angle
-                    AddInformationImage(new List<ImageModel> { new ImageModel("ShapeSteel_Angle", "Angle") });
+                    //AddInformationImage(new List<ImageModel> { new ImageModel("ShapeSteel_Angle", "Angle") });
 
                 }
             }
@@ -306,21 +294,21 @@ namespace ExcelAddIn.ExcelServices
         private static void ExcelSheetRoof_SelectionChange(Range Target)
         {
             SetInformationWindowArea(true, false);
-            if (Target.Column == 7)
+            if (Target.Column == 6)
             {
-                if (Target.Row == 16)
+                if (Target.Row == 25)
                 {
                     // Compression Ring
                     List<ImageModel> newImage = new List<ImageModel>();
                     newImage.Add(new ImageModel("compressionRing_detail_b", "Detail b"));
                     newImage.Add(new ImageModel("compressionRing_detail_d", "Detail d"));
-                    newImage.Add(new ImageModel("compressionRing_detail_e", "Detail e"));
+                    newImage.Add(new ImageModel("CompressionRing_detail_e(new)", "Detail e"));
                     newImage.Add(new ImageModel("compressionRing_detail_i", "Detail i"));
                     newImage.Add(new ImageModel("compressionRing_detail_k", "Detail k"));
 
                     AddInformationImage(newImage);
                 }
-                else if (Target.Row == 17)
+                else if (Target.Row == 28 || Target.Row == 31  || Target.Row == 34)
                 {
                     // Angle
                     SetInformationWindowArea(true, true);
@@ -422,30 +410,30 @@ namespace ExcelAddIn.ExcelServices
             Excel.Worksheet roofSheet = GetWorkSheet(EXCELSHEET_LIST.SHEET_ROOF);
             if(roofSheet != null)
             {
-                Range tempRange1 = roofSheet.Range[roofSheet.Cells[1, 3], roofSheet.Cells[1, 39]];
+                Range tempRange1 = roofSheet.Range[roofSheet.Cells[1, 1], roofSheet.Cells[1, 50]];
                 tempRange1.EntireColumn.Hidden = true;
                 Range roofViewRange = null;
 
                 switch (selRoofType)
                 {
                     case ROOF_TYPE.CRT:
-                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 3], roofSheet.Cells[1, 8]];
+                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 1], roofSheet.Cells[1, 9]];
                         roofViewRange.EntireColumn.Hidden = false;
                         break;
                     case ROOF_TYPE.DRT:
-                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 10], roofSheet.Cells[1, 16]];
+                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 11], roofSheet.Cells[1, 19]];
                         roofViewRange.EntireColumn.Hidden = false;
                         break;
                     case ROOF_TYPE.IFRT:
-                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 18], roofSheet.Cells[1, 24]];
+                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 21], roofSheet.Cells[1, 29]];
                         roofViewRange.EntireColumn.Hidden = false;
                         break;
                     case ROOF_TYPE.EFRTSingle:
-                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 26], roofSheet.Cells[1, 32]];
+                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 31], roofSheet.Cells[1, 39]];
                         roofViewRange.EntireColumn.Hidden = false;
                         break;
                     case ROOF_TYPE.EFRTDouble:
-                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 34], roofSheet.Cells[1, 39]];
+                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 41], roofSheet.Cells[1, 49]];
                         roofViewRange.EntireColumn.Hidden = false;
                         break;
                 }
@@ -455,30 +443,30 @@ namespace ExcelAddIn.ExcelServices
             Excel.Worksheet structureSheet = GetWorkSheet(EXCELSHEET_LIST.SHEET_STRUCTURE);
             if (structureSheet != null)
             {
-                Range tempRange1 = structureSheet.Range[structureSheet.Cells[1, 3], structureSheet.Cells[1, 59]];
+                Range tempRange1 = structureSheet.Range[structureSheet.Cells[1, 1], structureSheet.Cells[1, 85]];
                 tempRange1.EntireColumn.Hidden = true;
                 Range structureViewRange = null;
 
                 switch (selRoofType)
                 {
                     case ROOF_TYPE.CRT:
-                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 3], structureSheet.Cells[1, 13]];
+                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 1], structureSheet.Cells[1, 16]];
                         structureViewRange.EntireColumn.Hidden = false;
                         break;
                     case ROOF_TYPE.DRT:
-                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 15], structureSheet.Cells[1, 25]];
+                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 18], structureSheet.Cells[1, 33]];
                         structureViewRange.EntireColumn.Hidden = false;
                         break;
                     case ROOF_TYPE.IFRT:
-                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 27], structureSheet.Cells[1, 37]];
+                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 35], structureSheet.Cells[1, 50]];
                         structureViewRange.EntireColumn.Hidden = false;
                         break;
                     case ROOF_TYPE.EFRTSingle:
-                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 39], structureSheet.Cells[1, 48]];
+                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 52], structureSheet.Cells[1, 67]];
                         structureViewRange.EntireColumn.Hidden = false;
                         break;
                     case ROOF_TYPE.EFRTDouble:
-                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 50], structureSheet.Cells[1, 59]];
+                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 69], structureSheet.Cells[1, 85]];
                         structureViewRange.EntireColumn.Hidden = false;
                         break;
                 }
@@ -508,7 +496,7 @@ namespace ExcelAddIn.ExcelServices
                         break;
                 }
                 if (typeString != "")
-                    generalSheet.Cells[14, 6] = typeString;
+                    generalSheet.Cells[16, 6] = typeString;
 
             }
         }
@@ -519,7 +507,7 @@ namespace ExcelAddIn.ExcelServices
             Excel.Worksheet generalSheet = GetWorkSheet(EXCELSHEET_LIST.SHEET_GENERAL);
             if (generalSheet != null)
             {
-                string typeString = generalSheet.Cells[14, 6].Value;
+                string typeString = generalSheet.Cells[16, 6].Value;
                 switch (typeString)
                 {
                     case "CRT":

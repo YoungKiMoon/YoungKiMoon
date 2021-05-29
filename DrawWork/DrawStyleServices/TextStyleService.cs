@@ -24,7 +24,10 @@ namespace DrawWork.DrawStyleServices
         }
         public TextStyle GetStyle(string styleName, string fontFamilyName, double widthFactor=1)
         {
-            TextStyle newTextStyle = new TextStyle(styleName, fontFamilyName,System.Drawing.FontStyle.Regular, widthFactor);
+            TextStyle newTextStyle = new TextStyle(styleName, "romans",System.Drawing.FontStyle.Regular, widthFactor);
+            //TextStyle newTextStyle = new TextStyle(styleName, "", System.Drawing.FontStyle.Regular, widthFactor);
+            newTextStyle.FileName = fontFamilyName;
+
             //newTextStyle.Name = styleName;
             //newTextStyle.WidthFactor = widthFactor;
             return newTextStyle;

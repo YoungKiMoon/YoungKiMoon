@@ -159,6 +159,10 @@ namespace DrawWork.CommandServices
             CDPoint refPoint = drawPoint.referencePoint;
             CDPoint curPoint = drawPoint.currentPoint;
 
+            // ReferencePoint -> SingletonData
+            SingletonData.RefPoint = (CDPoint)refPoint.Clone();
+
+
             SetDrawPoint(drawPoint);
 
             // Create Boundary
@@ -291,8 +295,16 @@ namespace DrawWork.CommandServices
                     drawEntity.dimTextList.AddRange(newDim[CommonGlobal.DimText]);
                     drawEntity.dimlineExtList.AddRange(newDim[CommonGlobal.DimLineExt]);
                     drawEntity.dimArrowList.AddRange(newDim[CommonGlobal.DimArrow]);
-
                     goto case "allways";
+
+                case "customdim":
+                case "customdimline":
+                    Dictionary<string, List<Entity>> newCustomDim = drawObject.DoDimensionCustom(eachCmd, ref refPoint, ref curPoint,  scaleData.Value);
+                    drawEntity.dimlineList.AddRange(newCustomDim[CommonGlobal.DimLine]);
+                    drawEntity.dimTextList.AddRange(newCustomDim[CommonGlobal.DimText]);
+                    drawEntity.dimlineExtList.AddRange(newCustomDim[CommonGlobal.DimLineExt]);
+                    drawEntity.dimArrowList.AddRange(newCustomDim[CommonGlobal.DimArrow]);
+                    break;
 
                 // Import Block
                 case "block":
@@ -300,6 +312,12 @@ namespace DrawWork.CommandServices
                     BlockReference newImportBlock = drawObject.DoBlockImport(eachCmd, ref refPoint, ref curPoint);
                     if(newImportBlock !=null)
                         drawEntity.blockList.Add(newImportBlock);
+                    goto case "allways";
+
+                case "importcustomblock":
+                    List<BlockReference> newImportBlockList = drawObject.DoBlockCustomImport(eachCmd, ref refPoint, ref curPoint);
+                    if (newImportBlockList.Count>0)
+                        drawEntity.blockList.AddRange(newImportBlockList);
                     goto case "allways";
 
                 // Logic Block
@@ -329,6 +347,13 @@ namespace DrawWork.CommandServices
                     drawEntity.leaderArrowList.AddRange(newLeader[CommonGlobal.LeaderArrow]);
                     goto case "allways";
 
+                case "leaderlist":
+                    Dictionary<string, List<Entity>> newLeaderList = drawObject.DoLeaderList(eachCmd, ref refPoint, ref curPoint, singleModel, scaleData.Value);
+                    drawEntity.leaderlineList.AddRange(newLeaderList[CommonGlobal.LeaderLine]);
+                    drawEntity.leaderTextList.AddRange(newLeaderList[CommonGlobal.LeaderText]);
+                    drawEntity.leaderArrowList.AddRange(newLeaderList[CommonGlobal.LeaderArrow]);
+                    goto case "allways";
+
 
                 // allways
                 case "allways":
@@ -344,6 +369,7 @@ namespace DrawWork.CommandServices
 
             }
 
+            selCmdFunction = newCmdFunction;
         }
         #endregion
     }

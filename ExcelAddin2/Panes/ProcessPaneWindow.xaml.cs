@@ -196,7 +196,7 @@ namespace ExcelAddIn.Panes
                     ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_NOZZLE);
                     break;
                 case 6:
-                    //ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_NOZZLE);
+                    ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_ACCESS);
                     break;
                 case 7:
                     ExcelService.ChangeSheet(EXCELSHEET_LIST.SHEET_APPURTENANCES);
@@ -256,28 +256,33 @@ namespace ExcelAddIn.Panes
                 case ROOF_TYPE.CRT:
                     textDesignType01.Text = "CRT";
                     textDesignType02.Visibility = Visibility.Collapsed;
+                    currentImage.Source = new BitmapImage(new Uri("/ExcelAddin;component/Resources/icon_CRT.png", UriKind.Relative));
                     break;
                 case ROOF_TYPE.DRT:
                     textDesignType01.Text = "DRT";
                     textDesignType02.Visibility = Visibility.Collapsed;
+                    currentImage.Source = new BitmapImage(new Uri("/ExcelAddin;component/Resources/icon_DRT.png", UriKind.Relative));
                     break;
                 case ROOF_TYPE.IFRT:
                     textDesignType01.Text = "IFRT";
                     textDesignType02.Visibility = Visibility.Collapsed;
+                    currentImage.Source = new BitmapImage(new Uri("/ExcelAddin;component/Resources/icon_IFRT_single_deck.png", UriKind.Relative));
                     break;
                 case ROOF_TYPE.EFRTSingle:
                     textDesignType01.Text = "EFRT";
                     textDesignType02.Text = "Single Deck";
                     textDesignType02.Visibility = Visibility.Visible;
+                    currentImage.Source = new BitmapImage(new Uri("/ExcelAddin;component/Resources/icon_EFRT_single_deck.png", UriKind.Relative));
                     break;
                 case ROOF_TYPE.EFRTDouble:
                     textDesignType01.Text = "EFRT";
                     textDesignType02.Text = "Double Deck";
                     textDesignType02.Visibility = Visibility.Visible;
+                    currentImage.Source = new BitmapImage(new Uri("/ExcelAddin;component/Resources/icon_EFRT_double_deck.png", UriKind.Relative));
                     break;
                 default:
-                    textDesignType01.Text = "TABAS";
-                    textDesignType02.Text = "Open the file";
+                    textDesignType01.Text = "TANK";
+                    textDesignType02.Text = "OPEN";
                     break;
             }
         }

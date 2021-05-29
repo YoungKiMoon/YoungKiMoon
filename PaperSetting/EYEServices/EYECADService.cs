@@ -48,5 +48,23 @@ namespace PaperSetting.EYEServices
                 //EnableImportExportButtons(false);
             }
         }
+        public void TestExport2(Model selModel, Drawings selDraw)
+        {
+            var exportFileDialog = new SaveFileDialog();
+            exportFileDialog.Filter = "CAD drawings(*.dwg)| *.dwg|" + "Drawing Exchange Format (*.dxf)|*.dxf";
+            exportFileDialog.AddExtension = true;
+            exportFileDialog.Title = "Export";
+            exportFileDialog.CheckPathExists = true;
+            var result = exportFileDialog.ShowDialog();
+            if (result == true)
+            {
+
+                var wa = new WriteAutodesk(new WriteAutodeskParams(selModel, selDraw,false,false) , exportFileDialog.FileName);
+                wa.DoWork();
+
+                //EnableImportExportButtons(false);
+            }
+
+        }
     }
 }

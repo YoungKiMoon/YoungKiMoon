@@ -104,7 +104,7 @@ namespace ExcelAddIn
             }
             else if (control.Id == "cuGroupButton05")
             {
-                return "TANK CREATE";
+                return "TANK FILE OPEN";
             }
             else if (control.Id == "cuGroupButton06")
             {
@@ -206,7 +206,11 @@ namespace ExcelAddIn
                 //Service.PaneWindowService paneService = new Service.PaneWindowService();
                 //paneService.VisiblePane(Commons.CUSTOMPANE_LIST.NotSet, false, true);
                 //ExcelServices.ExcelService.ChangeSheet(Commons.EXCELSHEET_LIST.SHEET_MAIN);
+                string workbookName=Globals.ThisAddIn.Application.ActiveWorkbook.Name;
+
                 PaperSettingWindow cc = new PaperSettingWindow();
+                cc.workbookName = workbookName;
+                cc.activeCustomWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
                 cc.ShowDialog();
 
             }

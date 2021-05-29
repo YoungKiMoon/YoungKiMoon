@@ -1,4 +1,4 @@
-﻿<Window x:Class="PaperSetting.PaperSettingWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -10,13 +10,12 @@
         
         xmlns:vm="clr-namespace:PaperSetting.ViewModel"
         
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation" x:Class="PaperSetting.PaperSettingWindow"
+        
         mc:Ignorable="d"
-        Title="TABAS" Height="600" Width="1100">
-    <Window.DataContext>
-        <vm:PaperSettingViewModel/>
-    </Window.DataContext>
+        Title="TABAS" Height="600" Width="1100" ContentRendered="Window_ContentRendered" Closing="Window_Closing">
     <Window.Resources>
-        <Style TargetType="Button" x:Key="customButton">
+        <Style TargetType="{x:Type Button}" x:Key="customButton">
             <Style.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="4"/>
@@ -26,67 +25,56 @@
                 </Style>
             </Style.Resources>
         </Style>
-    </Window.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="36"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <Border Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Background="#FFDFE9F2">
-            <StackPanel Orientation="Horizontal" >
-                <Image Source="Resources/papericon.png" Stretch="Fill" Height="16" Margin="6,0,0,0" />
-                <TextBlock Text="DRAWING LIST" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#FF3F5072" FontWeight="Bold" Padding="6,0,0,0"/>
+        <DataTemplate x:Key="BusyContentDataTemplate">
+            <StackPanel Orientation="Horizontal" DataContext="{Binding DataContext, ElementName=customBusyIndicator}">
+                <Border CornerRadius="8" Padding="10,4,10,4" Margin="20,0,20,0">
+                    <Border.Background>
+                        <SolidColorBrush Color="#FF94C1EE" Opacity="0.6" />
+                    </Border.Background>
+                    <TextBlock HorizontalAlignment="Center" TextBlock.FontWeight="Bold" TextBlock.FontSize="16" Text="{Binding BContents}" />
+                </Border>
             </StackPanel>
-        </Border>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Border CornerRadius="4" Margin="2" Padding="0,4,0,0" BorderBrush="#FF63ADBD" BorderThickness="0">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button x:Name="btnRebuild" Content="REBUILD" Style="{StaticResource customButton}" Margin="10,2,2,0" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Padding="10,0" Background="#FF90E0F1"/>
-                    <Button x:Name="btnEnvironment" Content="ENVIRONMENT" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnEnvironment_PreviewMouseLeftButtonUp"/>
-                    <Button x:Name="btnTitleBlock" Content="TITLE BLOCK" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnTitleBlock_PreviewMouseLeftButtonUp"/>
-                </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    <Window.DataContext>
+        <vm:PaperSettingViewModel/>
+    </Window.DataContext>
+    <telerik:RadBusyIndicator Name="customBusyIndicator" telerik:StyleManager.Theme="VisualStudio2019" BusyContentTemplate="{StaticResource BusyContentDataTemplate}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="36"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Background="#FFDFE9F2">
             </Border>
-            <Button x:Name="btnExport" Content="CREATE DWG" Style="{StaticResource customButton}" Padding="10,2" FontWeight="Bold"  Margin="2,8,2,2" Background="#FF09A7C9"  BorderBrush="#FF63ADBD" PreviewMouseLeftButtonUp="btnExport_PreviewMouseLeftButtonUp"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Border CornerRadius="4" Margin="2" Padding="0,4,0,0" BorderBrush="#FF63ADBD" BorderThickness="0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button x:Name="btnRebuild" Content="REBUILD" Style="{StaticResource customButton}" Margin="10,2,2,0" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Padding="10,0" Background="#FF90E0F1"/>
+                        <Button x:Name="btnBlock" Content="BLOCK LOAD" Style="{StaticResource customButton}" Margin="10,2,2,0"  Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnBlock_PreviewMouseLeftButtonUp"/>
+                        <Button x:Name="btnEnvironment" Content="ENVIRONMENT" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnEnvironment_PreviewMouseLeftButtonUp"/>
+                        <Button x:Name="btnTitleBlock" Content="TITLE BLOCK" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnTitleBlock_PreviewMouseLeftButtonUp"/>
+                    </StackPanel>
+                </Border>
+                <Button x:Name="btnExport" Content="CREATE DWG" Style="{StaticResource customButton}" Padding="10,2" FontWeight="Bold"  Margin="2,8,2,2" Background="#FF09A7C9"  BorderBrush="#FF63ADBD" PreviewMouseLeftButtonUp="btnExport_PreviewMouseLeftButtonUp"/>
 
-        </StackPanel>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="400"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-            <GridSplitter Grid.Column="1" ShowsPreview="True" Width="4" Background="#FFDFE9F2" ResizeDirection="Columns" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Cursor="SizeWE"/>
+            </StackPanel>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="400"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <GridSplitter Grid.Column="1" ShowsPreview="True" Width="4" Background="#FFDFE9F2" ResizeDirection="Columns" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Cursor="SizeWE"/>
 
-            <!--#region Paper List-->
-            <Grid>
+                <!--#region Paper List-->
+                <Grid>
 
-                <DataGrid x:Name="dataPaperList" Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
-                      ItemsSource="{Binding PaperList}" SelectedItem="{Binding PaperListSelection,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                    <DataGrid x:Name="dataPaperList" Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                      ItemsSource="{Binding PaperList}" SelectedItem="{Binding PaperListSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       HorizontalScrollBarVisibility="Visible"
                       VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24" CanUserDeleteRows="False" CanUserResizeRows="False" SelectionChanged="DataGrid_SelectionChanged">
-                    <DataGrid.Columns>
-                        <DataGridCheckBoxColumn Binding="{Binding Basic.View}">
-                            <DataGridCheckBoxColumn.ElementStyle>
-                                <Style>
-                                    <Setter Property="FrameworkElement.Margin" Value="0,1,0,0" />
-                                    <Setter Property="FrameworkElement.HorizontalAlignment" Value="Center" />
-                                </Style>
-                            </DataGridCheckBoxColumn.ElementStyle>
-                            <DataGridCheckBoxColumn.Header>
-                                <CheckBox Name="customGridCheck" Click="CheckBox_Click" IsChecked="True" ></CheckBox>
-                            </DataGridCheckBoxColumn.Header>
-                        </DataGridCheckBoxColumn>
-
-                        <DataGridTextColumn Header="No" Width="30" Binding="{Binding Basic.No}"/>
-                        <DataGridTextColumn Header="TITLE" Width="100" Binding="{Binding Basic.Title}"/>
-                        <DataGridTextColumn Header="DWG. No." Width="200" Binding="{Binding Basic.DwgNo}"/>
-                        <DataGridTextColumn Header="STAMP" Width="100" Binding="{Binding Basic.StampName}"/>
-                        <DataGridTextColumn Header="R" Binding="{Binding Revisions.Count}"/>
-                        <DataGridTextColumn Header="V" Binding="{Binding ViewPorts.Count}"/>
-                        <DataGridTextColumn Header="T" Binding="{Binding Tables.Count}"/>
-                        <DataGridTextColumn Header="N" Binding="{Binding Notes.Count}"/>
-                    </DataGrid.Columns>
-                    <!--
+                        <!--
                 <DataGrid.Resources>
                     <Style TargetType="TextBlock">
                         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
@@ -94,296 +82,319 @@
                     </Style>
                 </DataGrid.Resources>
                 -->
-                    <DataGrid.Resources>
-                        <Style TargetType="DataGridRow">
-                            <Style.Resources>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF0078D7"/>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FF0078D7"/>
-                                
-                                <!-- 4.0 later
+                        <DataGrid.Resources>
+                            <Style TargetType="{x:Type DataGridRow}">
+                                <Style.Resources>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF0078D7"/>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FF0078D7"/>
+
+                                    <!-- 4.0 later
                                 <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="White"/>
                             <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Blue"/>
                             -->
-                            </Style.Resources>
-                        </Style>
-                    </DataGrid.Resources>
-                    <DataGrid.CellStyle>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="Padding" Value="2,2,0,0"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                        <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </DataGrid.CellStyle>
-                </DataGrid>
-            </Grid>
-            <!--#endregion-->
+                                </Style.Resources>
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Binding="{Binding Basic.View}">
+                                <DataGridCheckBoxColumn.ElementStyle>
+                                    <Style>
+                                        <Setter Property="FrameworkElement.Margin" Value="0,1,0,0" />
+                                        <Setter Property="FrameworkElement.HorizontalAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridCheckBoxColumn.ElementStyle>
+                                <DataGridCheckBoxColumn.Header>
+                                    <CheckBox x:Name="customGridCheck" Click="CheckBox_Click" IsChecked="True" />
+                                </DataGridCheckBoxColumn.Header>
+                            </DataGridCheckBoxColumn>
 
-            <!--#region Paper Detail List-->
-            <Border Grid.Row="0" Grid.Column="2"   Background="#FFDFE9F2"/>
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="24"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
+                            <DataGridTextColumn Header="No" Width="30" Binding="{Binding Basic.No}"/>
+                            <DataGridTextColumn Header="TITLE" Width="100" Binding="{Binding Basic.Title}"/>
+                            <DataGridTextColumn Header="DWG. No." Width="200" Binding="{Binding Basic.DwgNo}"/>
+                            <DataGridTextColumn Header="STAMP" Width="100" Binding="{Binding Basic.StampName}"/>
+                            <DataGridTextColumn Header="R" Binding="{Binding Revisions.Count}"/>
+                            <DataGridTextColumn Header="V" Binding="{Binding ViewPorts.Count}"/>
+                            <DataGridTextColumn Header="T" Binding="{Binding Tables.Count}"/>
+                            <DataGridTextColumn Header="N" Binding="{Binding Notes.Count}"/>
+                        </DataGrid.Columns>
+                        <DataGrid.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}">
+                                <Setter Property="Padding" Value="2,2,0,0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                            <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGrid.CellStyle>
+                    </DataGrid>
+                </Grid>
+                <!--#endregion-->
 
-                <DataGrid Grid.Row="0" Padding="0,0,0,0" HeadersVisibility="None" IsEnabled="False" IsReadOnly="True" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF28B0DF" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                <!--#region Paper Detail List-->
+                <Border Grid.Row="0" Grid.Column="2"   Background="#FFDFE9F2"/>
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="24"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <DataGrid Grid.Row="0" Padding="0,0,0,0" HeadersVisibility="None" IsEnabled="False" IsReadOnly="True" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF28B0DF" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
                       ItemsSource="{Binding PaperListSelectionColl}" 
                       VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" RowHeight="24" Background="#FFDFE9F2" HorizontalScrollBarVisibility="Hidden">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="No" Width="30" Binding="{Binding Basic.No}"/>
-                        <DataGridTextColumn Header="TITLE" Width="200" Binding="{Binding Basic.Title}"/>
-                        <DataGridTextColumn Header="DWG. No." Width="200" Binding="{Binding Basic.DwgNo}"/>
-                        <DataGridTextColumn Header="STAMP" Width="100" Binding="{Binding Basic.StampName}"/>
-                        <DataGridTextColumn Header="R" Binding="{Binding Revisions.Count}"/>
-                        <DataGridTextColumn Header="V" Binding="{Binding ViewPorts.Count}"/>
-                        <DataGridTextColumn Header="T" Binding="{Binding Tables.Count}"/>
-                        <DataGridTextColumn Header="N" Binding="{Binding Notes.Count}"/>
-                    </DataGrid.Columns>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="No" Width="30" Binding="{Binding Basic.No}"/>
+                            <DataGridTextColumn Header="TITLE" Width="200" Binding="{Binding Basic.Title}"/>
+                            <DataGridTextColumn Header="DWG. No." Width="200" Binding="{Binding Basic.DwgNo}"/>
+                            <DataGridTextColumn Header="STAMP" Width="100" Binding="{Binding Basic.StampName}"/>
+                            <DataGridTextColumn Header="R" Binding="{Binding Revisions.Count}"/>
+                            <DataGridTextColumn Header="V" Binding="{Binding ViewPorts.Count}"/>
+                            <DataGridTextColumn Header="T" Binding="{Binding Tables.Count}"/>
+                            <DataGridTextColumn Header="N" Binding="{Binding Notes.Count}"/>
+                        </DataGrid.Columns>
 
-                    <DataGrid.CellStyle>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="Padding" Value="2,2,0,0"/>
-                            <Setter Property="Foreground" Value="#FF28B0DF"/>
-                            <Setter Property="FontWeight" Value="Bold"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                        <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </DataGrid.CellStyle>
-                </DataGrid>
+                        <DataGrid.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}">
+                                <Setter Property="Padding" Value="2,2,0,0"/>
+                                <Setter Property="Foreground" Value="#FF28B0DF"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                            <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGrid.CellStyle>
+                    </DataGrid>
 
-                <TabControl x:Name="tabDetail" Grid.Row="1" BorderThickness="0" Padding="0" SelectionChanged="TabControl_SelectionChanged" >
-                    <TabControl.Resources>
-                        <Style TargetType="TabItem">
-                            <Setter Property="Padding" Value="4"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="TabItem">
-                                        <Border Name="Border" BorderBrush="#FFC3C3C3" CornerRadius="12,12,0,0" Margin="2,2,2,0" Background="#FFCECED6" BorderThickness="0" Height="22" Cursor="Hand">
-                                            <TextBlock  x:Name="TabItemContent"
+                    <TabControl x:Name="tabDetail" Grid.Row="1" BorderThickness="0" Padding="0" SelectionChanged="TabControl_SelectionChanged"   >
+                        <TabControl.Resources>
+                            <Style TargetType="{x:Type TabItem}">
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type TabItem}">
+                                            <Border x:Name="Border" BorderBrush="#FFC3C3C3" CornerRadius="12,12,0,0" Margin="2,2,2,0" Background="#FFCECED6" BorderThickness="0" Height="22" Cursor="Hand">
+                                                <TextBlock  x:Name="TabItemContent"
                                                         Text="{TemplateBinding Header}"
                                                         FontSize="13" FontWeight="Bold" 
                                                         Foreground="White"
                                                         VerticalAlignment="Center"
                                                         HorizontalAlignment="Center"
                                                         Margin="10,2"/>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="Border" Property="Background" Value="#28b0df" />
-                                                <Setter TargetName="TabItemContent" Property="Foreground" Value="#FFFFFF"/>
-                                            </Trigger>
-                                            <Trigger Property="IsSelected" Value="False">
-                                                <Setter TargetName="Border" Property="Background" Value="#89d4ed" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </TabControl.Resources>
-                    <TabItem Header="REVISION" MinWidth="100" BorderThickness="0" >
-                        <Grid>
-                            <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="True" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="Border" Property="Background" Value="#28b0df" />
+                                                    <Setter TargetName="TabItemContent" Property="Foreground" Value="#FFFFFF"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="False">
+                                                    <Setter TargetName="Border" Property="Background" Value="#89d4ed" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TabControl.Resources>
+                        <TabItem Header="REVISION" MinWidth="100" BorderThickness="0" >
+                            <Grid>
+                                <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="True" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
                       ItemsSource="{Binding PaperListSelection.Revisions}" HorizontalScrollBarVisibility="Visible"
                       VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="REV" Width="100" Binding="{Binding RevString }"/>
-                                    <DataGridTextColumn Header="DESCRIPTION" Width="100" Binding="{Binding Description}"/>
-                                    <DataGridTextColumn Header="DATE" Width="100" Binding="{Binding DateString}"/>
-                                    <DataGridTextColumn Header="DRWN" Width="100" Binding="{Binding DRWN}"/>
-                                    <DataGridTextColumn Header="CHKD" Width="100" Binding="{Binding CHKD}"/>
-                                    <DataGridTextColumn Header="REVD" Width="100" Binding="{Binding REVD}"/>
-                                    <DataGridTextColumn Header="APVD" Width="100" Binding="{Binding APVD}"/>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="REV" Width="100" Binding="{Binding RevString}"/>
+                                        <DataGridTextColumn Header="DESCRIPTION" Width="100" Binding="{Binding Description}"/>
+                                        <DataGridTextColumn Header="DATE" Width="100" Binding="{Binding DateString}"/>
+                                        <DataGridTextColumn Header="DRWN" Width="100" Binding="{Binding DRWN}"/>
+                                        <DataGridTextColumn Header="CHKD" Width="100" Binding="{Binding CHKD}"/>
+                                        <DataGridTextColumn Header="REVD" Width="100" Binding="{Binding REVD}"/>
+                                        <DataGridTextColumn Header="APVD" Width="100" Binding="{Binding APVD}"/>
 
-                                </DataGrid.Columns>
+                                    </DataGrid.Columns>
 
-                                <DataGrid.CellStyle>
-                                    <Style TargetType="DataGridCell">
-                                        <Setter Property="Padding" Value="2,2,0,0"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                                    <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </DataGrid.CellStyle>
-                            </DataGrid>
-                        </Grid>
-                    </TabItem>
-                    <TabItem Header="VIEWPORT" MinWidth="100" BorderThickness="0" >
-                        <Grid>
-                            <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                                    <DataGrid.CellStyle>
+                                        <Style TargetType="{x:Type DataGridCell}">
+                                            <Setter Property="Padding" Value="2,2,0,0"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                        <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </DataGrid.CellStyle>
+                                </DataGrid>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="VIEWPORT" MinWidth="100" BorderThickness="0" >
+                            <Grid>
+                                <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
                       ItemsSource="{Binding PaperListSelection.ViewPorts}" HorizontalScrollBarVisibility="Visible"
                       VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="No" Width="30" Binding="{Binding No}"/>
-                                    <DataGridTextColumn Header="NAME" Width="100" Binding="{Binding Name }"/>
-                                    <DataGridTextColumn Header="ASSEMBLY" Width="100" Binding="{Binding AssemblySelection}"/>
-                                    <DataGridTextColumn Header="X" Width="50" Binding="{Binding ViewPort.Location.X}"/>
-                                    <DataGridTextColumn Header="Y" Width="50" Binding="{Binding ViewPort.Location.Y}"/>
-                                    <DataGridTextColumn Header="W" Width="50" Binding="{Binding ViewPort.Size.Width}"/>
-                                    <DataGridTextColumn Header="H" Width="50" Binding="{Binding ViewPort.Size.Height}"/>
-                                    <DataGridTextColumn Header="SCALE" Width="100" Binding="{Binding ViewPort.Scale.ValueName}"/>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="No" Width="30" Binding="{Binding No}"/>
+                                        <DataGridTextColumn Header="NAME" Width="100" Binding="{Binding Name}"/>
+                                        <DataGridTextColumn Header="ASSEMBLY" Width="100" Binding="{Binding AssemblySelection}"/>
+                                        <DataGridTextColumn Header="X" Width="50" Binding="{Binding ViewPort.Location.X}"/>
+                                        <DataGridTextColumn Header="Y" Width="50" Binding="{Binding ViewPort.Location.Y}"/>
+                                        <DataGridTextColumn Header="W" Width="50" Binding="{Binding ViewPort.Size.Width}"/>
+                                        <DataGridTextColumn Header="H" Width="50" Binding="{Binding ViewPort.Size.Height}"/>
+                                        <DataGridTextColumn Header="SCALE" Width="100" Binding="{Binding ViewPort.Scale.ValueName}"/>
 
 
-                                </DataGrid.Columns>
+                                    </DataGrid.Columns>
 
-                                <DataGrid.CellStyle>
-                                    <Style TargetType="DataGridCell">
-                                        <Setter Property="Padding" Value="2,2,0,0"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                                    <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </DataGrid.CellStyle>
-                            </DataGrid>
-                        </Grid>
-                    </TabItem>
-                    <TabItem Header="TABLE" MinWidth ="100" BorderThickness="0">
-                        <Grid>
-                            <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                                    <DataGrid.CellStyle>
+                                        <Style TargetType="{x:Type DataGridCell}">
+                                            <Setter Property="Padding" Value="2,2,0,0"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                        <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </DataGrid.CellStyle>
+                                </DataGrid>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="TABLE" MinWidth ="100" BorderThickness="0">
+                            <Grid>
+                                <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
                       ItemsSource="{Binding PaperListSelection.Tables}" HorizontalScrollBarVisibility="Visible"
                       VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="No" Width="30" Binding="{Binding No}"/>
-                                    <DataGridTextColumn Header="NAME" Width="100" Binding="{Binding Name }"/>
-                                    <DataGridTextColumn Header="TABLE" Width="100" Binding="{Binding TableSelection}"/>
-                                    <DataGridTextColumn Header="X" Width="50" Binding="{Binding Location.X}"/>
-                                    <DataGridTextColumn Header="Y" Width="50" Binding="{Binding Location.Y}"/>
-                                    <DataGridTextColumn Header="W" Width="50" Binding="{Binding Size.Width}"/>
-                                    <DataGridTextColumn Header="H" Width="50" Binding="{Binding Size.Height}"/>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="No" Width="30" Binding="{Binding No}"/>
+                                        <DataGridTextColumn Header="NAME" Width="100" Binding="{Binding Name}"/>
+                                        <DataGridTextColumn Header="TABLE" Width="100" Binding="{Binding TableSelection}"/>
+                                        <DataGridTextColumn Header="X" Width="50" Binding="{Binding Location.X}"/>
+                                        <DataGridTextColumn Header="Y" Width="50" Binding="{Binding Location.Y}"/>
+                                        <DataGridTextColumn Header="W" Width="50" Binding="{Binding Size.Width}"/>
+                                        <DataGridTextColumn Header="H" Width="50" Binding="{Binding Size.Height}"/>
 
 
 
-                                </DataGrid.Columns>
+                                    </DataGrid.Columns>
 
-                                <DataGrid.CellStyle>
-                                    <Style TargetType="DataGridCell">
-                                        <Setter Property="Padding" Value="2,2,0,0"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                                    <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </DataGrid.CellStyle>
-                            </DataGrid>
-                        </Grid>
-                    </TabItem>
-                    <TabItem Header="NOTE" MinWidth="100" BorderThickness="0" >
-                        <Grid>
-                            <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                                    <DataGrid.CellStyle>
+                                        <Style TargetType="{x:Type DataGridCell}">
+                                            <Setter Property="Padding" Value="2,2,0,0"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                        <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </DataGrid.CellStyle>
+                                </DataGrid>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="NOTE" MinWidth="100" BorderThickness="0" >
+                            <Grid>
+                                <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
                       ItemsSource="{Binding PaperListSelection.Notes}" HorizontalScrollBarVisibility="Visible"
                       VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="No" Width="30" Binding="{Binding No}"/>
-                                    <DataGridTextColumn Header="NAME" Width="100" Binding="{Binding Name }"/>
-                                    <DataGridTextColumn Header="TABLE" Width="100" Binding="{Binding TableSelection}"/>
-                                    <DataGridTextColumn Header="X" Width="50" Binding="{Binding Location.X}"/>
-                                    <DataGridTextColumn Header="Y" Width="50" Binding="{Binding Location.Y}"/>
-                                    <DataGridTextColumn Header="W" Width="50" Binding="{Binding Size.Width}"/>
-                                    <DataGridTextColumn Header="H" Width="50" Binding="{Binding Size.Height}"/>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="No" Width="30" Binding="{Binding No}"/>
+                                        <DataGridTextColumn Header="NAME" Width="100" Binding="{Binding Name}"/>
+                                        <DataGridTextColumn Header="TABLE" Width="100" Binding="{Binding TableSelection}"/>
+                                        <DataGridTextColumn Header="X" Width="50" Binding="{Binding Location.X}"/>
+                                        <DataGridTextColumn Header="Y" Width="50" Binding="{Binding Location.Y}"/>
+                                        <DataGridTextColumn Header="W" Width="50" Binding="{Binding Size.Width}"/>
+                                        <DataGridTextColumn Header="H" Width="50" Binding="{Binding Size.Height}"/>
 
 
 
-                                </DataGrid.Columns>
+                                    </DataGrid.Columns>
 
-                                <DataGrid.CellStyle>
-                                    <Style TargetType="DataGridCell">
-                                        <Setter Property="Padding" Value="2,2,0,0"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                                    <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </DataGrid.CellStyle>
-                            </DataGrid>
-                        </Grid>
-                    </TabItem>
-                    <TabItem Header="*PREVIEW*" MinWidth="100" BorderThickness="0" >
-                        <ddes:Drawings x:Name="testDraw"></ddes:Drawings>
-                    </TabItem>
-                    <TabItem Header="*TEMPMODEL*" MinWidth="100" BorderThickness="0" >
-                        <ddes:Model x:Name="testModel">
-                            <ddes:Model.ProgressBar>
-                                <ddes:ProgressBar Lighting="False"/>
-                            </ddes:Model.ProgressBar>
-                            <ddes:Model.Viewports>
-                                <ddes:Viewport DisplayMode="Wireframe" InitialView="Other">
-                                    <ddes:Viewport.Background>
-                                        <ddgr:BackgroundSettings BottomColor="#FF00BFFF" StyleMode="Solid" TopColor="#FFDCDCDC"/>
-                                    </ddes:Viewport.Background>
-                                    <ddes:Viewport.CoordinateSystemIcon>
-                                        <ddes:CoordinateSystemIcon Lighting="False"/>
-                                    </ddes:Viewport.CoordinateSystemIcon>
-                                    <ddes:Viewport.Camera>
-                                        <ddes:Camera Distance="97.257904648780823" ProjectionMode="Orthographic" Rotation="0.5, 0.5, 0.5, 0.5" Target="0, 2, 47" ZoomFactor="0.23763337665493928"/>
-                                    </ddes:Viewport.Camera>
-                                    <ddes:Viewport.Grids>
-                                        <ddes:Grid Lighting="False" Visible="False"/>
-                                    </ddes:Viewport.Grids>
-                                    <ddes:Viewport.OriginSymbols>
-                                        <ddes:OriginSymbol Lighting="False"/>
-                                    </ddes:Viewport.OriginSymbols>
-                                    <ddes:Viewport.Rotate>
-                                        <ddes:RotateSettings Enabled="False"/>
-                                    </ddes:Viewport.Rotate>
-                                    <ddes:Viewport.ToolBars>
-                                        <ddes:ToolBar>
-                                            <ddes:ToolBar.Buttons>
-                                                <ddes:MagnifyingGlassToolBarButton/>
-                                                <ddes:ZoomWindowToolBarButton/>
-                                                <ddes:ZoomToolBarButton/>
-                                                <ddes:PanToolBarButton/>
-                                                <ddes:ZoomFitToolBarButton/>
-                                            </ddes:ToolBar.Buttons>
-                                        </ddes:ToolBar>
-                                    </ddes:Viewport.ToolBars>
-                                    <ddes:Viewport.ViewCubeIcon>
-                                        <ddes:ViewCubeIcon Lighting="False" Visible="False"/>
-                                    </ddes:Viewport.ViewCubeIcon>
-                                </ddes:Viewport>
-                            </ddes:Model.Viewports>
-                        </ddes:Model>
-                    </TabItem>
-                </TabControl>
+                                    <DataGrid.CellStyle>
+                                        <Style TargetType="{x:Type DataGridCell}">
+                                            <Setter Property="Padding" Value="2,2,0,0"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                        <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </DataGrid.CellStyle>
+                                </DataGrid>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="*PREVIEW*" MinWidth="100" BorderThickness="0" >
+                            <ddes:Drawings x:Name="testDraw"/>
+                        </TabItem>
+                        <TabItem x:Name="viewview" Header="*TEMPMODEL*" MinWidth="100" BorderThickness="0" >
+                            <ddes:Model x:Name="testModel" WorkCompleted="testModel_WorkCompleted">
+                                <ddes:Model.ProgressBar>
+                                    <ddes:ProgressBar Lighting="False"/>
+                                </ddes:Model.ProgressBar>
+                                <ddes:Model.Viewports>
+                                    <ddes:Viewport DisplayMode="Wireframe" InitialView="Other">
+                                        <ddes:Viewport.Background>
+                                            <ddgr:BackgroundSettings BottomColor="#FF00BFFF" StyleMode="Solid" TopColor="#FFDCDCDC"/>
+                                        </ddes:Viewport.Background>
+                                        <ddes:Viewport.CoordinateSystemIcon>
+                                            <ddes:CoordinateSystemIcon Lighting="False"/>
+                                        </ddes:Viewport.CoordinateSystemIcon>
+                                        <ddes:Viewport.Camera>
+                                            <ddes:Camera Distance="97.257904648780823" ProjectionMode="Orthographic" Rotation="0.5, 0.5, 0.5, 0.5" Target="0, 2, 47" ZoomFactor="0.23763337665493928"/>
+                                        </ddes:Viewport.Camera>
+                                        <ddes:Viewport.Grids>
+                                            <ddes:Grid Lighting="False" Visible="False"/>
+                                        </ddes:Viewport.Grids>
+                                        <ddes:Viewport.OriginSymbols>
+                                            <ddes:OriginSymbol Lighting="False"/>
+                                        </ddes:Viewport.OriginSymbols>
+                                        <ddes:Viewport.Rotate>
+                                            <ddes:RotateSettings Enabled="False"/>
+                                        </ddes:Viewport.Rotate>
+                                        <ddes:Viewport.ToolBars>
+                                            <ddes:ToolBar>
+                                                <ddes:ToolBar.Buttons>
+                                                    <ddes:MagnifyingGlassToolBarButton/>
+                                                    <ddes:ZoomWindowToolBarButton/>
+                                                    <ddes:ZoomToolBarButton/>
+                                                    <ddes:PanToolBarButton/>
+                                                    <ddes:ZoomFitToolBarButton/>
+                                                </ddes:ToolBar.Buttons>
+                                            </ddes:ToolBar>
+                                        </ddes:Viewport.ToolBars>
+                                        <ddes:Viewport.ViewCubeIcon>
+                                            <ddes:ViewCubeIcon Lighting="False" Visible="False"/>
+                                        </ddes:Viewport.ViewCubeIcon>
+                                    </ddes:Viewport>
+                                </ddes:Model.Viewports>
+                            </ddes:Model>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+
+                <!--#endregion-->
             </Grid>
-
-            <!--#endregion-->
         </Grid>
-    </Grid>
+    </telerik:RadBusyIndicator>
 </Window>

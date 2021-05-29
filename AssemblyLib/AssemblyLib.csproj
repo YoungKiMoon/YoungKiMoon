@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -43,6 +44,7 @@
   <ItemGroup>
     <Compile Include="AssemblyModels\AccessInputModel.cs" />
     <Compile Include="AssemblyModels\AirFoamNozzleModel.cs" />
+    <Compile Include="AssemblyModels\AMEDataModel.cs" />
     <Compile Include="AssemblyModels\AnchorageInputModel.cs" />
     <Compile Include="AssemblyModels\AnchorBoltModel.cs" />
     <Compile Include="AssemblyModels\AnchorChairModel.cs" />
@@ -82,6 +84,7 @@
     <Compile Include="AssemblyModels\LeaderListDRTInputModel.cs" />
     <Compile Include="AssemblyModels\LeaderListEFRTInputModel.cs" />
     <Compile Include="AssemblyModels\LeaderListIFRTInputModel.cs" />
+    <Compile Include="AssemblyModels\ModelScaleModel.cs" />
     <Compile Include="AssemblyModels\NotesCRTInputModel.cs" />
     <Compile Include="AssemblyModels\NotesDRTInputModel.cs" />
     <Compile Include="AssemblyModels\NotesEFRTInputModel.cs" />

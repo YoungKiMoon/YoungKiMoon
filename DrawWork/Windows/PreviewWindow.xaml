@@ -38,6 +38,8 @@
             <TextBox Text="{Binding viewPortSet.SizeX}" Width="50" Margin="4"/>
             <TextBlock Text="Size Y" VerticalAlignment="Center"/>
             <TextBox Text="{Binding viewPortSet.SizeY}" Width="50" Margin="4"/>
+            <TextBlock Text="EA" VerticalAlignment="Center"/>
+            <TextBox Text="{Binding viewPortSet.ExtensionAmount}" Width="50" Margin="4"/>
         </StackPanel>
         <ddes:Drawings x:Name="testDraw" Grid.Row="2"/>
 

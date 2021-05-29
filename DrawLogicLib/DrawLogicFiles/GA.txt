@@ -10,36 +10,46 @@ using RoofCRTIn
 
 // Bottom
 using BottomIn
+using BottomOut
 
 // Structure
-using StructureCRTIn
-using columnCRTSideOut
-using StructureCRTGirderIn
+using StructureIn
+using columnSideOut
+using StructureGirderIn
 
 // GA Drawing Point : 도면의 좌측 하단 
 // GA는 영역 설정이 Tank의 좌측 하단
 // Reference Point 는 변경이 없을 것
 
-refpoint xy 1000,2000
+refpoint xy 10000,10000
 
 
-
-#region Tank Outline
+#region TankCenterLine
 	point xy refpointx,refpointy
-	
-	line xy1 @,@ xy2 @,@cp[pointleftshelltopadj].y
-	line xy1 @sizenominalid,@ xy2 @sizenominalid,@cp[pointleftshelltopadj].y
-	
+	logicblock name centerline  xy @,@
+
 #endregion
 
 
+#region Tank Outline
+#	point xy refpointx,refpointy
+	
+#	line xy1 @,@ xy2 @,@cp[pointleftshelltopadj].y
+#	line xy1 @sizenominalid,@ xy2 @sizenominalid,@cp[pointleftshelltopadj].y
+#	line xy1 @sizenominalid/2,@ xy2 @sizenominalid/2,@cp[pointcentertop].y 
+#endregion
 
+#region Shell
+	point xy refpointx,refpointy
+	logicblock name shell xy @,@
+	logicblock name shellrightouter xy @,@
+#endregion
 
-
-#region Top Angle
+#region TopAngle
 	point xy refpointx,refpointy
 	logicblock name topangle xy @,@
-	logicblock name topangle xy @,@ mirror right
+	logicblock name topangle xy @,@ sp @,@ mirror right
+	logicblock name topanglerightouter xy @,@
 #endregion
 
 
@@ -53,5 +63,77 @@ refpoint xy 1000,2000
 	linedgree xy1 cp[pointleftroofdown].x,cp[pointleftroofdown].y xy2 @sizenominalid/2,@ degree roofslope direction x wp start mirror right
 	line xy1 @,@ xy2 @,@roofplatethickness rotater roofslope mirror right wp end
 	linedgree xy1 @,@ xy2 cp[pointcentertopdown].x,@ degree roofslope direction x 
-	
 #endregion
+
+#region Bottom
+	point xy refpointx,refpointy
+	logicblock name bottom xy @,@
+#endregion
+
+#region InsulationRoof
+	point xy refpointx,refpointy
+	logicblock name insulationroof xy @,@
+#endregion
+
+#region InsulationShell
+	point xy refpointx,refpointy
+	logicblock name insulationshell xy @,@
+#endregion
+
+#region WindGirder
+	point xy refpointx,refpointy
+	logicblock name windgirder xy @,@
+	logicblock name windgirder xy @,@ mirror right
+	logicblock name windgirderrightouter xy @,@
+#endregion
+
+#region Structure
+	point xy refpointx,refpointy
+	logicblock name structure xy @,@
+#endregion
+
+#region Dimension
+	point xy refpointx,refpointy
+	
+	
+#region Anchorage
+	point xy refpointx,refpointy
+	logicblock name anchorange xy @,@
+#endregion	
+	
+
+#endregion
+
+#region AA : Nozzle
+	point xy refpointx,refpointy
+	nozzle  type bottom position shell nozzleposition left fontsize 160 leadercirclesize 800 multicolumn true
+#endregion
+
+
+
+
+#region ETCBlock
+	point xy refpointx,refpointy
+	importcustomblock  xy @,@
+
+#endregion
+
+#region ETCText
+	point xy refpointx,refpointy
+	logicblock name etctext  xy @,@
+
+#endregion
+
+#region CustomDimension
+	point xy refpointx,refpointy
+	customdimline  xy @,@
+
+#endregion
+
+#region Leader : Sample
+	point xy refpointx,refpointy
+	
+	leaderlist
+
+#endregion
+

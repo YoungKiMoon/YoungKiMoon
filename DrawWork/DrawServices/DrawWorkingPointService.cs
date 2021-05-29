@@ -15,6 +15,7 @@ using AssemblyLib.AssemblyModels;
 using DrawWork.DrawModels;
 using DrawWork.ValueServices;
 using DrawWork.Commons;
+using DrawWork.DrawWorkingPointSevices;
 
 namespace DrawWork.DrawServices
 {
@@ -23,11 +24,31 @@ namespace DrawWork.DrawServices
         private AssemblyModel assemblyData;
 
         private ValueService valueService;
+        private DrawEditingService editingService;
+
+
+        public  DRTWorkingPointModel DRTWorkingData
+        {
+            get 
+            {
+                if (_DRTWorkingData == null)
+                    _DRTWorkingData = GetDRTRoofData();
+                return _DRTWorkingData; 
+            }
+            set { _DRTWorkingData = value; }
+        }
+
+        private DRTWorkingPointModel _DRTWorkingData;
+
+
 
         public DrawWorkingPointService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
             valueService = new ValueService();
+            editingService = new DrawEditingService();
+
+            DRTWorkingData = null;
         }
 
         public CDPoint WorkingPoint(string selPoint, ref CDPoint refPoint, ref CDPoint curPoint)
@@ -105,23 +126,40 @@ namespace DrawWork.DrawServices
 
 
 
-                case WORKINGPOINT_TYPE.PointCenterTopUp:                // 2021-04-22 완료
-                    CDPoint topcenterpoint = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
-                    double verticalHeight2 = valueService.GetHypotenuseByWidth(roofSlope, roofThickness);
-                    WPPoint = GetSumCDPoint(topcenterpoint, 0, verticalHeight2);
+                case WORKINGPOINT_TYPE.PointCenterTopUp:                // 2021-04-22 완료 : 2021-05-28 완료
+                    switch (SingletonData.TankType)
+                    {
+                        case TANK_TYPE.CRT:
+                            CDPoint topcenterpoint = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
+                            double verticalHeight2 = valueService.GetHypotenuseByWidth(roofSlope, roofThickness);
+                            WPPoint = GetSumCDPoint(topcenterpoint, 0, verticalHeight2);
+                            break;
+                        case TANK_TYPE.DRT:
+                            WPPoint = GetSumCDPoint(DRTWorkingData.PointCenterTopUp, 0, 0);
+                            break;
+                    }
                     break;
 
-                case WORKINGPOINT_TYPE.PointCenterTopDown:              // 2021-04-22 완료
+                case WORKINGPOINT_TYPE.PointCenterTopDown:              // 2021-04-22 완료 : 2021-05-28 완료
 
-                    // top angle roof point
-                    CDPoint topAngleRoofPoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
+                    switch (SingletonData.TankType)
+                    {
+                        case TANK_TYPE.CRT:
+                            // top angle roof point
+                            CDPoint topAngleRoofPoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
 
-                    double tempWidth3 = GetDistanceX(topAngleRoofPoint.X, refPoint.X + valueService.GetDoubleValue(selSizeNominalId) / 2);
-                    double tempHeight3 = valueService.GetOppositeByWidth(roofSlope, tempWidth3);
+                            double tempWidth3 = GetDistanceX(topAngleRoofPoint.X, refPoint.X + valueService.GetDoubleValue(selSizeNominalId) / 2);
+                            double tempHeight3 = valueService.GetOppositeByWidth(roofSlope, tempWidth3);
 
-                    WPPoint = GetSumCDPoint(topAngleRoofPoint, tempWidth3, tempHeight3);
+                            WPPoint = GetSumCDPoint(topAngleRoofPoint, tempWidth3, tempHeight3);
 
+                            break;
+                        case TANK_TYPE.DRT:
+                            WPPoint = GetSumCDPoint(DRTWorkingData.PointCenterTopDown, 0, 0);
+                            break;
+                    }
                     break;
+
 
 
                 case WORKINGPOINT_TYPE.PointCenterBottomUp:             // 2021-04-22 완료 : 문제 있음
@@ -167,14 +205,22 @@ namespace DrawWork.DrawServices
 
 
                 // Point : Roof
-                case WORKINGPOINT_TYPE.PointLeftRoofUp:                 // 2021-04-22 완료
-                    CDPoint topleftpoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
-                    WPPoint = GetSumCDPoint(topleftpoint,
-                                            - valueService.GetOppositeByHypotenuse(roofSlope, roofThickness),
-                                            valueService.GetAdjacentByHypotenuse(roofSlope, roofThickness));
+                case WORKINGPOINT_TYPE.PointLeftRoofUp:                 // 2021-04-22 완료 : 2021-05-28 완료
+                    switch (SingletonData.TankType)
+                    {
+                        case TANK_TYPE.CRT:
+                            CDPoint topleftpoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
+                            WPPoint = GetSumCDPoint(topleftpoint,
+                                                    -valueService.GetOppositeByHypotenuse(roofSlope, roofThickness),
+                                                    valueService.GetAdjacentByHypotenuse(roofSlope, roofThickness));
+                            break;
+                        case TANK_TYPE.DRT:
+                            WPPoint = GetSumCDPoint(DRTWorkingData.PointLeftRoofUp,0,0);
+                            break;
+                    }
                     break;
 
-                case WORKINGPOINT_TYPE.PointLeftRoofDown:               // Entiry Point : 2021-04-22 완료
+                case WORKINGPOINT_TYPE.PointLeftRoofDown:               // Entiry Point : 2021-04-22 완료 : CRT, DRT 같음
                     WPPoint = PointTopAngleRoof(ref refPoint, ref curPoint);
                     break;
 
@@ -211,32 +257,75 @@ namespace DrawWork.DrawServices
 
                 // Adj : Roof
                 case WORKINGPOINT_TYPE.AdjCenterRoofUp:                 // 2021-04-22 완료
-                    CDPoint tempCenterRoofPoint2 = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref curPoint);
-                    double tempRightRoofHeight2 = valueService.GetOppositeByWidth(roofSlope, selPointValue);
 
-                    WPPoint = GetSumCDPoint(tempCenterRoofPoint2, -selPointValue, -tempRightRoofHeight2);
+
+                    switch (SingletonData.TankType)
+                    {
+                        case TANK_TYPE.CRT:
+                            CDPoint tempCenterRoofPoint2 = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref curPoint);
+                            double tempRightRoofHeight2 = valueService.GetOppositeByWidth(roofSlope, selPointValue);
+
+                            WPPoint = GetSumCDPoint(tempCenterRoofPoint2, -selPointValue, -tempRightRoofHeight2);
+                            break;
+
+                        case TANK_TYPE.DRT:
+                            WPPoint = GetSumCDPoint(GetDRTRoofPoint(DRTWorkingData.circleRoofUpper, selPointValue), 0, 0);
+                            break;
+                    }
                     break;
-                    
+
                 case WORKINGPOINT_TYPE.AdjCenterRoofDown:               // 2021-04-22 완료
-                    CDPoint tempCenterRoofPoint = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
-                    double tempLeftRoofHeight = valueService.GetOppositeByWidth(roofSlope, selPointValue);
 
-                    WPPoint = GetSumCDPoint(tempCenterRoofPoint, -selPointValue, -tempLeftRoofHeight);
+                    switch (SingletonData.TankType)
+                    {
+                        case TANK_TYPE.CRT:
+                            CDPoint tempCenterRoofPoint = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
+                            double tempLeftRoofHeight = valueService.GetOppositeByWidth(roofSlope, selPointValue);
+
+                            WPPoint = GetSumCDPoint(tempCenterRoofPoint, -selPointValue, -tempLeftRoofHeight);
+                            break;
+
+                        case TANK_TYPE.DRT:
+                            WPPoint = GetSumCDPoint(GetDRTRoofPoint(DRTWorkingData.circleRoofLower, selPointValue), 0, 0);
+                            break;
+                    }
                     break;
+
 
                 case WORKINGPOINT_TYPE.AdjLeftRoofUp:                   // 2021-04-22 완료
                     double tempTankWidthHalf2 = valueService.GetDoubleValue(selSizeNominalId) / 2 - selPointValue;
-                    CDPoint tempCenterRoofPoint4 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, tempTankWidthHalf2.ToString(), ref refPoint, ref curPoint);
+                    switch (SingletonData.TankType)
+                    {
+                        case TANK_TYPE.CRT:
+                            CDPoint tempCenterRoofPoint4 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, tempTankWidthHalf2.ToString(), ref refPoint, ref curPoint);
 
-                    WPPoint = GetSumCDPoint(tempCenterRoofPoint4, 0, 0);
+                            WPPoint = GetSumCDPoint(tempCenterRoofPoint4, 0, 0);
+                            break;
+
+                        case TANK_TYPE.DRT:
+                            WPPoint = GetSumCDPoint(GetDRTRoofPoint(DRTWorkingData.circleRoofUpper, tempTankWidthHalf2), 0, 0);
+                            break;
+                    }
                     break;
+
 
                 case WORKINGPOINT_TYPE.AdjLeftRoofDown:                 // 2021-04-22 완료
-                    double tempTankWidthHalf=  valueService.GetDoubleValue(selSizeNominalId) / 2 - selPointValue;
-                    CDPoint tempCenterRoofPoint3 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, tempTankWidthHalf.ToString(), ref refPoint, ref curPoint);
 
-                    WPPoint = GetSumCDPoint(tempCenterRoofPoint3, 0, 0);
+                    double tempTankWidthHalf = valueService.GetDoubleValue(selSizeNominalId) / 2 - selPointValue;
+                    switch (SingletonData.TankType)
+                    {
+                        case TANK_TYPE.CRT:
+                            CDPoint tempCenterRoofPoint3 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, tempTankWidthHalf.ToString(), ref refPoint, ref curPoint);
+
+                            WPPoint = GetSumCDPoint(tempCenterRoofPoint3, 0, 0);
+                            break;
+
+                        case TANK_TYPE.DRT:
+                            WPPoint = GetSumCDPoint(GetDRTRoofPoint(DRTWorkingData.circleRoofLower, tempTankWidthHalf), 0, 0);
+                            break;
+                    }
                     break;
+
 
 
                 // Adj : Bottom
@@ -332,6 +421,7 @@ namespace DrawWork.DrawServices
                     newPoint= PointTopAngleRoof_CRT(ref refPoint, ref curPoint); 
                     break;
                 case TANK_TYPE.DRT:
+                    newPoint = PointTopAngleRoof_DRT(ref refPoint, ref curPoint); // 같음
                     break;
                 case TANK_TYPE.IFRT:
                     break;
@@ -358,7 +448,7 @@ namespace DrawWork.DrawServices
             // Max course count
             int maxCourse = assemblyData.ShellOutput.Count - 1;
 
-            switch (assemblyData.RoofCRTInput[0].CompressionRingType)
+            switch (assemblyData.RoofCompressionRing[0].CompressionRingType)
             {
                 case "Detail b":
                     // Point
@@ -417,13 +507,104 @@ namespace DrawWork.DrawServices
                     break;
 
                 case "Detail k":
-                    double t1Width = (valueService.GetDoubleValue(assemblyData.RoofCRTInput[firstIndex].DetailKShellThickness)
-                                      -valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness)
-                                     )/2;
+                    double maxCourseThk = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness);
+                    double maxCourseBeforeThk = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse - 1].Thickness);
+                    double t1Width = 0;
+                    if(maxCourseThk> maxCourseBeforeThk)
+                        t1Width = (maxCourseThk - maxCourseBeforeThk) / 2;
                     newPoint = GetSumCDPoint(refPoint,
                                              + t1Width,
 
                                              + valueService.GetDoubleValue(selSizeTankHeight)
+);
+                    break;
+
+            }
+
+            return newPoint;
+        }
+        private CDPoint PointTopAngleRoof_DRT(ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            int firstIndex = 0;
+
+            string selSizeTankHeight = assemblyData.GeneralDesignData[firstIndex].SizeTankHeight;
+            //string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalId;
+
+            CDPoint newPoint = new CDPoint();
+            // Angle Model
+            AngleSizeModel eachAngle = new AngleSizeModel();
+            if (assemblyData.RoofAngleOutput.Count > 0)
+                eachAngle = assemblyData.RoofAngleOutput[0];
+            // Max course count
+            int maxCourse = assemblyData.ShellOutput.Count - 1;
+
+            switch (assemblyData.RoofCompressionRing[0].CompressionRingType)
+            {
+                case "Detail b":
+                    // Point
+                    newPoint = GetSumCDPoint(refPoint,
+                                             -valueService.GetDoubleValue(eachAngle.E)
+                                             - valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness),
+
+                                             +valueService.GetDoubleValue(selSizeTankHeight));
+
+                    break;
+
+                case "Detail d":
+                    // Point
+                    newPoint = GetSumCDPoint(refPoint,
+                                             -valueService.GetDoubleValue(eachAngle.E),
+
+                                             +valueService.GetDoubleValue(selSizeTankHeight));
+
+
+                    break;
+
+                case "Detail e":
+                    // Point
+                    newPoint = GetSumCDPoint(refPoint,
+                                             +valueService.GetDoubleValue(eachAngle.E)
+                                             - valueService.GetDoubleValue(eachAngle.t),
+
+                                             +valueService.GetDoubleValue(selSizeTankHeight));
+
+
+                    break;
+
+                case "Detail i":
+                    // Roof Slope
+                    //string roofSlopeString = assemblyData.RoofCRTInput[firstIndex].RoofSlope;
+                    //double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
+
+                    //double A = valueService.GetDoubleValue(assemblyData.RoofCRTInput[firstIndex].DetailIOutsideProjection);
+                    //double B = valueService.GetDoubleValue(assemblyData.RoofCRTInput[firstIndex].DetailIWidth);
+                    //double C = valueService.GetDoubleValue(assemblyData.RoofCRTInput[firstIndex].DetailIOverlap);
+                    //double t1 = valueService.GetDoubleValue(assemblyData.RoofCRTInput[firstIndex].DetailIThickness);
+
+                    //double insideX = valueService.GetAdjacentByHypotenuse(roofSlopeDegree, B - A - C);
+                    //double insideY = valueService.GetOppositeByHypotenuse(roofSlopeDegree, B - A - C);
+                    //double thicknessY = valueService.GetAdjacentByHypotenuse(roofSlopeDegree, t1);
+                    //double thickneesX = valueService.GetOppositeByHypotenuse(roofSlopeDegree, t1);
+
+                    //double shellMaxCourseThickness = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness);
+                    //double shellHeight = +valueService.GetDoubleValue(selSizeTankHeight);
+                    //Line newSlopeLine=new Line(GetSumPoint(refPoint, -shellMaxCourseThickness, shellHeight), GetSumPoint(refPoint, -shellMaxCourseThickness, shellHeight) +(DRTWorkingData.CompressionRingDirection*(B-A)));
+
+                    // 계산 못함 그대로 가져와야 함.
+                    newPoint = GetSumCDPoint(DRTWorkingData.PointLeftRoofDown, 0, 0);
+
+                    break;
+
+                case "Detail k":
+                    double maxCourseThk = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness);
+                    double maxCourseBeforeThk = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse - 1].Thickness);
+                    double t1Width = 0;
+                    if (maxCourseThk > maxCourseBeforeThk)
+                        t1Width = (maxCourseThk - maxCourseBeforeThk) / 2;
+                    newPoint = GetSumCDPoint(refPoint,
+                                             +t1Width,
+
+                                             +valueService.GetDoubleValue(selSizeTankHeight)
 );
                     break;
 
@@ -441,6 +622,7 @@ namespace DrawWork.DrawServices
                     newPoint = PointTopAngleShell_CRT(ref refPoint, ref curPoint);
                     break;
                 case TANK_TYPE.DRT:
+                    newPoint = PointTopAngleShell_CRT(ref refPoint, ref curPoint);
                     break;
                 case TANK_TYPE.IFRT:
                     break;
@@ -468,7 +650,7 @@ namespace DrawWork.DrawServices
             // Max course count
             int maxCourse = assemblyData.ShellOutput.Count - 1;
 
-            switch (assemblyData.RoofCRTInput[0].CompressionRingType)
+            switch (assemblyData.RoofCompressionRing[0].CompressionRingType)
             {
                 case "Detail b":
 
@@ -499,10 +681,14 @@ namespace DrawWork.DrawServices
 
                     break;
                 case "Detail k":
+                    double maxCourseThk = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness);
                     newPoint = GetSumCDPoint(refPoint,
                                                    0,
-                                                   + valueService.GetDoubleValue(selSizeTankHeight)
-                                                   - valueService.GetDoubleValue(assemblyData.RoofCRTInput[firstIndex].DetailKShellWidth));
+                                                   + valueService.GetDoubleValue(selSizeTankHeight));
+                    //newPoint = GetSumCDPoint(refPoint,
+                    //                               0,
+                    //                               +valueService.GetDoubleValue(selSizeTankHeight)
+                    //                               - valueService.GetDoubleValue(assemblyData.RoofCRTInput[firstIndex].DetailKShellWidth));
                     break;
             }
 
@@ -570,6 +756,214 @@ namespace DrawWork.DrawServices
 
 
 
+
+        #region DRT WorkingPoint
+               
+        private DRTWorkingPointModel GetDRTRoofData()
+        {
+            // 매우 중요
+            CDPoint refPoint=SingletonData.RefPoint;
+            CDPoint curPoint = new CDPoint();
+
+
+            DRTWorkingPointModel returnValue = new DRTWorkingPointModel();
+
+            // Input Data
+            double sizeID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double roofThickness = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].RoofPlateThickness);
+
+            int maxCourse = assemblyData.ShellOutput.Count;
+            double shellMaxCourseThickness = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse - 1].Thickness);
+
+            double domeRadiusRatio = valueService.GetDoubleValue(assemblyData.RoofDRTInput[0].DomeRadiusRatio);
+            double domeRadius = domeRadiusRatio * sizeID;
+
+
+
+            CDPoint leftWoking = WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTop,ref refPoint,ref curPoint);
+            Point3D refPointLeft = GetSumPoint(leftWoking, 0, 0);
+            Point3D refPointRight = GetSumPoint(refPointLeft, sizeID, 0);
+
+            // Circle : 2
+            Circle cirLeft = new Circle(GetSumPoint(refPointLeft, 0, 0), domeRadius);
+            Circle cirRight = new Circle(GetSumPoint(refPointRight, 0, 0), domeRadius);
+            Point3D[] cirIntersectArray = cirLeft.IntersectWith(cirRight);
+
+            // Center Circle
+            Point3D currentCenterPoint = new Point3D();
+            if (cirIntersectArray != null)
+            {
+                double minValue = 9999999999;
+                foreach (Point3D eachPoint in cirIntersectArray)
+                {
+                    if (minValue > eachPoint.Y)
+                    {
+                        minValue = eachPoint.Y;
+                        currentCenterPoint = GetSumPoint(eachPoint, 0, 0);
+                    }
+                }
+            }
+            Circle cirCenter = new Circle(GetSumPoint(currentCenterPoint, 0, 0), domeRadius);
+
+
+            Point3D leftRoofDownPoint = new Point3D();
+            Point3D leftRoofDownPointNew = new Point3D();
+            if (assemblyData.RoofCompressionRing[0].CompressionRingType=="Detail i")
+            {
+
+                int firstIndex = 0;
+                double comA = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].OutsideProjectionA);
+                double comB = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].WidthB);
+                double comC = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].OverlapOfRoofAndCompRingC);
+                double comT1 = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].ThicknessT1);
+
+                // Compression Ring : Rotate
+                Line comPressRing = new Line(GetSumPoint(currentCenterPoint, 0, 0), GetSumPoint(refPointLeft, 0, 0));
+                comPressRing.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
+                // Direction
+                Vector3D direction = new Vector3D(comPressRing.EndPoint, comPressRing.StartPoint);
+                direction.Normalize();
+                // Compression Ring : New : Shift : Thickness
+                Line comPressRingNew = new Line(GetSumPoint(refPointLeft, -shellMaxCourseThickness, 0), GetSumPoint(refPointLeft, -shellMaxCourseThickness, 0));
+                comPressRingNew.EndPoint = comPressRingNew.EndPoint + direction * (comB - comA);
+                // compression Ring Upper : Offset
+                Line comPressRingNewUpper = (Line)comPressRingNew.Offset(-comT1, Vector3D.AxisZ, 0.01, true);// 위로
+
+                // compression Ring Upper Overlap Length
+                Line comPressRingNewUpperOverlapLength = new Line(GetSumPoint(comPressRingNewUpper.StartPoint, 0, 0), GetSumPoint(comPressRingNewUpper.StartPoint, 0, 0));
+                comPressRingNewUpperOverlapLength.EndPoint = comPressRingNewUpperOverlapLength.EndPoint + direction * (comB - comA - comC);
+                leftRoofDownPointNew = GetSumPoint(comPressRingNewUpperOverlapLength.EndPoint, 0, 0);
+
+                // compression Ring : Ref Point
+                Point3D comPressRingRefPoint = GetSumPoint(comPressRingNewUpper.EndPoint, 0, 0);
+
+
+                leftRoofDownPoint = GetSumPoint(comPressRingRefPoint, 0, 0);
+
+                // compression Ring : circle
+                Circle cirComPress = new Circle(GetSumPoint(comPressRingRefPoint, 0, 0), domeRadius);
+
+                // compression Ring : Ref Point : Line
+                Line centerVerticalLine = new Line(GetSumPoint(currentCenterPoint, 0, -domeRadius), GetSumPoint(currentCenterPoint, 0, domeRadius * 3));// Size ID 길이 만큼
+
+                // Intersect : CenterCircle <-> Left Line
+                double shiftVertical = 0;
+                Point3D[] leftIntersect = centerVerticalLine.IntersectWith(cirComPress);
+                if (leftIntersect != null)
+                {
+                    if (leftIntersect.Length > 0)
+                    {
+                        currentCenterPoint = leftIntersect[1];
+                    }
+
+                }
+
+                returnValue.CompressionRingDirection = direction;
+            }
+            else
+            {
+                // Left line
+                CDPoint leftAngel = PointTopAngleRoof(ref refPoint, ref curPoint);
+                leftRoofDownPoint = GetSumPoint(leftAngel, 0, 0);
+
+                Circle cirComPress = new Circle(GetSumPoint(leftRoofDownPoint, 0, 0), domeRadius);
+
+                // compression Ring : Ref Point : Line
+                Line centerVerticalLine = new Line(GetSumPoint(currentCenterPoint, 0, -domeRadius), GetSumPoint(currentCenterPoint, 0, domeRadius * 3));// Size ID 길이 만큼
+
+                // Intersect : CenterCircle <-> CenterLine
+                Point3D[] leftIntersect = centerVerticalLine.IntersectWith(cirComPress);
+                if (leftIntersect != null)
+                {
+                    if (leftIntersect.Length > 0)
+                    {
+                        currentCenterPoint = leftIntersect[1];
+                    }
+
+                }
+            }
+
+
+
+
+            // 값 세팅
+            returnValue.RoofCenterPoint = GetSumPoint(currentCenterPoint, 0, 0);
+
+            returnValue.circleRoofLower = new Circle(currentCenterPoint, domeRadius);
+            returnValue.circleRoofUpper = new Circle(currentCenterPoint, domeRadius + roofThickness);
+
+            // 겹침 라인
+            Line centerLine = new Line(currentCenterPoint, GetSumPoint(currentCenterPoint, 0, domeRadius * 2));
+            Line leftLine = editingService.GetExtendLine(new Line(currentCenterPoint, leftRoofDownPoint), domeRadius * 2);
+            Line leftLineNew = editingService.GetExtendLine(new Line(currentCenterPoint, leftRoofDownPointNew), domeRadius * 2);
+
+
+            Point3D[] inPointLeftUp= leftLine.IntersectWith(returnValue.circleRoofUpper);
+            Point3D[] inPointLeftDown = leftLine.IntersectWith(returnValue.circleRoofLower);
+
+            Point3D[] inPointLeftUpNew = leftLineNew.IntersectWith(returnValue.circleRoofUpper);
+            Point3D[] inPointLeftDownNew = leftLineNew.IntersectWith(returnValue.circleRoofLower);
+
+            Point3D[] inPointCenterUp = centerLine.IntersectWith(returnValue.circleRoofUpper);
+            Point3D[] inPointCenterDown = centerLine.IntersectWith(returnValue.circleRoofLower);
+
+            returnValue.PointCenterTopUp = inPointCenterUp[0];
+            returnValue.PointCenterTopDown = inPointCenterDown[0];
+
+            if (assemblyData.RoofCompressionRing[0].CompressionRingType == "Detail i")
+            {
+                returnValue.PointLeftRoofUp = inPointLeftUpNew[0];
+                returnValue.PointLeftRoofDown = inPointLeftDownNew[0];
+            }
+            else
+            {
+                returnValue.PointLeftRoofUp = inPointLeftUp[0];
+                returnValue.PointLeftRoofDown = inPointLeftDown[0];
+            }
+
+            // Degree
+            Point3D triA = GetSumPoint(refPoint, 0, 0);
+            Line triALine = new Line(GetSumPoint(triA, 0, 0), GetSumPoint(triA, 0, 0));
+            triALine.EndPoint = triALine.EndPoint + returnValue.CompressionRingDirection * (100);
+            Point3D triB = GetSumPoint(triALine.EndPoint, 0, 0);
+            Point3D triC = new Point3D(triB.X, triA.Y);
+
+            double tempDegree = valueService.GetDegreeOfSlope(triC.DistanceTo(triB), triA.DistanceTo(triC));
+
+            returnValue.CompressionRingDegree = tempDegree;
+
+            // 검증 용
+            if (false)
+            {
+                List<Entity> newList = new List<Entity>();
+                newList.Add(new Line(refPointLeft, GetSumPoint(refPointLeft, 0, -1000)));
+                newList.Add(new Line(refPointRight, GetSumPoint(refPointRight, 0, -1000)));
+                newList.Add(cirLeft);
+                newList.Add(cirRight);
+                newList.Add(cirCenter);
+                //newList.Add(leftAngleLine);
+                //styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+                newList.Add(new Line(refPointLeft, GetSumPoint(refPointLeft, -7, 0)));
+                newList.Add(new Line(refPointLeft, refPointRight));
+                newList.Add(new Circle(currentCenterPoint, domeRadius));
+            }
+
+            return returnValue;
+        }
+
+
+
+        private Point3D GetDRTRoofPoint(Circle selCircle, double selRadius)
+        {
+            Line vLine = new Line(GetSumPoint(DRTWorkingData.RoofCenterPoint,-selRadius,0), GetSumPoint(DRTWorkingData.RoofCenterPoint, -selRadius, DRTWorkingData.PointCenterTopUp.Y + 99999));
+            Point3D[] vPoint = vLine.IntersectWith(selCircle);
+            return vPoint[0];
+        }
+        #endregion
+
+
+
+
         #region Distance
         private double GetDistanceX(double selX1, double selX2)
         {
@@ -592,9 +986,24 @@ namespace DrawWork.DrawServices
         #endregion
 
 
+
         private CDPoint GetSumCDPoint(CDPoint selPoint1, double X, double Y, double Z = 0)
         {
             return new CDPoint(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
+        }
+
+        private CDPoint GetSumCDPoint(Point3D selPoint1, double X, double Y, double Z = 0)
+        {
+            return new CDPoint(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
+        }
+
+        private Point3D GetSumPoint(Point3D selPoint1, double X, double Y, double Z = 0)
+        {
+            return new Point3D(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
+        }
+        private Point3D GetSumPoint(CDPoint selPoint1, double X, double Y, double Z = 0)
+        {
+            return new Point3D(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
         }
     }
 }

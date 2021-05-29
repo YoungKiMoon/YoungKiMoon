@@ -12,25 +12,29 @@
         <SolidColorBrush x:Key="ProcessCheck" Color="White"/>
     </UserControl.Resources>
     <Grid>
-        <Grid x:Name="gridGroup" Height="160">
+        <Grid x:Name="gridGroup" Height="80">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Grid x:Name="gridDesignType" Grid.Column="0" >
-                <Border x:Name="btnDesignType" Width="86" Height="110" Margin="5,0" BorderThickness="4"   Background="#FF2D95D1" BorderBrush="#FF0B6FA8" Cursor="Hand" PreviewMouseLeftButtonUp="btnDesignType_PreviewMouseLeftButtonUp"  >
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                        <TextBlock x:Name="textDesignType01" Text="EFRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
-                        <TextBlock x:Name="textDesignType02" Text="Open the file" FontSize="10"  VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFBBF4F9" TextWrapping="Wrap"/>
-                    </StackPanel>
+                <Border x:Name="btnDesignType" Width="80"   Cursor="Hand" PreviewMouseLeftButtonUp="btnDesignType_PreviewMouseLeftButtonUp" HorizontalAlignment="Right"  >
+                    <Grid>
+                        <Image x:Name="currentImage" Source="/ExcelAddIn;component/Resources/icon_CRT.png" Margin="0,-2,0,2" OpacityMask="#FF87CDF5"/>
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,36,0,0">
+                            <TextBlock x:Name="textDesignType01" Text="TANK" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+                            <TextBlock x:Name="textDesignType02" Text="SELECT" Margin="0,-6,0,5" FontSize="9"  VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFBBF4F9" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Grid>
+
                 </Border>
             </Grid>
-            <Grid x:Name="gridProcess" Height="160" Grid.Column="1">
-                <Grid x:Name="gridProcessHeader" Height="30" Margin="20,0,40,0" VerticalAlignment="Top">
+            <Grid x:Name="gridProcess" Height="100" Grid.Column="1">
+                <Grid x:Name="gridProcessHeader" Visibility="Collapsed" Height="30" Margin="20,0,40,0" VerticalAlignment="Top">
                     <TextBlock Text="Tank Basic Design Process" FontSize="20" FontWeight="Bold" Foreground="#FF485563" HorizontalAlignment="Center"/>
                 </Grid>
 
-                <Grid x:Name="gridProcessLine" Height="30" Margin="20,0,40,0">
+                <Grid x:Name="gridProcessLine" Height="30" Margin="20,0,40,0" VerticalAlignment="Top">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.5*"/>
                         <ColumnDefinition/>
@@ -69,7 +73,7 @@
 
 
                 </Grid>
-                <Grid x:Name="gridProcessItem" Height="30" Margin="20,0,40,0">
+                <Grid x:Name="gridProcessItem" Height="30" Margin="20,0,40,0" VerticalAlignment="Top">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>

@@ -33,12 +33,14 @@ namespace DrawWork.DrawServices
         private ValueService valueService;
         private StyleFunctionService styleService;
         private LayerStyleService layerService;
+        private DrawEditingService editingService;
 
         public DrawSettingService()
         {
             valueService = new ValueService();
             styleService = new StyleFunctionService();
             layerService = new LayerStyleService();
+            editingService = new DrawEditingService();
         }
         public void SetModelSpace(Model singleModel)
         {
@@ -1654,68 +1656,585 @@ namespace DrawWork.DrawServices
 
             //singleModel.Entities.AddRange(testLIne);
 
-            string sss = string.Format("aaa{0}\"_{1}", 1,2);
+            if (false)
+            {
 
-            DrawNozzleBlockService nozzleDraw = new DrawNozzleBlockService();
+                string sss = string.Format("aaa{0}\"_{1}", 1, 2);
 
-            Line newCen01 = new Line(0, 100, 200, 100);
-            Line newCen02 = new Line(100, 0, 100, 200);
-            singleModel.Entities.Add(newCen01);
-            singleModel.Entities.Add(newCen02);
+                DrawNozzleBlockService nozzleDraw = new DrawNozzleBlockService();
 
-            // Elbow
-            ElbowModel newElbow = new ElbowModel() {OD="33.4",LRA="38.1",LRB="22.225",SRD="25.4" };
-            Point3D refPoint1 = new Point3D(100, 100,0);
+                Line newCen01 = new Line(0, 100, 200, 100);
+                Line newCen02 = new Line(100, 0, 100, 200);
+                singleModel.Entities.Add(newCen01);
+                singleModel.Entities.Add(newCen02);
 
-
-            List<Point3D> outputPointList = new List<Point3D>();
-            List<Entity> elbowList0 = nozzleDraw.DrawReference_Nozzle_Elbow(out outputPointList, refPoint1, 1, newElbow, "lr", "45", Utility.DegToRad(45), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx= true});
-            List<Entity> elbowList1 = nozzleDraw.DrawReference_Nozzle_Elbow(out outputPointList, outputPointList[0], 1, newElbow, "lr", "45", Utility.DegToRad(90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true,oneEx=true });
-            singleModel.Entities.AddRange( elbowList0);
-            singleModel.Entities.AddRange(elbowList1);
+                // Elbow
+                ElbowModel newElbow = new ElbowModel() { OD = "33.4", LRA = "38.1", LRB = "22.225", SRD = "25.4" };
+                Point3D refPoint1 = new Point3D(100, 100, 0);
 
 
-            // Tee
-            TeeModel newTee = new TeeModel() { OD = "33.4", A = "38.1", B = "38.1" };
-            List<Entity> teeList0 = nozzleDraw.DrawReference_Nozzle_Tee(out outputPointList, outputPointList[0], 1, newTee, 0, new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true, twoEx = true });
-            singleModel.Entities.AddRange(teeList0);
-
-            // Reducer
-            ReducerModel newReducer = new ReducerModel() { OD1 = "60.3", OD2 = "33.4", H = "72" };
-            List<Entity> reducer0 = nozzleDraw.DrawReference_Nozzle_Reducer(out outputPointList, outputPointList[2], 1, newReducer, Utility.DegToRad(90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
-            singleModel.Entities.AddRange(reducer0);
-
-            // Pipe
-
-            List<Entity> pipe0 = nozzleDraw.DrawReference_Nozzle_Pipe(out outputPointList, outputPointList[0], 1, 33.4, 100,false,false, Utility.DegToRad(90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
-            singleModel.Entities.AddRange(pipe0);
-            List<Entity> pipe1 = nozzleDraw.DrawReference_Nozzle_Pipe(out outputPointList, outputPointList[0], 1, 33.4, 100, false,false,0, new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
-            singleModel.Entities.AddRange(pipe1);
-            List<Entity> pipeSlope1 = nozzleDraw.DrawReference_Nozzle_PipeSlope(out outputPointList, outputPointList[0], 1, 33.4, 100,0,0, 0, new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
-            singleModel.Entities.AddRange(pipeSlope1);
-            Point3D newPP = GetSumPoint(outputPointList[1], 33.4, 0);
-            List<Entity> pipeSlope2 = nozzleDraw.DrawReference_Nozzle_PipeSlope(out outputPointList, newPP, 1, 33.4, 100,Utility.DegToRad(30), 33.4, Utility.DegToRad(90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
-            singleModel.Entities.AddRange(pipeSlope2);
+                List<Point3D> outputPointList = new List<Point3D>();
+                List<Entity> elbowList0 = nozzleDraw.DrawReference_Nozzle_Elbow(out outputPointList, refPoint1, 1, newElbow, "lr", "45", Utility.DegToRad(45), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                List<Entity> elbowList1 = nozzleDraw.DrawReference_Nozzle_Elbow(out outputPointList, outputPointList[0], 1, newElbow, "lr", "45", Utility.DegToRad(90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                singleModel.Entities.AddRange(elbowList0);
+                singleModel.Entities.AddRange(elbowList1);
 
 
-            List<Point3D> outputPointListTest = new List<Point3D>();
-            List<Entity> pipeSlope3 = nozzleDraw.DrawReference_Nozzle_PipeSlope( out outputPointListTest, new Point3D(300, 300), 1, 33.4, 100, Utility.DegToRad(-15), 33.4, Utility.DegToRad(90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
-            singleModel.Entities.AddRange(pipeSlope3);
+                // Tee
+                TeeModel newTee = new TeeModel() { OD = "33.4", A = "38.1", B = "38.1" };
+                List<Entity> teeList0 = nozzleDraw.DrawReference_Nozzle_Tee(out outputPointList, outputPointList[0], 1, newTee, 0, new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true, twoEx = true });
+                singleModel.Entities.AddRange(teeList0);
 
-            List<Entity> neck1 = nozzleDraw.DrawReference_Nozzle_Neck(out outputPointList, outputPointList[0], 1, 33.4, 50, 20, Utility.DegToRad(45), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
-            singleModel.Entities.AddRange(neck1);
+                // Reducer
+                ReducerModel newReducer = new ReducerModel() { OD1 = "60.3", OD2 = "33.4", H = "72" };
+                List<Entity> reducer0 = nozzleDraw.DrawReference_Nozzle_Reducer(out outputPointList, outputPointList[2], 1, newReducer, Utility.DegToRad(90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                singleModel.Entities.AddRange(reducer0);
 
-            List<Entity> pad1 = nozzleDraw.DrawReference_Nozzle_Pad(out outputPointList, outputPointList[0], 1, 33.4, 100, 20, Utility.DegToRad(45), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
-            singleModel.Entities.AddRange(pad1);
+                // Pipe
 
-            List<Entity> padSlope1 = nozzleDraw.DrawReference_Nozzle_PadSlope(out outputPointList, outputPointList[0], 1, 33.4, 100, 20, false, Utility.DegToRad(30), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
-            singleModel.Entities.AddRange(padSlope1);
+                List<Entity> pipe0 = nozzleDraw.DrawReference_Nozzle_Pipe(out outputPointList, outputPointList[0], 1, 33.4, 100, false, false, Utility.DegToRad(90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                singleModel.Entities.AddRange(pipe0);
+                List<Entity> pipe1 = nozzleDraw.DrawReference_Nozzle_Pipe(out outputPointList, outputPointList[0], 1, 33.4, 100, false, false, 0, new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                singleModel.Entities.AddRange(pipe1);
+                List<Entity> pipeSlope1 = nozzleDraw.DrawReference_Nozzle_PipeSlope(out outputPointList, outputPointList[0], 1, 33.4, 100, 0, 0, 0, new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                singleModel.Entities.AddRange(pipeSlope1);
+                Point3D newPP = GetSumPoint(outputPointList[1], 33.4, 0);
+                List<Entity> pipeSlope2 = nozzleDraw.DrawReference_Nozzle_PipeSlope(out outputPointList, newPP, 1, 33.4, 100, Utility.DegToRad(30), 33.4, Utility.DegToRad(90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                singleModel.Entities.AddRange(pipeSlope2);
 
-            List<Entity> blindFlange1 = nozzleDraw.DrawReference_Nozzle_BlindFlange(out outputPointList, outputPointList[0], 1, 33.4, 100, 20, Utility.DegToRad(30), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
-            singleModel.Entities.AddRange(blindFlange1);
 
-            List<Entity> flange1 = nozzleDraw.DrawReference_Nozzle_Flange(out outputPointList, outputPointList[0], 1, 100, 140, 20, Utility.DegToRad(45), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true,twoEx=true });
-            singleModel.Entities.AddRange(flange1);
+                List<Point3D> outputPointListTest = new List<Point3D>();
+                List<Entity> pipeSlope3 = nozzleDraw.DrawReference_Nozzle_PipeSlope(out outputPointListTest, new Point3D(300, 300), 1, 33.4, 100, Utility.DegToRad(-15), 33.4, Utility.DegToRad(90), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                singleModel.Entities.AddRange(pipeSlope3);
+
+                List<Entity> neck1 = nozzleDraw.DrawReference_Nozzle_Neck(out outputPointList, outputPointList[0], 1, 33.4, 50, 20, Utility.DegToRad(45), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                singleModel.Entities.AddRange(neck1);
+
+                List<Entity> pad1 = nozzleDraw.DrawReference_Nozzle_Pad(out outputPointList, outputPointList[0], 1, 33.4, 100, 20, Utility.DegToRad(45), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                singleModel.Entities.AddRange(pad1);
+
+                List<Entity> padSlope1 = nozzleDraw.DrawReference_Nozzle_PadSlope(out outputPointList, outputPointList[0], 1, 33.4, 100, 20, false, Utility.DegToRad(30), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                singleModel.Entities.AddRange(padSlope1);
+
+                List<Entity> blindFlange1 = nozzleDraw.DrawReference_Nozzle_BlindFlange(out outputPointList, outputPointList[0], 1, 33.4, 100, 20, Utility.DegToRad(30), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true });
+                singleModel.Entities.AddRange(blindFlange1);
+
+                List<Entity> flange1 = nozzleDraw.DrawReference_Nozzle_Flange(out outputPointList, outputPointList[0], 1, 100, 140, 20, Utility.DegToRad(45), new DrawCenterLineModel() { scaleValue = 90, zeroEx = true, oneEx = true, twoEx = true });
+                singleModel.Entities.AddRange(flange1);
+            }
+
+            if (false)
+            {
+
+                double scaleValue = 90;
+
+                ShellManholeModel newShell = new ShellManholeModel();
+                double D1 = valueService.GetDoubleValue(newShell.D1);
+                double BCD = valueService.GetDoubleValue(newShell.BCD);
+                double D2 = valueService.GetDoubleValue(newShell.D2);
+                double L = valueService.GetDoubleValue(newShell.L);
+                D1 = 500;
+                BCD = 667;
+                D2 = 730;
+                L = 1055;
+                double LHalf = L / 2;
+                double R = D1 / 2;
+                double LCross = valueService.GetAdjacentByHypotenuse(valueService.GetDegreeOfSlope("1"), LHalf);
+
+
+                List<Entity> newList = new List<Entity>();
+                
+
+                Point3D refPoint = new Point3D(300, 300);
+                Line vLine01 = new Line(GetSumPoint(refPoint, 0, LHalf), GetSumPoint(refPoint, L * 10, LHalf));
+                Line vLine02 = new Line(GetSumPoint(refPoint, -L * 100,0), GetSumPoint(refPoint, L * 10, 0));
+                vLine02.Rotate(Utility.DegToRad(-45), Vector3D.AxisZ, refPoint);
+                vLine02.Translate(new Vector3D(LCross, LCross));
+                Line vLine03 = new Line(GetSumPoint(refPoint,0, -LHalf), GetSumPoint(refPoint, L * 10, -LHalf));
+                Line vLine04 = new Line(GetSumPoint(refPoint, -L * 100,0), GetSumPoint(refPoint, L * 10, 0));
+                vLine04.Rotate(Utility.DegToRad(45), Vector3D.AxisZ, refPoint);
+                vLine04.Translate(new Vector3D(LCross, -LCross));
+
+                Arc arcFillet01;
+                Curve.Fillet(vLine01, vLine02, R, false, false, true, true, out arcFillet01);
+                Arc arcFillet03;
+                Curve.Fillet(vLine03, vLine04, R, false, false, true, true, out arcFillet03);
+                Arc arcFillet02;
+                Curve.Fillet(vLine02, vLine04, R, true, false, true, true, out arcFillet02);
+
+                Line vLine05 = new Line(GetSumPoint(refPoint, 0, 0), GetSumPoint(refPoint, L * 10, 0));
+                Point3D[] pointInter01 = vLine05.IntersectWith(arcFillet02);
+
+
+                Arc newArc01 = new Arc(refPoint, D2 / 2, Utility.DegToRad(90), Utility.DegToRad(-90));
+                Arc newArc02 = new Arc(refPoint, BCD / 2, Utility.DegToRad(90), Utility.DegToRad(-90));
+                Arc newArc03 = new Arc(refPoint, D1 / 2, Utility.DegToRad(90), Utility.DegToRad(-90));
+
+                newList.AddRange(new Entity[] { vLine01, vLine02, vLine03,vLine04 });
+                newList.AddRange(new Entity[] { arcFillet01, arcFillet02, arcFillet03 });
+                newList.AddRange(new Entity[] { newArc01, newArc03 });
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+                styleService.SetLayer(ref newArc02, layerService.LayerCenterLine);
+                newList.Add(newArc02);
+
+
+                // Center LIne
+                DrawCenterLineModel centerModel = new DrawCenterLineModel();
+                if (pointInter01.Length > 0)
+                {
+                    
+                    Line centerLine01 = new Line(GetSumPoint(refPoint, 0, 0), GetSumPoint(pointInter01[0], 0, 0));
+                    Line centerLine02 = new Line(GetSumPoint(pointInter01[0], 0, 0), GetSumPoint(pointInter01[0], centerModel.exLength * scaleValue, 0));
+                    styleService.SetLayer(ref centerLine01, layerService.LayerCenterLine);
+                    styleService.SetLayer(ref centerLine02, layerService.LayerCenterLine);
+                    newList.Add(centerLine01);
+                    newList.Add(centerLine02);
+                }
+
+                // Mirror
+
+                // Verical
+
+                Line centerVLine01 = new Line(GetSumPoint(refPoint, 0, LHalf), GetSumPoint(refPoint, 0, -LHalf));
+                Line centerVLine02 = new Line(GetSumPoint(refPoint, 0, LHalf), GetSumPoint(refPoint, 0, LHalf + centerModel.exLength * scaleValue));
+                Line centerVLine03 = new Line(GetSumPoint(refPoint, 0, -LHalf), GetSumPoint(refPoint, 0, -LHalf - centerModel.exLength * scaleValue));
+                styleService.SetLayer(ref centerVLine01, layerService.LayerCenterLine);
+                styleService.SetLayer(ref centerVLine02, layerService.LayerCenterLine);
+                styleService.SetLayer(ref centerVLine03, layerService.LayerCenterLine);
+                newList.Add(centerVLine01);
+                newList.Add(centerVLine02);
+                newList.Add(centerVLine03);
+
+
+
+                singleModel.Entities.AddRange(newList);
+            }
+
+
+            if (false)
+            {
+
+                List<Entity> customEntity = new List<Entity>();
+                List<Entity> customLine = new List<Entity>();
+
+                AnchorChairModel newAnchor = new AnchorChairModel();
+
+
+                double A = valueService.GetDoubleValue(newAnchor.A);
+                double A1 = valueService.GetDoubleValue(newAnchor.A1);
+                double B = valueService.GetDoubleValue(newAnchor.B);
+                double E = valueService.GetDoubleValue(newAnchor.E);
+                double F = valueService.GetDoubleValue(newAnchor.F);
+                double T = valueService.GetDoubleValue(newAnchor.T);
+                double T1 = valueService.GetDoubleValue(newAnchor.T1);
+                double H = valueService.GetDoubleValue(newAnchor.H);
+                double I = valueService.GetDoubleValue(newAnchor.I);
+                double W = valueService.GetDoubleValue(newAnchor.W);
+                double P = valueService.GetDoubleValue(newAnchor.P);
+                double T2 = valueService.GetDoubleValue(newAnchor.T2);
+
+                double C1 = valueService.GetDoubleValue(newAnchor.C1);
+                double B1 = valueService.GetDoubleValue(newAnchor.B1);
+                double H1 = valueService.GetDoubleValue(newAnchor.H1);
+                double G1 = valueService.GetDoubleValue(newAnchor.G1);
+                double C = valueService.GetDoubleValue(newAnchor.C);
+
+                A = 80;
+                A1 = 40;
+                B = 120;
+                E = 80;
+                F = 135;
+                T = 25;
+                T1 = 12;
+                H = 250;
+                I = 27;
+                W = 110;
+                P = 70;
+                T2 = 12;
+                C1 = 50;
+                B1 = 50;
+                H1 = 15;
+                G1 = 15;
+                C = 36;
+
+                double scaleValue = 90;
+
+                double shellThickness = 24;
+                double bottomThickness = 8;
+
+                double anchorHeight = H - bottomThickness;
+                double padHeight = anchorHeight + B1;
+                double anchorCenterWidth = shellThickness + A;
+
+                List<Entity> newList = new List<Entity>();
+
+                //CDPoint curPoint = new CDPoint();
+                //CDPoint bottomPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottomUp, 0, ref refPoint, ref curPoint);
+
+
+                Point3D refCenterPoint = new Point3D(1000, 1000);
+
+                Point3D PadLeftDown = GetSumPoint(refCenterPoint, 0, C1);
+                Point3D PadRightDown = GetSumPoint(refCenterPoint, shellThickness, C1);
+                Point3D PadLeftUp = GetSumPoint(refCenterPoint, 0, padHeight);
+                Point3D PadRightUp = GetSumPoint(refCenterPoint, shellThickness, padHeight);
+
+                Point3D TopPadLeftUp = GetSumPoint(PadRightUp, 0, -B1);
+                Point3D TopPadLeftDown = GetSumPoint(TopPadLeftUp, 0, -T);
+                Point3D TopPadRightUp = GetSumPoint(TopPadLeftUp, B, 0);
+                Point3D TopPadRightDown = GetSumPoint(TopPadLeftUp, B, -T);
+
+
+                Point3D TopSmallTriUpRight = GetSumPoint(TopPadLeftDown, H1, 0);
+                Point3D TopSmallTriDownLeft = GetSumPoint(TopPadLeftDown, 0, -H1);
+
+                Point3D TopSmallPadLeftUp = GetSumPoint(TopPadLeftUp, A - P / 2, T2);
+                Point3D TopSmallPadLeftDown = GetSumPoint(TopSmallPadLeftUp, 0, -T2);
+                Point3D TopSmallPadRightUp = GetSumPoint(TopSmallPadLeftUp, P, 0);
+                Point3D TopSmallPadDown = GetSumPoint(TopSmallPadRightUp, 0, -T2);
+
+                Point3D bigTriLeft = GetSumPoint(refCenterPoint, shellThickness + G1, 0);
+                Point3D bigTriRight = GetSumPoint(refCenterPoint, shellThickness + C, 0);
+
+                Point3D CenterTop = GetSumPoint(TopSmallPadLeftUp, P / 2, 0);
+                Point3D CenterDown = GetSumPoint(refCenterPoint, shellThickness + A, -bottomThickness);
+
+
+                newList.Add(new Line(PadLeftDown, PadRightDown));
+                newList.Add(new Line(PadLeftDown, PadLeftUp));
+                newList.Add(new Line(PadLeftUp, PadRightUp));
+                newList.Add(new Line(PadRightDown, PadRightUp));
+
+                newList.Add(new Line(TopPadLeftUp, TopPadRightUp));
+                newList.Add(new Line(TopPadRightDown, TopPadRightUp));
+                newList.Add(new Line(TopPadLeftDown, TopPadRightDown));
+
+                newList.Add(new Line(TopSmallPadLeftUp, TopSmallPadLeftDown));
+                newList.Add(new Line(TopSmallPadLeftUp, TopSmallPadRightUp));
+                newList.Add(new Line(TopSmallPadDown, TopSmallPadRightUp));
+
+                newList.Add(new Line(TopSmallTriUpRight, TopSmallTriDownLeft));
+
+
+                newList.Add(new Line(PadRightDown, bigTriLeft));
+                newList.Add(new Line(bigTriLeft, bigTriRight));
+                newList.Add(new Line(bigTriRight, TopPadRightDown));
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+
+
+                // Center LIne
+                DrawCenterLineModel centerModel = new DrawCenterLineModel();
+                customLine.Add(new Line(CenterTop, CenterDown));
+                customLine.Add(new Line(CenterTop, GetSumPoint(CenterTop, 0, centerModel.exLength * scaleValue)));
+                customLine.Add(new Line(CenterDown, GetSumPoint(CenterDown, 0, -centerModel.exLength * scaleValue)));
+
+                styleService.SetLayerListEntity(ref customLine, layerService.LayerCenterLine);
+                // Mirror
+
+                // Verical
+                newList.AddRange(customLine);
+                customEntity.AddRange(newList);
+
+                singleModel.Entities.AddRange(customEntity);
+            }
+
+
+
+            if (false)
+            {
+                Point3D refCenterPoint = new Point3D(1000, 1000);
+
+                // View Port 점검
+                List<Entity> newnewList = new List<Entity>();
+                newnewList.Add(new Line(GetSumPoint(refCenterPoint, 0, 0), GetSumPoint(refCenterPoint, 1000, 1000)));
+                newnewList.Add(new Line(GetSumPoint(refCenterPoint, 0, 0), GetSumPoint(refCenterPoint, 0, 1000)));
+                newnewList.Add(new Line(GetSumPoint(refCenterPoint, 0, 1000), GetSumPoint(refCenterPoint, 1000, 1000)));
+                newnewList.Add(new Line(GetSumPoint(refCenterPoint, 1000, 0), GetSumPoint(refCenterPoint, 1000, 1000)));
+                newnewList.Add(new Line(GetSumPoint(refCenterPoint, 1000, 0), GetSumPoint(refCenterPoint, 0, 0)));
+                newnewList.Add(new Line(GetSumPoint(refCenterPoint, 0, 1000), GetSumPoint(refCenterPoint, 1000, 0)));
+
+                styleService.SetLayerListEntity(ref newnewList, layerService.LayerCenterLine);
+
+
+                // 오른쪽 복사
+                List<Entity> newnewListCopy = new List<Entity>();
+                foreach (Entity eachEn in newnewList)
+                {
+                    Entity newEn = (Entity)eachEn.Clone();
+                    newEn.Translate(2000, 2000);
+                    newnewListCopy.Add(newEn);
+                }
+                styleService.SetLayerListEntity(ref newnewListCopy, layerService.LayerOutLine);
+                newnewList.Add(new Line(GetSumPoint(refCenterPoint, 1000, 1000), GetSumPoint(refCenterPoint, 2000, 2000)));
+
+                // 왼쪽 복사
+                List<Entity> leftListCopy = new List<Entity>();
+                foreach (Entity eachEn in newnewList)
+                {
+                    Entity newEn = (Entity)eachEn.Clone();
+                    newEn.Translate(0, 4000);
+                    leftListCopy.Add(newEn);
+                }
+                styleService.SetLayerListEntity(ref leftListCopy, layerService.LayerVirtualLine);
+                newnewList.Add(new Line(GetSumPoint(refCenterPoint, 2000, 3000), GetSumPoint(refCenterPoint, 1000, 4000)));
+
+
+                singleModel.Entities.AddRange(leftListCopy);
+                singleModel.Entities.AddRange(newnewListCopy);
+                singleModel.Entities.AddRange(newnewList);
+            }
+
+            // Angle
+            if (false)
+            {
+                List<Entity> newList = new List<Entity>();
+
+
+                List<Entity> newRoofList = new List<Entity>();
+
+                // Input Data
+                double sizeID = 600;
+                double domeRadiusRatio = 1;
+                double domeRadius = domeRadiusRatio * sizeID;
+
+                Point3D refPointLeft = new Point3D(10000, 10000);
+                Point3D refPointRight = GetSumPoint(refPointLeft, 600, 0);
+
+                // Circle : 2
+                Circle cirLeft = new Circle(GetSumPoint(refPointLeft,0,0), domeRadius);
+                Circle cirRight = new Circle(GetSumPoint(refPointRight,0,0), domeRadius);
+                Point3D[] cirIntersectArray = cirLeft.IntersectWith(cirRight);
+
+                // Center Circle
+                Point3D currentCenterPoint = new Point3D();
+                if (cirIntersectArray != null)
+                {
+                    double minValue = 9999999999;
+                    foreach (Point3D eachPoint in cirIntersectArray)
+                    {
+                        if (minValue > eachPoint.Y)
+                        {
+                            minValue = eachPoint.Y;
+                            currentCenterPoint = GetSumPoint(eachPoint, 0, 0);
+                        }
+                    }
+                }
+                Circle cirCenter = new Circle(GetSumPoint(currentCenterPoint,0,0), domeRadius);
+
+                // Left line
+                Point3D leftRoofDownPoint = new Point3D();
+                leftRoofDownPoint = refPointLeft;
+
+
+                Circle cirComPress = new Circle(GetSumPoint(leftRoofDownPoint, 0, 0), domeRadius);
+
+                // compression Ring : Ref Point : Line
+                Line centerVerticalLine = new Line(GetSumPoint(currentCenterPoint, 0, -domeRadius), GetSumPoint(currentCenterPoint, 0, domeRadius * 3));// Size ID 길이 만큼
+                
+
+                // Intersect : CenterCircle <-> Left Line
+                double shiftVertical = 0;
+                Point3D[] leftIntersect = centerVerticalLine.IntersectWith(cirComPress);
+                if (leftIntersect != null)
+                {
+                    if (leftIntersect.Length > 0)
+                    {
+                        currentCenterPoint = leftIntersect[1];
+                    }
+
+                }
+
+
+                // 검증 용
+                if (true)
+                {
+                    newList.Add(new Line(refPointLeft, GetSumPoint(refPointLeft, 0, -1000)));
+                    newList.Add(new Line(refPointRight, GetSumPoint(refPointRight, 0, -1000)));
+                    newList.Add(cirLeft);
+                    newList.Add(cirRight);
+                    newList.Add(cirCenter);
+                    newList.Add(cirComPress);
+                    newList.Add(centerVerticalLine);
+
+                    styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+                    newList.Add(new Line(refPointLeft, GetSumPoint(refPointLeft, -7,0)));
+                    newList.Add(new Line(refPointLeft, refPointRight));
+                    newList.Add(new Circle(currentCenterPoint, domeRadius));
+                }
+
+
+               
+
+                singleModel.Entities.AddRange(newList);
+                singleModel.Entities.AddRange(newRoofList);
+            }
+
+            // Compression Ring
+            if (true)
+            {
+                List<Entity> newList = new List<Entity>();
+
+
+                List<Entity> newRoofList = new List<Entity>();
+
+                // Input Data
+                double sizeID = 600;
+                double domeRadiusRatio = 1;
+                double domeRadius = domeRadiusRatio * sizeID;
+
+                double shellMaxCourseThickness = 10;
+                double comA = 10;
+                double comB = 70;
+                double comC = 12;
+                double comT1 = 2.5;
+
+
+
+                Point3D refPointLeft = new Point3D(10000, 10000);
+                Point3D refPointRight = GetSumPoint(refPointLeft, 600, 0);
+
+                // Circle : 2
+                Circle cirLeft = new Circle(GetSumPoint(refPointLeft, 0, 0), domeRadius);
+                Circle cirRight = new Circle(GetSumPoint(refPointRight, 0, 0), domeRadius);
+                Point3D[] cirIntersectArray = cirLeft.IntersectWith(cirRight);
+
+                // Center Circle
+                Point3D currentCenterPoint = new Point3D();
+                if (cirIntersectArray != null)
+                {
+                    double minValue = 9999999999;
+                    foreach (Point3D eachPoint in cirIntersectArray)
+                    {
+                        if (minValue > eachPoint.Y)
+                        {
+                            minValue = eachPoint.Y;
+                            currentCenterPoint = GetSumPoint(eachPoint, 0, 0);
+                        }
+                    }
+                }
+                Circle cirCenter = new Circle(GetSumPoint(currentCenterPoint, 0, 0), domeRadius);
+
+                // Compression Ring : Rotate
+                Line comPressRing = new Line(GetSumPoint(currentCenterPoint, 0, 0), GetSumPoint( refPointLeft,0,0));
+                comPressRing.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
+                // Direction
+                Vector3D direction = new Vector3D(comPressRing.EndPoint, comPressRing.StartPoint);
+                direction.Normalize();
+                // Compression Ring : New : Shift : Thickness
+                Line comPressRingNew = new Line(GetSumPoint(refPointLeft, -shellMaxCourseThickness, 0), GetSumPoint(refPointLeft, -shellMaxCourseThickness, 0));
+                comPressRingNew.EndPoint = comPressRingNew.EndPoint + direction * (comB -comA);
+                // compression Ring Upper : Offset
+                Line comPressRingNewUpper = (Line)comPressRingNew.Offset(-comT1, Vector3D.AxisZ, 0.01, true);// 위로
+
+
+                // compression Ring : Ref Point
+                Point3D comPressRingRefPoint = GetSumPoint(comPressRingNewUpper.EndPoint, 0, 0);
+                // compression Ring : circle
+                Circle cirComPress = new Circle(GetSumPoint(comPressRingRefPoint, 0, 0), domeRadius);
+
+                // compression Ring : Ref Point : Line
+                Line centerVerticalLine = new Line(GetSumPoint(currentCenterPoint, 0, 0), GetSumPoint(currentCenterPoint, 0, sizeID*2));// Size ID 길이 만큼
+
+                // Intersect : CenterCircle <-> Left Line
+                double shiftVertical = 0;
+                Point3D[] leftIntersect = centerVerticalLine.IntersectWith(cirComPress);
+                if (leftIntersect != null)
+                {
+                    if (leftIntersect.Length > 0)
+                    {
+                        currentCenterPoint = leftIntersect[1];
+                    }
+
+                }
+
+
+                // 검증 용
+                if (true)
+                {
+                    Arc newARC=new Arc(currentCenterPoint, GetSumPoint(comPressRingRefPoint, 0, 0), GetSumPoint(centerVerticalLine.EndPoint, 0, 0));
+                    newList.Add(newARC);
+
+
+
+                    newList.Add(new Line(refPointLeft, GetSumPoint(refPointLeft, 0, -1000)));
+                    newList.Add(new Line(refPointRight, GetSumPoint(refPointRight, 0, -1000)));
+                    newList.Add(cirLeft);
+                    newList.Add(cirRight);
+                    newList.Add(cirCenter);
+                    newList.Add(cirComPress);
+                    newList.Add(centerVerticalLine);
+
+                    //newList.Add(comPressRing);
+                    newList.Add(comPressRingNew);
+                    styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+
+                    styleService.SetLayer(ref comPressRingNewUpper, layerService.LayerDimension);
+                    newList.Add(comPressRingNewUpper);
+
+                    newList.Add(new Line(refPointLeft, GetSumPoint(refPointLeft, shellMaxCourseThickness, 0)));
+                    newList.Add(new Line(refPointLeft, refPointRight));
+                    newList.Add(new Circle(currentCenterPoint, domeRadius));
+                }
+
+
+
+
+                singleModel.Entities.AddRange(newList);
+                singleModel.Entities.AddRange(newRoofList);
+            }
+
+
+            if (false)
+            {
+                // End Point : Extend : 종료 방향
+                Line aa = new Line(300, 300, 500, 500);
+                Line line = (Line)aa.Clone();
+
+                // Create temp line which will intersect boundary curve depending on which end to extend
+                Line tempLine = null;
+                Vector3D direction = null;
+                
+                tempLine = new Line(line.StartPoint, line.EndPoint);
+                direction = new Vector3D(line.StartPoint, line.EndPoint);
+
+                direction.Normalize();
+                tempLine.EndPoint = tempLine.EndPoint + direction * 200;
+
+                tempLine.Translate(10,0);
+
+                styleService.SetLayer(ref aa, layerService.LayerOutLine);
+                singleModel.Entities.Add(aa);
+                singleModel.Entities.Add(tempLine);
+
+            }
+            if (false)
+            {
+                // Start Point : Extend  : 시작 방향
+                Line aa = new Line(300, 300, 500, 500);
+                Line line = (Line)aa.Clone();
+
+                // Create temp line which will intersect boundary curve depending on which end to extend
+                Line tempLine = null;
+                Vector3D direction = null;
+
+                tempLine = new Line(line.StartPoint, line.EndPoint);
+                direction = new Vector3D(line.EndPoint, line.StartPoint);
+
+                direction.Normalize();
+                tempLine.StartPoint = tempLine.StartPoint + direction * 200;
+
+                tempLine.Translate(10, 0);
+
+                styleService.SetLayer(ref aa, layerService.LayerOutLine);
+                singleModel.Entities.Add(aa);
+                singleModel.Entities.Add(tempLine);
+
+            }
 
 
 

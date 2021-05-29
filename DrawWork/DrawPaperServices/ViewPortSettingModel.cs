@@ -18,6 +18,7 @@ namespace DrawWork.DrawPaperServices
             LocationY = "";
             SizeX = "";
             SizeY = "";
+            ExtensionAmount = 0;
         }
         public string Scale
         {
@@ -93,5 +94,17 @@ namespace DrawWork.DrawPaperServices
             }
         }
         private string _SizeY;
+
+        
+        public double ExtensionAmount
+        {
+            get { return _ExtensionAmount; }
+            set
+            {
+                _ExtensionAmount = value;
+                OnPropertyChanged(nameof(ExtensionAmount));
+            }
+        }
+        private double _ExtensionAmount;
     }
 }

@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:ExcelAddIn.Windows"
              mc:Ignorable="d"
              Topmost="True"
-             Title="ROOF TYPE" Height="160" Width="500" WindowStartupLocation="CenterScreen">
+             Title="ROOF TYPE" Height="200" Width="600" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid Margin="5,0,5,0">
             <Grid.ColumnDefinitions>
@@ -16,26 +16,45 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Border x:Name="btnCRT" Grid.Row="0" Grid.Column="0" Margin="5,10,5,10" BorderThickness="4" PreviewMouseLeftButtonUp="btnCRT_PreviewMouseLeftButtonUp" Background="#FF2D95D1" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnCRT_MouseEnter" >
-                <TextBlock x:Name="textCRT" Grid.Row="1" Grid.Column="0" Text="CRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+            <Border x:Name="btnCRT" Grid.Row="0" Grid.Column="0" Margin="5,10,5,10" BorderThickness="4" Background="#332D95D1" PreviewMouseLeftButtonUp="btnCRT_PreviewMouseLeftButtonUp" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnCRT_MouseEnter" >
+                <Grid>
+                    <Image Source="/ExcelAddIn;component/Resources/icon_CRT.png" />
+                    <TextBlock x:Name="textCRT" Grid.Row="1" Grid.Column="0" Text="CRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Margin="0,0,0,-46"/>
+                </Grid>
+
             </Border>
-            <Border x:Name="btnDRT" Grid.Row="0" Grid.Column="1" Margin="5,10,5,10" BorderThickness="4"  PreviewMouseLeftButtonUp="btnDRT_PreviewMouseLeftButtonUp" Background="#FF2D95D1" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnDRT_MouseEnter" >
-                <TextBlock x:Name="textDRT" Grid.Row="1" Grid.Column="1" Text="DRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+            <Border x:Name="btnDRT" Grid.Row="0" Grid.Column="1" Margin="5,10,5,10" BorderThickness="4" Background="#332D95D1" PreviewMouseLeftButtonUp="btnDRT_PreviewMouseLeftButtonUp" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnDRT_MouseEnter" >
+                <Grid>
+                    <Image Source="/ExcelAddIn;component/Resources/icon_DRT.png"/>
+                    <TextBlock x:Name="textDRT" Grid.Row="1" Grid.Column="1" Text="DRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Margin="0,0,0,-46"/>
+                </Grid>
+
             </Border>
-            <Border x:Name="btnIFRT" Grid.Row="0" Grid.Column="2" Margin="5,10,5,10" BorderThickness="4"  PreviewMouseLeftButtonUp="btnIFRT_PreviewMouseLeftButtonUp" Background="#FF2D95D1" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnIFRT_MouseEnter" >
-                <TextBlock x:Name="textIFRT" Grid.Row="1" Grid.Column="2" Text="IFRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+            <Border x:Name="btnIFRT" Grid.Row="0" Grid.Column="2" Margin="5,10,5,10" BorderThickness="4" Background="#332D95D1" PreviewMouseLeftButtonUp="btnIFRT_PreviewMouseLeftButtonUp" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnIFRT_MouseEnter" >
+                <Grid>
+                    <Image Source="/ExcelAddIn;component/Resources/icon_IFRT_single_deck.png"/>
+                    <TextBlock x:Name="textIFRT" Grid.Row="1" Grid.Column="2" Text="IFRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Margin="0,0,0,-46"/>
+                </Grid>
             </Border>
-            <Border x:Name="btnEFRTs" Grid.Row="0" Grid.Column="3" Margin="5,10,5,10" BorderThickness="4"  PreviewMouseLeftButtonUp="btnEFRTs_PreviewMouseLeftButtonUp" Background="#FF2D95D1" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnEFRTs_MouseEnter" >
-                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                    <TextBlock x:Name="textEFRTs1" Grid.Row="1" Grid.Column="3" Text="EFRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
-                    <TextBlock x:Name="textEFRTs2" Grid.Row="1" Grid.Column="3" Text="Single Deck" FontSize="10"  VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFBBF4F9"/>
-                </StackPanel>
+            <Border x:Name="btnEFRTs" Grid.Row="0" Grid.Column="3" Margin="5,10,5,10" BorderThickness="4" Background="#332D95D1" PreviewMouseLeftButtonUp="btnEFRTs_PreviewMouseLeftButtonUp" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnEFRTs_MouseEnter" >
+                <Grid>
+                    <Image Source="/ExcelAddIn;component/Resources/icon_EFRT_single_deck.png"/>
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,0,-40">
+                        <TextBlock x:Name="textEFRTs1" Grid.Row="1" Grid.Column="3" Text="EFRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+                        <TextBlock x:Name="textEFRTs2" Grid.Row="1" Grid.Column="3" Text="Single Deck" FontSize="10"  VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF9DD4E8" Margin="0,-6,0,-2"/>
+                    </StackPanel>
+                </Grid>
+
             </Border>
-            <Border x:Name="btnEFRTd" Grid.Row="0" Grid.Column="4" Margin="5,10,5,10" BorderThickness="4"  PreviewMouseLeftButtonUp="btnEFRTd_PreviewMouseLeftButtonUp" Background="#FF2D95D1" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnEFRTd_MouseEnter" >
-                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                    <TextBlock x:Name="textEFRTd1" Grid.Row="1" Grid.Column="3" Text="EFRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
-                    <TextBlock x:Name="textEFRTd2" Grid.Row="1" Grid.Column="3" Text="Double Deck" FontSize="10"  VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFBBF4F9"/>
-                </StackPanel>
+            <Border x:Name="btnEFRTd" Grid.Row="0" Grid.Column="4" Margin="5,10,5,10" BorderThickness="4"  PreviewMouseLeftButtonUp="btnEFRTd_PreviewMouseLeftButtonUp" Background="#332D95D1" BorderBrush="#FF0B6FA8" Cursor="Hand" MouseEnter="btnEFRTd_MouseEnter" >
+                <Grid>
+                    <Image Source="/ExcelAddIn;component/Resources/icon_EFRT_double_deck.png"/>
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,0,-40">
+                        <TextBlock x:Name="textEFRTd1" Grid.Row="1" Grid.Column="3" Text="EFRT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
+                        <TextBlock x:Name="textEFRTd2" Grid.Row="1" Grid.Column="3" Text="Double Deck" FontSize="10"  VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF9DD4E8" Margin="0,-6,0,-2"/>
+                    </StackPanel>
+                </Grid>
+
             </Border>
         </Grid>
     </Grid>
