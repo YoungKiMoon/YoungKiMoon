@@ -51,7 +51,7 @@ namespace DrawWork.DrawServices
 
             publicFunService = new DrawPublicFunctionService();
 
-            nozzleBlock = new DrawNozzleBlockService();
+            nozzleBlock = new DrawNozzleBlockService(selAssembly);
             blockImportService = new DrawImportBlockService(selAssembly,(Model)selModel);
         }
 
@@ -380,7 +380,8 @@ namespace DrawWork.DrawServices
             // Nozzle : Create Model
             foreach (NozzleInputModel eachNozzle in drawArrangeNozzle)
             {
-                // Start Point
+                Console.WriteLine("Press " + eachNozzle.Description + " " + eachNozzle.Remarks);
+                // Start Point : roof 접점
                 Point3D newNozzlePoint = GetPositionPoint(refPoint, eachNozzle.Position, eachNozzle.LR, eachNozzle.HRSort, 0, sizeNominalId, centerTopHeight, shellSpacing);
                 NozzlePointList.Add(newNozzlePoint);
 
@@ -392,6 +393,7 @@ namespace DrawWork.DrawServices
 
                 // Create Model : OutLine
                 customOutlineEntity.AddRange(customEntity);
+                Console.WriteLine(eachNozzle.Description + " " + eachNozzle.Remarks);
             }
 
             // Layer
@@ -842,7 +844,8 @@ namespace DrawWork.DrawServices
             double couplingHeight = 0;
             if (selNozzle.RePadType != "")
             {
-                customEntity.AddRange(CreateReinforcingPAD(refPoint, drawPoint, selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
+                if (SingletonData.TankType == TANK_TYPE.CRT)
+                    customEntity.AddRange(CreateReinforcingPAD(refPoint, drawPoint, selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
             }
 
             if (selNozzle.LR == "center")
@@ -853,8 +856,16 @@ namespace DrawWork.DrawServices
             else
             {
 
-                // Neck
-                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                if (SingletonData.TankType == TANK_TYPE.DRT && selNozzle.Position.ToLower() == "roof" && selNozzle.InternalPipe != "yes")
+                {
+                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeArc(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                }
+                else
+                {
+
+                    // Neck
+                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                }
             }
 
 
@@ -1006,7 +1017,8 @@ namespace DrawWork.DrawServices
             double couplingHeight = 0;
             if (selNozzle.RePadType != "")
             {
-                customEntity.AddRange(CreateReinforcingPAD(refPoint, drawPoint, selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
+                if (SingletonData.TankType == TANK_TYPE.CRT)
+                    customEntity.AddRange(CreateReinforcingPAD(refPoint, drawPoint, selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
             }
 
             if (selNozzle.LR == "center")
@@ -1016,9 +1028,16 @@ namespace DrawWork.DrawServices
             }
             else
             {
+                if (SingletonData.TankType == TANK_TYPE.DRT && selNozzle.Position.ToLower() == "roof" && selNozzle.InternalPipe != "yes")
+                {
+                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeArc(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                }
+                else
+                {
 
-                // Neck
-                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                    // Neck
+                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                }
             }
 
 
@@ -1163,7 +1182,8 @@ namespace DrawWork.DrawServices
             double couplingHeight = 0;
             if (selNozzle.RePadType != "")
             {
-                customEntity.AddRange(CreateReinforcingPAD(refPoint, drawPoint, selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
+                if (SingletonData.TankType == TANK_TYPE.CRT)
+                    customEntity.AddRange(CreateReinforcingPAD(refPoint, drawPoint, selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
             }
 
             if (selNozzle.LR == "center")
@@ -1173,8 +1193,16 @@ namespace DrawWork.DrawServices
             }
             else
             {
-                // Neck
-                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, H, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                if (SingletonData.TankType == TANK_TYPE.DRT && selNozzle.Position.ToLower() == "roof" && selNozzle.InternalPipe != "yes")
+                {
+                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeArc(out currentPoint, currentPoint[0], 1, H, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                }
+                else
+                {
+                    // Neck
+                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, H, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                }
+
             }
 
 
@@ -1258,6 +1286,11 @@ namespace DrawWork.DrawServices
             double C = valueService.GetDoubleValue(drawNozzle.C);
             double facingC = 0;
 
+            if (selNozzle.Description.Contains("SKIMMER"))
+            {
+                Console.WriteLine("Break");
+            }
+
             // Facing : Default : Rf
             bool facingAdd = false;
             if (selNozzle.Facing.Contains("ff"))
@@ -1329,7 +1362,8 @@ namespace DrawWork.DrawServices
             double couplingHeight = 0;
             if (selNozzle.RePadType != "")
             {
-                customEntity.AddRange(CreateReinforcingPAD(refPoint, GetSumPoint(currentInternalPoint, 0,0), selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
+                if(SingletonData.TankType==TANK_TYPE.CRT)
+                    customEntity.AddRange(CreateReinforcingPAD(refPoint, GetSumPoint(currentInternalPoint, 0,0), selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
             }
 
 
@@ -1341,7 +1375,18 @@ namespace DrawWork.DrawServices
             else
             {
                 // Neck
-                customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                //customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlopeAll(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                //customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+
+                if (SingletonData.TankType == TANK_TYPE.DRT && selNozzle.Position.ToLower() == "roof" && selNozzle.InternalPipe != "yes")
+                {
+                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeArc(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                }
+                else
+                {
+                    customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, G, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+
+                }
             }
 
 
@@ -1933,13 +1978,32 @@ namespace DrawWork.DrawServices
 
                     if (selNozzle.LR == "left")
                     {
-                        customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, manholeOD, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
-                        customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PadSlope(out currentPoint, GetSumPoint(currentPoint[0],0,padBottomGap), 0, manholeOD, L, padThickness, true, pipeSlope, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+
+                        if (SingletonData.TankType == TANK_TYPE.DRT && selNozzle.Position.ToLower() == "roof")
+                        {
+                            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeArc(out currentPoint, currentPoint[0], 1, manholeOD, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                        }
+                        else
+                        {
+                            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, manholeOD, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+                        }
+
+                        if(SingletonData.TankType==TANK_TYPE.CRT)
+                            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PadSlope(out currentPoint, GetSumPoint(currentPoint[0],0,padBottomGap), 0, manholeOD, L, padThickness, true, pipeSlope, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
                     }
                     else if (selNozzle.LR == "right")
                     {
-                        customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, manholeOD, neckLength, -pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, twoEx = true }));
-                        customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PadSlope(out currentPoint, GetSumPoint(currentPoint[0], 0, padBottomGap), 0, manholeOD, L, padThickness, true, -pipeSlope, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
+
+                        if (SingletonData.TankType == TANK_TYPE.DRT && selNozzle.Position.ToLower() == "roof")
+                        {
+                            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeArc(out currentPoint, currentPoint[0], 1, manholeOD, neckLength, -pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, twoEx = true }));
+                        }
+                        else
+                        {
+                            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, manholeOD, neckLength, -pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, twoEx = true }));
+                        }
+                        if (SingletonData.TankType == TANK_TYPE.CRT)
+                            customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PadSlope(out currentPoint, GetSumPoint(currentPoint[0], 0, padBottomGap), 0, manholeOD, L, padThickness, true, -pipeSlope, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
                     }
 
                 }

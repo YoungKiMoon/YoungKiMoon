@@ -306,6 +306,12 @@ namespace DrawWork.CommandServices
                     drawEntity.dimArrowList.AddRange(newCustomDim[CommonGlobal.DimArrow]);
                     break;
 
+                case "extradim":
+                    Dictionary<string, List<Entity>> newExtraDim = drawObject.DoDimensionExtra(eachCmd, ref refPoint, ref curPoint, scaleData.Value);
+                    drawEntity.dimlineList.AddRange(newExtraDim[CommonGlobal.DimLine]);
+                    drawEntity.dimTextList.AddRange(newExtraDim[CommonGlobal.DimText]);
+                    break;
+
                 // Import Block
                 case "block":
                 case "importblock":

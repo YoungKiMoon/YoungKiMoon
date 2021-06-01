@@ -36,6 +36,8 @@ using devDept.Eyeshot.Translators;
 using DrawWork.DWGFileServices;
 using Microsoft.Win32;
 using DrawWork.ImportServices;
+using PaperSetting.Utils;
+using DrawWork.DrawBuilders;
 
 namespace PaperSetting
 {
@@ -44,13 +46,51 @@ namespace PaperSetting
     /// </summary>
     public partial class PaperSettingWindow : Window
     {
+
+        #region Custom Cursor
+        public CustomCursor currentCursor;
+        #endregion
+
+        #region Busy Indicator
+        private BackgroundWorker BusyWorker = new BackgroundWorker();
+        private int BusyAngle = 0;
+        private bool IsBusy = false;
+        #endregion
+
+        public double progressCustomi=0;
+
         public string workbookName = "";
         public object activeCustomWorkbook = null;
+        
+
+        #region One Click
+        private long _oneClickFirsttime = (long)0;
+
+        public bool One_Click()
+        {
+            bool flag;
+            long ticks = DateTime.Now.Ticks;
+            if (ticks - this._oneClickFirsttime >= (long)4000000)
+            {
+                this._oneClickFirsttime = ticks;
+                flag = true;
+            }
+            else
+            {
+                this._oneClickFirsttime = ticks;
+                flag = false;
+            }
+            return flag;
+        }
+        #endregion
+
         public PaperSettingWindow()
         {
             
 
             InitializeComponent();
+
+            busyAreaSource.Visibility = Visibility.Hidden;
 
             tabDetail.SelectedItem = viewview;
 
@@ -60,6 +100,7 @@ namespace PaperSetting
             testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Wireframe;
             testModel.ActiveViewport.Background.TopColor = new SolidColorBrush(Color.FromRgb(59, 68, 83));
 
+            testModel.ProgressBar.Visible = true;
 
             // Create Setting
             DrawSettingService drawSetting = new DrawSettingService();
@@ -73,6 +114,10 @@ namespace PaperSetting
             workbookName = "TEST 2019-3.xlsm";
             workbookName = "TEST-002.xlsm";
             workbookName = "TEST 2019-1.xlsm";
+            workbookName = "TankDesign_0527-2.xlsm";
+            workbookName = "TankDesign_0528.xlsm";
+            workbookName = "TankDesign_0528-1.xlsm";
+            workbookName = "DRT TEST-1.xlsm";
             //workbookName = "TankDesign_TEST-2.xlsm";
 
 
@@ -92,12 +137,15 @@ namespace PaperSetting
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
+
+
             ExcelApplicationService eDataService = new ExcelApplicationService(-1);
             if (activeCustomWorkbook != null)
             {
                 if (eDataService.CheckTABASExcel2(activeCustomWorkbook))
                 {
                     // 자동 실행
+                    //testBackStart();
                     SetAssemblyData();
                 }
                 else
@@ -109,10 +157,11 @@ namespace PaperSetting
             else
             {
                 // 자동 실행
+                //testBackStart();
                 SetAssemblyData();
             }
 
-            
+            gridLoading.Visibility = Visibility.Collapsed;
 
 
         }
@@ -122,21 +171,138 @@ namespace PaperSetting
             //SampleDraw();
             //CreateDraw();
             //CreateDrawSample();
-            CreateDraw1st();
+            if (One_Click())
+            {
+                //BusyStartSource(true);
+                //CreateDraw1st
+                testBack();
+                
+            }
 
             //SampleDraw();
         }
 
 
+        public void testBackStart()
+        {
+            PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+            selView.BContents = "TANK DATA 준비 중입니다.";
+            customBusyIndicator.IsBusy = true;
+
+
+            BackgroundWorker bgWorker = new BackgroundWorker();
+
+            bgWorker.WorkerReportsProgress = true;
+            bgWorker.ProgressChanged += (ssender, ee) =>
+            {
+                if (ee.ProgressPercentage == 99999)
+                {
+                    customBusyIndicator.IsBusy = false;
+                    IsBusy = false;
+                }
+                else
+                {
+
+                }
+
+            };
+            bgWorker.RunWorkerCompleted += (ssender, ee) =>
+            {
+                customBusyIndicator.IsBusy = false;
+                IsBusy = false;
+
+                gridLoading.Visibility = Visibility.Collapsed;
+            };
+            bgWorker.DoWork += (ssender, ee) =>
+            {
+
+
+
+                try
+                {
+                    //DoEvents();
+                    //Thread.Sleep(1000);
+                    Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+                    {
+                        //your code
+                        //DoEvents();
+                        SetAssemblyData();
+                    }));
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            };
+            bgWorker.RunWorkerAsync();
+        }
+
+
+        public void testBack()
+        {
+            PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+            selView.BContents = "TANK 를 생성 중입니다.";
+            customBusyIndicator.IsBusy = true;
+
+
+            BackgroundWorker bgWorker = new BackgroundWorker();
+
+            bgWorker.WorkerReportsProgress = true;
+            bgWorker.ProgressChanged += (ssender, ee) =>
+            {
+                if (ee.ProgressPercentage == 99999)
+                {
+                    customBusyIndicator.IsBusy = false;
+                    IsBusy = false;
+                }
+                else
+                {
+
+                }
+
+            };
+            bgWorker.RunWorkerCompleted += (ssender, ee) =>
+            {
+
+                customBusyIndicator.IsBusy = false;
+                IsBusy = false;
+            };
+            bgWorker.DoWork += (ssender, ee) =>
+            {
+
+
+
+                try
+                {
+                    //DoEvents();
+                    Thread.Sleep(1000);
+                    Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+                    {
+                        //your code
+                        //DoEvents();
+                        CreateDraw1st();
+                    }));
+
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            };
+            bgWorker.RunWorkerAsync();
+        }
+
         public void SetAssemblyData()
         {
             PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
             // Assembly
-
+            
             AssemblyDataService assemblyService = new AssemblyDataService();
             AssemblyModel newTankData = assemblyService.CreateMappingData(workbookName,activeCustomWorkbook);
             //selView.newTankData = newTankData;
 
+            selView.newTankData = newTankData;
             PaperSettingService newSetting = new PaperSettingService();
             selView.PaperList = newSetting.CreateDrawingCRTList(newTankData);
             //selView.PaperList = newSetting.CreateDrawingCRTList();
@@ -146,35 +312,6 @@ namespace PaperSetting
 
         public void CreateDraw1st()
         {
-            PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
-
-            //selView.BContents = "TANK 를 생성 중입니다.";
-            //BackgroundWorker bgWorker = new BackgroundWorker();
-
-            //bgWorker.WorkerReportsProgress = true;
-            //bgWorker.ProgressChanged += (ssender, ee) =>
-            //{
-            //    if (ee.ProgressPercentage == 99999)
-            //    {
-            //        customBusyIndicator.IsBusy = false;
-            //    }
-            //    else
-            //    {
-
-            //    }
-
-            //};
-            //bgWorker.RunWorkerCompleted += (ssender, ee) =>
-            //{
-            //    customBusyIndicator.IsBusy = false;
-            //};
-            //bgWorker.DoWork += (ssender, ee) =>
-            //{
-
-
-
-            //    try
-            //    {
 
 
 
@@ -242,22 +379,23 @@ namespace PaperSetting
             DrawScaleService scaleService = new DrawScaleService();
             double autoScale = scaleService.GetAIScale(newTankData);
 
-
+            LogicBuilder outBuilder = null;
             IntergrationService newInterService = new IntergrationService("CRT", newTankData, testModel);
-            if (newInterService.CreateLogic(autoScale, newAll.ToArray()))
+            if (newInterService.CreateLogic(autoScale, newAll.ToArray(), out outBuilder))
             {
 
                 //bgWorker.ReportProgress(99999);
-                MessageBox.Show("생성 완료", "안내");
+                //MessageBox.Show("생성 완료", "안내");
+                //DoEvents();
 
             }
             else
             {
                 //bgWorker.ReportProgress(88888);
                 MessageBox.Show("생성 실패", "안내");
+                //DoEvents();
             }
-            SampleDraw(newTankData, autoScale);
-
+            //SampleDraw(newTankData, autoScale);
 
             //    }
 
@@ -330,7 +468,10 @@ namespace PaperSetting
         }
 
 
-
+        public static void DoEvents()
+        {
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate { }));
+        }
 
 
         #region Sample Draw
@@ -624,8 +765,11 @@ namespace PaperSetting
 
         private void testModel_WorkCompleted(object sender, devDept.Eyeshot.WorkCompletedEventArgs e)
         {
-            
-                if (e.WorkUnit is ReadFileAsync)
+
+
+
+
+            if (e.WorkUnit is ReadFileAsync)
                 {
                     ReadFileAsync rfa = (ReadFileAsync)e.WorkUnit;
 
@@ -661,9 +805,9 @@ namespace PaperSetting
                     MessageBox.Show("Block Loading Complete.");
                     }
 
-                
 
-                    //var br3 = new BlockReference(10, 100, 10, "ssblock",testModel.RootBlock.Units,testModel.Blocks,0);
+
+                //var br3 = new BlockReference(10, 100, 10, "ssblock",testModel.RootBlock.Units,testModel.Blocks,0);
 
                 // 블럭 삽입 방법
                 //if (false)
@@ -677,12 +821,77 @@ namespace PaperSetting
 
                 //                rfa.AddToScene(testModel);
             }
+            else
+            {
+                
+                    PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+                    DrawScaleService scaleService = new DrawScaleService();
+                    double autoScale = scaleService.GetAIScale(selView.newTankData);
+                    SampleDraw(selView.newTankData, autoScale);
+                testDraw.ZoomFit();
+                    
+            }
             
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             ReadAutodesk.OnApplicationExit(sender,e);
+        }
+
+
+
+        #region Busy : Source
+        private void BusyStartSource(bool selBusy)
+        {
+            CustomCursor selCursor = new CustomCursor();
+            selCursor.WaitCursor();
+
+            IsBusy = selBusy;
+            BusyAngle = 0;
+
+            busyAreaSource.Visibility = Visibility.Visible;
+
+            BusyWorker = new BackgroundWorker();
+            BusyWorker.WorkerReportsProgress = true;
+            BusyWorker.WorkerSupportsCancellation = true;
+            BusyWorker.ProgressChanged += (ssender, ee) =>
+            {
+                BusyAngle += 30;
+                if (BusyAngle == 360)
+                    BusyAngle = 0;
+                RotateTransform rt = new RotateTransform();
+                rt.Angle = BusyAngle;
+                rt.CenterX = 50;
+                rt.CenterY = 50;
+
+                busyImageSource.RenderTransform = rt;
+            };
+            BusyWorker.RunWorkerCompleted += (ssender, ee) =>
+            {
+                busyAreaSource.Visibility = Visibility.Hidden;
+                selCursor.Dispose();
+            };
+            BusyWorker.DoWork += (ssender, ee) =>
+            {
+                while (IsBusy)
+                {
+                    BusyWorker.ReportProgress(1);
+                    Thread.Sleep(80);
+                }
+            };
+            BusyWorker.RunWorkerAsync();
+        }
+
+        #endregion
+
+        private void testModel_ProgressChanged(object sender, devDept.Eyeshot.ProgressChangedEventArgs e)
+        {
+            progressCustomi++;
+            Console.WriteLine(progressCustomi.ToString());
+            Console.WriteLine(e.Progress);
+
+            
         }
     }
 }

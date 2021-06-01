@@ -52,17 +52,21 @@ refpoint xy 10000,10000
 	logicblock name topanglerightouter xy @,@
 #endregion
 
-
 #region Roof
 	point xy refpointx,refpointy
-	linedgree xy1 cp[pointleftroofdown].x,cp[pointleftroofdown].y xy2 @sizenominalid/2,@ degree roofslope direction x wp start
-	line xy1 @,@ xy2 @,@roofplatethickness wp end rotater roofslope
-	linedgree xy1 @,@ xy2 cp[pointcentertopdown].x,@ degree roofslope direction x
+	logicblock name roof xy @,@
+#endregion
+
+#region Roof
+#	point xy refpointx,refpointy
+#	linedgree xy1 cp[pointleftroofdown].x,cp[pointleftroofdown].y xy2 @sizenominalid/2,@ degree roofslope direction x wp start
+#	line xy1 @,@ xy2 @,@roofplatethickness wp end rotater roofslope
+#	linedgree xy1 @,@ xy2 cp[pointcentertopdown].x,@ degree roofslope direction x
 	
-	point xy refpointx,refpointy
-	linedgree xy1 cp[pointleftroofdown].x,cp[pointleftroofdown].y xy2 @sizenominalid/2,@ degree roofslope direction x wp start mirror right
-	line xy1 @,@ xy2 @,@roofplatethickness rotater roofslope mirror right wp end
-	linedgree xy1 @,@ xy2 cp[pointcentertopdown].x,@ degree roofslope direction x 
+#	point xy refpointx,refpointy
+#	linedgree xy1 cp[pointleftroofdown].x,cp[pointleftroofdown].y xy2 @sizenominalid/2,@ degree roofslope direction x wp start mirror right
+#	line xy1 @,@ xy2 @,@roofplatethickness rotater roofslope mirror right wp end
+#	linedgree xy1 @,@ xy2 cp[pointcentertopdown].x,@ degree roofslope direction x 
 #endregion
 
 #region Bottom
@@ -127,6 +131,13 @@ refpoint xy 10000,10000
 #region CustomDimension
 	point xy refpointx,refpointy
 	customdimline  xy @,@
+
+#endregion
+
+
+#region ExtraDimension
+	point xy refpointx,refpointy
+	extradim  xy @,@
 
 #endregion
 

@@ -40,6 +40,7 @@
                 <Button Content="Create Logic"  Width="100" Click="Button_Click_1" Background="#FFE6A1A1"/>
                 <Button Content="Create Logic(New)"  Width="100" Background="#FFE6A1A1" Click="Button_Click_4"/>
                 <Button Content="Create Sample" Width="100" Click="Button_Click"/>
+                <Button Content="Regen" Width="100" Click="Button_Click_5"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
 

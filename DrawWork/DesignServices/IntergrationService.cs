@@ -88,8 +88,9 @@ namespace DrawWork.DesignServices
 		}
 
 
-		public bool CreateLogic(double selScale,string[] selCommandArray , bool clearEntities = true)
+		public bool CreateLogic(double selScale,string[] selCommandArray, out LogicBuilder outLogicBuilder, bool clearEntities = true)
         {
+			outLogicBuilder = null;
 			bool returnValue = false;
             try
             {
@@ -99,7 +100,7 @@ namespace DrawWork.DesignServices
 					singleModel.Entities.Clear();
 
 				singleModel.StartWork(testBuilder);
-
+				//outLogicBuilder = testBuilder;
 				returnValue = true;
 
 			}

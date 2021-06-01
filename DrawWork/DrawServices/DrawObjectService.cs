@@ -956,6 +956,14 @@ namespace DrawWork.DrawServices
 
 
         }
+        public Dictionary<string, List<Entity>> DoDimensionExtra(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
+        {
+
+
+            return drawLogicBlockService.DrawBlock_EtraDimension(ref refPoint, ref curPoint, scaleValue);
+
+
+        }
 
         // Leader
         public Dictionary<string, List<Entity>> DoLeader(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
@@ -1205,7 +1213,7 @@ namespace DrawWork.DrawServices
                     returnEntity = (DoBlockEtcBlock(eachCmd, ref refPoint, ref curPoint, scaleValue));
                     goto case "allways";
 
-                case "etcText":
+                case "etctext":
                     returnEntity = (DoBlockEtcText(eachCmd, ref refPoint, ref curPoint, scaleValue));
                     goto case "allways";
 

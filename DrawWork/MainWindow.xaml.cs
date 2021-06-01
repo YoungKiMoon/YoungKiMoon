@@ -64,7 +64,10 @@ namespace DrawWork
             this.testModel.ActiveViewport.Background.TopColor= new SolidColorBrush(Color.FromRgb(59, 68, 83));
             //this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Rendered;
             this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Wireframe;
-            this.testModel.Wireframe.SilhouettesDrawingMode = silhouettesDrawingType.LastFrame;
+            this.testModel.Wireframe.SilhouettesDrawingMode = silhouettesDrawingType.Always;
+            //this.testModel.ActiveViewport.SmallSize
+            //this.testModel.ActiveViewport.SmallSizeRatio = 0.001;
+
             drawSetting = new DrawSettingService();
             drawSetting.SetModelSpace(testModel);
 
@@ -393,7 +396,9 @@ namespace DrawWork
 
 
             IntergrationService newInterService = new IntergrationService("CRT", newTankData, testModel);
-            if (newInterService.CreateLogic(Convert.ToDouble(autoScale), newComData))
+
+            LogicBuilder outBuilder = null;
+            if (newInterService.CreateLogic(Convert.ToDouble(autoScale), newComData,out outBuilder))
             {
                 MessageBox.Show("완료");
             }
@@ -409,6 +414,13 @@ namespace DrawWork
             Properties.Settings.Default.logicPath = logicFile.Text;
             Properties.Settings.Default.excelPath=ExcelFile.Text;
             Properties.Settings.Default.Save();
+
+        }
+
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+
+            this.testModel.Entities.RegenAllCurved(new RegenOptions() { PreProcessSilhouettes = true });
 
         }
     }

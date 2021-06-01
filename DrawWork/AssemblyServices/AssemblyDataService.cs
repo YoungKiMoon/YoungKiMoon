@@ -572,6 +572,90 @@ namespace DrawWork.AssemblyServices
             else if(SingletonData.TankType == TANK_TYPE.DRT)
             {
                 #region DRT
+
+                // Structure : Clip Shell Side
+                selAssembly.StructureDRTClipShellSideOutput.Clear();
+                string acRafterSizeLast = valueService.GetAllTrim(selAssembly.StructureDRTRafterInput[selAssembly.StructureDRTRafterInput.Count - 1].Size);
+                foreach (StructureClipShellSideModel eachClip in selAssembly.StructureClipShellSideList)
+                {
+                    if (eachClip.TankType == StructureDivService.tankType)      // Tank Type
+                        if (eachClip.Type == StructureDivService.columnType)        // Column type
+                            if (eachClip.Angle == StructureDivService.topAngleType)     // Top Angle
+                                if (valueService.GetAllTrim(eachClip.SIZE) == acRafterSizeLast)
+                                    selAssembly.StructureDRTClipShellSideOutput.Add(eachClip);  // DRT : H
+
+
+                }
+
+
+
+                // Structure : Centering
+                selAssembly.StructureDRTCenteringOutput.Clear();
+                string acRafterSizeFirst = valueService.GetAllTrim(selAssembly.StructureDRTRafterInput[0].Size);
+                foreach (StructureCenteringModel eachCentering in selAssembly.StructureCenteringList)
+                {
+                    //if (eachCentering.TankType.Contains(StructureDivService.tankType))
+                        if (eachCentering.InEx == StructureDivService.centeringInEx)
+                            if (acRafterSizeFirst == eachCentering.SIZE)
+                                selAssembly.StructureDRTCenteringOutput.Add(eachCentering);
+
+                }
+
+                // Structure : ClipCenteringSide
+                selAssembly.StructureDRTClipCenteringSideOutput.Clear();
+                foreach (StructureClipCenteringSideModel eachClip in selAssembly.StructureClipCenteringSideList)
+                {
+                    if (eachClip.TankType.Contains(StructureDivService.tankType))
+                        if (eachClip.SIZE == acRafterSizeFirst)
+                            selAssembly.StructureDRTClipCenteringSideOutput.Add(eachClip);
+                }
+
+                // Structure : Centering Rafter
+                selAssembly.StructureDRTCenteringRafterOutput.Clear();
+                foreach(StructureDRTRafterInputModel eachInputRafter in selAssembly.StructureDRTRafterInput)
+                {
+                    foreach (StructureCenteringRafterModel eachRafter in selAssembly.StructureCenteringRafterList)
+                    {
+                        if (eachRafter.TankType == StructureDivService.tankType)
+                            if (eachRafter.InEx == StructureDivService.centeringInEx)
+                                if (eachRafter.Angle == StructureDivService.topAngleType)
+                                    if (eachRafter.SIZE == eachInputRafter.Size)
+                                        selAssembly.StructureDRTCenteringRafterOutput.Add(eachRafter);
+
+                    }
+                }
+
+
+                // Structure : Rafter HBeam
+                selAssembly.StructureDRTRafterHBeamOutput.Clear();
+                foreach(StructureDRTRafterInputModel eachRafter in selAssembly.StructureDRTRafterInput)
+                {
+                    string rafterSize = valueService.GetAllTrim(eachRafter.Size);
+                    foreach (HBeamModel eachHbeam in selAssembly.HBeamList)
+                    {
+                        if (eachHbeam.SIZE == rafterSize)
+                        {
+                            selAssembly.StructureDRTRafterHBeamOutput.Add(eachHbeam);
+                        }
+                    }
+                }
+
+
+                // Structure : Girder HBeam
+                selAssembly.StructureDRTGirderHBeamOutput.Clear();
+                foreach (StructureDRTGirderInputModel eachGirder in selAssembly.StructureDRTGirderInput)
+                {
+                    string rafterSize = valueService.GetAllTrim(eachGirder.Size);
+                    foreach (HBeamModel eachHbeam in selAssembly.HBeamList)
+                    {
+                        if (eachHbeam.SIZE == rafterSize)
+                        {
+                            selAssembly.StructureDRTGirderHBeamOutput.Add(eachHbeam);
+                        }
+                    }
+                }
+
+
                 #endregion
             }
 

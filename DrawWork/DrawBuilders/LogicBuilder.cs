@@ -14,9 +14,7 @@ using devDept.Serialization;
 using eyeEnvironment = devDept.Eyeshot.Environment;
 using MColor = System.Windows.Media.Color;
 using Color = System.Drawing.Color;
-
-
-
+using DrawWork.Commons;
 
 namespace DrawWork.DrawBuilders
 {
@@ -67,11 +65,21 @@ namespace DrawWork.DrawBuilders
             // update top data display
             environment.Entities.Regen();
 
+            //environment.Entities.BoxSize
+
+            SingletonData.GAViewPortSize.X = environment.Entities.BoxSize.X;
+            SingletonData.GAViewPortSize.Y = environment.Entities.BoxSize.Y;
+
+            SingletonData.GAViewPortCenter.X = environment.Entities.BoxMin.X;
+            SingletonData.GAViewPortCenter.Y = environment.Entities.BoxMin.Y;
+
             // sets trimetric view
             environment.SetView(viewType.Top);
 
             // fits the model in the viewport
             environment.ZoomFit();
+
+
         }
     }
 }

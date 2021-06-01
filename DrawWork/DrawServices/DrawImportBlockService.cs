@@ -59,7 +59,7 @@ namespace DrawWork.DrawServices
 
             publicFunService = new DrawPublicFunctionService();
 
-            nozzleBlock = new DrawNozzleBlockService();
+            nozzleBlock = new DrawNozzleBlockService(selAssembly);
 
             drawService = new DrawService(selAssembly);
 

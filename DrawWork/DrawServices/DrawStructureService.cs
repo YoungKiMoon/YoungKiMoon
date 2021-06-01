@@ -28,6 +28,7 @@ namespace DrawWork.DrawServices
             originStructureType = selStructureType;
             originTopAngleType = selTopAngleType;
 
+            // Tank Type
             switch (selTankType)
             {
                 case TANK_TYPE.CRT:
@@ -39,38 +40,89 @@ namespace DrawWork.DrawServices
 
             }
 
-            switch (selStructureType)
+            // Structure Type
+            switch (selTankType)
             {
-                case "Self-supporting":
+                case TANK_TYPE.CRT:
+                    switch (selStructureType)
+                    {
+                        case "Self-supporting":
+                            break;
+                        case "Rafter only (internal)":
+                            columnType = "centering";
+                            centeringInEx = "internal";
+                            break;
+                        case "Rafter only (external)":
+                            columnType = "centering";
+                            centeringInEx = "external";
+                            break;
+                        case "Rafter w/Column":
+                            columnType = "column";
+                            break;
+                        case "Rafter w/Column & Girder":
+                            columnType = "column";
+                            break;
+                    }
                     break;
-                case "Rafter only (internal)":
-                    columnType = "centering";
-                    centeringInEx = "internal";
+
+                case TANK_TYPE.DRT:
+
+                    switch (selStructureType)
+                    {
+                        case "Self-supporting":
+                            break;
+                        case "Rafter only(Internal)":
+                        case "Rafter w/Girder(Internal)":
+                            columnType = "centering";
+                            centeringInEx = "internal";
+                            break;
+                        case "Rafter w/Girder(External)":
+                        case "Rafter only(External)":
+                            columnType = "centering";
+                            centeringInEx = "external";
+                            break;
+
+                    }
                     break;
-                case "Rafter only (external)":
-                    columnType = "centering";
-                    centeringInEx = "external";
-                    break;
-                case "Rafter w/Column":
-                    columnType = "column";
-                    break;
-                case "Rafter w/Column & Girder":
-                    columnType = "column";
-                    break;
+
             }
 
-            switch (selTopAngleType)
+            // Structure Type
+            switch (selTankType)
             {
-                case "Detail b":
-                case "Detail d":
-                case "Detail e":
-                    topAngleType = "topangle";
+                case TANK_TYPE.CRT:
+                    switch (selTopAngleType)
+                    {
+                        case "Detail b":
+                        case "Detail d":
+                        case "Detail e":
+                            topAngleType = "topangle";
+                            break;
+                        case "Detail i":
+                        case "Detail k":
+                            topAngleType = "compressionring";
+                            break;
+                    }
                     break;
-                case "Detail i":
-                case "Detail k":
-                    topAngleType = "compressionring";
+
+
+                case TANK_TYPE.DRT:
+                    switch (selTopAngleType)
+                    {
+                        case "Detail b":
+                        case "Detail d":
+                        case "Detail e":
+                        case "Detail k":
+                            topAngleType = "topangle";
+                            break;
+                        case "Detail i":
+                            topAngleType = "compressionring";
+                            break;
+                    }
                     break;
             }
+                    // 공통
+
         }
 
 

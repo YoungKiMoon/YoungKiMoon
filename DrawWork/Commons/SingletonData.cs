@@ -55,5 +55,20 @@ namespace DrawWork.Commons
         private static List<DimensionPointModel> _DimPublicList = new List<DimensionPointModel>();
 
 
+        // GA ViewPort
+        public static CDPoint GAViewPortSize
+        {
+            get { return _GAViewPortSize; }
+            set { _GAViewPortSize = value; }
+        }
+        private static CDPoint _GAViewPortSize = new CDPoint();
+
+        public static CDPoint GAViewPortCenter
+        {
+            get { return _GAViewPortCenter; }
+            set { _GAViewPortCenter = value; }
+        }
+        private static CDPoint _GAViewPortCenter = new CDPoint();
+
     }
 }

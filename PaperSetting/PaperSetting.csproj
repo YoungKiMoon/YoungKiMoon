@@ -118,6 +118,7 @@
     <Compile Include="Services\PaperDockService.cs" />
     <Compile Include="Services\PaperSettingService.cs" />
     <Compile Include="Services\SampleService.cs" />
+    <Compile Include="Utils\CustomCursor.cs" />
     <Compile Include="Utils\Notifier.cs" />
     <Compile Include="ViewModel\PaperSettingViewModel.cs" />
     <Page Include="PaperSettingWindow.xaml">
@@ -185,6 +186,12 @@
       <Project>{135b58cb-c30c-4500-84c4-0a67a68c7812}</Project>
       <Name>ExcelDataLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Spinner.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ssp.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

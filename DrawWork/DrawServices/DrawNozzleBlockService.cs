@@ -18,6 +18,7 @@ using DrawWork.ValueServices;
 using AssemblyLib.AssemblyModels;
 using DrawWork.DrawStyleServices;
 using DrawWork.DrawModels;
+using DrawWork.Commons;
 
 namespace DrawWork.DrawServices
 {
@@ -26,11 +27,20 @@ namespace DrawWork.DrawServices
         private ValueService valueService;
         private StyleFunctionService styleService;
         private LayerStyleService layerService;
-        public DrawNozzleBlockService()
+
+
+        private DrawEditingService editingService;
+        private DrawWorkingPointService workingService;
+
+
+        public DrawNozzleBlockService(AssemblyModel selAssembly)
         {
             valueService = new ValueService();
             styleService = new StyleFunctionService();
             layerService = new LayerStyleService();
+
+            editingService = new DrawEditingService();
+            workingService = new DrawWorkingPointService(selAssembly);
         }
         public List<Entity> DrawReference_Nozzle_Elbow(out List<Point3D> selOutputPointList, Point3D selPoint1, int selPointNumber, ElbowModel selElbow, string selType = "lr", string selDegree = "90", double selRotate = 0, DrawCenterLineModel selCenterLine = null)
         {
@@ -492,6 +502,18 @@ namespace DrawWork.DrawServices
             return newList;
         }
 
+
+        public List<Entity> DrawReference_Nozzle_PipeSlopeAll(out List<Point3D> selOutputPointList, Point3D selPoint1, int selPointNumber, double selOD, double selLength, double selSlopeDgree, double selOverlap = 0, double selRotate = 0, DrawCenterLineModel selCenterLine = null)
+        {
+            if (SingletonData.TankType == TANK_TYPE.CRT)
+            {
+                return DrawReference_Nozzle_PipeSlope(out selOutputPointList, selPoint1, selPointNumber, selOD, selOD, selSlopeDgree, selOverlap, selRotate, selCenterLine);
+            }
+            else
+            {
+                return DrawReference_Nozzle_PipeArc(out selOutputPointList, selPoint1, selPointNumber, selOD, selOD, selSlopeDgree, selOverlap, selRotate, selCenterLine);
+            }
+        }
         public List<Entity> DrawReference_Nozzle_PipeSlope(out List<Point3D> selOutputPointList, Point3D selPoint1, int selPointNumber, double selOD, double selLength, double selSlopeDgree, double selOverlap = 0, double selRotate = 0, DrawCenterLineModel selCenterLine = null)
         {
 
@@ -598,6 +620,129 @@ namespace DrawWork.DrawServices
 
             return newList;
         }
+        public List<Entity> DrawReference_Nozzle_PipeArc(out List<Point3D> selOutputPointList, Point3D selPoint1, int selPointNumber, double selOD, double selLength, double selSlopeDgree, double selOverlap = 0, double selRotate = 0, DrawCenterLineModel selCenterLine = null)
+        {
+
+            double OD = selOD;
+            double Length = selLength - selOverlap;
+
+
+            List<Entity> newList = new List<Entity>();
+
+            // WP : Left Lower
+            Point3D WP = new Point3D(selPoint1.X, selPoint1.Y );
+            double centerMiddle = OD / 2;
+            Point3D WPRotate = WP;
+
+
+            // Drawing Shape
+            Arc line00 = null;
+            Line line01 = null;
+
+            //line00 = new Line(GetSumPoint(WP, -OD * 100, 0), GetSumPoint(WP, +OD * 100, 0));
+            Line lineTempVLeft = new Line(GetSumPoint(WP, -centerMiddle, +selLength * 100), GetSumPoint(WP, -centerMiddle, -selLength * 100));
+            Line lineTempVRight = new Line(GetSumPoint(WP, centerMiddle, +selLength * 100), GetSumPoint(WP, centerMiddle, -selLength * 100));
+
+
+            line00 = editingService.GetArcOfPoint(GetSumPoint(workingService.DRTWorkingData.RoofCenterPoint, 0, 0), workingService.DRTWorkingData.DomeRaidus, GetSumPoint(selPoint1, 0, 0), OD);
+
+            Vector3D tempMovement = new Vector3D(0, selLength);
+            line00.Translate(tempMovement);
+             
+            //line00.Rotate(selSlopeDgree, Vector3D.AxisZ, line00.MidPoint);
+
+
+
+
+            Point3D[] leftDownPoint = line00.IntersectWith(lineTempVLeft);
+            Point3D[] rightDownPoint = line00.IntersectWith(lineTempVRight);
+
+
+
+            line01 = new Line(GetSumPoint(WP, -centerMiddle, Length), GetSumPoint(WP, centerMiddle, Length));
+
+            Line exLine00 = new Line(GetSumPoint(leftDownPoint[0], 0, 0), GetSumPoint(rightDownPoint[0], 0, 0));
+            Line exLine01 = new Line(GetSumPoint(leftDownPoint[0], 0, 0), GetSumPoint(line01.StartPoint, 0, 0));
+            Line exLine02 = new Line(GetSumPoint(rightDownPoint[0], 0, 0), GetSumPoint(line01.EndPoint, 0, 0));
+
+            newList.AddRange(new Line[] { exLine00, exLine01, exLine02 });
+
+            newList.Add(line00);
+            newList.Add(line01);
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+            // Center Line
+            if (selCenterLine != null)
+            {
+                if (selCenterLine.centerLine)
+                {
+                    // 기본 형상
+                    Point3D zeroPoint = exLine00.MidPoint;
+                    Point3D onePoint = line01.MidPoint;
+                    Line centerLine00 = new Line(zeroPoint, onePoint);
+
+                    styleService.SetLayer(ref centerLine00, layerService.LayerCenterLine);
+                    newList.Add(centerLine00);
+
+                    // 0
+                    if (selCenterLine.zeroEx)
+                    {
+                        Line zeroLine = new Line(GetSumPoint(zeroPoint, 0, 0), GetSumPoint(zeroPoint, 0, -selCenterLine.exLength * selCenterLine.scaleValue));
+                        styleService.SetLayer(ref zeroLine, layerService.LayerCenterLine);
+                        newList.Add(zeroLine);
+                    }
+
+                    // 1
+                    if (selCenterLine.oneEx)
+                    {
+                        Line oneLine = new Line(GetSumPoint(onePoint, 0, 0), GetSumPoint(onePoint, 0, +selCenterLine.exLength * selCenterLine.scaleValue));
+                        styleService.SetLayer(ref oneLine, layerService.LayerCenterLine);
+                        newList.Add(oneLine);
+                    }
+
+                }
+            }
+
+            // Rotate
+            if (selRotate != 0)
+            {
+                foreach (Entity eachEntity in newList)
+                    eachEntity.Rotate(selRotate, Vector3D.AxisZ, WPRotate);
+            }
+
+            // Rotate After : Set Point : Translate
+            if (selPointNumber >= 0)
+            {
+                if (selPointNumber == 0)
+                    line00.EntityData = line00.MidPoint;
+                else if (selPointNumber == 1)
+                    line01.EntityData = line01.MidPoint;
+            }
+
+            // Translate
+            if (selPointNumber > -1)
+            {
+                Point3D translatePoint = GetTranslatePoint(ref newList);
+                if (translatePoint != null)
+                    SetTranslate(ref newList, WP, translatePoint);
+
+            }
+
+            newList.Remove(line00);
+
+            selOutputPointList = new List<Point3D>();
+            selOutputPointList.Add(line00.MidPoint);
+            selOutputPointList.Add(line01.MidPoint);
+
+            return newList;
+        }
+
+
+
+
+
+
 
         public List<Entity> DrawReference_Nozzle_Neck(out List<Point3D> selOutputPointList, Point3D selPoint1, int selPointNumber, double selOD1, double selOD2, double selLength, double selRotate = 0, DrawCenterLineModel selCenterLine = null)
         {

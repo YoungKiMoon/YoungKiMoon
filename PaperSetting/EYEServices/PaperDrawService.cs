@@ -24,6 +24,7 @@ using DrawWork.DrawSacleServices;
 using DrawWork.DrawModels;
 using DrawWork.DrawStyleServices;
 using AssemblyLib.AssemblyModels;
+using DrawWork.Commons;
 
 namespace PaperSetting.EYEServices
 {
@@ -209,80 +210,64 @@ namespace PaperSetting.EYEServices
 
             if (first)
             {
-                //Sheet selSheet = singleDraw.Sheets[0];
-
-                Camera newCamera = new Camera();
-
-                newCamera.FocalLength = 0;
-                newCamera.ProjectionMode = projectionType.Orthographic;
-
-                newCamera.Rotation.X = 0.5;
-                newCamera.Rotation.Y = 0.5;
-                newCamera.Rotation.Z = 0.5;
-                newCamera.Rotation.W = 0.5;
-
-                double sizeWidth = valueService.GetDoubleValue(assemData.GeneralDesignData[0].SizeNominalID);
-                double sizeHeight = valueService.GetDoubleValue(assemData.GeneralDesignData[0].SizeTankHeight);
-                sizeHeight = 10000 + sizeHeight / 2;
-                sizeWidth = 10000 + sizeWidth/2;
-
-                // 표적 중앙
-                //newCamera.Target.X = valueService.GetDoubleValue(selViewPort.TargetX);
-                //newCamera.Target.Y = valueService.GetDoubleValue(selViewPort.TargetY);
-                newCamera.Target.Z = 0;
 
 
-                newCamera.Target.X = sizeWidth;
-                newCamera.Target.Y = sizeHeight;
-                
-
+                //double sizeWidth = valueService.GetDoubleValue(assemData.GeneralDesignData[0].SizeNominalID);
+                //double sizeHeight = valueService.GetDoubleValue(assemData.GeneralDesignData[0].SizeTankHeight);
+                //sizeHeight = 10000 + sizeHeight / 2;
+                //sizeWidth = 10000 + sizeWidth / 2;
 
                 double extensionAmount = Math.Min(selSheet.Width, selSheet.Height) / 594;
+                //bool visibleValue = false;
+                //if (visibleValue)
+                //{
+                //    Camera newCamera = new Camera();
+
+                //    newCamera.FocalLength = 0;
+                //    newCamera.ProjectionMode = projectionType.Orthographic;
+
+                //    newCamera.Rotation.X = 0.5;
+                //    newCamera.Rotation.Y = 0.5;
+                //    newCamera.Rotation.Z = 0.5;
+                //    newCamera.Rotation.W = 0.5;
+
+                //    // 표적 중앙
+                //    //newCamera.Target.X = valueService.GetDoubleValue(selViewPort.TargetX);
+                //    //newCamera.Target.Y = valueService.GetDoubleValue(selViewPort.TargetY);
+                //    newCamera.Target.Z = 0;
+
+
+                //    newCamera.Target.X = sizeWidth;
+                //    newCamera.Target.Y = sizeHeight;
 
 
 
 
-                VectorView newView = new VectorView(10000,
-                                                    10000,
-                                                    newCamera,
-                                                    scaleValue,
-                                                    "newView",
-                                                    valueService.GetDoubleValue(selViewPort.SizeX),
-                                                    valueService.GetDoubleValue(selViewPort.SizeY));
-
-                newView.CenterlinesExtensionAmount = extensionAmount;
-                //newView.CenterlinesExtensionAmount = 0;
-                //newView.FillRegions = false;
-                //newView.FillTexts = false;
-
-                //selSheet.AddViewPlaceHolder(newView, singleModel, singleDraw, "GAPlaceHolder");
-
-                //Camera newnewCamera = new Camera(new Point3D(valueService.GetDoubleValue(selViewPort.TargetX), valueService.GetDoubleValue(selViewPort.TargetY), 0),
-                //                0,
-                //                Viewport.GetCameraRotation(viewType.Top),
-                //                projectionType.Orthographic,
-                //                0,
-                //                1);
-                //VectorView newnewView = new VectorView(valueService.GetDoubleValue(selViewPort.LocationX),
-                //                                    valueService.GetDoubleValue(selViewPort.LocationY),
-                //                                    newnewCamera,
-                //                                    scaleService.GetViewScale(scaleValue),
-                //                                    "newView",
-                //                                    valueService.GetDoubleValue(selViewPort.SizeX),
-                //                                    valueService.GetDoubleValue(selViewPort.SizeY)
-                //                                    );
 
 
 
 
-                Camera newnewCamera = new Camera(new Point3D(sizeWidth, sizeHeight, 0),
-                0,
-                Viewport.GetCameraRotation(viewType.Top),
-                projectionType.Orthographic,
-                0,
-                1);
-                VectorView newnewView = new VectorView(300,
-                                                    360,
+                //    VectorView newView = new VectorView(10000,
+                //                                        10000,
+                //                                        newCamera,
+                //                                        scaleValue,
+                //                                        "newView",
+                //                                        valueService.GetDoubleValue(selViewPort.SizeX),
+                //                                        valueService.GetDoubleValue(selViewPort.SizeY));
+
+                //    newView.CenterlinesExtensionAmount = extensionAmount;
+
+                //}
+
+
+                Point3D targetPoint = new Point3D();
+                targetPoint.X = SingletonData.GAViewPortCenter.X + SingletonData.GAViewPortSize.X / 2;
+                targetPoint.Y = SingletonData.GAViewPortCenter.Y + SingletonData.GAViewPortSize.Y / 2;
+
+
+                Camera newnewCamera = new Camera(targetPoint,0,Viewport.GetCameraRotation(viewType.Top),projectionType.Orthographic,0,1);
+                VectorView newnewView = new VectorView(334,
+                                                    363,
                                                     newnewCamera,
                                                     scaleService.GetViewScale(scaleValue),
                                                     "newView",

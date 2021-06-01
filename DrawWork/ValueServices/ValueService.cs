@@ -217,13 +217,13 @@ namespace DrawWork.ValueServices
         {
             string returnValue = "";
             if (selNumber == 1)
-                returnValue = "st";
+                returnValue = "ST";
             else if (selNumber == 2)
-                returnValue = "nd";
+                returnValue = "ND";
             else if (selNumber == 3)
-                returnValue = "rd";
+                returnValue = "RD";
             else 
-                returnValue = "th";
+                returnValue = "TH";
 
 
             return selNumber + returnValue;

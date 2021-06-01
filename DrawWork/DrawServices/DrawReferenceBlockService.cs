@@ -217,11 +217,10 @@ namespace DrawWork.DrawServices
             // Roof Slope
             string roofSlopeString = assemblyData.RoofCRTInput[firstIndex].RoofSlope;
             double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
+            if(SingletonData.TankType==TANK_TYPE.DRT)
+                if (assemblyData.RoofCompressionRing[firstIndex].CompressionRingType == "Detail i")
+                    roofSlopeDegree = workingPointService.DRTWorkingData.CompressionRingDegree;
 
-            if (assemblyData.RoofCompressionRing[firstIndex].CompressionRingType == "Detail i")
-            {
-                roofSlopeDegree = workingPointService.DRTWorkingData.CompressionRingDegree;
-            }
 
             double outsideBottomX = valueService.GetAdjacentByHypotenuse(roofSlopeDegree, A);
             double outsideBottomY = valueService.GetOppositeByHypotenuse(roofSlopeDegree, A);

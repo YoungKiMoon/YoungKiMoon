@@ -432,6 +432,10 @@ namespace DrawWork.DrawServices
             double middleDistanceH = (selPoint2.X - selPoint1.X) / 2;
             double middleDistanceV = (selPoint2.Y - selPoint1.Y) / 2;
 
+
+
+                
+
             // Top
             switch (selPosition)
             {

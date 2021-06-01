@@ -61,10 +61,13 @@ namespace DrawWork.DrawSacleServices
 
             double returnValue = 1;
             string returnString = "1";
+            string returnString2 = "1";
+            double st1Value = 1;
+            double st2Value = 1;
             double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
             double tankWidth = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
 
-            if (tankHeight > tankWidth)
+            
             {
                 //Vertical
                 foreach(ModelScaleModel eachScale in assemblyData.ModelScaleList)
@@ -74,20 +77,21 @@ namespace DrawWork.DrawSacleServices
                     if (tankHeight < eachValue)
                         break;
                 }
-            }
-            else
-            {
+
                 //Horizontal
                 foreach (ModelScaleModel eachScale in assemblyData.ModelScaleList)
                 {
-                    returnString = eachScale.HorizontalScale;
-                    double eachValue = valueService.GetDoubleValue(eachScale.HorizontalID);
-                    if (tankWidth < eachValue)
+                    returnString2 = eachScale.HorizontalScale;
+                    double eachValue = valueService.GetDoubleValue(eachScale.HorizontalH);
+                    if (tankHeight < eachValue)
                         break;
                 }
             }
-            returnValue = valueService.GetDoubleValue(returnString);
-            returnValue +=20;
+
+            st1Value= valueService.GetDoubleValue(returnString);
+            st2Value = valueService.GetDoubleValue(returnString2);
+            returnValue = Math.Max(st1Value, st2Value);
+            returnValue +=0;
             return returnValue;
         }
     }

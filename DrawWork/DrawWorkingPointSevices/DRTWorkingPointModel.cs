@@ -88,6 +88,13 @@ namespace DrawWork.DrawWorkingPointSevices
         }
         private double _CompressionRingDegree;
 
+        public double DomeRaidus
+        {
+            get { return _DomeRaidus; }
+            set { _DomeRaidus = value; }
+        }
+        private double _DomeRaidus;
+
         public DRTWorkingPointModel()
         {
             //RoofCenterPoint = GetCenterPoint();

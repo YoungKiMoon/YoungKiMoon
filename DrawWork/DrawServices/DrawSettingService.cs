@@ -77,6 +77,7 @@ namespace DrawWork.DrawServices
 
         public void CreateModelSpaceSample(Model singleModel)
         {
+            bool visibleFalse = false;
             singleModel.Entities.Clear();
 
             #region Sample
@@ -1572,7 +1573,7 @@ namespace DrawWork.DrawServices
             //singleModel.Entities.Add(customArrow);
 
 
-            if (false)
+            if (visibleFalse)
             {
                 List<Entity> arrowList = new List<Entity>();
                 double selArrowWidth = 2.5;
@@ -1656,12 +1657,13 @@ namespace DrawWork.DrawServices
 
             //singleModel.Entities.AddRange(testLIne);
 
-            if (false)
+
+            if (visibleFalse)
             {
 
                 string sss = string.Format("aaa{0}\"_{1}", 1, 2);
 
-                DrawNozzleBlockService nozzleDraw = new DrawNozzleBlockService();
+                DrawNozzleBlockService nozzleDraw = new DrawNozzleBlockService(null);
 
                 Line newCen01 = new Line(0, 100, 200, 100);
                 Line newCen02 = new Line(100, 0, 100, 200);
@@ -1723,7 +1725,7 @@ namespace DrawWork.DrawServices
                 singleModel.Entities.AddRange(flange1);
             }
 
-            if (false)
+            if (visibleFalse)
             {
 
                 double scaleValue = 90;
@@ -1813,7 +1815,7 @@ namespace DrawWork.DrawServices
             }
 
 
-            if (false)
+            if (visibleFalse)
             {
 
                 List<Entity> customEntity = new List<Entity>();
@@ -1944,7 +1946,7 @@ namespace DrawWork.DrawServices
 
 
 
-            if (false)
+            if (visibleFalse)
             {
                 Point3D refCenterPoint = new Point3D(1000, 1000);
 
@@ -1989,7 +1991,7 @@ namespace DrawWork.DrawServices
             }
 
             // Angle
-            if (false)
+            if (visibleFalse)
             {
                 List<Entity> newList = new List<Entity>();
 
@@ -2074,7 +2076,7 @@ namespace DrawWork.DrawServices
             }
 
             // Compression Ring
-            if (true)
+            if (visibleFalse)
             {
                 List<Entity> newList = new List<Entity>();
 
@@ -2189,7 +2191,7 @@ namespace DrawWork.DrawServices
             }
 
 
-            if (false)
+            if (visibleFalse)
             {
                 // End Point : Extend : 종료 방향
                 Line aa = new Line(300, 300, 500, 500);
@@ -2212,7 +2214,7 @@ namespace DrawWork.DrawServices
                 singleModel.Entities.Add(tempLine);
 
             }
-            if (false)
+            if (visibleFalse)
             {
                 // Start Point : Extend  : 시작 방향
                 Line aa = new Line(300, 300, 500, 500);
@@ -2236,6 +2238,217 @@ namespace DrawWork.DrawServices
 
             }
 
+            if (visibleFalse)
+            {
+                Point3D ccc = new Point3D(100, 100);
+                Circle cccc = new Circle(ccc, 100);
+
+                Point3D selPoint = new Point3D(22, 300);
+
+                double selPositionX = selPoint.X- ccc.X;
+                double selWidth = 20;
+                double selWidthHalf = selWidth / 2;
+
+                double padHeight = 0;
+
+                Line vLine01 = new Line(GetSumPoint(ccc, selPositionX, +200), GetSumPoint(ccc, selPositionX, -200));
+                Line vLineleft = (Line)vLine01.Offset(selWidthHalf, Vector3D.AxisZ, 0.01, true);
+                Line vLineRight = (Line)vLine01.Offset(-selWidthHalf, Vector3D.AxisZ, 0.01, true);
+
+
+                Point3D[] vInter = cccc.IntersectWith(vLine01);
+                Point3D[] vInterLeft = cccc.IntersectWith(vLineleft);
+                Point3D[] vInterRight = cccc.IntersectWith(vLineRight);
+
+
+                Arc newArc = new Arc(ccc, vInterLeft[0], vInterRight[0]);
+
+
+                
+                styleService.SetLayer(ref newArc, layerService.LayerOutLine);
+                singleModel.Entities.Add(newArc);
+
+                singleModel.Entities.Add(vLine01);
+                singleModel.Entities.Add(vLineleft);
+                singleModel.Entities.Add(vLineRight);
+
+                singleModel.Entities.Add(cccc);
+
+            }
+
+
+
+            if (visibleFalse)
+            {
+                Point3D ccc = new Point3D(100, 100);
+                Circle cccc = new Circle(ccc, 100);
+
+                Point3D selPoint = new Point3D(22, 300);
+
+                double selPositionX = selPoint.X - ccc.X;
+                double selWidth = 20;
+                double selWidthHalf = selWidth / 2;
+
+                double padHeight = 0;
+
+                Line vLine01 = new Line(GetSumPoint(ccc, selPositionX, +200), GetSumPoint(ccc, selPositionX, -200));
+                Line vLineleft = (Line)vLine01.Offset(selWidthHalf, Vector3D.AxisZ, 0.01, true);
+                Line vLineRight = (Line)vLine01.Offset(-selWidthHalf, Vector3D.AxisZ, 0.01, true);
+
+
+                Point3D[] vInter = cccc.IntersectWith(vLine01);
+                Point3D[] vInterLeft = cccc.IntersectWith(vLineleft);
+                Point3D[] vInterRight = cccc.IntersectWith(vLineRight);
+
+
+                Arc newArc = new Arc(ccc, vInterLeft[0], vInterRight[0]);
+
+
+
+                styleService.SetLayer(ref newArc, layerService.LayerOutLine);
+                singleModel.Entities.Add(newArc);
+
+                singleModel.Entities.Add(vLine01);
+                singleModel.Entities.Add(vLineleft);
+                singleModel.Entities.Add(vLineRight);
+
+                singleModel.Entities.Add(cccc);
+
+            }
+
+            if (false)
+            {
+                string selText = "HLL 18100";
+                double scale = 20;
+                double textHeight = 2.5;
+                double scaleTextHeight = textHeight * scale;
+                double middleLineWidth = 0;
+
+                Point3D riqCenter = new Point3D(100, 100);
+
+                List<Entity> newList = new List<Entity>();
+                
+                Point3D triP01 = GetSumPoint(riqCenter, 0, 0);
+                Point3D triP02 = GetSumPoint(riqCenter, scaleTextHeight/2, scaleTextHeight);
+                Point3D triP03 = GetSumPoint(riqCenter, -scaleTextHeight / 2, scaleTextHeight);
+                Line tri01 = new Line(GetSumPoint(triP01, 0, 0), GetSumPoint(triP02, 0, 0));
+                Line tri02 = new Line(GetSumPoint(triP01, 0, 0), GetSumPoint(triP03, 0, 0));
+                Line tri03 = new Line(GetSumPoint(triP03, 0, 0), GetSumPoint(triP02, 0, 0));
+
+
+                Point3D textPoint = GetSumPoint(riqCenter, scaleTextHeight / 2 + scaleTextHeight / 2,0);
+
+                Text newText01 = new Text(GetSumPoint(textPoint, 0, scaleTextHeight*0.2), selText, scaleTextHeight);
+                newText01.Regen(new RegenParams(0, singleModel));
+                newText01.Alignment = Text.alignmentType.BaselineLeft;
+                styleService.SetLayer(ref newText01, layerService.LayerDimension);
+                middleLineWidth = newText01.BoxSize.X;
+
+                Line newCourseLine = new Line(GetSumPoint(riqCenter, -scaleTextHeight / 2, 0), GetSumPoint(textPoint, middleLineWidth +(middleLineWidth/3) + scaleTextHeight / 2, 0));
+
+                Point3D triqq01 = GetSumPoint(textPoint, 0, -(scaleTextHeight / 3));
+                Point3D triqq02 = GetSumPoint(triqq01,  (scaleTextHeight / 2), -(scaleTextHeight / 3));
+                Point3D triqq03 = GetSumPoint(triqq02, (scaleTextHeight / 2) , -(scaleTextHeight / 3));
+                Line triiLine01 = new Line(GetSumPoint(triqq01, 0, 0), GetSumPoint(triqq01, scaleTextHeight * 3, 0));
+                Line triiLine02 = new Line(GetSumPoint(triqq02, 0, 0), GetSumPoint(triqq02, scaleTextHeight * 2, 0));
+                Line triiLine03 = new Line(GetSumPoint(triqq03, 0, 0), GetSumPoint(triqq03, scaleTextHeight * 1, 0));
+
+                styleService.SetLayer(ref newText01, layerService.LayerDimension);
+
+                newList.Add(tri01);
+                newList.Add(tri02);
+                newList.Add(tri03);
+                newList.Add(triiLine01);
+                newList.Add(triiLine02);
+                newList.Add(triiLine03);
+                newList.Add(newCourseLine);
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerDimension);
+
+                singleModel.Entities.Add(newText01);
+                singleModel.Entities.AddRange(newList);
+            }
+
+            if (false)
+            {
+                string selText1 = "12";
+                string selText2 = "1";
+                double scale = 20;
+                double textHeight = 2.5;
+                double scaleTextHeight = textHeight * scale;
+                double middleLineWidth = 0;
+
+                Point3D riqCenter = new Point3D(100, 100);
+
+                List<Entity> newList = new List<Entity>();
+
+                Point3D triP01 = GetSumPoint(riqCenter, 0, 0);
+                Point3D triP02 = GetSumPoint(triP01, scaleTextHeight *2 + scaleTextHeight * 3 + scaleTextHeight * 2, 0);
+                Point3D triP03 = GetSumPoint(triP02, 0, scaleTextHeight);
+                Line tri01 = new Line(GetSumPoint(triP01, 0, 0), GetSumPoint(triP02, 0, 0));
+                Line tri02 = new Line(GetSumPoint(triP02, 0, 0), GetSumPoint(triP03, 0, 0));
+                Line tri03 = new Line(GetSumPoint(triP03, 0, 0), GetSumPoint(triP01, 0, 0));
+
+
+                Text newText01 = new Text(GetSumPoint(tri01.MidPoint,0 , -scaleTextHeight * 0.2 ), selText1, scaleTextHeight);
+                newText01.Alignment = Text.alignmentType.TopCenter;
+                styleService.SetLayer(ref newText01, layerService.LayerDimension);
+
+                Text newText02 = new Text(GetSumPoint(tri02.MidPoint, +scaleTextHeight * 0.2, 0), selText2, scaleTextHeight);
+                newText02.Alignment = Text.alignmentType.MiddleLeft;
+                styleService.SetLayer(ref newText02, layerService.LayerDimension);
+
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerDimension);
+
+                newList.Add(tri01);
+                newList.Add(tri02);
+                newList.Add(tri03);
+                newList.Add(newText01);
+                newList.Add(newText02);
+                singleModel.Entities.AddRange(newList);
+            }
+
+
+            if (true)
+            {
+                string selText1 = "12";
+                string selText2 = "1";
+                double scale = 20;
+                double textHeight = 2.5;
+                double scaleTextHeight = textHeight * scale;
+                double middleLineWidth = 0;
+
+                Point3D riqCenter = new Point3D(100, 100);
+
+                List<Entity> newList = new List<Entity>();
+
+                Point3D triP01 = GetSumPoint(riqCenter, 0, 0);
+                Point3D triP02 = GetSumPoint(triP01, scaleTextHeight * 2 + scaleTextHeight * 3 + scaleTextHeight * 2, 0);
+                Point3D triP03 = GetSumPoint(triP02, 0, -scaleTextHeight);
+                Line tri01 = new Line(GetSumPoint(triP01, 0, 0), GetSumPoint(triP02, 0, 0));
+                Line tri02 = new Line(GetSumPoint(triP02, 0, 0), GetSumPoint(triP03, 0, 0));
+                Line tri03 = new Line(GetSumPoint(triP03, 0, 0), GetSumPoint(triP01, 0, 0));
+
+
+                Text newText01 = new Text(GetSumPoint(tri01.MidPoint, 0, scaleTextHeight * 0.2), selText1, scaleTextHeight);
+                newText01.Alignment = Text.alignmentType.BottomCenter;
+                styleService.SetLayer(ref newText01, layerService.LayerDimension);
+
+                Text newText02 = new Text(GetSumPoint(tri02.MidPoint, +scaleTextHeight * 0.2, 0), selText2, scaleTextHeight);
+                newText02.Alignment = Text.alignmentType.MiddleLeft;
+                styleService.SetLayer(ref newText02, layerService.LayerDimension);
+
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerDimension);
+
+                newList.Add(tri01);
+                newList.Add(tri02);
+                newList.Add(tri03);
+                newList.Add(newText01);
+                newList.Add(newText02);
+                singleModel.Entities.AddRange(newList);
+            }
 
 
 

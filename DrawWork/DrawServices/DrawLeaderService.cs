@@ -59,7 +59,7 @@ namespace DrawWork.DrawServices
 
             publicFunService = new DrawPublicFunctionService();
 
-            nozzleBlock = new DrawNozzleBlockService();
+            nozzleBlock = new DrawNozzleBlockService(selAssembly);
             blockImportService = new DrawImportBlockService(selAssembly,(Model)selModel);
 
             drawService = new DrawService(selAssembly);
@@ -152,7 +152,6 @@ namespace DrawWork.DrawServices
                 if (eachPart == "roof")
                 {
                     newText = new List<string>();
-                    newText.Add("(" + assemblyData.GeneralMaterialSpecifications[0].RoofPlate + ")");
                     newText.Add("t" + assemblyData.RoofCompressionRing[0].RoofPlateThickness + " ROOF PLATE");
 
                     double radiusValue = valueService.GetDoubleValue(eachLeader.R)/100 * tankNominalIDHalf;
@@ -178,7 +177,6 @@ namespace DrawWork.DrawServices
                 {
                     newText = new List<string>();
                     newText.Add("t" + assemblyData.BottomInput[0].BottomPlateThickness + " BOTTOM PLATE");
-                    newText.Add("(" + assemblyData.GeneralMaterialSpecifications[0].BottomPlate + ")");
 
                     double radiusValue = valueService.GetDoubleValue(eachLeader.R) / 100 * tankNominalIDHalf;
                     CDPoint currentPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterBottomDown, radiusValue, ref refPoint, ref curPoint);

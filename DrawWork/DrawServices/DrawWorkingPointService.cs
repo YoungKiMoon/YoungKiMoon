@@ -778,7 +778,7 @@ namespace DrawWork.DrawServices
             double domeRadiusRatio = valueService.GetDoubleValue(assemblyData.RoofDRTInput[0].DomeRadiusRatio);
             double domeRadius = domeRadiusRatio * sizeID;
 
-
+            
 
             CDPoint leftWoking = WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTop,ref refPoint,ref curPoint);
             Point3D refPointLeft = GetSumPoint(leftWoking, 0, 0);
@@ -921,16 +921,24 @@ namespace DrawWork.DrawServices
                 returnValue.PointLeftRoofDown = inPointLeftDown[0];
             }
 
-            // Degree
-            Point3D triA = GetSumPoint(refPoint, 0, 0);
-            Line triALine = new Line(GetSumPoint(triA, 0, 0), GetSumPoint(triA, 0, 0));
-            triALine.EndPoint = triALine.EndPoint + returnValue.CompressionRingDirection * (100);
-            Point3D triB = GetSumPoint(triALine.EndPoint, 0, 0);
-            Point3D triC = new Point3D(triB.X, triA.Y);
+            if (assemblyData.RoofCompressionRing[0].CompressionRingType == "Detail i")
+            {
+                // Degree
+                Point3D triA = GetSumPoint(refPoint, 0, 0);
+                Line triALine = new Line(GetSumPoint(triA, 0, 0), GetSumPoint(triA, 0, 0));
+                triALine.EndPoint = triALine.EndPoint + returnValue.CompressionRingDirection * (100);
+                Point3D triB = GetSumPoint(triALine.EndPoint, 0, 0);
+                Point3D triC = new Point3D(triB.X, triA.Y);
 
-            double tempDegree = valueService.GetDegreeOfSlope(triC.DistanceTo(triB), triA.DistanceTo(triC));
+                double tempDegree = valueService.GetDegreeOfSlope(triC.DistanceTo(triB), triA.DistanceTo(triC));
 
-            returnValue.CompressionRingDegree = tempDegree;
+                returnValue.CompressionRingDegree = tempDegree;
+            }
+
+
+            // Dome Radius
+            returnValue.DomeRaidus = domeRadius;
+
 
             // 검증 용
             if (false)
