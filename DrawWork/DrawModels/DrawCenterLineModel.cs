@@ -17,6 +17,8 @@ namespace DrawWork.DrawModels
             oneEx = false;
             twoEx = false;
             scaleValue = 1;
+
+            arcEx = false;
         }
 
         public bool centerLine
@@ -64,5 +66,13 @@ namespace DrawWork.DrawModels
             set { _scaleValue = value; }
         }
         private double _scaleValue;
+
+
+        public bool arcEx
+        {
+            get { return _arcEx; }
+            set { _arcEx = value; }
+        }
+        private bool _arcEx;
     }
 }

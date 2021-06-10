@@ -33,6 +33,7 @@ namespace DrawWork.DrawServices
 
         private DrawService drawService;
         private DrawNozzleService drawNozzleService;
+        private DrawNozzleOrientationService drawNozzleOrientationService;
 
         private DrawLogicBlockService drawLogicBlockService;
         private DrawImportBlockService drawImportBlockService;
@@ -54,6 +55,8 @@ namespace DrawWork.DrawServices
             drawService = new DrawService(selAssembly);
 
             drawNozzleService = new DrawNozzleService(selAssembly,selModel);
+            drawNozzleOrientationService = new DrawNozzleOrientationService(selAssembly, selModel);
+
 
             drawLogicBlockService = new DrawLogicBlockService(selAssembly, selModel);
             drawImportBlockService = new DrawImportBlockService(selAssembly,singleModel);
@@ -801,6 +804,89 @@ namespace DrawWork.DrawServices
             return returnEntity;
         }
 
+        public DrawEntityModel DoNozzleOrientation(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            string newPosition = "";
+            string newNozzleType = "";
+            string newNozzlePosition = "";
+            string newNozzleFontSize = "";
+            string newReaderCircleSize = "";
+            string newMultiColumn = "";
+            NozzleInputModel newNozzle = new NozzleInputModel();
+            string layerName = layerStyle.LayerDimension;
+
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j])
+                {
+
+                    case "type":
+                        if (j + 1 <= eachCmd.Length)
+                            newNozzleType = eachCmd[j + 1];
+                        break;
+
+                    case "position":
+                        if (j + 1 <= eachCmd.Length)
+                            newPosition = eachCmd[j + 1];
+                        break;
+
+                    case "nozzleposition":
+                        if (j + 1 <= eachCmd.Length)
+                            newNozzlePosition = eachCmd[j + 1];
+                        break;
+
+                    case "fontsize":
+                        if (j + 1 <= eachCmd.Length)
+                            newNozzleFontSize = eachCmd[j + 1];
+                        break;
+
+                    case "leadercirclesize":
+                        if (j + 1 <= eachCmd.Length)
+                            newReaderCircleSize = eachCmd[j + 1];
+                        break;
+
+                    case "multicolumn":
+                        if (j + 1 <= eachCmd.Length)
+                            newMultiColumn = eachCmd[j + 1];
+                        break;
+
+                    case "layer":
+                    case "layername":
+                        if (j + 1 <= eachCmd.Length)
+                            layerName = eachCmd[j + 1];
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            DrawEntityModel returnEntity = new DrawEntityModel();
+            // Create Line
+            //if (newNozzleType != "" && newNozzlePosition != "")
+                returnEntity = drawNozzleOrientationService.DrawNozzle_Orientation(ref refPoint, scaleValue);
+
+            return returnEntity;
+        }
+
         // Working Point
         public void DoWorkingPoint(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
         {
@@ -1171,8 +1257,12 @@ namespace DrawWork.DrawServices
                     goto case "allways";
 
                 case "roof":
-                    returnEntity = (DoBlockRoof(eachCmd, ref refPoint, ref curPoint));
+                    returnEntity = (DoBlockRoof(eachCmd, ref refPoint, ref curPoint,scaleValue));
                     goto case "allways";
+
+                //case "frt":
+                //    returnEntity = (DoBlockFrt(eachCmd, ref refPoint, ref curPoint,scaleValue));
+                //    goto case "allways";
 
                 case "shell":
                     returnEntity = (DoBlockShell(eachCmd, ref refPoint, ref curPoint));
@@ -1224,6 +1314,87 @@ namespace DrawWork.DrawServices
             }
 
 
+            return returnEntity;
+        }
+
+        public Entity[] DoBlockOrientation(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,double scaleValue)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+            CDPoint newMirrorPoint = new CDPoint();
+
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j])
+                {
+                    case "xy":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            Entity[] returnEntity = null;
+            // Create Line
+            returnEntity = drawLogicBlockService.DrawBlock_Orientation(newPoint1, ref refPoint, ref curPoint,scaleValue);
+
+
+
+            // Mirror
+            if (returnEntity != null)
+            {
+                for (int j = refIndex; j < eachCmd.Length; j += 2)
+                {
+                    switch (eachCmd[j])
+                    {
+                        case "mirror":
+
+                            newMirrorPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterBottomUp, ref refPoint, ref curPoint);
+                            if (j + 1 <= eachCmd.Length)
+                            {
+                                switch (eachCmd[j + 1])
+                                {
+                                    case "right":
+
+                                        Plane pl1 = Plane.YZ;
+                                        pl1.Origin.X = newMirrorPoint.X;
+                                        pl1.Origin.Y = newMirrorPoint.Y;
+                                        Mirror customMirror = new Mirror(pl1);
+                                        foreach (Entity eachEntity in returnEntity)
+                                        {
+                                            eachEntity.TransformBy(customMirror);
+                                        }
+                                        break;
+                                }
+                            }
+
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            break;
+
+
+                    }
+                }
+            }
             return returnEntity;
         }
 
@@ -1630,7 +1801,7 @@ namespace DrawWork.DrawServices
             return returnEntity;
         }
 
-        public Entity[] DoBlockRoof(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint)
+        public Entity[] DoBlockRoof(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,double selScaleValue)
         {
             // 0 : Object
             // 1 : Command
@@ -1665,7 +1836,81 @@ namespace DrawWork.DrawServices
 
             Entity[] returnEntity = null;
             // Create Line
-            returnEntity = drawLogicBlockService.DrawBlock_Roof(newPoint1, ref refPoint, ref curPoint);
+            returnEntity = drawLogicBlockService.DrawBlock_Roof(newPoint1, ref refPoint, ref curPoint,selScaleValue);
+
+
+
+            // Mirror
+            if (returnEntity != null)
+            {
+                for (int j = refIndex; j < eachCmd.Length; j += 2)
+                {
+                    switch (eachCmd[j])
+                    {
+                        case "mirror":
+                            if (j + 1 <= eachCmd.Length)
+                            {
+                                switch (eachCmd[j + 1])
+                                {
+                                    case "right":
+
+                                        Plane pl1 = Plane.YZ;
+                                        pl1.Origin.X = newPoint1.X;
+                                        pl1.Origin.Y = newPoint1.Y;
+                                        Mirror customMirror = new Mirror(pl1);
+                                        foreach (Entity eachEntity in returnEntity)
+                                        {
+                                            eachEntity.TransformBy(customMirror);
+                                        }
+                                        break;
+                                }
+                            }
+
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            break;
+
+
+                    }
+                }
+            }
+            return returnEntity;
+        }
+        public Entity[] DoBlockFrt(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,double selScaleValue)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+
+            CDPoint newPoint1 = new CDPoint();
+            CDPoint newPoint2 = new CDPoint();
+            CDPoint newPoint3 = new CDPoint();
+            CDPoint newSetPoint = new CDPoint();
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j])
+                {
+                    case "xy":
+                        if (j + 1 <= eachCmd.Length)
+                            newPoint1 = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                        break;
+
+                    case "sp":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newSetPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            curPoint.X = newSetPoint.X;
+                            curPoint.Y = newSetPoint.Y;
+                        }
+                        break;
+                }
+            }
+
+            Entity[] returnEntity = null;
+            // Create Line
+            //returnEntity = drawLogicBlockService.DrawBlock_Frt(newPoint1, ref refPoint, ref curPoint,selScaleValue);
 
 
 

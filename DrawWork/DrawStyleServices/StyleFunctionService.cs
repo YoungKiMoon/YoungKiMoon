@@ -19,10 +19,12 @@ namespace DrawWork.DrawStyleServices
 {
     public class StyleFunctionService
     {
+        private LayerStyleService layerService;
         private TextStyleService textService;
         
         public StyleFunctionService()
         {
+            layerService = new LayerStyleService();
             textService = new TextStyleService();
         }
 
@@ -48,6 +50,12 @@ namespace DrawWork.DrawStyleServices
             selEntity.LineTypeMethod = colorMethodType.byLayer;
             selEntity.ColorMethod = colorMethodType.byLayer;
         }
+        public void SetLayer(ref Circle selEntity, string selLayerName)
+        {
+            selEntity.LayerName = selLayerName;
+            selEntity.LineTypeMethod = colorMethodType.byLayer;
+            selEntity.ColorMethod = colorMethodType.byLayer;
+        }
 
 
 
@@ -68,6 +76,18 @@ namespace DrawWork.DrawStyleServices
                 eachEntity.LayerName = selLayerName;
                 eachEntity.LineTypeMethod = colorMethodType.byLayer;
                 eachEntity.ColorMethod = colorMethodType.byLayer;
+            }
+        }
+        public void SetLayerListEntityExcludingCenterLine(ref List<Entity> selEntity, string selLayerName)
+        {
+            foreach (Entity eachEntity in selEntity)
+            {
+                if(eachEntity.LayerName!= layerService.LayerCenterLine)
+                {
+                    eachEntity.LayerName = selLayerName;
+                    eachEntity.LineTypeMethod = colorMethodType.byLayer;
+                    eachEntity.ColorMethod = colorMethodType.byLayer;
+                }
             }
         }
         public void SetLayerListLine(ref Entity[] selEntity, string selLayerName)

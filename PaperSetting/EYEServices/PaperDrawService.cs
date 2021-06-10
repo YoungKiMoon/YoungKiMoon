@@ -1379,9 +1379,9 @@ namespace PaperSetting.EYEServices
             newList.Add(GetNewLineWhite(GetSumPoint(refPoint, 132.5, currentY), GetSumPoint(refPoint, 132.5, currentY + rowHeight)));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "APPLIED CODE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 67.5 / 2, currentY + rowHeight / 2), AMEDATA[0], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 67.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].CodeApplied, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + 107.5, currentY + rowHeight / 2), "CONTENTS", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, 132.5 + 42.5 / 2, currentY + rowHeight / 2), AMEDATA[1], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, 132.5 + 42.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].Contents, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1392,10 +1392,10 @@ namespace PaperSetting.EYEServices
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "SIZE (mm)", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "INSIDE DIA.", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 25 + 42.5 / 2, currentY + rowHeight / 2), AMEDATA[2], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 25 + 42.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].SizeNominalID, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + 107.5, currentY + rowHeight / 2), "HEIGHT", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, 132.5, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, 132.5 + 42.5 / 2, currentY + rowHeight / 2), AMEDATA[3], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, 132.5 + 42.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].SizeTankHeight, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1405,10 +1405,10 @@ namespace PaperSetting.EYEServices
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "CAPACITY (m3)", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "NOMINAL", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 25 + 42.5 / 2, currentY + rowHeight / 2), AMEDATA[4], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 25 + 42.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralLiquidCapacityWeight[0].NominalCapacity, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + 107.5, currentY + rowHeight / 2), "WORKING", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, 132.5, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, 132.5 + 42.5 / 2, currentY + rowHeight / 2), AMEDATA[5], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, 132.5 + 42.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralLiquidCapacityWeight[0].WorkingCapacity, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1418,10 +1418,10 @@ namespace PaperSetting.EYEServices
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "PUMPING RATES", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "IN", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 25 + 42.5 / 2, currentY + rowHeight / 2), AMEDATA[6], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 25 + 42.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].PumpingRatesIn, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + 107.5, currentY + rowHeight / 2), "OUT", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, 132.5, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, 132.5 + 42.5 / 2, currentY + rowHeight / 2), AMEDATA[7], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, 132.5 + 42.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].PumpingRatesOut, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1434,10 +1434,10 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "OPERATING TEMP.", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "(MAX.)", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25 + 26 / 2, currentY + rowHeight / 2), AMEDATA[8], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25 + 26 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].OperTempMax, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 51, currentY + rowHeight / 2), "DESIGN TEMP", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 81, currentY + rowHeight / 2), "(MIN./MAX.)", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 106 + 29 / 2, currentY + rowHeight / 2), AMEDATA[9] + "/" + AMEDATA[10], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 106 + 29 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].DesignTempMin + "/" + assemblyData.GeneralDesignData[0].DesignTempMax, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1450,11 +1450,11 @@ namespace PaperSetting.EYEServices
             newList.Add(GetNewLineWhite(GetSumPoint(refPoint, tableOneWidth + 115, currentY), GetSumPoint(refPoint, tableOneWidth + 115, currentY + rowHeight)));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "OPERATING PRESS.", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 39 / 2, currentY + rowHeight / 2), AMEDATA[11] + "/" + AMEDATA[12], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 39 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].OperPressInt + "/" + assemblyData.GeneralDesignData[0].OperPressExt, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 39, currentY + rowHeight / 2), "TEST SP. GR.", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 67.5 + 13.5 / 2, currentY + rowHeight / 2), "", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 67.5 + 13.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].TestSPGR, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 81, currentY + rowHeight / 2), "DESIGN SP. GR.", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 115 + 20 / 2, currentY + rowHeight / 2), "", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 115 + 20 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].DesignSpecGR, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1467,9 +1467,9 @@ namespace PaperSetting.EYEServices
 
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "VAPOR PRESSURE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 51 / 2, currentY + rowHeight / 2), "", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 51 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].VaporPressureMax, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 51, currentY + rowHeight / 2), "DESIGN PRESS.", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 81 + 54 / 2, currentY + rowHeight / 2), AMEDATA[13] + "/" + AMEDATA[14], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 81 + 54 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].DesignPressInt + "/" + assemblyData.GeneralDesignData[0].DesignPressExt, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1482,7 +1482,7 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "EMERGENCY COVER MANHOLE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 60, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 60 + 75 / 2, currentY + rowHeight / 2), AMEDATA[15], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 60 + 75 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].SetPressureEmerCoverManhole, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
             currentY -= rowHeight;
@@ -1490,7 +1490,7 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "BREATHER VALVE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 60, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 60 + 75 / 2, currentY + rowHeight / 2), AMEDATA[16], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 60 + 75 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].SetPressureBreatherValve, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1499,7 +1499,7 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "BREATHER VALVE (VAC.)", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 60, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 60 + 75 / 2, currentY + rowHeight / 2), AMEDATA[17], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 60 + 75 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].SetPressureBreatherValveVac, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
             currentY -= rowHeight;
@@ -1510,15 +1510,15 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "SHELL", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25 + 20 / 2, currentY + rowHeight / 2), AMEDATA[18], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25 + 20 / 2, currentY + rowHeight / 2), assemblyData.GeneralCorrosionLoading[0].ShellPlate, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 45, currentY + rowHeight / 2), "ROOF", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 20 / 2, currentY + rowHeight / 2), AMEDATA[19], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 20 / 2, currentY + rowHeight / 2), assemblyData.GeneralCorrosionLoading[0].RoofPlate, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 90, currentY + rowHeight / 2), "BOTTOM", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 115, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 115 + 20 / 2, currentY + rowHeight / 2), AMEDATA[20], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 115 + 20 / 2, currentY + rowHeight / 2), assemblyData.GeneralCorrosionLoading[0].BottomPlate, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
             currentY -= rowHeight;
@@ -1526,11 +1526,11 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "NOZZLE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25 + 20 / 2, currentY + rowHeight / 2), AMEDATA[21], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25 + 20 / 2, currentY + rowHeight / 2), assemblyData.GeneralCorrosionLoading[0].Nozzle, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 45, currentY + rowHeight / 2), "STRUCTURE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 20 / 2, currentY + rowHeight / 2), AMEDATA[22], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 20 / 2, currentY + rowHeight / 2), assemblyData.GeneralCorrosionLoading[0].StructureEachSide, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 90, currentY + rowHeight / 2), "(EACH SIDE)", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
@@ -1540,13 +1540,13 @@ namespace PaperSetting.EYEServices
             newList.Add(GetNewLineWhite(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "SHELL DESIGN", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 135 / 2, currentY + rowHeight / 2), AMEDATA[23], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 135 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].ShellPlate, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
             currentY -= rowHeight;
             newList.Add(GetNewLineWhite(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "ROOF DESIGN", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 135 / 2, currentY + rowHeight / 2), AMEDATA[24], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 135 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].RoofPlate, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1558,7 +1558,7 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "UNIFORM LIVE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 65 / 2, currentY + rowHeight / 2), AMEDATA[25], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 65 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].RoofLoadsUniformLive, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1567,7 +1567,7 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "SPECIAL LOADING (PROVIDE SKETCH)", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 65 / 2, currentY + rowHeight / 2), AMEDATA[26], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 65 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].RoofLoadsSpecialLoading, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1577,10 +1577,10 @@ namespace PaperSetting.EYEServices
             // 2행
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY - rowHeight * 1 + rowHeight * 2 / 2), "EARTHQUAKE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), AMEDATA[27], fontHeight, 0.95, Text.alignmentType.MiddleLeft));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), assemblyData.GeneralSeismic[0].CodeApplied, fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 70, currentY + rowHeight / 2), "SEISMIC USE GROUP", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 42, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 42 + 21 / 2, currentY + rowHeight / 2), AMEDATA[28], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 42 + 21 / 2, currentY + rowHeight / 2), assemblyData.GeneralSeismic[0].SeismicUseGroup, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1591,15 +1591,15 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "Ss(g)", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 15, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 15 + 21 / 2, currentY + rowHeight / 2), AMEDATA[29], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 15 + 21 / 2, currentY + rowHeight / 2), assemblyData.GeneralSeismic[0].Ss, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 36, currentY + rowHeight / 2), "Ss(g)", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 36, currentY + rowHeight / 2), "S1(g)", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 51, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 51 + 21 / 2, currentY + rowHeight / 2), AMEDATA[30], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 51 + 21 / 2, currentY + rowHeight / 2), assemblyData.GeneralSeismic[0].S1, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 70, currentY + rowHeight / 2), "IMPORTANCE FACTOR", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 42, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 42 + 21 / 2, currentY + rowHeight / 2), AMEDATA[31], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 70 + 42 + 21 / 2, currentY + rowHeight / 2), assemblyData.GeneralSeismic[0].ImportanceFactor, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1612,8 +1612,8 @@ namespace PaperSetting.EYEServices
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY - rowHeight * 1 + rowHeight * 2 / 2), "WIND", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
 
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), AMEDATA[32], fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 60 + 75 / 2, currentY + rowHeight / 2), AMEDATA[33], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), assemblyData.GeneralWind[0].CodeApplied, fontHeight, 0.95, Text.alignmentType.MiddleLeft));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 60 + 75 / 2, currentY + rowHeight / 2), assemblyData.GeneralWind[0].DesignWindSpeed, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
             currentY -= rowHeight;
@@ -1621,12 +1621,12 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "EXPOSURE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25 + 35 / 2, currentY + rowHeight / 2), AMEDATA[34], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 25 + 35 / 2, currentY + rowHeight / 2), assemblyData.GeneralWind[0].Exposure, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 60, currentY + rowHeight / 2), "IMPORTANCE FACTOR", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 103, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 103 + 32 / 2, currentY + rowHeight / 2), AMEDATA[35], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 103 + 32 / 2, currentY + rowHeight / 2), assemblyData.GeneralWind[0].ImportanceFactor, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
             currentY -= rowHeight;
@@ -1637,11 +1637,11 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "TOTAL ACCUMULATION", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 44, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 44 + 28 / 2, currentY + rowHeight / 2), AMEDATA[36], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 44 + 28 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].SnowFallTotalAccumulation, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 44 + 28, currentY + rowHeight / 2), "RAIN FALL", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 44 + 28 + 24, currentY + rowHeight / 2), "(MAX.)", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 44 + 28 + 24 + 13 + 26 / 2, currentY + rowHeight / 2), AMEDATA[37], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 44 + 28 + 24 + 13 + 26 / 2, currentY + rowHeight / 2), assemblyData.GeneralDesignData[0].RainFallMax, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
             newList.Add(GetNewLineWhite(GetSumPoint(refPoint, tableOneWidth + 44 + 28, currentY), GetSumPoint(refPoint, tableOneWidth + 44 + 28, currentY + rowHeight)));
@@ -1654,13 +1654,13 @@ namespace PaperSetting.EYEServices
 
 
             // 사각형
-            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth , currentY + 1.2), AMEDATA[33].ToLower().Contains("earth")));
+            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth , currentY + 1.2), assemblyData.GeneralDesignData[0].FoundationType.ToLower().Contains("earth")));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 5.5, currentY + rowHeight / 2), "EARTH", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
-            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth +30 , currentY + 1.2), AMEDATA[33].ToLower().Contains("concrete ring wall")));
+            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth +30 , currentY + 1.2), assemblyData.GeneralDesignData[0].FoundationType.ToLower().Contains("ring")));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth +30+ 5.5, currentY + rowHeight / 2), "CONCRETE RING WALL", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
-            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 90, currentY + 1.2), AMEDATA[33].ToLower().Contains("concrete mat")));
+            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 90, currentY + 1.2), assemblyData.GeneralDesignData[0].FoundationType.ToLower().Contains("mat")));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 90 + 5.5, currentY + rowHeight / 2), "CONCRETE MAT", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
 
@@ -1672,15 +1672,15 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "EMPTY", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 16, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 16 + 24 / 2, currentY + rowHeight / 2), AMEDATA[39], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 16 + 24 / 2, currentY + rowHeight / 2), assemblyData.GeneralLiquidCapacityWeight[0].Empty, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 40, currentY + rowHeight / 2), "OPER.", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 56, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 56 + 24 / 2, currentY + rowHeight / 2), AMEDATA[40], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 56 + 24 / 2, currentY + rowHeight / 2), assemblyData.GeneralLiquidCapacityWeight[0].Operating, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 80, currentY + rowHeight / 2), "FULL OF WATER", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 111, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 111 + 24 / 2, currentY + rowHeight / 2), AMEDATA[41], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 111 + 24 / 2, currentY + rowHeight / 2), assemblyData.GeneralLiquidCapacityWeight[0].fullOfWater, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewLineWhite(GetSumPoint(refPoint, tableOneWidth + 40, currentY), GetSumPoint(refPoint, tableOneWidth + 40, currentY + rowHeight)));
             newList.Add(GetNewLineWhite(GetSumPoint(refPoint, tableOneWidth + 80, currentY), GetSumPoint(refPoint, tableOneWidth + 80, currentY + rowHeight)));
@@ -1709,11 +1709,11 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "SHELL", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 17, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 17 + 59 / 2, currentY + rowHeight / 2), AMEDATA[42], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 17 + 59 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].ShellPlate, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 76, currentY + rowHeight / 2), "COLUMN", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 100, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 100 + 35 / 2, currentY + rowHeight / 2), AMEDATA[43], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 100 + 35 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].Column, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1723,11 +1723,11 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "BOTTOM", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 17, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 17 + 59 / 2, currentY + rowHeight / 2), AMEDATA[44], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 17 + 59 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].BottomPlate, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 76, currentY + rowHeight / 2), "ANNULAR", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 100, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 100 + 35 / 2, currentY + rowHeight / 2), AMEDATA[45], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 100 + 35 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].AnnularPlate, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
             currentY -= rowHeight;
@@ -1735,11 +1735,11 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "ROOF", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 17, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 17 + 59 / 2, currentY + rowHeight / 2), AMEDATA[46], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 17 + 59 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].RoofPlate, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 76, currentY + rowHeight / 2), "STRUCTURE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 100, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 100 + 35 / 2, currentY + rowHeight / 2), AMEDATA[47], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 100 + 35 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].RoofStructure, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
             currentY -= rowHeight;
@@ -1747,11 +1747,11 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "FLANGE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 17, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 17 + 59 / 2, currentY + rowHeight / 2), AMEDATA[48], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 17 + 59 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].PlateFlangeCovers, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 76, currentY + rowHeight / 2), "GASKET", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 100, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 100 + 35 / 2, currentY + rowHeight / 2), AMEDATA[49], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 100 + 35 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].Gasket, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1760,11 +1760,11 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "BOLT/NUT", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 21, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 21 + 42.5 / 2, currentY + rowHeight / 2), AMEDATA[50] + "/" + AMEDATA[51], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 21 + 42.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].BoltNut, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 21 + 42.5, currentY + rowHeight / 2), "NOZZLE NECK", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 21 + 42.5 + 28.2, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 21 + 42.5 + 28.2 + 43.5 / 2, currentY + rowHeight / 2), AMEDATA[52], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 21 + 42.5 + 28.2 + 43.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].NozzleNeckPipePlate, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1773,7 +1773,7 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "ANCHOR BOLT/NUT", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 40, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 40 + 95 / 2, currentY + rowHeight / 2), AMEDATA[53] + "/" + AMEDATA[54], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 40 + 95 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].AnchorBlot + "/" + assemblyData.GeneralMaterialSpecifications[0].AnchorNut, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1787,12 +1787,12 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "TH'K", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 25 / 2, currentY + rowHeight / 2), AMEDATA[55], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 25 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].BottomPlateThickness, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
-            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 23 + 25, currentY + 1.2), AMEDATA[56].ToLower().Contains("lap joint")));
+            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 23 + 25, currentY + 1.2), assemblyData.GeneralMaterialSpecifications[0].BottomPlateWeldJointType.ToLower().Contains("lap")));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 23 + 25 + 5.5, currentY + rowHeight / 2), "LAP JOINT", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
-            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 84, currentY + 1.2), AMEDATA[56].ToLower().Contains("butt joint")));
+            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 84, currentY + 1.2), assemblyData.GeneralMaterialSpecifications[0].BottomPlateWeldJointType.ToLower().Contains("butt")));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 84 + 5.5, currentY + rowHeight / 2), "BUTT JOINT", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
 
@@ -1801,12 +1801,12 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "SLOPE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 25 / 2, currentY + rowHeight / 2), AMEDATA[57], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 25 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].BottomPlateSlope, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
-            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 23 + 25, currentY + 1.2), AMEDATA[58].ToLower().Contains("coned up")));
+            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 23 + 25, currentY + 1.2), assemblyData.GeneralMaterialSpecifications[0].BottomPlateBottomStyle.ToLower().Contains("up")));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 23 + 25 + 5.5, currentY + rowHeight / 2), "CONED UP", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
-            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 84, currentY + 1.2), AMEDATA[58].ToLower().Contains("coned down")));
+            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 84, currentY + 1.2), assemblyData.GeneralMaterialSpecifications[0].BottomPlateBottomStyle.ToLower().Contains("down")));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 84 + 5.5, currentY + rowHeight / 2), "CONED DOWN", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
 
@@ -1815,16 +1815,16 @@ namespace PaperSetting.EYEServices
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "ANNULAR PLATE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "MIN. WIDTH", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 25 / 2, currentY + rowHeight / 2), AMEDATA[59], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 25 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].AnnularPlateMinWidth, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 23 + 25, currentY + rowHeight / 2), "TH'K", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 25 + 12, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 25 + 12 + 13 / 2, currentY + rowHeight / 2), AMEDATA[60], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 25 + 12 + 13 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].AnnularPlateThickness, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
-            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 73, currentY + 1.2), AMEDATA[61].ToLower().Contains("butt joint")));
+            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 73, currentY + 1.2), assemblyData.GeneralMaterialSpecifications[0].AnnularPlateWeldJointType.ToLower().Contains("butt")));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 73 + 5.5, currentY + rowHeight / 2), "BUTT JOINT", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
-            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 103, currentY + 1.2), AMEDATA[61].ToLower().Contains("lap joint")));
+            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 103, currentY + 1.2), assemblyData.GeneralMaterialSpecifications[0].AnnularPlateWeldJointType.ToLower().Contains("lap")));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 103 + 5.5, currentY + rowHeight / 2), "LAP JOINT", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
 
@@ -1834,13 +1834,13 @@ namespace PaperSetting.EYEServices
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "ROOF PLATE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "TH'K", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 50 / 2, currentY + rowHeight / 2), AMEDATA[62], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 50 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].RoofPlateThickness, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
-            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 73, currentY + 1.2), AMEDATA[63].ToLower().Contains("butt joint")));
+            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 73, currentY + 1.2), assemblyData.GeneralMaterialSpecifications[0].RoofPlateWeldJointType.ToLower().Contains("butt joint")));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 73 + 5.5, currentY + rowHeight / 2), "BUTT JOINT", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
 
-            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 103, currentY + 1.2), AMEDATA[63].ToLower().Contains("lap joint")));
+            newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 103, currentY + 1.2), assemblyData.GeneralMaterialSpecifications[0].RoofPlateWeldJointType.ToLower().Contains("lap joint")));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 103 + 5.5, currentY + rowHeight / 2), "LAP JOINT", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
             currentY -= rowHeight;
@@ -1849,7 +1849,7 @@ namespace PaperSetting.EYEServices
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "FIXED ROOF", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "SLOPE", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 25 / 2, currentY + rowHeight / 2), AMEDATA[64], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 25 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].RoofPlateSlopeRadiusRatio, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.AddRange(GetSquare(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 23 + 25, currentY +1.2 ), AMEDATA[65].ToLower().Contains("column")));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 23+25 +5.5, currentY + rowHeight / 2), "COLUMN", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
@@ -1919,7 +1919,7 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "INTERNAL", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 112 / 2, currentY + rowHeight / 2), AMEDATA[71], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 112 / 2, currentY + rowHeight / 2), assemblyData.GeneralLiquidCapacityWeight[0].PaintingAreaInt, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 
@@ -1935,7 +1935,7 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "EXTERNAL", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 112 / 2, currentY + rowHeight / 2), AMEDATA[72], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 112 / 2, currentY + rowHeight / 2), assemblyData.GeneralLiquidCapacityWeight[0].PaintingAreaExt, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
             currentY -= rowHeight;
@@ -1948,13 +1948,28 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap, currentY + rowHeight / 2), "INSULATION (mm)", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
 
+            string insulationType = "";
+            if (assemblyData.GeneralMaterialSpecifications[0].InsulationType != "")
+                insulationType = "(" + assemblyData.GeneralMaterialSpecifications[0].InsulationType + ")";
+            string insShellThickness = assemblyData.GeneralMaterialSpecifications[0].InsulationShellThickness.Trim().ToLower().Replace("none","");
+            string insRoofThickness = assemblyData.GeneralMaterialSpecifications[0].InsulationRoofThickness.Trim().ToLower().Replace("none", "");
+            if (insShellThickness != "")
+                insShellThickness = insShellThickness + " " + insulationType;
+            else
+                insShellThickness = "NONE";
+
+            if (insRoofThickness != "")
+                insRoofThickness = insRoofThickness + " " + insulationType;
+            else
+                insRoofThickness = "NONE";
+
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth, currentY + rowHeight / 2), "SHELL", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 44 / 2, currentY + rowHeight / 2), AMEDATA[73], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 44 / 2, currentY + rowHeight / 2), insShellThickness, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 23 + 44, currentY + rowHeight / 2), "ROOF", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 44 + 23, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 44 + 23 + 45 / 2, currentY + rowHeight / 2), AMEDATA[74], fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 23 + 44 + 23 + 45 / 2, currentY + rowHeight / 2), insRoofThickness, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 

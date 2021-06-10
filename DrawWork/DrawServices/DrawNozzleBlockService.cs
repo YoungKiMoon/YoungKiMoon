@@ -505,7 +505,7 @@ namespace DrawWork.DrawServices
 
         public List<Entity> DrawReference_Nozzle_PipeSlopeAll(out List<Point3D> selOutputPointList, Point3D selPoint1, int selPointNumber, double selOD, double selLength, double selSlopeDgree, double selOverlap = 0, double selRotate = 0, DrawCenterLineModel selCenterLine = null)
         {
-            if (SingletonData.TankType == TANK_TYPE.CRT)
+            if (SingletonData.TankType == TANK_TYPE.CRT || SingletonData.TankType == TANK_TYPE.IFRT)
             {
                 return DrawReference_Nozzle_PipeSlope(out selOutputPointList, selPoint1, selPointNumber, selOD, selOD, selSlopeDgree, selOverlap, selRotate, selCenterLine);
             }
@@ -737,7 +737,85 @@ namespace DrawWork.DrawServices
 
             return newList;
         }
+        public List<Entity> DrawReference_Nozzle_PipeTrimByCircle(out List<Point3D> selOutputPointList,ref Circle trimCircle,ref Line centerLine, Point3D selPoint1, double selPipeOD, DrawCenterLineModel selCenterLine = null)
+        {
+            selOutputPointList = new List<Point3D>();
+            List<Entity> newList = new List<Entity>();
 
+            selOutputPointList.Add(GetSumPoint(centerLine.EndPoint,0,0));
+
+            Line leftLine = (Line)centerLine.Offset(-selPipeOD / 2, Vector3D.AxisZ);
+            Line rightLine = (Line)centerLine.Offset(selPipeOD / 2, Vector3D.AxisZ);
+            Point3D[] leftInter = leftLine.IntersectWith(trimCircle);
+            Point3D[] rightInter = rightLine.IntersectWith(trimCircle);
+
+            // Drawing Shape
+            Line lineTempVLeft = null;
+            if (leftInter.Length > 0)
+            {
+                lineTempVLeft = new Line(GetSumPoint(leftLine.EndPoint, 0, 0), GetSumPoint(leftInter[0], 0, 0));
+                newList.Add(lineTempVLeft);
+            }
+            Line lineTempVRight = null;
+            if (rightInter.Length > 0)
+            {
+                lineTempVRight = new Line(GetSumPoint(rightLine.EndPoint, 0, 0), GetSumPoint(rightInter[0], 0, 0));
+                newList.Add(lineTempVRight);
+            }
+            Line topLine = null;
+            if (leftInter.Length>0 && rightInter.Length > 0)
+            {
+                topLine= new Line(GetSumPoint(lineTempVLeft.StartPoint, 0, 0), GetSumPoint(lineTempVRight.StartPoint, 0,0));
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+
+                // Center Line
+                if (selCenterLine != null)
+                {
+                    if (selCenterLine.centerLine)
+                    {
+                        // 기본 형상
+                        Point3D onePoint = topLine.MidPoint;
+
+                        Point3D[] centerInter = centerLine.IntersectWith(trimCircle);
+                        if (centerInter.Length > 0)
+                        {
+                            Point3D zeroPoint = centerInter[0];
+
+                            Line centerLine00 = new Line(zeroPoint, onePoint);
+
+                            styleService.SetLayer(ref centerLine00, layerService.LayerCenterLine);
+                            newList.Add(centerLine00);
+
+                            Vector3D direction = new Vector3D(centerLine00.StartPoint, centerLine00.EndPoint);
+                            direction.Normalize();
+
+                            // 0
+                            if (selCenterLine.zeroEx || selCenterLine.twoEx)
+                            {
+                                Line zeroLine = new Line(GetSumPoint(zeroPoint, 0, 0), GetSumPoint(zeroPoint, 0,0) - (direction * selCenterLine.exLength * selCenterLine.scaleValue));
+                                styleService.SetLayer(ref zeroLine, layerService.LayerCenterLine);
+                                newList.Add(zeroLine);
+                            }
+
+                            // 1
+                            if (selCenterLine.oneEx || selCenterLine.twoEx)
+                            {
+                                Line oneLine = new Line(GetSumPoint(onePoint, 0, 0), GetSumPoint(onePoint, 0, 0) + (direction * selCenterLine.exLength * selCenterLine.scaleValue));
+                                styleService.SetLayer(ref oneLine, layerService.LayerCenterLine);
+                                newList.Add(oneLine);
+                            }
+
+                            selOutputPointList.Add(zeroPoint);
+                        }
+
+                    }
+                }
+            }
+
+            return newList;
+        }
 
 
 
@@ -1527,6 +1605,135 @@ namespace DrawWork.DrawServices
             return newList;
         }
 
+        public List<Entity> DrawReference_Nozzle_Flange_Top(out List<Point3D> selOutputPointList, Point3D selPoint1, int selPointNumber, double selOD1, double selOD2, double selOD3, double selRadius, double selRotate = 0, double offset=0, DrawCenterLineModel selCenterLine = null)
+        {
+
+            double OD1 = selOD1;    // Pipe OD
+            double OD2 = selOD2;    // Center Line : Bolt
+            double OD3 = selOD3;    // Flange OD
+            double centerRadius = selRadius;
+
+
+            List<Entity> newList = new List<Entity>();
+
+            // WP : Center
+            Point3D WP = new Point3D(selPoint1.X, selPoint1.Y);
+            Point3D WPRotate = WP;
+
+
+            // Drawing Shape
+            Circle circle01 = null;
+            Circle circle02 = null;
+            Circle circle03 = null;
+
+            circle01 = new Circle(GetSumPoint(WP, 0, 0), OD1/2);
+            styleService.SetLayer(ref circle01, layerService.LayerOutLine);
+            circle02 = new Circle(GetSumPoint(WP, 0, 0), OD2/2);
+            styleService.SetLayer(ref circle02, layerService.LayerCenterLine);
+            circle03 = new Circle(GetSumPoint(WP, 0, 0), OD3/2);
+            styleService.SetLayer(ref circle03, layerService.LayerOutLine);
+
+
+
+            newList.AddRange(new Circle[] { circle01, circle02, circle03 });
+
+
+
+            // Center Line
+            if (selCenterLine != null)
+            {
+                if (selCenterLine.centerLine)
+                {
+                    // 기본 형상
+                    Point3D zeroPoint = GetSumPoint(WP, 0, -OD3 / 2);
+                    Point3D onePoint = GetSumPoint(WP, 0, OD3 / 2);
+                    Line centerLine00 = new Line(zeroPoint, onePoint);
+                    styleService.SetLayer(ref centerLine00, layerService.LayerCenterLine);
+                    newList.Add(centerLine00);
+
+
+                    // 0
+                    if (selCenterLine.zeroEx || selCenterLine.twoEx)
+                    {
+                        Line zeroLine = new Line(GetSumPoint(zeroPoint, 0, 0), GetSumPoint(zeroPoint, 0, -selCenterLine.exLength * selCenterLine.scaleValue));
+                        styleService.SetLayer(ref zeroLine, layerService.LayerCenterLine);
+                        newList.Add(zeroLine);
+                    }
+
+                    // 1
+                    if (selCenterLine.oneEx || selCenterLine.twoEx)
+                    {
+                        Line oneLine = new Line(GetSumPoint(onePoint, 0, 0), GetSumPoint(onePoint, 0, +selCenterLine.exLength * selCenterLine.scaleValue));
+                        styleService.SetLayer(ref oneLine, layerService.LayerCenterLine);
+                        newList.Add(oneLine);
+                    }
+
+
+                    // Radius --> Cross Centerline
+                    if (centerRadius <= selOD3/2)
+                        selCenterLine.arcEx = false;
+
+                    // Horizon : Arc
+                    if (selCenterLine.arcEx)
+                    {
+                        Circle vCircle1 = new Circle(GetSumPoint(WP, 0, -centerRadius), centerRadius);
+                        Circle vCircle2 = new Circle(GetSumPoint(WP, 0,0), OD3/2 + selCenterLine.exLength * selCenterLine.scaleValue);
+                        Point3D[] vCircleInter = vCircle1.IntersectWith(vCircle2);
+                        if (vCircleInter.Length > 0)
+                        {
+                            Arc centerArc = new Arc(GetSumPoint(vCircleInter[1],0,0), GetSumPoint(WP, 0, 0), GetSumPoint(vCircleInter[0], 0, 0),false);
+                            styleService.SetLayer(ref centerArc, layerService.LayerCenterLine);
+                            newList.Add(centerArc);
+                        }
+                        //newList.Add(vCircle1);
+                        //newList.Add(vCircle2);
+
+                    }
+                    // Horizon : Line
+                    else
+                    {
+                        Point3D horizonPoint1 = GetSumPoint(WP, -OD3 / 2 - selCenterLine.exLength * selCenterLine.scaleValue, 0 );
+                        Point3D horizonPoint2 = GetSumPoint(WP, OD3 / 2 + selCenterLine.exLength * selCenterLine.scaleValue, 0);
+                        Line horizonLine00 = new Line(horizonPoint1, horizonPoint2);
+                        styleService.SetLayer(ref horizonLine00, layerService.LayerCenterLine);
+                        newList.Add(horizonLine00);
+                    }
+
+                }
+            }
+
+            // Rotate
+            if (selRotate != 0)
+            {
+                foreach (Entity eachEntity in newList)
+                    eachEntity.Rotate(selRotate, Vector3D.AxisZ, WPRotate);
+            }
+
+            // Translate
+            if (selPointNumber > -1)
+            {
+                //Point3D translatePoint = null;
+                //if (selPointNumber >= 0)
+                //{
+                //    if (selPointNumber == 0)
+                //        translatePoint = line02.MidPoint;
+                //    else if (selPointNumber == 1)
+                //        translatePoint = line03.MidPoint;
+                //}
+                //if (translatePoint != null)
+                //    SetTranslate(ref newList, WP, translatePoint);
+
+            }
+
+
+
+            selOutputPointList = new List<Point3D>();
+            //selOutputPointList.Add(line00.MidPoint);
+            //selOutputPointList.Add(line01.MidPoint);
+
+            return newList;
+        }
+
 
         public List<Entity> DrawReference_Hole(Point3D selPoint1, double selRadius,  double selRotate = 0, DrawCenterLineModel selCenterLine = null)
         {
@@ -1577,6 +1784,9 @@ namespace DrawWork.DrawServices
 
             return newList;
         }
+
+
+
 
 
 

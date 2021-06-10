@@ -101,6 +101,10 @@
     <Compile Include="DrawPaperServices\ViewPortSettingModel.cs" />
     <Compile Include="DrawSacleServices\DrawScaleService.cs" />
     <Compile Include="DrawServices\DrawBoundaryService.cs" />
+    <Compile Include="DrawServices\DrawDimensionService.cs" />
+    <Compile Include="DrawServices\DrawFRTBlockService.cs" />
+    <Compile Include="DrawServices\DrawNozzleOrientationService.cs" />
+    <Compile Include="DrawServices\DrawShapeServices.cs" />
     <Compile Include="DrawServices\DrawEditingService.cs" />
     <Compile Include="DrawServices\DrawImportBlockService.cs" />
     <Compile Include="DrawServices\DrawLeaderPublicService.cs" />

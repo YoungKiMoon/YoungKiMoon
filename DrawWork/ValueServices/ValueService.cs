@@ -149,6 +149,11 @@ namespace DrawWork.ValueServices
             return Math.Sin(selDegree) * selHypotenuse;
         }
 
+        public double GetOppositeByAdjacent(double selDegree, double selAdjacent)
+        {
+            return selAdjacent * Math.Tan(selDegree);
+        }
+
         public double GetAdjacentByHeight(string selSlope, string selHeight)
         {
             return GetAdjacentByHeight(GetDegreeOfSlope(selSlope), GetDoubleValue(selHeight));
@@ -227,6 +232,16 @@ namespace DrawWork.ValueServices
 
 
             return selNumber + returnValue;
+        }
+
+        public double GetRadianByArcLength(double selLength, double selRadius)
+        {
+           return selLength / selRadius;
+        }
+
+        public double GetCirclePerimeter(double selRadius)
+        {
+            return Math.PI * selRadius * 2;
         }
     }
 }

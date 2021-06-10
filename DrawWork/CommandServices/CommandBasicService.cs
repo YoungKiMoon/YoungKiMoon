@@ -197,6 +197,7 @@ namespace DrawWork.CommandServices
             // Adjust : Dimension
             AutomationDimensionService autoDimService = new AutomationDimensionService();
             commandEntities.AddRange(autoDimService.SetLineBreak(singleModel as Model, drawEntity));
+            
             commandEntities.AddRange(drawEntity.blockList);
 
 
@@ -343,6 +344,21 @@ namespace DrawWork.CommandServices
                     drawEntity.blockList.AddRange(newNozzle.blockList);
                     goto case "allways";
 
+                // Nozzle : Orientation
+                case "nozzleorientation":
+                    DrawEntityModel newNozzleOrientation = drawObject.DoNozzleOrientation(eachCmd, ref refPoint, ref curPoint, scaleData.Value);
+                    drawEntity.outlineList.AddRange(newNozzleOrientation.outlineList);
+                    drawEntity.nozzlelineList.AddRange(newNozzleOrientation.nozzlelineList);
+                    drawEntity.nozzleMarkList.AddRange(newNozzleOrientation.nozzleMarkList);
+                    drawEntity.nozzleTextList.AddRange(newNozzleOrientation.nozzleTextList);
+                    drawEntity.blockList.AddRange(newNozzleOrientation.blockList);
+                    goto case "allways";
+
+                case "orientation":
+                    Entity[] newOrientation = drawObject.DoBlockOrientation(eachCmd, ref refPoint, ref curPoint, scaleData.Value);
+                    if (newOrientation != null)
+                        drawEntity.outlineList.AddRange(newOrientation);
+                    goto case "allways";
 
                 // Leader : Scale
                 case "leader":

@@ -124,7 +124,7 @@ namespace DrawWork.DrawServices
         }
         #endregion
 
-
+        #region Intersect
         public Point3D GetIntersectLength(ICurve selCurve,double selLength,bool endPoint=true)
         {
             Point3D newValue = new Point3D();
@@ -157,14 +157,31 @@ namespace DrawWork.DrawServices
             return newValue;
 
         }
+        #endregion
 
+        #region Angle
         public double GetAngleOfLine(ICurve selCurve)
         {
             Vector3D direction = new Vector3D(selCurve.StartPoint, selCurve.EndPoint);
             direction.Normalize();
             return direction.Angle;
         }
+        #endregion
 
+
+        #region Translate
+        public void SetTranslate(ref List<Entity> selList, Point3D refPoint, Point3D currentPoint)
+        {
+            double distanceY = refPoint.Y - currentPoint.Y;
+            double distanceX = refPoint.X - currentPoint.X;
+            Vector3D tempMovement = new Vector3D(distanceX, distanceY);
+            foreach (Entity eachEntity in selList)
+                eachEntity.Translate(tempMovement);
+        }
+        #endregion
+
+
+        //
         public Arc GetArcOfPoint(Point3D centerPoint,double selRadius, Point3D selPoint, double selWidth)
         {
             Circle cccc = new Circle(centerPoint, selRadius);
@@ -193,6 +210,24 @@ namespace DrawWork.DrawServices
             return newArc;
 
         }
+
+
+        #region Center Line
+        public List<Entity> GetCenterLine(Point3D selStartPoint, Point3D selEndPoint, double selExtLength,double selScaleValue)
+        {
+            List<Entity> newList = new List<Entity>();
+            Line newLine = new Line(GetSumPoint(selStartPoint,0,0), GetSumPoint(selEndPoint,0,0));
+
+            Vector3D direction = new Vector3D(newLine.StartPoint, newLine.EndPoint);
+            direction.Normalize();
+            Line extStartLine = new Line(selStartPoint, selStartPoint - (direction*selExtLength*selScaleValue));
+            Line extEndLine = new Line(selEndPoint, selEndPoint + (direction * selExtLength * selScaleValue));
+            newList.Add(newLine);
+            newList.Add(extStartLine);
+            newList.Add(extEndLine);
+            return newList;
+        }
+        #endregion
 
 
         private Point3D GetSumPoint(Point3D selPoint1, double X, double Y, double Z = 0)

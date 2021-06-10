@@ -32,11 +32,13 @@ namespace DrawWork.DrawServices
             switch (selTankType)
             {
                 case TANK_TYPE.CRT:
+                case TANK_TYPE.IFRT:
                     tankType = "CRT";
                     break;
                 case TANK_TYPE.DRT:
                     tankType = "DRT";
                     break;
+
 
             }
 
@@ -44,6 +46,7 @@ namespace DrawWork.DrawServices
             switch (selTankType)
             {
                 case TANK_TYPE.CRT:
+                case TANK_TYPE.IFRT:
                     switch (selStructureType)
                     {
                         case "Self-supporting":
@@ -91,6 +94,7 @@ namespace DrawWork.DrawServices
             switch (selTankType)
             {
                 case TANK_TYPE.CRT:
+                case TANK_TYPE.IFRT:
                     switch (selTopAngleType)
                     {
                         case "Detail b":

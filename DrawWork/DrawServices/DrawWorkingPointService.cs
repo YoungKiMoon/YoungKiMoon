@@ -80,25 +80,9 @@ namespace DrawWork.DrawServices
             string selSizeTankHeight = assemblyData.GeneralDesignData[refFirstIndex].SizeTankHeight;
             string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalID;
 
-            string roofSlope = "";
-            string roofThickness = "";
-            string roofRadiusRatio = "";
-
-            switch (SingletonData.TankType)
-            {
-                case TANK_TYPE.CRT:
-                    roofSlope = assemblyData.RoofCRTInput[0].RoofSlope;
-                    roofThickness = assemblyData.RoofCRTInput[0].RoofPlateThickness;
-                    break;
-                case TANK_TYPE.DRT:
-                    roofRadiusRatio = assemblyData.RoofDRTInput[0].DomeRadiusRatio;
-                    roofThickness = assemblyData.RoofDRTInput[0].RoofPlateThickness;
-                    break;
-                case TANK_TYPE.IFRT:
-                    roofSlope = assemblyData.RoofIFRTInput[0].RoofSlope;
-                    roofThickness = assemblyData.RoofIFRTInput[0].RoofPlateThickness;
-                    break;
-            }
+            string roofSlope = assemblyData.RoofCompressionRing[refFirstIndex].RoofSlope;
+            string roofThickness = assemblyData.RoofCompressionRing[refFirstIndex].RoofPlateThickness;
+            string roofRadiusRatio = assemblyData.RoofCompressionRing[refFirstIndex].DomeRadiusRatio;
 
             string bottomSlope = assemblyData.BottomInput[0].BottomPlateSlope;
             string bottomThickness = assemblyData.BottomInput[0].BottomPlateThickness;
@@ -126,10 +110,11 @@ namespace DrawWork.DrawServices
 
 
 
-                case WORKINGPOINT_TYPE.PointCenterTopUp:                // 2021-04-22 완료 : 2021-05-28 완료
+                case WORKINGPOINT_TYPE.PointCenterTopUp:                // 2021-04-22 완료 : 2021-05-28 완료 : 2021-06-10 완료
                     switch (SingletonData.TankType)
                     {
                         case TANK_TYPE.CRT:
+                        case TANK_TYPE.IFRT:
                             CDPoint topcenterpoint = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
                             double verticalHeight2 = valueService.GetHypotenuseByWidth(roofSlope, roofThickness);
                             WPPoint = GetSumCDPoint(topcenterpoint, 0, verticalHeight2);
@@ -137,14 +122,19 @@ namespace DrawWork.DrawServices
                         case TANK_TYPE.DRT:
                             WPPoint = GetSumCDPoint(DRTWorkingData.PointCenterTopUp, 0, 0);
                             break;
+                        case TANK_TYPE.EFRTSingle:
+                        case TANK_TYPE.EFRTDouble:
+                            WPPoint = GetSumCDPoint(WorkingPoint(WORKINGPOINT_TYPE.PointCenterTop, ref refPoint, ref curPoint), 0, valueService.GetDoubleValue(roofThickness));
+                            break;
                     }
                     break;
 
-                case WORKINGPOINT_TYPE.PointCenterTopDown:              // 2021-04-22 완료 : 2021-05-28 완료
+                case WORKINGPOINT_TYPE.PointCenterTopDown:              // 2021-04-22 완료 : 2021-05-28 완료 : 2021-06-10 완료
 
                     switch (SingletonData.TankType)
                     {
                         case TANK_TYPE.CRT:
+                        case TANK_TYPE.IFRT:
                             // top angle roof point
                             CDPoint topAngleRoofPoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
 
@@ -156,6 +146,10 @@ namespace DrawWork.DrawServices
                             break;
                         case TANK_TYPE.DRT:
                             WPPoint = GetSumCDPoint(DRTWorkingData.PointCenterTopDown, 0, 0);
+                            break;
+                        case TANK_TYPE.EFRTSingle:
+                        case TANK_TYPE.EFRTDouble:
+                            WPPoint = GetSumCDPoint(WorkingPoint(WORKINGPOINT_TYPE.PointCenterTop, ref refPoint, ref curPoint), 0, 0);
                             break;
                     }
                     break;
@@ -209,6 +203,7 @@ namespace DrawWork.DrawServices
                     switch (SingletonData.TankType)
                     {
                         case TANK_TYPE.CRT:
+                        case TANK_TYPE.IFRT:
                             CDPoint topleftpoint = WorkingPoint(WORKINGPOINT_TYPE.PointLeftRoofDown, ref refPoint, ref curPoint);
                             WPPoint = GetSumCDPoint(topleftpoint,
                                                     -valueService.GetOppositeByHypotenuse(roofSlope, roofThickness),
@@ -217,10 +212,14 @@ namespace DrawWork.DrawServices
                         case TANK_TYPE.DRT:
                             WPPoint = GetSumCDPoint(DRTWorkingData.PointLeftRoofUp,0,0);
                             break;
+                        case TANK_TYPE.EFRTSingle:
+                        case TANK_TYPE.EFRTDouble:
+                            WPPoint = GetSumCDPoint(WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTop, ref refPoint, ref curPoint), 0,valueService.GetDoubleValue( roofThickness));
+                            break;
                     }
                     break;
 
-                case WORKINGPOINT_TYPE.PointLeftRoofDown:               // Entiry Point : 2021-04-22 완료 : CRT, DRT 같음
+                case WORKINGPOINT_TYPE.PointLeftRoofDown:               // Entiry Point : 2021-04-22 완료 : CRT, DRT, IFRT, EFRT 추가 : 2021-06-10
                     WPPoint = PointTopAngleRoof(ref refPoint, ref curPoint);
                     break;
 
@@ -262,6 +261,7 @@ namespace DrawWork.DrawServices
                     switch (SingletonData.TankType)
                     {
                         case TANK_TYPE.CRT:
+                        case TANK_TYPE.IFRT:
                             CDPoint tempCenterRoofPoint2 = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref curPoint);
                             double tempRightRoofHeight2 = valueService.GetOppositeByWidth(roofSlope, selPointValue);
 
@@ -279,6 +279,7 @@ namespace DrawWork.DrawServices
                     switch (SingletonData.TankType)
                     {
                         case TANK_TYPE.CRT:
+                        case TANK_TYPE.IFRT:
                             CDPoint tempCenterRoofPoint = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
                             double tempLeftRoofHeight = valueService.GetOppositeByWidth(roofSlope, selPointValue);
 
@@ -297,6 +298,7 @@ namespace DrawWork.DrawServices
                     switch (SingletonData.TankType)
                     {
                         case TANK_TYPE.CRT:
+                        case TANK_TYPE.IFRT:
                             CDPoint tempCenterRoofPoint4 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, tempTankWidthHalf2.ToString(), ref refPoint, ref curPoint);
 
                             WPPoint = GetSumCDPoint(tempCenterRoofPoint4, 0, 0);
@@ -315,6 +317,7 @@ namespace DrawWork.DrawServices
                     switch (SingletonData.TankType)
                     {
                         case TANK_TYPE.CRT:
+                        case TANK_TYPE.IFRT:
                             CDPoint tempCenterRoofPoint3 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, tempTankWidthHalf.ToString(), ref refPoint, ref curPoint);
 
                             WPPoint = GetSumCDPoint(tempCenterRoofPoint3, 0, 0);
@@ -418,17 +421,18 @@ namespace DrawWork.DrawServices
             switch (SingletonData.TankType)
             {
                 case TANK_TYPE.CRT:
-                    newPoint= PointTopAngleRoof_CRT(ref refPoint, ref curPoint); 
+                case TANK_TYPE.IFRT:
+                    newPoint = PointTopAngleRoof_CRT(ref refPoint, ref curPoint); 
                     break;
                 case TANK_TYPE.DRT:
                     newPoint = PointTopAngleRoof_DRT(ref refPoint, ref curPoint); // 같음
                     break;
-                case TANK_TYPE.IFRT:
-                    break;
                 case TANK_TYPE.EFRTSingle:
-                    break;
                 case TANK_TYPE.EFRTDouble:
+                    newPoint = PointTopAngleRoof_EFRT(ref refPoint, ref curPoint); // 같음
                     break;
+
+                // 하나로 통합 할 필요성 있음
             }
 
             return newPoint;
@@ -613,22 +617,60 @@ namespace DrawWork.DrawServices
             return newPoint;
         }
 
+        private CDPoint PointTopAngleRoof_EFRT(ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+            int firstIndex = 0;
+
+            string selSizeTankHeight = assemblyData.GeneralDesignData[firstIndex].SizeTankHeight;
+            //string selSizeNominalId = assemblyData.GeneralDesignData[refFirstIndex].SizeNominalId;
+
+            CDPoint newPoint = new CDPoint();
+            // Angle Model
+            AngleSizeModel eachAngle = new AngleSizeModel();
+            if (assemblyData.RoofAngleOutput.Count > 0)
+                eachAngle = assemblyData.RoofAngleOutput[0];
+            // Max course count
+            int maxCourse = assemblyData.ShellOutput.Count - 1;
+
+            switch (assemblyData.RoofCompressionRing[0].CompressionRingType)
+            {
+                case "Detail b":
+                    // Point
+                    newPoint = GetSumCDPoint(refPoint,
+                                             -valueService.GetDoubleValue(eachAngle.E)
+                                             - valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness),
+
+                                             +valueService.GetDoubleValue(selSizeTankHeight));
+
+                    break;
+
+                case "Detail d":
+                    // Point
+                    newPoint = GetSumCDPoint(refPoint,
+                                             -valueService.GetDoubleValue(eachAngle.E),
+
+                                             +valueService.GetDoubleValue(selSizeTankHeight));
+
+
+                    break;
+
+            
+            }
+
+            return newPoint;
+        }
+
         private CDPoint PointTopAngleShell(ref CDPoint refPoint, ref CDPoint curPoint)
         {
             CDPoint newPoint = new CDPoint();
             switch (SingletonData.TankType)
             {
                 case TANK_TYPE.CRT:
-                    newPoint = PointTopAngleShell_CRT(ref refPoint, ref curPoint);
-                    break;
                 case TANK_TYPE.DRT:
-                    newPoint = PointTopAngleShell_CRT(ref refPoint, ref curPoint);
-                    break;
                 case TANK_TYPE.IFRT:
-                    break;
                 case TANK_TYPE.EFRTSingle:
-                    break;
                 case TANK_TYPE.EFRTDouble:
+                    newPoint = PointTopAngleShell_CRT(ref refPoint, ref curPoint);
                     break;
             }
 

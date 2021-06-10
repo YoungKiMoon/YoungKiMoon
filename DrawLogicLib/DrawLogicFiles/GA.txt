@@ -21,7 +21,7 @@ using StructureGirderIn
 // GA는 영역 설정이 Tank의 좌측 하단
 // Reference Point 는 변경이 없을 것
 
-refpoint xy 10000,10000
+refpoint xy 100000,100000
 
 
 #region TankCenterLine

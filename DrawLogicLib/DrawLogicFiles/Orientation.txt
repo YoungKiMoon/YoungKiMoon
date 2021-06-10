@@ -1,0 +1,12 @@
+
+
+refpoint xy 900000,100000
+
+
+
+#region Nozzle : Orientation
+	point xy refpointx,refpointy
+	nozzleorientation 
+#endregion
+
+

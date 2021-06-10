@@ -123,6 +123,11 @@ namespace DrawWork.DrawServices
                 newNozzle.WaterSpray = eachNozzle.WaterSpray.ToLower();
                 newNozzle.FoamConn = eachNozzle.FoamConn.ToLower();
 
+                newNozzle.AutoBleederVent = eachNozzle.AutoBleederVent.ToLower();
+                newNozzle.RimVent = eachNozzle.RimVent.ToLower();
+                newNozzle.RoofDrainSump = eachNozzle.RoofDrainSump.ToLower();
+                newNozzle.NozzleOnPlateform = eachNozzle.NozzleOnPlateform.ToLower();
+
                 // Sort Value
                 if (newNozzle.Position == "shell")
                     newNozzle.HRSort = valueService.GetDoubleValue(eachNozzle.H);
@@ -194,6 +199,11 @@ namespace DrawWork.DrawServices
                 newNozzle.WaterSpray = eachNozzle.WaterSpray.ToLower();
                 newNozzle.FoamConn = eachNozzle.FoamConn.ToLower();
 
+                newNozzle.AutoBleederVent = eachNozzle.AutoBleederVent.ToLower();
+                newNozzle.RimVent = eachNozzle.RimVent.ToLower();
+                newNozzle.RoofDrainSump = eachNozzle.RoofDrainSump.ToLower();
+                newNozzle.NozzleOnPlateform = eachNozzle.NozzleOnPlateform.ToLower();
+
                 // Sort Value
                 if (newNozzle.Position == "shell")
                     newNozzle.HRSort = valueService.GetDoubleValue(eachNozzle.H);
@@ -203,6 +213,8 @@ namespace DrawWork.DrawServices
 
                 newList.Add(newNozzle);
             }
+
+            #region Temp
             //foreach (NozzleFRTRoofInputModel eachNozzle in assemblyData.NozzleFRTRoofInputModel)
             //{
             //    NozzleInputModel newNozzle = new NozzleInputModel();
@@ -274,6 +286,20 @@ namespace DrawWork.DrawServices
 
             //    newList.Add(newNozzle);
             //}
+            #endregion
+
+            #region Tank Plan : Adjust
+            if(SingletonData.TankType==TANK_TYPE.EFRTSingle ||
+               SingletonData.TankType == TANK_TYPE.EFRTDouble)
+            {
+                // Roof 제외하기
+                for (int i = newList.Count - 1; i >= 0; i--)
+                {
+                    if (newList[i].Position == "roof")
+                        newList.RemoveAt(i);
+                }
+            }
+            #endregion
 
             return newList;
         }
@@ -844,7 +870,7 @@ namespace DrawWork.DrawServices
             double couplingHeight = 0;
             if (selNozzle.RePadType != "")
             {
-                if (SingletonData.TankType == TANK_TYPE.CRT)
+                if (SingletonData.TankType == TANK_TYPE.CRT || SingletonData.TankType == TANK_TYPE.IFRT)
                     customEntity.AddRange(CreateReinforcingPAD(refPoint, drawPoint, selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
             }
 
@@ -1017,7 +1043,7 @@ namespace DrawWork.DrawServices
             double couplingHeight = 0;
             if (selNozzle.RePadType != "")
             {
-                if (SingletonData.TankType == TANK_TYPE.CRT)
+                if (SingletonData.TankType == TANK_TYPE.CRT || SingletonData.TankType == TANK_TYPE.IFRT)
                     customEntity.AddRange(CreateReinforcingPAD(refPoint, drawPoint, selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
             }
 
@@ -1182,7 +1208,7 @@ namespace DrawWork.DrawServices
             double couplingHeight = 0;
             if (selNozzle.RePadType != "")
             {
-                if (SingletonData.TankType == TANK_TYPE.CRT)
+                if (SingletonData.TankType == TANK_TYPE.CRT || SingletonData.TankType == TANK_TYPE.IFRT)
                     customEntity.AddRange(CreateReinforcingPAD(refPoint, drawPoint, selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
             }
 
@@ -1362,7 +1388,7 @@ namespace DrawWork.DrawServices
             double couplingHeight = 0;
             if (selNozzle.RePadType != "")
             {
-                if(SingletonData.TankType==TANK_TYPE.CRT)
+                if(SingletonData.TankType==TANK_TYPE.CRT || SingletonData.TankType == TANK_TYPE.IFRT)
                     customEntity.AddRange(CreateReinforcingPAD(refPoint, GetSumPoint(currentInternalPoint, 0,0), selNozzle, selSizeNominalID, selScaleValue, ref couplingHeight));
             }
 
@@ -1988,7 +2014,7 @@ namespace DrawWork.DrawServices
                             customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, manholeOD, neckLength, pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
                         }
 
-                        if(SingletonData.TankType==TANK_TYPE.CRT)
+                        if(SingletonData.TankType==TANK_TYPE.CRT || SingletonData.TankType == TANK_TYPE.IFRT)
                             customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PadSlope(out currentPoint, GetSumPoint(currentPoint[0],0,padBottomGap), 0, manholeOD, L, padThickness, true, pipeSlope, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
                     }
                     else if (selNozzle.LR == "right")
@@ -2002,7 +2028,7 @@ namespace DrawWork.DrawServices
                         {
                             customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PipeSlope(out currentPoint, currentPoint[0], 1, manholeOD, neckLength, -pipeSlope, 0, 0, new DrawCenterLineModel() { scaleValue = selScaleValue, twoEx = true }));
                         }
-                        if (SingletonData.TankType == TANK_TYPE.CRT)
+                        if (SingletonData.TankType == TANK_TYPE.CRT || SingletonData.TankType == TANK_TYPE.IFRT)
                             customEntity.AddRange(nozzleBlock.DrawReference_Nozzle_PadSlope(out currentPoint, GetSumPoint(currentPoint[0], 0, padBottomGap), 0, manholeOD, L, padThickness, true, -pipeSlope, new DrawCenterLineModel() { scaleValue = selScaleValue, oneEx = true }));
                     }
 

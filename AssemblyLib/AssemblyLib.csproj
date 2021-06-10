@@ -54,6 +54,9 @@
     <Compile Include="AssemblyModels\AssemblyModel.cs" />
     <Compile Include="AssemblyModels\BottomInputModel.cs" />
     <Compile Include="AssemblyModels\ChannelModel.cs" />
+    <Compile Include="AssemblyModels\DeckSupportEFRTDoubleInputModel.cs" />
+    <Compile Include="AssemblyModels\DeckSupportEFRTSingleInputModel.cs" />
+    <Compile Include="AssemblyModels\DeckSupportIFRTInputModel.cs" />
     <Compile Include="AssemblyModels\DrainInternalModel.cs" />
     <Compile Include="AssemblyModels\DrainLowerModel.cs" />
     <Compile Include="AssemblyModels\DrainSumpModel.cs" />
@@ -96,6 +99,8 @@
     <Compile Include="AssemblyModels\PipeScheduleModel.cs" />
     <Compile Include="AssemblyModels\ReducerModel.cs" />
     <Compile Include="AssemblyModels\ReinforcingPadModel.cs" />
+    <Compile Include="AssemblyModels\RimVentNozzleModel.cs" />
+    <Compile Include="AssemblyModels\RingEFRTDoubleInputModel.cs" />
     <Compile Include="AssemblyModels\RoofCompressionRingModel.cs" />
     <Compile Include="AssemblyModels\RoofCRTInputModel.cs" />
     <Compile Include="AssemblyModels\RoofDRTInputModel.cs" />

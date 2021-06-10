@@ -56,6 +56,10 @@ namespace DrawWork.CutomModels
 			InternalPipeBended = "";
 			WaterSpray = "";
 			FoamConn = "";
+			AutoBleederVent = "";
+			RimVent = "";
+			RoofDrainSump = "";
+			NozzleOnPlateform = "";
 			HRSort = 0;
 		}
 
@@ -543,6 +547,50 @@ namespace DrawWork.CutomModels
 			}
 		}
 
+		private string _AutoBleederVent;
+		public string AutoBleederVent
+		{
+			get { return _AutoBleederVent; }
+			set
+			{
+				_AutoBleederVent = value;
+				OnPropertyChanged(nameof(AutoBleederVent));
+			}
+		}
+
+		private string _RimVent;
+		public string RimVent
+		{
+			get { return _RimVent; }
+			set
+			{
+				_RimVent = value;
+				OnPropertyChanged(nameof(RimVent));
+			}
+		}
+
+		private string _RoofDrainSump;
+		public string RoofDrainSump
+		{
+			get { return _RoofDrainSump; }
+			set
+			{
+				_RoofDrainSump = value;
+				OnPropertyChanged(nameof(RoofDrainSump));
+			}
+		}
+
+		private string _NozzleOnPlateform;
+		public string NozzleOnPlateform
+		{
+			get { return _NozzleOnPlateform; }
+			set
+			{
+				_NozzleOnPlateform = value;
+				OnPropertyChanged(nameof(NozzleOnPlateform));
+			}
+		}
+
 		private double _HRSort;
 		public double HRSort
 		{
@@ -555,5 +603,4 @@ namespace DrawWork.CutomModels
 		}
 
 	}
-
 }

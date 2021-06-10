@@ -429,11 +429,11 @@ namespace ExcelAddIn.ExcelServices
                         roofViewRange.EntireColumn.Hidden = false;
                         break;
                     case ROOF_TYPE.EFRTSingle:
-                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 31], roofSheet.Cells[1, 39]];
+                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 32], roofSheet.Cells[1, 40]];
                         roofViewRange.EntireColumn.Hidden = false;
                         break;
                     case ROOF_TYPE.EFRTDouble:
-                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 41], roofSheet.Cells[1, 49]];
+                        roofViewRange = roofSheet.Range[roofSheet.Cells[1, 43], roofSheet.Cells[1, 51]];
                         roofViewRange.EntireColumn.Hidden = false;
                         break;
                 }

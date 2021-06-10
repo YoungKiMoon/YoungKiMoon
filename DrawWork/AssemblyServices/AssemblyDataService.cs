@@ -68,6 +68,8 @@ namespace DrawWork.AssemblyServices
             int firstIndex = 0;
             switch (selAssembly.GeneralDesignData[firstIndex].RoofType.ToLower())
             {
+                case "Ccrt":
+                case "CRT":
                 case "crt":
                     SingletonData.TankType = TANK_TYPE.CRT;
                     break;
@@ -186,27 +188,27 @@ namespace DrawWork.AssemblyServices
                     break;
                 case TANK_TYPE.EFRTSingle:
                     newModel.RoofPlateThickness = "";
-                    newModel.CompressionRingType = selAssembly.RoofEFRTSingleDeck[firstIndex].CompressionRingType;
+                    newModel.CompressionRingType = selAssembly.RoofEFRTSingleInput[firstIndex].CompressionRingType;
                     switch (newModel.CompressionRingType)
                     {
                         case "Detail b":
-                            newModel.AngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTSingleDeck[firstIndex].DeatilBAngleSize);
+                            newModel.AngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTSingleInput[firstIndex].DeatilBAngleSize);
                             break;
                         case "Detail d":
-                            newModel.AngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTSingleDeck[firstIndex].DetailDAngleSize);
+                            newModel.AngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTSingleInput[firstIndex].DetailDAngleSize);
                             break;
                     }
                     break;
                 case TANK_TYPE.EFRTDouble:
                     newModel.RoofPlateThickness = "";
-                    newModel.CompressionRingType = selAssembly.RoofEFRTDoubleDeck[firstIndex].CompressionRingType;
+                    newModel.CompressionRingType = selAssembly.RoofEFRTDoubleInput[firstIndex].CompressionRingType;
                     switch (newModel.CompressionRingType)
                     {
                         case "Detail b":
-                            newModel.AngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTDoubleDeck[firstIndex].DeatilBAngleSize);
+                            newModel.AngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTDoubleInput[firstIndex].DeatilBAngleSize);
                             break;
                         case "Detail d":
-                            newModel.AngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTDoubleDeck[firstIndex].DetailDAngleSize);
+                            newModel.AngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTDoubleInput[firstIndex].DetailDAngleSize);
                             break;
                     }
                     break;
@@ -240,16 +242,16 @@ namespace DrawWork.AssemblyServices
                     newModel.Type = selAssembly.RoofIFRTInput[firstIndex].InsulationType;
                     break;
                 case TANK_TYPE.EFRTSingle:
-                    newModel.Required = selAssembly.RoofEFRTSingleDeck[firstIndex].InsulationRequired;
-                    newModel.Thickness = selAssembly.RoofEFRTSingleDeck[firstIndex].InsulationThickness;
-                    newModel.Density = selAssembly.RoofEFRTSingleDeck[firstIndex].InsulationDensity;
-                    newModel.Type = selAssembly.RoofEFRTSingleDeck[firstIndex].InsulationType;
+                    newModel.Required = selAssembly.RoofEFRTSingleInput[firstIndex].InsulationRequired;
+                    newModel.Thickness = selAssembly.RoofEFRTSingleInput[firstIndex].InsulationThickness;
+                    newModel.Density = selAssembly.RoofEFRTSingleInput[firstIndex].InsulationDensity;
+                    newModel.Type = selAssembly.RoofEFRTSingleInput[firstIndex].InsulationType;
                     break;
                 case TANK_TYPE.EFRTDouble:
-                    newModel.Required = selAssembly.RoofEFRTDoubleDeck[firstIndex].InsulationRequired;
-                    newModel.Thickness = selAssembly.RoofEFRTDoubleDeck[firstIndex].InsulationThickness;
-                    newModel.Density = selAssembly.RoofEFRTDoubleDeck[firstIndex].InsulationDensity;
-                    newModel.Type = selAssembly.RoofEFRTDoubleDeck[firstIndex].InsulationType;
+                    newModel.Required = selAssembly.RoofEFRTDoubleInput[firstIndex].InsulationRequired;
+                    newModel.Thickness = selAssembly.RoofEFRTDoubleInput[firstIndex].InsulationThickness;
+                    newModel.Density = selAssembly.RoofEFRTDoubleInput[firstIndex].InsulationDensity;
+                    newModel.Type = selAssembly.RoofEFRTDoubleInput[firstIndex].InsulationType;
                     break;
             }
             selAssembly.RoofInsulation.Add(newModel);
@@ -317,26 +319,26 @@ namespace DrawWork.AssemblyServices
                     }
                     break;
                 case TANK_TYPE.EFRTSingle:
-                    acTopAngleType = selAssembly.RoofEFRTSingleDeck[firstIndex].CompressionRingType;
+                    acTopAngleType = selAssembly.RoofEFRTSingleInput[firstIndex].CompressionRingType;
                     switch (acTopAngleType)
                     {
                         case "Detail b":
-                            acTopAngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTSingleDeck[firstIndex].DeatilBAngleSize);
+                            acTopAngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTSingleInput[firstIndex].DeatilBAngleSize);
                             break;
                         case "Detail d":
-                            acTopAngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTSingleDeck[firstIndex].DetailDAngleSize);
+                            acTopAngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTSingleInput[firstIndex].DetailDAngleSize);
                             break;
                     }
                     break;
                 case TANK_TYPE.EFRTDouble:
-                    acTopAngleType = selAssembly.RoofEFRTDoubleDeck[firstIndex].CompressionRingType;
+                    acTopAngleType = selAssembly.RoofEFRTDoubleInput[firstIndex].CompressionRingType;
                     switch (acTopAngleType)
                     {
                         case "Detail b":
-                            acTopAngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTDoubleDeck[firstIndex].DeatilBAngleSize);
+                            acTopAngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTDoubleInput[firstIndex].DeatilBAngleSize);
                             break;
                         case "Detail d":
-                            acTopAngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTDoubleDeck[firstIndex].DetailDAngleSize);
+                            acTopAngleSize = valueService.GetAllTrim(selAssembly.RoofEFRTDoubleInput[firstIndex].DetailDAngleSize);
                             break;
                     }
                     break;
@@ -363,13 +365,11 @@ namespace DrawWork.AssemblyServices
             switch (SingletonData.TankType)
             {
                 case TANK_TYPE.CRT:
+                case TANK_TYPE.IFRT:
                     stSupportingType = selAssembly.StructureCRTInput[0].SupportingType;
                     break;
                 case TANK_TYPE.DRT:
                     stSupportingType = selAssembly.StructureDRTInput[0].SupportingType;
-                    break;
-                case TANK_TYPE.IFRT:
-                    stSupportingType = selAssembly.StructureIFRTInput[0].SupportingType;
                     break;
                 case TANK_TYPE.EFRTSingle:
                     break;
@@ -380,7 +380,7 @@ namespace DrawWork.AssemblyServices
             // Structure Related Type
             StructureDivService.SetStructureData(SingletonData.TankType, stSupportingType, acTopAngleType);
 
-            if (SingletonData.TankType == TANK_TYPE.CRT)
+            if (SingletonData.TankType == TANK_TYPE.CRT || SingletonData.TankType == TANK_TYPE.IFRT)
             {
                 #region CRT
                 // Structure Column Rafter Output
