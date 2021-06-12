@@ -172,58 +172,107 @@ namespace DrawWork.DrawServices
             }
 
 
-            if (assemblyData.AccessInput[0].SpiralStairwayVSLadder!= "")
+            #region Platform & Ladder or Stairway 
+            if (SingletonData.TankType == TANK_TYPE.CRT ||
+                SingletonData.TankType == TANK_TYPE.DRT ||
+                SingletonData.TankType == TANK_TYPE.IFRT)
             {
-                string stairwayName = assemblyData.AccessInput[0].SpiralStairwayVSLadder.ToLower();
-
-                string nameName = "";
-                if (stairwayName.Contains("stairway"))
+                if (assemblyData.AccessInput[0].SpiralStairwayVSLadder != "")
                 {
-                    nameName = "SPIRAL_STAIRWAY-1";
-                    CDPoint topLeftPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTop, 0, ref refPoint, ref curPoint);
+                    string stairwayName = assemblyData.AccessInput[0].SpiralStairwayVSLadder.ToLower();
 
-                    BlockReference nameBlock = Draw_ImportBlock(GetSumCDPoint(topLeftPoint, - shellTopThickness, 0), nameName, layerService.LayerBlock);
-                    if (nameBlock != null)
+                    string nameName = "";
+                    if (stairwayName.Contains("stairway"))
                     {
-                        newList.Add(nameBlock);
-                        // Leader
-                        SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                        nameName = "SPIRAL_STAIRWAY-1";
+                        CDPoint topLeftPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTop, 0, ref refPoint, ref curPoint);
+
+                        BlockReference nameBlock = Draw_ImportBlock(GetSumCDPoint(topLeftPoint, -shellTopThickness, 0), nameName, layerService.LayerBlock);
+                        if (nameBlock != null)
                         {
-                            leaderPoint = GetSumCDPoint(topLeftPoint, -1473.2, -567.8),
-                            lineTextList = new List<string>() { "SPIRAL STAIRWAY", "W/INTERMEDIATE PLATFORM" },
-                            Position = "bottomleft"
-                        });
+                            newList.Add(nameBlock);
+                            // Leader
+                            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                            {
+                                leaderPoint = GetSumCDPoint(topLeftPoint, -1473.2, -567.8),
+                                lineTextList = new List<string>() { "SPIRAL STAIRWAY", "W/INTERMEDIATE PLATFORM" },
+                                Position = "bottomleft"
+                            });
+                        }
+
+                    }
+                    else if (stairwayName.Contains("ladder"))
+                    {
+                        nameName = "LADDER-1";
+                        CDPoint topLeftPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTop, 0, ref refPoint, ref curPoint);
+
+                        BlockReference nameBlock = Draw_ImportBlock(GetSumCDPoint(topLeftPoint, -shellTopThickness, 0), nameName, layerService.LayerBlock);
+                        if (nameBlock != null)
+                        {
+                            newList.Add(nameBlock);
+                            // Leader
+                            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                            {
+                                leaderPoint = GetSumCDPoint(etcBasePoint, -905, -300),
+                                lineTextList = new List<string>() { "EXTERNAL LADDER" },
+                                Position = "bottomleft"
+                            });
+                        }
+                    }
+
+                    if (nameName != "")
+                    {
+
+
                     }
 
                 }
-                else if (stairwayName.Contains("ladder"))
-                {
-                    nameName = "LADDER-1";
-                    CDPoint topLeftPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTop, 0, ref refPoint, ref curPoint);
-
-                    BlockReference nameBlock = Draw_ImportBlock(GetSumCDPoint(topLeftPoint, - shellTopThickness, 0), nameName, layerService.LayerBlock);
-                    if (nameBlock != null)
-                    {
-                        newList.Add(nameBlock);
-                        // Leader
-                        SingletonData.LeaderPublicList.Add(new LeaderPointModel()
-                        {
-                            leaderPoint = GetSumCDPoint(etcBasePoint, -905, -300),
-                            lineTextList = new List<string>() { "EXTERNAL LADDER" },
-                            Position = "bottomleft"
-                        });
-                    }
-                }
-
-                if (nameName != "")
-                {
-
-
-                }
-
             }
+            else if (SingletonData.TankType == TANK_TYPE.EFRTSingle ||
+                    SingletonData.TankType == TANK_TYPE.EFRTDouble)
+            {
+                // Ref Point
+                CDPoint refFRTPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointLeftShellTop, 0, ref refPoint, ref curPoint);
+                double shellCourseLastThk = 0;
+                if (assemblyData.ShellOutput.Count > 0)
+                    shellCourseLastThk = valueService.GetDoubleValue(assemblyData.ShellOutput.Last().Thickness);
+                Point3D FRTPoint = GetSumPoint(refFRTPoint, -shellCourseLastThk, 0);
 
+                // Platform
+                string platformName = "FRT-GAUGING_PLATFORM_&_LADDER";
+                //double platformShiftXValue = 500;
+                //double platformShiftYValue = 900;
+                BlockReference platformBlock = Draw_ImportBlock(GetSumCDPoint(FRTPoint, 0,0), platformName, layerService.LayerBlock);
+                if (platformBlock != null)
+                {
+                    newList.Add(platformBlock);
+                    // Leader
+                    //SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    //{
+                    //    leaderPoint = GetSumCDPoint(etcBasePoint, 1000, 1500),
+                    //    lineTextList = new List<string>() { "NAME PLATE" },
+                    //    Position = "topright"
+                    //});
+                }
 
+                // Platform
+                string stairwayName = "FRT-WIND_GIRDER_&_SPIRALSTAIRWAY";
+                //double stairwayShiftXValue = 500;
+                //double stairwayShiftYValue = 900;
+                BlockReference stairwayBlock = Draw_ImportBlock(GetSumCDPoint(FRTPoint, 0 , 0), stairwayName, layerService.LayerBlock);
+                if (platformBlock != null)
+                {
+                    newList.Add(stairwayBlock);
+                    // Leader
+                    //SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    //{
+                    //    leaderPoint = GetSumCDPoint(etcBasePoint, 1000, 1500),
+                    //    lineTextList = new List<string>() { "NAME PLATE" },
+                    //    Position = "topright"
+                    //});
+                }
+            }
+            #endregion
 
 
             return newList;

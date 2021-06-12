@@ -33,6 +33,7 @@ namespace DrawWork.DrawServices
         private StyleFunctionService styleService;
         private LayerStyleService layerService;
         private DrawEditingService editingService;
+        private DrawShapeServices shapeService;
 
         private DrawPublicFunctionService publicFunService;
 
@@ -48,6 +49,7 @@ namespace DrawWork.DrawServices
             styleService = new StyleFunctionService();
             layerService = new LayerStyleService();
             editingService = new DrawEditingService();
+            shapeService = new DrawShapeServices();
 
             publicFunService = new DrawPublicFunctionService();
 
@@ -289,14 +291,54 @@ namespace DrawWork.DrawServices
             #endregion
 
             #region Tank Plan : Adjust
+            // EFRT : Roof 노즐 제거
             if(SingletonData.TankType==TANK_TYPE.EFRTSingle ||
                SingletonData.TankType == TANK_TYPE.EFRTDouble)
             {
-                // Roof 제외하기
                 for (int i = newList.Count - 1; i >= 0; i--)
                 {
                     if (newList[i].Position == "roof")
-                        newList.RemoveAt(i);
+                    {
+                        //if (newList[i].AutoBleederVent == "yes" ||
+                        //    newList[i].RimVent == "yes" ||
+                        //    newList[i].RoofDrainSump == "yes" ||
+                        //    newList[i].NozzleOnPlateform == "yes")
+                        if (newList[i].RoofDrainSump == "yes" ||
+                            newList[i].NozzleOnPlateform == "yes")
+                        {
+                            if (newList[i].RoofDrainSump == "yes")
+                            {
+                                newList[i].Position = "shell";
+                                newList[i].LR = "left";
+                                newList[i].HRSort = valueService.GetDoubleValue(newList[i].H);
+                                double roofDrainSumpR = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID) /2 + 235;//235는 고정
+                                newList[i].R = roofDrainSumpR.ToString();
+                            }
+                        }
+                        else
+                        {
+                            newList.RemoveAt(i);
+                        }
+
+                    }
+                }
+            }
+            // CRT & DRT : FRT 노즐 제거
+            else if (SingletonData.TankType == TANK_TYPE.CRT ||
+                     SingletonData.TankType == TANK_TYPE.DRT)
+            {
+                for (int i = newList.Count - 1; i >= 0; i--)
+                {
+                    if (newList[i].Position == "roof")
+                    {
+                        if (newList[i].AutoBleederVent == "yes" ||
+                            newList[i].RimVent == "yes" ||
+                            newList[i].RoofDrainSump == "yes" ||
+                            newList[i].NozzleOnPlateform == "yes")
+                        {
+                            newList.RemoveAt(i);
+                        }
+                    }
                 }
             }
             #endregion
@@ -570,127 +612,8 @@ namespace DrawWork.DrawServices
                         }
                         else
                         {
-                            #region Flange
-                            string seriesValue = selNozzle.ASMESeries.Replace(" ", "").ToLower().Replace("series", "");
-                            string typeValue = selNozzle.Type;
-                            string ratingValue = selNozzle.Rating.Replace("#", "");
-                            if (seriesValue.Contains("a"))
-                            {
-                                if (selNozzle.Rating.Contains("150"))
-                                {
-                                    FlangeOHFSeriesAModel newNozzle = null;
-                                    foreach (FlangeOHFSeriesAModel eachNozzle in assemblyData.FlangeOHFSeriesAList)
-                                    {
-                                        if (eachNozzle.NPS == selNozzle.Size)
-                                        {
-                                            newNozzle = eachNozzle;
-                                            customEntity = CreateFlangeSeriesA(refPoint, drawPoint, darwStartPoint, selNozzle, newNozzle, selSizeNominalID, selCenterTopHeight, scaleValue);
-                                            break;
-                                        }
-                                    }
-                                }
-                                else if (selNozzle.Rating.Contains("300"))
-                                {
-                                    FlangeTHSeriesAModel newNozzle = null;
-                                    foreach (FlangeTHSeriesAModel eachNozzle in assemblyData.FlangeTHSeriesAist)
-                                    {
-                                        if (eachNozzle.NPS == selNozzle.Size)
-                                        {
-                                            newNozzle = eachNozzle;
-                                            customEntity = CreateFlangeSeriesA(refPoint, drawPoint, darwStartPoint, selNozzle, TransNozzleATHtoOHF(newNozzle), selSizeNominalID, selCenterTopHeight, scaleValue);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            else if (seriesValue.Contains("b"))
-                            {
-                                if (selNozzle.Rating.Contains("150"))
-                                {
-                                    FlangeOHFSeriesBModel newNozzle = null;
-                                    foreach (FlangeOHFSeriesBModel eachNozzle in assemblyData.FlangeOHFSeriesBList)
-                                    {
-                                        if (eachNozzle.NPS == selNozzle.Size)
-                                        {
-                                            newNozzle = eachNozzle;
-                                            customEntity = CreateFlangeSeriesB(refPoint, drawPoint, darwStartPoint, selNozzle, newNozzle, selSizeNominalID, selCenterTopHeight, scaleValue);
-                                            break;
-                                        }
-                                    }
-                                }
-                                else if (selNozzle.Rating.Contains("300"))
-                                {
-                                    FlangeTHSeriesBModel newNozzle = null;
-                                    foreach (FlangeTHSeriesBModel eachNozzle in assemblyData.FlangeTHSeriesBist)
-                                    {
-                                        if (eachNozzle.NPS == selNozzle.Size)
-                                        {
-                                            newNozzle = eachNozzle;
-                                            customEntity = CreateFlangeSeriesB(refPoint, drawPoint, darwStartPoint, selNozzle, TransNozzleBTHtoOHF(newNozzle), selSizeNominalID, selCenterTopHeight, scaleValue);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            else if (typeValue.Contains("lwn"))
-                            {
-                                if (selNozzle.Rating.Contains("150"))
-                                {
-                                    FlangeOHFLWNModel newNozzle = null;
-                                    foreach (FlangeOHFLWNModel eachNozzle in assemblyData.FlangeOHFLWNList)
-                                    {
-                                        if (eachNozzle.NPS == selNozzle.Size)
-                                        {
-                                            newNozzle = eachNozzle;
-                                            customEntity = CreateFlangeLWN(refPoint, drawPoint, darwStartPoint, selNozzle, newNozzle, selSizeNominalID, selCenterTopHeight, scaleValue);
-                                            break;
-                                        }
-                                    }
-                                }
-                                else if (selNozzle.Rating.Contains("300"))
-                                {
-                                    FlangeTHLWNModel newNozzle = null;
-                                    foreach (FlangeTHLWNModel eachNozzle in assemblyData.FlangeTHLWNList)
-                                    {
-                                        if (eachNozzle.NPS == selNozzle.Size)
-                                        {
-                                            newNozzle = eachNozzle;
-                                            customEntity = CreateFlangeLWN(refPoint, drawPoint, darwStartPoint, selNozzle, TransNozzleLWNTHtoOHF(newNozzle), selSizeNominalID, selCenterTopHeight, scaleValue);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (selNozzle.Rating.Contains("150"))
-                                {
-                                    FlangeOHFModel newNozzle = null;
-                                    foreach (FlangeOHFModel eachNozzle in assemblyData.FlangeOHFList)
-                                    {
-                                        if (eachNozzle.NPS == selNozzle.Size)
-                                        {
-                                            newNozzle = eachNozzle;
-                                            customEntity = CreateFlange(refPoint, drawPoint, darwStartPoint, selNozzle, newNozzle, selSizeNominalID, selCenterTopHeight, scaleValue);
-                                            break;
-                                        }
-                                    }
-                                }
-                                else if (selNozzle.Rating.Contains("300"))
-                                {
-                                    FlangeTHModel newNozzle = null;
-                                    foreach (FlangeTHModel eachNozzle in assemblyData.FlangeTHList)
-                                    {
-                                        if (eachNozzle.NPS == selNozzle.Size)
-                                        {
-                                            newNozzle = eachNozzle;
-                                            customEntity = CreateFlange(refPoint, drawPoint, darwStartPoint, selNozzle, TransNozzleTHtoOHF(newNozzle), selSizeNominalID, selCenterTopHeight, scaleValue);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            #endregion
+                            if(GetFRTNozzleDrawingSign(selNozzle))   
+                                customEntity.AddRange(CreateFlangeOnly(ref selDrawEntities, refPoint, drawPoint, darwStartPoint, selNozzle, selSizeNominalID, selCenterTopHeight, scaleValue, selCleanoutWidth));
                         }
 
 
@@ -727,12 +650,16 @@ namespace DrawWork.DrawServices
                         #endregion
 
 
-
-
                         // Internal
                         double couplingHeight = 0;
                         customEntity.AddRange(CreateInternal(refPoint, drawPoint, selNozzle, couplingHeight,scaleValue));
 
+
+                        // FRT : Custom Nozzle
+                        if (GetFRTNozzleCustomDrawing(selNozzle))
+                        {
+                            //customEntity.AddRange(CreateFRTNozzle(refPoint, selNozzle, scaleValue));
+                        }
                     }
 
 
@@ -755,6 +682,289 @@ namespace DrawWork.DrawServices
 
             return customEntity;
         }
+
+        // FRT Nozzle 임시 적용
+        #region FRT Nozzle
+        private bool GetFRTNozzleDrawingSign(NozzleInputModel selNozzle)
+        {
+            string checkValue = "yes";
+            bool returnValue = true;
+            if (selNozzle.AutoBleederVent == checkValue)
+                returnValue = false;
+            else if (selNozzle.RimVent == checkValue)
+                returnValue = false;
+            else if (selNozzle.NozzleOnPlateform == checkValue)
+                returnValue = true;
+            else if (selNozzle.RoofDrainSump == checkValue)
+            {
+                // 형상 위치 변경
+                selNozzle.Position = "shell";
+                selNozzle.LR = "left";
+            }
+
+            return returnValue;
+        }
+        private bool GetFRTNozzleCustomDrawing(NozzleInputModel selNozzle)
+        {
+            string checkValue = "yes";
+            bool returnValue = false;
+            if (selNozzle.AutoBleederVent == checkValue)
+                returnValue = false;
+            else if (selNozzle.RimVent == checkValue)
+                returnValue = true;
+            else if (selNozzle.NozzleOnPlateform == checkValue)
+                returnValue = false;
+            else if (selNozzle.RoofDrainSump == checkValue)
+                returnValue = true;
+
+            return returnValue;
+        }
+
+
+        private List<Entity> CreateFRTNozzle(CDPoint refPoint, NozzleInputModel selNozzle,  double scaleValue)
+        {
+            List<Entity> newList = new List<Entity>();
+            string checkValue = "yes";
+            bool returnValue = false;            
+            //if (selNozzle.AutoBleederVent == checkValue)
+                //newList.AddRange(CreateAutoBleederVent(refPoint, selNozzle, scaleValue));
+            if (selNozzle.RimVent == checkValue)
+                returnValue = false;
+            else if (selNozzle.NozzleOnPlateform == checkValue)
+                returnValue = false;
+            else if (selNozzle.RoofDrainSump == checkValue)
+                returnValue = false;
+
+            return newList;
+        }
+
+        private List<Entity> CreateAutoBleederVent(CDPoint refPoint, NozzleInputModel selNozzle, double selScaleValue)
+        {
+            DrawFRTBlockService drawFRT = new DrawFRTBlockService();
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double tankIDHalf = tankID / 2;
+
+            double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
+            double pontoonPositionHeight = drawFRT.GetPontoonPositionHeight(tankHeight);
+
+            double nozzleRadius = valueService.GetDoubleValue(selNozzle.R);
+
+            Point3D referencePoint = GetSumPoint(refPoint,tankIDHalf-nozzleRadius, pontoonPositionHeight);
+
+            List<Point3D> newOutPoint = new List<Point3D>();
+            List<Entity> newList = new List<Entity>();
+            List<Entity> newCenterList = new List<Entity>();
+
+            //newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(EBottomLeftPoint, 0, 0), pontoonRightFlatWidth, pontoonThkE, 0, 0, 3));
+            //newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(FTopLeftPoint, 0, 0), pontoonFlatLength, pontoonThkF, 0, 0, 0, new bool[] { true, false, true, true }));
+
+            double bottomGap = 30;
+
+
+
+            double topPadHeight = 10;
+            double topPadWidth = 100 + 19 + 20;
+
+            double padUpHeight = 115;
+            double padUpWidth = 100;
+
+            double padUpUpHeight = 1600 - 620 - 110 - 115;
+            double padUpUpWidth = padUpWidth - (20 * 2);
+
+            double middleUpHeight = 110;
+            double middleUpWidth = 330;
+
+            double middleUpPadHeight = 10;
+            double middleUpPadWidth = middleUpWidth - (10 * 2);
+
+            double middleHeight = 650;
+            double middleWidth = middleUpWidth - (30 * 2);
+
+            double bottomHeight = 1600 - bottomGap;
+            double bottomWidth = 73;
+
+            Point3D refAdjPoint = GetSumPoint(referencePoint, 0, -bottomGap);
+            double currentY = -bottomHeight;
+            newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -bottomWidth / 2, currentY), bottomWidth, bottomHeight, 0, 0, 3, new bool[] { false, true, true, true }));
+            currentY += bottomHeight;
+            newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -middleWidth / 2, currentY), middleWidth, middleHeight, 0, 0, 3, new bool[] { false, true, true, true }));
+            currentY += middleHeight;
+            newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -middleUpWidth / 2, currentY), middleUpWidth, middleUpHeight, 0, 0, 3, new bool[] { true, true, true, true }));
+            currentY += middleUpHeight;
+            newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -middleUpPadWidth / 2, currentY), middleUpPadWidth, middleUpPadHeight, 0, 0, 3, new bool[] { true, true, false, true }));
+            currentY += middleUpPadHeight;
+            newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -padUpWidth / 2, currentY), padUpWidth, padUpHeight, 0, 0, 3, new bool[] { true, true, false, true }));
+            currentY += padUpHeight;
+            newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -padUpUpWidth / 2, currentY), padUpUpWidth, padUpUpHeight, 0, 0, 3, new bool[] { false, true, false, true }));
+            currentY += padUpUpHeight;
+            newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -topPadWidth / 2, currentY), topPadWidth, topPadHeight, 0, 0, 3, new bool[] { true, true, true, true }));
+            currentY += topPadHeight;
+
+
+
+
+            double topHeight = 90;
+            double topRadius = 50;
+            double topWidth = 100;
+            double topPipeWidth = 19;
+            Arc topCenterArc = new Arc(Plane.XY, GetSumPoint(refAdjPoint, -topWidth / 2, currentY + topHeight), GetSumPoint(refAdjPoint, 0, currentY + topHeight + topRadius), GetSumPoint(refAdjPoint, topWidth / 2, currentY + topHeight), true);
+            Line topLeftLine = new Line(GetSumPoint(refAdjPoint, -topWidth / 2, currentY), GetSumPoint(refAdjPoint, -topWidth / 2, currentY + topHeight));
+            Line topRightLine = new Line(GetSumPoint(refAdjPoint, topWidth / 2, currentY), GetSumPoint(refAdjPoint, topWidth / 2, currentY + topHeight));
+            newCenterList.AddRange(new Entity[] { topCenterArc, topLeftLine, topRightLine });
+
+            Arc topCenterArcInner = (Arc)topCenterArc.Offset(-topPipeWidth / 2, Vector3D.AxisZ);
+            Line topLeftLineInner = (Line)topLeftLine.Offset(topPipeWidth / 2, Vector3D.AxisZ);
+            Line topRightInnertLine = (Line)topRightLine.Offset(-topPipeWidth / 2, Vector3D.AxisZ);
+            Arc topCenterArcOuter = (Arc)topCenterArc.Offset(topPipeWidth / 2, Vector3D.AxisZ);
+            Line topLeftLineOuter = (Line)topLeftLine.Offset(-topPipeWidth / 2, Vector3D.AxisZ);
+            Line topRightInnertOuter = (Line)topRightLine.Offset(+topPipeWidth / 2, Vector3D.AxisZ);
+            newList.AddRange(new Entity[] { topCenterArcInner, topLeftLineInner, topRightInnertLine, topCenterArcOuter, topLeftLineOuter, topRightInnertOuter });
+            // CenterLine
+            DrawCenterLineModel newCenterModel = new DrawCenterLineModel();
+            List<Entity> centerLongLine = editingService.GetCenterLine(GetSumPoint(refAdjPoint, 0, -bottomHeight), GetSumPoint(refAdjPoint, 0, currentY + topHeight + topRadius + (topPipeWidth / 2)), newCenterModel.exLength, selScaleValue);
+            List<Entity> centerLongLine2 = editingService.GetCenterLine(GetSumPoint(refAdjPoint, -(topWidth / 2) - (topPipeWidth / 2), currentY + topHeight), GetSumPoint(refAdjPoint, +(topWidth / 2) + (topPipeWidth / 2), currentY + topHeight), newCenterModel.exLength, selScaleValue);
+            newCenterList.AddRange(centerLongLine);
+            newCenterList.AddRange(centerLongLine2);
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+            styleService.SetLayerListEntity(ref newCenterList, layerService.LayerCenterLine);
+
+
+            newList.AddRange(newCenterList);
+            return newList;
+        }
+
+        #endregion
+
+        private List<Entity> CreateFlangeOnly(ref DrawEntityModel selDrawEntities, CDPoint refPoint, Point3D drawPoint, Point3D darwStartPoint, NozzleInputModel selNozzle, double selSizeNominalID, double selCenterTopHeight, double scaleValue, double selCleanoutWidth)
+        {
+            List<Entity> customEntity = new List<Entity>();
+
+            #region Flange
+            string seriesValue = selNozzle.ASMESeries.Replace(" ", "").ToLower().Replace("series", "");
+            string typeValue = selNozzle.Type;
+            string ratingValue = selNozzle.Rating.Replace("#", "");
+            if (seriesValue.Contains("a"))
+            {
+                if (selNozzle.Rating.Contains("150"))
+                {
+                    FlangeOHFSeriesAModel newNozzle = null;
+                    foreach (FlangeOHFSeriesAModel eachNozzle in assemblyData.FlangeOHFSeriesAList)
+                    {
+                        if (eachNozzle.NPS == selNozzle.Size)
+                        {
+                            newNozzle = eachNozzle;
+                            customEntity = CreateFlangeSeriesA(refPoint, drawPoint, darwStartPoint, selNozzle, newNozzle, selSizeNominalID, selCenterTopHeight, scaleValue);
+                            break;
+                        }
+                    }
+                }
+                else if (selNozzle.Rating.Contains("300"))
+                {
+                    FlangeTHSeriesAModel newNozzle = null;
+                    foreach (FlangeTHSeriesAModel eachNozzle in assemblyData.FlangeTHSeriesAist)
+                    {
+                        if (eachNozzle.NPS == selNozzle.Size)
+                        {
+                            newNozzle = eachNozzle;
+                            customEntity = CreateFlangeSeriesA(refPoint, drawPoint, darwStartPoint, selNozzle, TransNozzleATHtoOHF(newNozzle), selSizeNominalID, selCenterTopHeight, scaleValue);
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (seriesValue.Contains("b"))
+            {
+                if (selNozzle.Rating.Contains("150"))
+                {
+                    FlangeOHFSeriesBModel newNozzle = null;
+                    foreach (FlangeOHFSeriesBModel eachNozzle in assemblyData.FlangeOHFSeriesBList)
+                    {
+                        if (eachNozzle.NPS == selNozzle.Size)
+                        {
+                            newNozzle = eachNozzle;
+                            customEntity = CreateFlangeSeriesB(refPoint, drawPoint, darwStartPoint, selNozzle, newNozzle, selSizeNominalID, selCenterTopHeight, scaleValue);
+                            break;
+                        }
+                    }
+                }
+                else if (selNozzle.Rating.Contains("300"))
+                {
+                    FlangeTHSeriesBModel newNozzle = null;
+                    foreach (FlangeTHSeriesBModel eachNozzle in assemblyData.FlangeTHSeriesBist)
+                    {
+                        if (eachNozzle.NPS == selNozzle.Size)
+                        {
+                            newNozzle = eachNozzle;
+                            customEntity = CreateFlangeSeriesB(refPoint, drawPoint, darwStartPoint, selNozzle, TransNozzleBTHtoOHF(newNozzle), selSizeNominalID, selCenterTopHeight, scaleValue);
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (typeValue.Contains("lwn"))
+            {
+                if (selNozzle.Rating.Contains("150"))
+                {
+                    FlangeOHFLWNModel newNozzle = null;
+                    foreach (FlangeOHFLWNModel eachNozzle in assemblyData.FlangeOHFLWNList)
+                    {
+                        if (eachNozzle.NPS == selNozzle.Size)
+                        {
+                            newNozzle = eachNozzle;
+                            customEntity = CreateFlangeLWN(refPoint, drawPoint, darwStartPoint, selNozzle, newNozzle, selSizeNominalID, selCenterTopHeight, scaleValue);
+                            break;
+                        }
+                    }
+                }
+                else if (selNozzle.Rating.Contains("300"))
+                {
+                    FlangeTHLWNModel newNozzle = null;
+                    foreach (FlangeTHLWNModel eachNozzle in assemblyData.FlangeTHLWNList)
+                    {
+                        if (eachNozzle.NPS == selNozzle.Size)
+                        {
+                            newNozzle = eachNozzle;
+                            customEntity = CreateFlangeLWN(refPoint, drawPoint, darwStartPoint, selNozzle, TransNozzleLWNTHtoOHF(newNozzle), selSizeNominalID, selCenterTopHeight, scaleValue);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (selNozzle.Rating.Contains("150"))
+                {
+                    FlangeOHFModel newNozzle = null;
+                    foreach (FlangeOHFModel eachNozzle in assemblyData.FlangeOHFList)
+                    {
+                        if (eachNozzle.NPS == selNozzle.Size)
+                        {
+                            newNozzle = eachNozzle;
+                            customEntity = CreateFlange(refPoint, drawPoint, darwStartPoint, selNozzle, newNozzle, selSizeNominalID, selCenterTopHeight, scaleValue);
+                            break;
+                        }
+                    }
+                }
+                else if (selNozzle.Rating.Contains("300"))
+                {
+                    FlangeTHModel newNozzle = null;
+                    foreach (FlangeTHModel eachNozzle in assemblyData.FlangeTHList)
+                    {
+                        if (eachNozzle.NPS == selNozzle.Size)
+                        {
+                            newNozzle = eachNozzle;
+                            customEntity = CreateFlange(refPoint, drawPoint, darwStartPoint, selNozzle, TransNozzleTHtoOHF(newNozzle), selSizeNominalID, selCenterTopHeight, scaleValue);
+                            break;
+                        }
+                    }
+                }
+            }
+            #endregion
+
+            return customEntity;
+        }
+
         private double GetNeckLength(CDPoint refPoint, Point3D drawPoint, NozzleInputModel selNozzle, double selSizeNominalID, double selCenterTopHeight)
         {
             double neckLength = 0;

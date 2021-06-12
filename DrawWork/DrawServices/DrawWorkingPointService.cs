@@ -267,6 +267,11 @@ namespace DrawWork.DrawServices
 
                             WPPoint = GetSumCDPoint(tempCenterRoofPoint2, -selPointValue, -tempRightRoofHeight2);
                             break;
+                        case TANK_TYPE.EFRTSingle:
+                        case TANK_TYPE.EFRTDouble:
+                            CDPoint tempCenterRoofPoint3 = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref curPoint);
+                            WPPoint = GetSumCDPoint(tempCenterRoofPoint3, -selPointValue, 0);
+                            break;
 
                         case TANK_TYPE.DRT:
                             WPPoint = GetSumCDPoint(GetDRTRoofPoint(DRTWorkingData.circleRoofUpper, selPointValue), 0, 0);
@@ -285,6 +290,11 @@ namespace DrawWork.DrawServices
 
                             WPPoint = GetSumCDPoint(tempCenterRoofPoint, -selPointValue, -tempLeftRoofHeight);
                             break;
+                        case TANK_TYPE.EFRTSingle:
+                        case TANK_TYPE.EFRTDouble:
+                            CDPoint tempCenterRoofPoint1 = WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopDown, ref refPoint, ref curPoint);
+                            WPPoint = GetSumCDPoint(tempCenterRoofPoint1, -selPointValue, 0);
+                            break;
 
                         case TANK_TYPE.DRT:
                             WPPoint = GetSumCDPoint(GetDRTRoofPoint(DRTWorkingData.circleRoofLower, selPointValue), 0, 0);
@@ -300,10 +310,13 @@ namespace DrawWork.DrawServices
                         case TANK_TYPE.CRT:
                         case TANK_TYPE.IFRT:
                             CDPoint tempCenterRoofPoint4 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, tempTankWidthHalf2.ToString(), ref refPoint, ref curPoint);
-
                             WPPoint = GetSumCDPoint(tempCenterRoofPoint4, 0, 0);
                             break;
-
+                        case TANK_TYPE.EFRTSingle:
+                        case TANK_TYPE.EFRTDouble:
+                            CDPoint tempCenterRoofPoint5 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, tempTankWidthHalf2.ToString(), ref refPoint, ref curPoint);
+                            WPPoint = GetSumCDPoint(tempCenterRoofPoint5, 0, 0);
+                            break;
                         case TANK_TYPE.DRT:
                             WPPoint = GetSumCDPoint(GetDRTRoofPoint(DRTWorkingData.circleRoofUpper, tempTankWidthHalf2), 0, 0);
                             break;
@@ -319,10 +332,13 @@ namespace DrawWork.DrawServices
                         case TANK_TYPE.CRT:
                         case TANK_TYPE.IFRT:
                             CDPoint tempCenterRoofPoint3 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, tempTankWidthHalf.ToString(), ref refPoint, ref curPoint);
-
                             WPPoint = GetSumCDPoint(tempCenterRoofPoint3, 0, 0);
                             break;
-
+                        case TANK_TYPE.EFRTSingle:
+                        case TANK_TYPE.EFRTDouble:
+                            CDPoint tempCenterRoofPoint4 = WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, tempTankWidthHalf.ToString(), ref refPoint, ref curPoint);
+                            WPPoint = GetSumCDPoint(tempCenterRoofPoint4, 0, 0);
+                            break;
                         case TANK_TYPE.DRT:
                             WPPoint = GetSumCDPoint(GetDRTRoofPoint(DRTWorkingData.circleRoofLower, tempTankWidthHalf), 0, 0);
                             break;

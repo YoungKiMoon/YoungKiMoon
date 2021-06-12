@@ -280,16 +280,19 @@ namespace DrawWork.DrawServices
 
 
             // Annular Type
-            if (true)
+            if (assemblyData.BottomInput[0].AnnularPlate.ToLower()=="yes")
             {
-                double annularInWidth = 200;
-                double annularCirRadius = tankODRadius - annularInWidth;
+
+                double outsideProjection = publicFunService.GetBottomFocuntionOD(assemblyData.BottomInput[0].AnnularPlate);
+
+                double annularInWidth = valueService.GetDoubleValue( assemblyData.BottomInput[0].AnnularPlateWidth);
+                double annularCirRadius = tankODRadius - (annularInWidth- outsideProjection);
                 Circle cirAnnular = new Circle(oriCenterPoint, annularCirRadius);
                 styleService.SetLayer(ref cirAnnular, layerService.LayerHiddenLine);
                 newList.Add(cirAnnular);
 
                 double circlePerimeter = valueService.GetCirclePerimeter(annularCirRadius);
-                double divWidth = 4000;//9144
+                double divWidth = 9144;//9144
                 double circleDivNum = Math.Ceiling(circlePerimeter / divWidth);
                 double circleDivOneWidth = circlePerimeter / circleDivNum;
                 double divOneRadius = valueService.GetRadianByArcLength(circleDivOneWidth, annularCirRadius);
@@ -315,90 +318,118 @@ namespace DrawWork.DrawServices
                 }
             }
 
-
-            // Column
-            if (true)
+            //
+            if(SingletonData.TankType==TANK_TYPE.CRT || SingletonData.TankType == TANK_TYPE.IFRT)
             {
-                List<Tuple<double, double, double>> columnList = new List<Tuple<double, double, double>>();
-                columnList.Add(new Tuple<double, double, double>(1, 200, 0));
-                columnList.Add(new Tuple<double, double, double>(5, 200, 2000));
-                columnList.Add(new Tuple<double, double, double>(8, 200, 4000));
-                columnList.Add(new Tuple<double, double, double>(14, 200, 6000));
+                DrawStructureService StructureDivService = new DrawStructureService();
+                StructureDivService.SetStructureData(SingletonData.TankType, assemblyData.StructureCRTInput[0].SupportingType, assemblyData.RoofCompressionRing[0].CompressionRingType);
 
-                foreach (Tuple<double, double, double> eachColumn in columnList)
+                // Column
+                if (StructureDivService.columnType == "column")
                 {
-                    double columnCount = eachColumn.Item1;
-                    double columnPipeOD = eachColumn.Item2;
-                    double columnRadius = eachColumn.Item3;
-                    if (columnRadius == 0)
+
+                    List<Tuple<double, double, double>> columnList = new List<Tuple<double, double, double>>();
+                    //columnList.Add(new Tuple<double, double, double>(1, 200, 0));
+                    //columnList.Add(new Tuple<double, double, double>(5, 200, 2000));
+                    //columnList.Add(new Tuple<double, double, double>(8, 200, 4000));
+                    //columnList.Add(new Tuple<double, double, double>(14, 200, 6000));
+                    foreach (StructureCRTColumnInputModel eachColumn in assemblyData.StructureCRTColumnInput)
                     {
-                        // Center : Only One
-                        Circle cirColumnCenter = new Circle(GetSumPoint(oriCenterPoint, 0, 0), columnPipeOD / 2);
-                        styleService.SetLayer(ref cirColumnCenter, layerService.LayerHiddenLine);
-                        newList.Add(cirColumnCenter);
+                        double pipeOD = GetPipeOD(eachColumn.Size);
+                        columnList.Add(new Tuple<double, double, double>(valueService.GetDoubleValue(eachColumn.Qty),
+                                                                         pipeOD,
+                                                                         valueService.GetDoubleValue(eachColumn.Radius)));
                     }
-                    else
+
+                    foreach (Tuple<double, double, double> eachColumn in columnList)
                     {
-                        Circle cirColumnCenterLine = new Circle(GetSumPoint(oriCenterPoint, 0, 0), columnRadius / 2);
-                        styleService.SetLayer(ref cirColumnCenterLine, layerService.LayerCenterLine);
-                        newList.Add(cirColumnCenterLine);
-
-                        double circlePerimeter = valueService.GetCirclePerimeter(columnRadius);
-                        double circleDivOneWidth = circlePerimeter / columnCount;
-                        double divOneRadius = valueService.GetRadianByArcLength(circleDivOneWidth, columnRadius);
-
-                        List<Point3D> cirConnPointList = new List<Point3D>();
-                        double startRadianSum = 0;
-                        for (int i = 0; i < columnCount; i++)
+                        double columnCount = eachColumn.Item1;
+                        double columnPipeOD = eachColumn.Item2;
+                        double columnRadius = eachColumn.Item3;
+                        if (columnRadius == 0)
                         {
-                            Line eachLine = new Line(GetSumPoint(oriCenterPoint, 0, 0), GetSumPoint(oriCenterPoint, 0, columnRadius * 2));
-                            eachLine.Rotate(-startRadianSum, Vector3D.AxisZ, GetSumPoint(oriCenterPoint, 0, 0));
+                            // Center : Only One
+                            Circle cirColumnCenter = new Circle(GetSumPoint(oriCenterPoint, 0, 0), columnPipeOD / 2);
+                            styleService.SetLayer(ref cirColumnCenter, layerService.LayerHiddenLine);
+                            newList.Add(cirColumnCenter);
+                        }
+                        else
+                        {
+                            Circle cirColumnCenterLine = new Circle(GetSumPoint(oriCenterPoint, 0, 0), columnRadius );
+                            styleService.SetLayer(ref cirColumnCenterLine, layerService.LayerCenterLine);
+                            newList.Add(cirColumnCenterLine);
 
-                            Point3D[] interPoint = eachLine.IntersectWith(cirColumnCenterLine);
-                            if (interPoint.Length > 0)
+                            double circlePerimeter = valueService.GetCirclePerimeter(columnRadius);
+                            double circleDivOneWidth = circlePerimeter / columnCount;
+                            double divOneRadius = valueService.GetRadianByArcLength(circleDivOneWidth, columnRadius);
+
+                            List<Point3D> cirConnPointList = new List<Point3D>();
+                            double startRadianSum = 0;
+                            for (int i = 0; i < columnCount; i++)
                             {
-                                cirConnPointList.Add(interPoint[0]);
+                                Line eachLine = new Line(GetSumPoint(oriCenterPoint, 0, 0), GetSumPoint(oriCenterPoint, 0, columnRadius * 2));
+                                eachLine.Rotate(-startRadianSum, Vector3D.AxisZ, GetSumPoint(oriCenterPoint, 0, 0));
 
-                                // Pipe
-                                Circle cirColumn = new Circle(GetSumPoint(interPoint[0], 0, 0), columnPipeOD / 2);
-                                styleService.SetLayer(ref cirColumn, layerService.LayerHiddenLine);
-                                newList.Add(cirColumn);
-
-                                Point3D[] cirInterPoint = eachLine.IntersectWith(cirColumn);
-                                if (cirInterPoint.Length > 0)
+                                Point3D[] interPoint = eachLine.IntersectWith(cirColumnCenterLine);
+                                if (interPoint.Length > 0)
                                 {
-                                    List<Entity> eachCirColumnCenterLine = editingService.GetCenterLine(GetSumPoint(cirInterPoint[0], 0, 0), GetSumPoint(cirInterPoint[1], 0, 0), extSubLength, selScaleValue);
-                                    styleService.SetLayerListEntity(ref eachCirColumnCenterLine, layerService.LayerCenterLine);
-                                    newList.AddRange(eachCirColumnCenterLine);
+                                    cirConnPointList.Add(interPoint[0]);
+
+                                    // Pipe
+                                    Circle cirColumn = new Circle(GetSumPoint(interPoint[0], 0, 0), columnPipeOD / 2);
+                                    styleService.SetLayer(ref cirColumn, layerService.LayerHiddenLine);
+                                    newList.Add(cirColumn);
+
+                                    Point3D[] cirInterPoint = eachLine.IntersectWith(cirColumn);
+                                    if (cirInterPoint.Length > 0)
+                                    {
+                                        List<Entity> eachCirColumnCenterLine = editingService.GetCenterLine(GetSumPoint(cirInterPoint[0], 0, 0), GetSumPoint(cirInterPoint[1], 0, 0), extSubLength, selScaleValue);
+                                        styleService.SetLayerListEntity(ref eachCirColumnCenterLine, layerService.LayerCenterLine);
+                                        newList.AddRange(eachCirColumnCenterLine);
+                                    }
                                 }
+                                startRadianSum += divOneRadius;
                             }
-                            startRadianSum += divOneRadius;
-                        }
 
-                        // Circle Connection
-                        if (cirConnPointList.Count > 1)
-                        {
-                            List<Entity> circleConnLineList = new List<Entity>();
-                            circleConnLineList.Add(new Line(cirConnPointList[0], cirConnPointList[cirConnPointList.Count - 1]));
-                            for (int i = 0; i < cirConnPointList.Count - 1; i++)
+                            // Circle Connection
+                            if (cirConnPointList.Count > 1)
                             {
-                                circleConnLineList.Add(new Line(cirConnPointList[i], cirConnPointList[i + 1]));
+                                List<Entity> circleConnLineList = new List<Entity>();
+                                circleConnLineList.Add(new Line(cirConnPointList[0], cirConnPointList[cirConnPointList.Count - 1]));
+                                for (int i = 0; i < cirConnPointList.Count - 1; i++)
+                                {
+                                    circleConnLineList.Add(new Line(cirConnPointList[i], cirConnPointList[i + 1]));
+                                }
+                                styleService.SetLayerListEntity(ref circleConnLineList, layerService.LayerCenterLine);
+                                newList.AddRange(circleConnLineList);
                             }
-                            styleService.SetLayerListEntity(ref circleConnLineList, layerService.LayerCenterLine);
-                            newList.AddRange(circleConnLineList);
+
+
                         }
-
-
                     }
                 }
             }
+
 
 
             return newList.ToArray();
         }
 
 
+        private double GetPipeOD(string selNPS)
+        {
+            double returnValue = 0;
+            foreach (PipeModel eachPipe in assemblyData.PipeList)
+            {
+                if (eachPipe.NPS == selNPS)
+                {
+                    returnValue = valueService.GetDoubleValue(eachPipe.OD);
+                    break;
+                }
+            }
 
+            return returnValue;
+        }
 
         public Entity[] DrawBlock_Structure(CDPoint selPoint1, double scaleValue)
         {
@@ -2534,7 +2565,48 @@ namespace DrawWork.DrawServices
             }
             newList.AddRange(deckSupportList);
 
+            // Nozzle
+            List<Entity> nozzleList = new List<Entity>();
+            List<Entity> nozzleOneList = new List<Entity>();
+            foreach (NozzleRoofInputModel eachNozzle in assemblyData.NozzleRoofInputModel)
+            {
+                if (eachNozzle.AutoBleederVent.ToLower() == "yes")
+                    nozzleList.AddRange(drawFRT.DrawFRT_Nozzle_AutoBleederVent(GetSumPoint(deckBottomPoint, -valueService.GetDoubleValue(eachNozzle.R),0),selScaleValue));
+                else if (eachNozzle.RimVent.ToLower() == "yes")
+                {
+                    RimVentNozzleModel selRimVent = null;
+                    foreach (RimVentNozzleModel eachRim in assemblyData.RimVentNozzleList)
+                        if(eachNozzle.Size== eachRim.NPS)
+                            selRimVent = eachRim;
 
+                    if (selRimVent != null)
+                    {
+                        double rimA = valueService.GetDoubleValue(selRimVent.A);
+                        double rimB = valueService.GetDoubleValue(selRimVent.B);
+                        Point3D rimWp = GetSumPoint(ABottomLeftPoint, 0, pontoonLeftHeight);
+                        Point3D topPoint = GetSumPoint(rimWp, rimA, -valueService.GetOppositeByAdjacent(topSlopeDegree, rimA- pontoonThkA));
+                        Point3D leftPoint = GetSumPoint(rimWp, 0, -rimB);
+
+                        nozzleOneList.AddRange(drawFRT.DrawFRT_Nozzle_RimVent(GetSumPoint(topPoint, 0, 0), GetSumPoint(leftPoint, 0, 0),selRimVent,eachNozzle,topSlopeDegree, selScaleValue, ref assemblyData));
+                    }
+                }
+                else if (eachNozzle.RoofDrainSump.ToLower() == "yes")
+                {
+                    double roofDrainSumpRadius = valueService.GetDoubleValue(eachNozzle.R);
+                    Point3D upperPoint = null;
+                    Point3D lowerPoint = new Point3D(tankBottomMidPoint.X - roofDrainSumpRadius, DBottomRightPoint.Y + pontoonLenghtG);
+
+                    nozzleOneList.AddRange(drawFRT.DrawFRT_Nozzle_RoofDrainSump(GetSumPoint(refPoint,0,0), GetSumPoint(lowerPoint, 0, 0), GetSumPoint(upperPoint, 0, 0),  eachNozzle, topSlopeDegree, selScaleValue, ref assemblyData));
+                }
+            }
+            newList.AddRange(nozzleList);
+
+            // Seal
+            string sealType = GetFRTSealType();
+            if (sealType.Contains("mechanical"))
+                newList.AddRange(drawFRT.DrawFRT_SealMechanical(GetSumPoint(ABottomLeftPoint, 0, pontoonLeftHeight + pontoonTopLeftExt)));
+            else if (sealType.Contains("soft"))
+                newList.AddRange(drawFRT.DrawFRT_SealSoft(GetSumPoint(ABottomLeftPoint, 0, pontoonLeftHeight + pontoonTopLeftExt), selScaleValue));
 
             // Right Mirror
             Plane mirrorPlane = Plane.YZ;
@@ -2547,30 +2619,47 @@ namespace DrawWork.DrawServices
             customBlockList.AddRange(newRightList);
 
 
-
-
-            // RunWay
-            // ID : 2/3 Point
-            double runWayWidth = drawFRT.GetRollingLadderWidth(tankID);
-            Point3D runWayPoint = new Point3D(GetSumPoint(referencePoint, tankIDHalf * 2 / 3, 0).X, FTopLeftPoint.Y);
-            List<Entity> runWayList = new List<Entity>();
-            runWayList.AddRange(drawFRT.DrawFRT_RunWay(runWayPoint, runWayWidth));
-
-            customBlockList.AddRange(runWayList);
-
-
             // Rolling Ladder
-            double tankLastShellThickness = 0;
-            if (assemblyData.ShellOutput.Count > 0)
-                tankLastShellThickness = valueService.GetDoubleValue(assemblyData.ShellOutput[0].Thickness);
-            Point3D rollingLadderStartPoint = GetSumPoint(referencePoint, -tankLastShellThickness, tankHeight);
-            Point3D rollingLadderEndPoint = GetSumPoint(runWayPoint, 0, 350); // 350 고정
-            List<Entity> rollingLadderList = new List<Entity>();
-            rollingLadderList.AddRange(drawFRT.DrawFRT_RollingLadder(rollingLadderStartPoint, rollingLadderEndPoint, selScaleValue));
+            if(SingletonData.TankType==TANK_TYPE.EFRTSingle || SingletonData.TankType == TANK_TYPE.EFRTDouble)
+            {
+                // RunWay
+                // ID : 2/3 Point
+                double runWayWidth = drawFRT.GetRollingLadderWidth(tankID);
+                Point3D runWayPoint = new Point3D(GetSumPoint(referencePoint, tankIDHalf * 2 / 3, 0).X, FTopLeftPoint.Y);
+                List<Entity> runWayList = new List<Entity>();
+                runWayList.AddRange(drawFRT.DrawFRT_RunWay(runWayPoint, runWayWidth));
 
-            customBlockList.AddRange(rollingLadderList);
+                customBlockList.AddRange(runWayList);
+
+
+                // Rolling Ladder
+                double tankLastShellThickness = 0;
+                if (assemblyData.ShellOutput.Count > 0)
+                    tankLastShellThickness = valueService.GetDoubleValue(assemblyData.ShellOutput[0].Thickness);
+                Point3D rollingLadderStartPoint = GetSumPoint(referencePoint, -tankLastShellThickness, tankHeight);
+                Point3D rollingLadderEndPoint = GetSumPoint(runWayPoint, 0, 350); // 350 고정
+                List<Entity> rollingLadderList = new List<Entity>();
+                rollingLadderList.AddRange(drawFRT.DrawFRT_RollingLadder(rollingLadderStartPoint, rollingLadderEndPoint, selScaleValue));
+
+                customBlockList.AddRange(rollingLadderList);
+            }
+
+            customBlockList.AddRange(nozzleOneList);
+
 
             return customBlockList.ToArray();
+        }
+        public string GetFRTSealType()
+        {
+            string sealType = "";
+            if (SingletonData.TankType == TANK_TYPE.IFRT)
+                 sealType = assemblyData.RoofIFRTInput[0].SelaSystemType.ToLower();
+            else if (SingletonData.TankType == TANK_TYPE.EFRTSingle)
+                sealType = assemblyData.RoofEFRTSingleInput[0].SelaSystemType.ToLower();
+            else if (SingletonData.TankType == TANK_TYPE.EFRTDouble)
+                sealType = assemblyData.RoofEFRTDoubleInput[0].SealSystemType.ToLower();
+
+            return sealType;
         }
 
         public Entity[] DrawBlock_FrtDouble(CDPoint selPoint1, ref CDPoint refPoint, ref CDPoint curPoint, double selScaleValue)
@@ -2710,6 +2799,62 @@ namespace DrawWork.DrawServices
             newList.AddRange(deckSupportList);
 
 
+            // Nozzle
+            List<Entity> nozzleList = new List<Entity>();
+            List<Entity> nozzleOneList = new List<Entity>();
+            foreach (NozzleRoofInputModel eachNozzle in assemblyData.NozzleRoofInputModel)
+            {
+                if (eachNozzle.AutoBleederVent.ToLower() == "yes")
+                    nozzleList.AddRange(drawFRT.DrawFRT_Nozzle_AutoBleederVent(GetSumPoint(deckBottomPoint, -valueService.GetDoubleValue(eachNozzle.R), 0), selScaleValue));
+                else if (eachNozzle.RimVent.ToLower() == "yes")
+                {
+                    RimVentNozzleModel selRimVent = null;
+                    foreach (RimVentNozzleModel eachRim in assemblyData.RimVentNozzleList)
+                        if (eachNozzle.Size == eachRim.NPS)
+                            selRimVent = eachRim;
+
+                    if (selRimVent != null)
+                    {
+                        double rimA = valueService.GetDoubleValue(selRimVent.A);
+                        double rimB = valueService.GetDoubleValue(selRimVent.B);
+                        Point3D rimWp = GetSumPoint(ABottomLeftPoint, 0, pontoonLeftHeight);
+                        Point3D topPoint = GetSumPoint(rimWp, rimA, -valueService.GetOppositeByAdjacent(topSlopeDegree, rimA - pontoonThkA));
+                        Point3D leftPoint = GetSumPoint(rimWp, 0, -rimB);
+
+                        nozzleOneList.AddRange(drawFRT.DrawFRT_Nozzle_RimVent(GetSumPoint(topPoint, 0, 0), GetSumPoint(leftPoint, 0, 0), selRimVent, eachNozzle, topSlopeDegree, selScaleValue, ref assemblyData));
+                    }
+                }
+                else if (eachNozzle.RoofDrainSump.ToLower() == "yes")
+                {
+                    double roofDrainSumpRadius = valueService.GetDoubleValue(eachNozzle.R);
+                    double adjWidth = 100;
+                    Line vUpperLine = new Line(GetSumPoint(tankBottomMidPoint, - roofDrainSumpRadius- adjWidth, 0), GetSumPoint(tankBottomMidPoint, - roofDrainSumpRadius- adjWidth, tankHeight));
+                    Point3D vUpperPoint = null;
+                    foreach (Entity eachEntity in upperPlateList)
+                    {
+                        Point3D eachPoint = editingService.GetIntersectWidth(vUpperLine, (ICurve)eachEntity, 0);
+                        if (eachPoint.Y != 0)
+                        {
+                            if (vUpperPoint == null)
+                                vUpperPoint = eachPoint;
+                            if (vUpperPoint.Y > eachPoint.Y)
+                                vUpperPoint = eachPoint;
+                        }
+                    }
+                    Point3D upperPoint = GetSumPoint(vUpperPoint, adjWidth,- valueService.GetOppositeByAdjacent(topSlopeDegree,adjWidth));
+                    Point3D lowerPoint = new Point3D(tankBottomMidPoint.X - roofDrainSumpRadius, CFlatTopLeftPoint.Y-pontoonThkC);
+
+                    nozzleOneList.AddRange(drawFRT.DrawFRT_Nozzle_RoofDrainSump(GetSumPoint(refPoint, 0, 0),GetSumPoint(lowerPoint, 0, 0), GetSumPoint(upperPoint, 0, 0), eachNozzle, topSlopeDegree, selScaleValue, ref assemblyData));
+                }
+            }
+            newList.AddRange(nozzleList);
+
+            // Seal
+            string sealType = GetFRTSealType();
+            if (sealType.Contains("mechanical"))
+                newList.AddRange(drawFRT.DrawFRT_SealMechanical(GetSumPoint(ABottomLeftPoint, 0, pontoonLeftHeight + pontoonTopLeftExt)));
+            else if (sealType.Contains("soft"))
+                newList.AddRange(drawFRT.DrawFRT_SealSoft(GetSumPoint(ABottomLeftPoint, 0, pontoonLeftHeight + pontoonTopLeftExt), selScaleValue));
 
 
             // Right Mirror
@@ -2717,53 +2862,57 @@ namespace DrawWork.DrawServices
             mirrorPlane.Origin.X = tankBottomMidPoint.X;
             mirrorPlane.Origin.Y = tankBottomMidPoint.Y;
             List<Entity> newRightList = editingService.GetEntityByMirror(mirrorPlane, newList);
-            styleService.SetLayerListEntity(ref newRightList, layerService.LayerHiddenLine);
+            styleService.SetLayerListEntityExcludingCenterLine(ref newRightList, layerService.LayerHiddenLine);
 
             customBlockList.AddRange(newList);
             customBlockList.AddRange(newRightList);
 
-
-            // RunWay
-            // ID : 2/3 Point
-            double runWayWidth = drawFRT.GetRollingLadderWidth(tankID);
-            double runWayX = tankIDHalf * 2 / 3;
-            Line vRunWayLine = new Line(GetSumPoint(referencePoint, runWayX, 0), GetSumPoint(referencePoint, runWayX, tankHeight));
-            Point3D runWayPoint = null;
-            foreach (Entity eachEntity in upperPlateList)
-            {
-                Point3D eachPoint = editingService.GetIntersectWidth(vRunWayLine, (ICurve)eachEntity, 0);
-                if (runWayPoint == null)
-                    runWayPoint = eachPoint;
-                if (runWayPoint.Y < eachPoint.Y)
-                    runWayPoint = eachPoint;
-            }
-
-            List<Entity> runWayList = drawFRT.DrawFRT_RunWay(GetSumPoint(runWayPoint, 0, 0), runWayWidth);
-            // Rotate
-            foreach (Entity eachEntity in runWayList)
-                eachEntity.Rotate(-topSlopeDegree, Vector3D.AxisZ, runWayPoint);
-
-            customBlockList.AddRange(runWayList);
-
-
             // Rolling Ladder
-            double tankLastShellThickness = 24;
-            Point3D rollingLadderStartPoint = GetSumPoint(referencePoint, -tankLastShellThickness, tankHeight);
-            Point3D rollingLadderEndPoint = null;
-            foreach (Entity eachEntity in runWayList)
+            if (SingletonData.TankType == TANK_TYPE.EFRTSingle || SingletonData.TankType == TANK_TYPE.EFRTDouble)
             {
-                Point3D eachPoint = editingService.GetIntersectWidth(vRunWayLine, (ICurve)eachEntity, 0);
-                if (rollingLadderEndPoint == null)
-                    rollingLadderEndPoint = eachPoint;
-                if (rollingLadderEndPoint.Y < eachPoint.Y)
-                    rollingLadderEndPoint = eachPoint;
+                // RunWay
+                // ID : 2/3 Point
+                double runWayWidth = drawFRT.GetRollingLadderWidth(tankID);
+                double runWayX = tankIDHalf * 2 / 3;
+                Line vRunWayLine = new Line(GetSumPoint(referencePoint, runWayX, 0), GetSumPoint(referencePoint, runWayX, tankHeight));
+                Point3D runWayPoint = null;
+                foreach (Entity eachEntity in upperPlateList)
+                {
+                    Point3D eachPoint = editingService.GetIntersectWidth(vRunWayLine, (ICurve)eachEntity, 0);
+                    if (runWayPoint == null)
+                        runWayPoint = eachPoint;
+                    if (runWayPoint.Y < eachPoint.Y)
+                        runWayPoint = eachPoint;
+                }
+
+                List<Entity> runWayList = drawFRT.DrawFRT_RunWay(GetSumPoint(runWayPoint, 0, 0), runWayWidth);
+                // Rotate
+                foreach (Entity eachEntity in runWayList)
+                    eachEntity.Rotate(-topSlopeDegree, Vector3D.AxisZ, runWayPoint);
+
+                customBlockList.AddRange(runWayList);
+
+
+                // Rolling Ladder
+                double tankLastShellThickness = 24;
+                Point3D rollingLadderStartPoint = GetSumPoint(referencePoint, -tankLastShellThickness, tankHeight);
+                Point3D rollingLadderEndPoint = null;
+                foreach (Entity eachEntity in runWayList)
+                {
+                    Point3D eachPoint = editingService.GetIntersectWidth(vRunWayLine, (ICurve)eachEntity, 0);
+                    if (rollingLadderEndPoint == null)
+                        rollingLadderEndPoint = eachPoint;
+                    if (rollingLadderEndPoint.Y < eachPoint.Y)
+                        rollingLadderEndPoint = eachPoint;
+                }
+                List<Entity> rollingLadderList = new List<Entity>();
+                rollingLadderList.AddRange(drawFRT.DrawFRT_RollingLadder(rollingLadderStartPoint, rollingLadderEndPoint, selScaleValue));
+
+                customBlockList.AddRange(rollingLadderList);
             }
-            List<Entity> rollingLadderList = new List<Entity>();
-            rollingLadderList.AddRange(drawFRT.DrawFRT_RollingLadder(rollingLadderStartPoint, rollingLadderEndPoint, selScaleValue));
-
-            customBlockList.AddRange(rollingLadderList);
 
 
+            customBlockList.AddRange(nozzleOneList);
 
 
             return customBlockList.ToArray();

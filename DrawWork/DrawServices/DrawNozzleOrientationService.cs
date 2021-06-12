@@ -52,77 +52,6 @@ namespace DrawWork.DrawServices
             List<NozzleInputModel> newList = new List<NozzleInputModel>();
 
             // 첫번재 복사 해서 사용
-            foreach (NozzleRoofInputModel eachNozzle in assemblyData.NozzleRoofInputModel)
-            {
-                NozzleInputModel newNozzle = new NozzleInputModel();
-
-                newNozzle.Position = eachNozzle.Position.ToLower();
-                newNozzle.LR = eachNozzle.LR.ToLower();
-                newNozzle.Mark = eachNozzle.Mark;
-                newNozzle.Size = eachNozzle.Size;
-                newNozzle.SCH = eachNozzle.SCH;
-
-                newNozzle.PipeMaterial = eachNozzle.PipeMaterial;
-                newNozzle.Qty = eachNozzle.Qty;
-                newNozzle.Flange = eachNozzle.Facing;
-                newNozzle.Rating = eachNozzle.Rating;
-                newNozzle.Type = eachNozzle.Type.ToLower();
-
-                newNozzle.Facing = eachNozzle.Facing.ToLower();
-                newNozzle.FlangeMaterial = eachNozzle.FlangeMaterial;
-                newNozzle.R = eachNozzle.R;
-                newNozzle.H = eachNozzle.H;
-                newNozzle.Ort = eachNozzle.Ort;
-
-                newNozzle.AttachedType = eachNozzle.AttachedType.ToLower();
-                newNozzle.OffsetToCL = eachNozzle.OffsetToCL;
-                newNozzle.Description = eachNozzle.Description;
-                newNozzle.Remarks = eachNozzle.Remarks;
-
-                // -> Start
-
-                newNozzle.ASMESeries = eachNozzle.ASMESeries.ToLower();
-
-                newNozzle.RePad = eachNozzle.RePad.ToLower();
-                newNozzle.RePadType = eachNozzle.RePadType.ToLower();
-                newNozzle.InternalPipe = eachNozzle.InternalPipe.ToLower();
-                newNozzle.InternalPipeBottomSupt = eachNozzle.InternalPipeBottomSupt.ToLower();
-                newNozzle.PipeJoint = eachNozzle.PipeJoint.ToLower();
-
-                newNozzle.Fitting = eachNozzle.Fitting.ToLower();
-                newNozzle.OutletDirection = eachNozzle.OutletDirection.ToLower();
-                newNozzle.DrainType = eachNozzle.DrainType.ToLower();
-                newNozzle.Cover = eachNozzle.Cover.ToLower();
-                newNozzle.Manhole = eachNozzle.Manhole.ToLower();
-
-                newNozzle.CleanOut = eachNozzle.CleanOut.ToLower();
-                newNozzle.ManholeSupt = eachNozzle.ManholeSupt.ToLower();
-                newNozzle.RiserPipe = eachNozzle.RiserPipe.ToLower();
-                newNozzle.Mixer = eachNozzle.Mixer.ToLower();
-
-                // Block
-                newNozzle.GaugeHatch = eachNozzle.GaugeHatch.ToLower();
-
-                newNozzle.InternalLadder = eachNozzle.InternalLadder.ToLower();
-                newNozzle.GooseNeckBirdScreen = eachNozzle.GooseNeckBirdScreen.ToLower();
-                newNozzle.FlameArrestor = eachNozzle.FlameArrestor.ToLower();
-                newNozzle.BreatherValve = eachNozzle.BreatherValve.ToLower();
-                newNozzle.VacuumReliefValve = eachNozzle.VacuumReliefValve.ToLower();
-
-                newNozzle.EmergencyVent = eachNozzle.EmergencyVent.ToLower();
-                newNozzle.InternalPipeBended = eachNozzle.InternalPipeBended.ToLower();
-                newNozzle.WaterSpray = eachNozzle.WaterSpray.ToLower();
-                newNozzle.FoamConn = eachNozzle.FoamConn.ToLower();
-
-                // Sort Value
-                if (newNozzle.Position == "shell")
-                    newNozzle.HRSort = valueService.GetDoubleValue(eachNozzle.Ort);
-                else if (newNozzle.Position == "roof")
-                    newNozzle.HRSort = valueService.GetDoubleValue(eachNozzle.Ort);
-
-
-                newList.Add(newNozzle);
-            }
             foreach (NozzleShellInputModel eachNozzle in assemblyData.NozzleShellInputModel)
             {
                 NozzleInputModel newNozzle = new NozzleInputModel();
@@ -145,7 +74,7 @@ namespace DrawWork.DrawServices
                 newNozzle.H = eachNozzle.H;
                 newNozzle.Ort = eachNozzle.Ort;
 
-                newNozzle.AttachedType = eachNozzle.AttachedType.ToLower();
+                newNozzle.AttachedType = eachNozzle.AttachedType;
                 newNozzle.OffsetToCL = eachNozzle.OffsetToCL;
                 newNozzle.Description = eachNozzle.Description;
                 newNozzle.Remarks = eachNozzle.Remarks;
@@ -185,15 +114,98 @@ namespace DrawWork.DrawServices
                 newNozzle.WaterSpray = eachNozzle.WaterSpray.ToLower();
                 newNozzle.FoamConn = eachNozzle.FoamConn.ToLower();
 
+                newNozzle.AutoBleederVent = eachNozzle.AutoBleederVent.ToLower();
+                newNozzle.RimVent = eachNozzle.RimVent.ToLower();
+                newNozzle.RoofDrainSump = eachNozzle.RoofDrainSump.ToLower();
+                newNozzle.NozzleOnPlateform = eachNozzle.NozzleOnPlateform.ToLower();
+
                 // Sort Value
                 if (newNozzle.Position == "shell")
-                    newNozzle.HRSort = valueService.GetDoubleValue(eachNozzle.Ort);
+                    newNozzle.HRSort = valueService.GetDoubleValue(eachNozzle.H);
                 else if (newNozzle.Position == "roof")
-                    newNozzle.HRSort = valueService.GetDoubleValue(eachNozzle.Ort);
+                    newNozzle.HRSort = valueService.GetDoubleValue(eachNozzle.R);
 
 
                 newList.Add(newNozzle);
             }
+            foreach (NozzleRoofInputModel eachNozzle in assemblyData.NozzleRoofInputModel)
+            {
+                NozzleInputModel newNozzle = new NozzleInputModel();
+
+                newNozzle.Position = eachNozzle.Position.ToLower();
+                newNozzle.LR = eachNozzle.LR.ToLower();
+                newNozzle.Mark = eachNozzle.Mark;
+                newNozzle.Size = eachNozzle.Size;
+                newNozzle.SCH = eachNozzle.SCH;
+
+                newNozzle.PipeMaterial = eachNozzle.PipeMaterial;
+                newNozzle.Qty = eachNozzle.Qty;
+                newNozzle.Flange = eachNozzle.Facing;
+                newNozzle.Rating = eachNozzle.Rating;
+                newNozzle.Type = eachNozzle.Type.ToLower();
+
+                newNozzle.Facing = eachNozzle.Facing.ToLower();
+                newNozzle.FlangeMaterial = eachNozzle.FlangeMaterial;
+                newNozzle.R = eachNozzle.R;
+                newNozzle.H = eachNozzle.H;
+                newNozzle.Ort = eachNozzle.Ort;
+
+                newNozzle.AttachedType = eachNozzle.AttachedType;
+                newNozzle.OffsetToCL = eachNozzle.OffsetToCL;
+                newNozzle.Description = eachNozzle.Description;
+                newNozzle.Remarks = eachNozzle.Remarks;
+
+                // -> Start
+
+                newNozzle.ASMESeries = eachNozzle.ASMESeries.ToLower();
+
+                newNozzle.RePad = eachNozzle.RePad.ToLower();
+                newNozzle.RePadType = eachNozzle.RePadType.ToLower();
+                newNozzle.InternalPipe = eachNozzle.InternalPipe.ToLower();
+                newNozzle.InternalPipeBottomSupt = eachNozzle.InternalPipeBottomSupt.ToLower();
+                newNozzle.PipeJoint = eachNozzle.PipeJoint.ToLower();
+
+                newNozzle.Fitting = eachNozzle.Fitting.ToLower();
+                newNozzle.OutletDirection = eachNozzle.OutletDirection.ToLower();
+                newNozzle.DrainType = eachNozzle.DrainType.ToLower();
+                newNozzle.Cover = eachNozzle.Cover.ToLower();
+                newNozzle.Manhole = eachNozzle.Manhole.ToLower();
+
+                newNozzle.CleanOut = eachNozzle.CleanOut.ToLower();
+                newNozzle.ManholeSupt = eachNozzle.ManholeSupt.ToLower();
+                newNozzle.RiserPipe = eachNozzle.RiserPipe.ToLower();
+                newNozzle.Mixer = eachNozzle.Mixer.ToLower();
+
+                // Block
+                newNozzle.GaugeHatch = eachNozzle.GaugeHatch.ToLower();
+
+                newNozzle.InternalLadder = eachNozzle.InternalLadder.ToLower();
+                newNozzle.GooseNeckBirdScreen = eachNozzle.GooseNeckBirdScreen.ToLower();
+                newNozzle.FlameArrestor = eachNozzle.FlameArrestor.ToLower();
+                newNozzle.BreatherValve = eachNozzle.BreatherValve.ToLower();
+                newNozzle.VacuumReliefValve = eachNozzle.VacuumReliefValve.ToLower();
+
+                newNozzle.EmergencyVent = eachNozzle.EmergencyVent.ToLower();
+                newNozzle.InternalPipeBended = eachNozzle.InternalPipeBended.ToLower();
+                newNozzle.WaterSpray = eachNozzle.WaterSpray.ToLower();
+                newNozzle.FoamConn = eachNozzle.FoamConn.ToLower();
+
+                newNozzle.AutoBleederVent = eachNozzle.AutoBleederVent.ToLower();
+                newNozzle.RimVent = eachNozzle.RimVent.ToLower();
+                newNozzle.RoofDrainSump = eachNozzle.RoofDrainSump.ToLower();
+                newNozzle.NozzleOnPlateform = eachNozzle.NozzleOnPlateform.ToLower();
+
+                // Sort Value
+                if (newNozzle.Position == "shell")
+                    newNozzle.HRSort = valueService.GetDoubleValue(eachNozzle.H);
+                else if (newNozzle.Position == "roof")
+                    newNozzle.HRSort = valueService.GetDoubleValue(eachNozzle.R);
+
+
+                newList.Add(newNozzle);
+            }
+
+            #region Temp
             //foreach (NozzleFRTRoofInputModel eachNozzle in assemblyData.NozzleFRTRoofInputModel)
             //{
             //    NozzleInputModel newNozzle = new NozzleInputModel();
@@ -265,6 +277,20 @@ namespace DrawWork.DrawServices
 
             //    newList.Add(newNozzle);
             //}
+            #endregion
+
+            #region Tank Plan : Adjust
+            if (SingletonData.TankType == TANK_TYPE.EFRTSingle ||
+               SingletonData.TankType == TANK_TYPE.EFRTDouble)
+            {
+                // Roof 제외하기
+                for (int i = newList.Count - 1; i >= 0; i--)
+                {
+                    if (newList[i].Position == "roof")
+                        newList.RemoveAt(i);
+                }
+            }
+            #endregion
 
             return newList;
         }
@@ -612,6 +638,7 @@ namespace DrawWork.DrawServices
             double B = valueService.GetDoubleValue(drawNozzle.B);
             double C = valueService.GetDoubleValue(drawNozzle.C);
             double facingC = 0;
+
 
 
             // Facing : Default : Rf

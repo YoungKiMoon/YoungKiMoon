@@ -2641,7 +2641,7 @@ namespace DrawWork.DrawServices
             }
 
             // Deouble Deck
-            if (true)
+            if (visibleFalse)
             {
                 DrawFRTBlockService drawFRT = new DrawFRTBlockService();
 
@@ -2995,10 +2995,231 @@ namespace DrawWork.DrawServices
                 singleModel.Entities.AddRange(newFlangeTop2);
             }
 
-            if (false)
+
+            // Seal
+            if (visibleFalse)
             {
 
+                DrawFRTBlockService drawFRT = new DrawFRTBlockService();
+
+                List<Point3D> newOutPoint = new List<Point3D>();
+                List<Entity> newList = new List<Entity>();
+
+                double shellLeftDistance = 200;
+                double AThickness = 10;// 고정
+                double bottomHeight = 50;
+                double bottomWidth = 25;
+                double rightHeight = 155;
+
+                Point3D sealPoint = new Point3D(10000, 10000);
+
+                Point3D cBottomLeftPoint = GetSumPoint(sealPoint, AThickness, -bottomHeight);
+                Point3D cBottomRightPoint = GetSumPoint(cBottomLeftPoint,  bottomWidth, 0);
+                Point3D cTopRightPoint = GetSumPoint(cBottomRightPoint,0 , rightHeight);
+
+                Point3D cTopCurveMidPoint = GetSumPoint(cTopRightPoint, -120 - bottomWidth - AThickness,100);
+                Point3D cTopCurveEndPoint = GetSumPoint(cTopCurveMidPoint, -80, 155);
+
+                Line leftSheetLine = new Line(GetSumPoint(sealPoint, -shellLeftDistance, 0), GetSumPoint(sealPoint, -shellLeftDistance, 1000));
+
+                // First Courve
+                Line cBottomLine = new Line(GetSumPoint(cBottomLeftPoint, 0, 0), GetSumPoint(cBottomRightPoint, 0, 0));
+                Line cRightLine = new Line(GetSumPoint(cBottomRightPoint, 0, 0), GetSumPoint(cTopRightPoint, 0, 0));
+
+                Arc cUpperArc = new Arc(Plane.XY,cTopRightPoint, cTopCurveMidPoint, cTopCurveEndPoint,true);
+                Arc cUpperArcFillet = null;
+                Curve.Fillet(cUpperArc, cRightLine, 50, true, false, true, true, out cUpperArcFillet);
+
+                Arc cLowerArc = (Arc)cUpperArc.Offset(bottomWidth, Vector3D.AxisZ);
+                Point3D cLeftInter = editingService.GetIntersectWidth(leftSheetLine, cLowerArc, 0);
+                cLowerArc.TrimBy(cLeftInter, true);
+                Arc cLowerArcFillet = (Arc)cUpperArcFillet.Offset(bottomWidth, Vector3D.AxisZ);
+                Line cLeftLine = new Line(GetSumPoint(cLowerArcFillet.EndPoint, 0, 0), GetSumPoint(cBottomLeftPoint, 0, 0));
+
+                // Second Courve
+                Arc cLowerLowerArc = new Arc(Plane.XY, GetSumPoint(sealPoint,0,0), GetSumPoint(sealPoint,-135,65), GetSumPoint(sealPoint, -200, 196), true);
+                newList.AddRange(new Entity[] { cBottomLine, cRightLine, cUpperArc, cUpperArcFillet,cLowerArc, cLowerArcFillet, cLeftLine, cLowerLowerArc });
+
+
+                Point3D lowerShapeWP = GetSumPoint(sealPoint, -shellLeftDistance, -50);
+                Line uTopLine = new Line(GetSumPoint(lowerShapeWP, 0, 0), GetSumPoint(lowerShapeWP, 45, 0));
+
+                Line uTopRightSlopeLine = new Line(GetSumPoint(uTopLine.EndPoint, 0, 0), GetSumPoint(uTopLine.EndPoint, 30, -30));
+                Line uTopRightLine = new Line(GetSumPoint(uTopRightSlopeLine.EndPoint, 0, 0), GetSumPoint(uTopRightSlopeLine.EndPoint, 0, -70));
+                Line uTopBottomLine = new Line(GetSumPoint(uTopRightLine.EndPoint, 0, 0), GetSumPoint(uTopRightLine.EndPoint, -75, 0));
+
+                Point3D uTopRecPoint = GetSumPoint(uTopLine.EndPoint, 0, -48);
+                List<Entity> uTopRec=shapeService.GetRectangle(out newOutPoint, GetSumPoint(uTopRecPoint, 0, 0), 25, 550, Utility.DegToRad(15), 1, 1);
+                newList.AddRange(uTopRec);
+                newList.AddRange(new Entity[] { uTopLine, uTopRightSlopeLine, uTopRightLine});
+
+                // utopRec 겹침
+                List<Point3D> uTopRecPointList = new List<Point3D>();
+                foreach(Entity eachEntity in uTopRec)
+                {
+                    Point3D eachInter = editingService.GetIntersectWidth(uTopBottomLine,(ICurve)eachEntity, 0);
+                    if (eachInter.Y > 0)
+                        uTopRecPointList.Add(GetSumPoint(eachInter, 0, 0));
+                }
+                List<Point3D> uTopRecPointListSort=uTopRecPointList.OrderBy(x => x.X).ToList();
+                Line uTopBottomLine1 = new Line(GetSumPoint(uTopBottomLine.EndPoint, 0, 0), GetSumPoint(uTopRecPointListSort[0], 0, 0));
+                Line uTopBottomLine2 = new Line(GetSumPoint(uTopBottomLine.StartPoint, 0, 0), GetSumPoint(uTopRecPointListSort[1], 0, 0));
+                newList.AddRange(new Entity[] { uTopBottomLine1, uTopBottomLine2 });
+
+                // Bottom
+                Point3D sealBottonPoint = GetSumPoint(sealPoint, -shellLeftDistance, -800 + 50);
+                Line bBottomLine1 = new Line(GetSumPoint(sealBottonPoint, 0, 0), GetSumPoint(sealBottonPoint, shellLeftDistance, 0));
+                Line bBottomLine2 = new Line(GetSumPoint(sealBottonPoint, 0, 50), GetSumPoint(sealBottonPoint, shellLeftDistance, 50));
+
+                newList.AddRange(new Entity[] { bBottomLine1, bBottomLine2 });
+
+                // uShape
+                Point3D uBottomShape = GetSumPoint(sealBottonPoint, shellLeftDistance, 50 + 500);
+                Line uBottomTop= new Line(GetSumPoint(uBottomShape, 0, 0), GetSumPoint(uBottomShape, -55, 0));
+                Line uBottomSlope = new Line(GetSumPoint(uBottomTop.EndPoint, 0, 0), GetSumPoint(uBottomTop.EndPoint, -30, -30));
+                
+                Line bBottomLeft = new Line(GetSumPoint(uBottomSlope.EndPoint, 0, 0), GetSumPoint(uBottomSlope.EndPoint, 0, -1000));
+
+                // uBottomRec
+                Point3D uBottomRecPoint = GetSumPoint(uBottomTop.EndPoint, 0, -25);
+                List<Entity> uBottomRec = shapeService.GetRectangle(out newOutPoint, GetSumPoint(uBottomRecPoint, 0, 0), 25, 310, -Utility.DegToRad(27), 0, 0);
+                newList.AddRange(uBottomRec);
+                newList.AddRange(new Entity[] { uBottomTop, uBottomSlope });
+
+                Line bBottomRight = new Line(GetSumPoint(uBottomRecPoint, 0, -500+25), GetSumPoint(uBottomRecPoint, 0, 0));
+
+                // uLeft 겹침
+                // utopRec 겹침
+                List<Point3D> uBottomRecPointList = new List<Point3D>();
+                foreach (Entity eachEntity in uBottomRec)
+                {
+                    Point3D eachInter = editingService.GetIntersectWidth(bBottomLeft, (ICurve)eachEntity, 0);
+                    if (eachInter.Y > 0)
+                        uBottomRecPointList.Add(GetSumPoint(eachInter, 0, 0));
+                }
+                List<Point3D> uBottomRecPointListSort = uBottomRecPointList.OrderBy(x => x.Y).ToList();
+                Line bBottomLeft1 = new Line(GetSumPoint(uBottomSlope.EndPoint, 0, 0), GetSumPoint(uBottomRecPointListSort[1], 0, 0));
+
+                newList.AddRange(new Entity[] { bBottomLeft1 });
+
+                // 맨마지막 겹침
+                List<Point3D> uBottomRecPointList1 = new List<Point3D>();
+                foreach (Entity eachEntity in uBottomRec)
+                {
+                    Point3D eachInter = editingService.GetIntersectWidth(bBottomRight, (ICurve)eachEntity, 0);
+                    if (eachInter.Y > 0)
+                        uBottomRecPointList1.Add(GetSumPoint(eachInter, 0, 0));
+                }
+                List<Point3D> uBottomRecPointListSort1= uBottomRecPointList1.OrderBy(x => x.Y).ToList();
+
+
+                List<Point3D> uBottomRecPointList2 = new List<Point3D>();
+                foreach (Entity eachEntity in uTopRec)
+                {
+                    Point3D eachInter = editingService.GetIntersectWidth(bBottomRight, (ICurve)eachEntity, 0);
+                    if (eachInter.Y > 0)
+                        uBottomRecPointList2.Add(GetSumPoint(eachInter, 0, 0));
+                }
+                List<Point3D> uBottomRecPointListSort2 = uBottomRecPointList2.OrderBy(x => x.Y).ToList();
+
+
+                Line bBottomRight1 = new Line(GetSumPoint(bBottomRight.StartPoint, 0,0), GetSumPoint(uBottomRecPointListSort2[0], 0, 0));
+                Line bBottomRight2 = new Line(GetSumPoint(uBottomRecPointListSort2[1], 0,0), GetSumPoint(uBottomRecPointListSort1[0], 0, 0));
+                newList.AddRange(new Entity[] { bBottomRight1, bBottomRight2 });
+
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerVirtualLine);
+                singleModel.Entities.AddRange(newList);
             }
+
+            if (true) 
+            {
+                double selScaleValue = 90;
+                Point3D referencePoint = new Point3D(10000, 10000);
+
+                List<Point3D> newOutPoint = new List<Point3D>();
+                List<Entity> newList = new List<Entity>();
+                List<Entity> newCenterList = new List<Entity>();
+
+                //newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(EBottomLeftPoint, 0, 0), pontoonRightFlatWidth, pontoonThkE, 0, 0, 3));
+                //newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(FTopLeftPoint, 0, 0), pontoonFlatLength, pontoonThkF, 0, 0, 0, new bool[] { true, false, true, true }));
+
+                double bottomGap =30;
+
+
+
+                double topPadHeight = 10;
+                double topPadWidth = 100 + 19 + 20;
+
+                double padUpHeight = 115;
+                double padUpWidth = 100;
+
+                double padUpUpHeight = 1600 - 620 - 110 - 115;
+                double padUpUpWidth = padUpWidth - (20 * 2);
+
+                double middleUpHeight = 110;
+                double middleUpWidth = 330;
+
+                double middleUpPadHeight = 10;
+                double middleUpPadWidth = middleUpWidth - (10 * 2);
+
+                double middleHeight = 650;
+                double middleWidth = middleUpWidth - (30 * 2);
+
+                double bottomHeight = 1600 - bottomGap;
+                double bottomWidth = 73;
+
+                Point3D refAdjPoint = GetSumPoint(referencePoint, 0, -bottomGap);
+                double currentY = - bottomHeight;
+                newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -bottomWidth / 2, currentY), bottomWidth, bottomHeight, 0, 0, 3, new bool[] { false, true, true, true }));
+                currentY += bottomHeight;
+                newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -middleWidth / 2, currentY), middleWidth, middleHeight, 0, 0, 3, new bool[] { false, true, true, true }));
+                currentY += middleHeight;
+                newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -middleUpWidth / 2, currentY), middleUpWidth, middleUpHeight, 0, 0, 3, new bool[] { true, true, true, true }));
+                currentY += middleUpHeight;
+                newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -middleUpPadWidth / 2, currentY), middleUpPadWidth, middleUpPadHeight, 0, 0, 3, new bool[] { true, true, false, true }));
+                currentY += middleUpPadHeight;
+                newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -padUpWidth / 2, currentY), padUpWidth, padUpHeight, 0, 0, 3, new bool[] { true, true, false, true }));
+                currentY += padUpHeight;
+                newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -padUpUpWidth / 2, currentY), padUpUpWidth, padUpUpHeight, 0, 0, 3, new bool[] { false, true, false, true }));
+                currentY += padUpUpHeight;
+                newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(refAdjPoint, -topPadWidth / 2, currentY), topPadWidth, topPadHeight, 0, 0, 3, new bool[] { true, true, true, true }));
+                currentY += topPadHeight;
+
+
+
+
+                double topHeight = 90;
+                double topRadius = 50;
+                double topWidth = 100;
+                double topPipeWidth = 19;
+                Arc topCenterArc = new Arc(Plane.XY, GetSumPoint(refAdjPoint, -topWidth/2, currentY + topHeight), GetSumPoint(refAdjPoint, 0, currentY + topHeight + topRadius), GetSumPoint(refAdjPoint,topWidth/2, currentY + topHeight),true);
+                Line topLeftLine = new Line(GetSumPoint(refAdjPoint, -topWidth/2, currentY), GetSumPoint(refAdjPoint, -topWidth/2, currentY +topHeight));
+                Line topRightLine = new Line(GetSumPoint(refAdjPoint, topWidth/2, currentY), GetSumPoint(refAdjPoint, topWidth/2, currentY +topHeight));
+                newCenterList.AddRange(new Entity[] { topCenterArc, topLeftLine, topRightLine });
+
+                Arc topCenterArcInner = (Arc)topCenterArc.Offset(-topPipeWidth / 2, Vector3D.AxisZ);
+                Line topLeftLineInner = (Line)topLeftLine.Offset(topPipeWidth / 2, Vector3D.AxisZ);
+                Line topRightInnertLine = (Line)topRightLine.Offset(-topPipeWidth / 2, Vector3D.AxisZ);
+                Arc topCenterArcOuter = (Arc)topCenterArc.Offset(topPipeWidth / 2, Vector3D.AxisZ);
+                Line topLeftLineOuter = (Line)topLeftLine.Offset(-topPipeWidth / 2, Vector3D.AxisZ);
+                Line topRightInnertOuter = (Line)topRightLine.Offset(+topPipeWidth / 2, Vector3D.AxisZ);
+                newList.AddRange(new Entity[] { topCenterArcInner, topLeftLineInner, topRightInnertLine, topCenterArcOuter, topLeftLineOuter, topRightInnertOuter });
+                // CenterLine
+                DrawCenterLineModel newCenterModel = new DrawCenterLineModel();
+                List<Entity> centerLongLine = editingService.GetCenterLine(GetSumPoint(refAdjPoint, 0, -bottomHeight), GetSumPoint(refAdjPoint, 0, currentY + topHeight + topRadius +(topPipeWidth/2)), newCenterModel.exLength,selScaleValue);
+                List<Entity> centerLongLine2 = editingService.GetCenterLine(GetSumPoint(refAdjPoint, -(topWidth / 2) -(topPipeWidth/2), currentY + topHeight), GetSumPoint(refAdjPoint, +(topWidth / 2) + (topPipeWidth / 2), currentY + topHeight), newCenterModel.exLength, selScaleValue);
+                newCenterList.AddRange(centerLongLine);
+                newCenterList.AddRange(centerLongLine2);
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+                styleService.SetLayerListEntity(ref newCenterList, layerService.LayerCenterLine);
+
+                singleModel.Entities.AddRange(newList);
+                singleModel.Entities.AddRange(newCenterList);
+            }
+
+
             singleModel.Entities.Regen();
             singleModel.ZoomFit();
             singleModel.SetView(viewType.Top);
