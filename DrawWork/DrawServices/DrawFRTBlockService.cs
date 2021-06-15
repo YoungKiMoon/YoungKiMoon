@@ -1,6 +1,7 @@
 ﻿using AssemblyLib.AssemblyModels;
 using devDept.Eyeshot.Entities;
 using devDept.Geometry;
+using DrawWork.Commons;
 using DrawWork.CutomModels;
 using DrawWork.DrawModels;
 using DrawWork.DrawStyleServices;
@@ -95,6 +96,17 @@ namespace DrawWork.DrawServices
             newList.AddRange(shapeService.GetRectangle(out newOutPoint, GetSumPoint(topBlockLeftTop, 0, 0),runWayWidth-(flatThickness*2), flatThickness, 0, 0, 0, new bool[] { true, false, true, false}));
 
             styleService.SetLayerListEntity(ref newList, layerService.LayerVirtualLine);
+
+            // Leader
+            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+            {
+
+                leaderPoint = GetSumCDPoint(drawPoint, -400, 50 + runWayHeight),
+                lineTextList = new List<string>() { "RUN WAY" },
+                lineLength = -50,
+                Position = "topleft"
+            });
+
 
             return newList;
         }
@@ -225,6 +237,18 @@ namespace DrawWork.DrawServices
             Point3D rotatePoint = GetSumPoint(actualStartPoint, 0, 0);
             foreach (Entity eachEntity in newList)
                 eachEntity.Rotate(rotateValue, Vector3D.AxisZ, rotatePoint);
+
+
+            // Leader
+            Point3D[] leaderPoint = topOuterLine.GetPointsByLength(topOuterLine.Length() * 0.4);
+            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+            {
+
+                leaderPoint = GetSumCDPoint(leaderPoint[1], 50, 50),
+                lineTextList = new List<string>() {"ROLLING LADDER"},
+                lineLength = -50,
+                Position = "topright"
+            });
 
             return newList;
         }
@@ -737,6 +761,17 @@ namespace DrawWork.DrawServices
                 customEntity.AddRange(hoseList);
 
 
+                // Leader
+                SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                {
+
+                    leaderPoint = GetSumCDPoint(LeftStartLinePoint4, 0, -10),
+                    lineTextList = new List<string>() { "ROOF DRAIN SYSTEM", "PIVOT MASTER TYPE" },
+                    lineLength = 50,
+                    Position = "bottomleft"
+                });
+
+
                 // Upper Flat : Double Deck
                 if (selUpperPoint != null)
                 {
@@ -770,6 +805,17 @@ namespace DrawWork.DrawServices
                 }
 
 
+
+
+                // Leader
+                SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                {
+
+                    leaderPoint = GetSumCDPoint(rightTopBototmPoint1, - 20, 20),
+                    lineTextList = new List<string>() { "ROOF DRAIN SUMP" },
+                    lineLength = 20,
+                    Position = "bottomright"
+                });
             }
 
             return customEntity;
@@ -1045,6 +1091,10 @@ namespace DrawWork.DrawServices
         private Point3D GetSumPoint(CDPoint selPoint1, double X, double Y, double Z = 0)
         {
             return new Point3D(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
+        }
+        private CDPoint GetSumCDPoint(Point3D selPoint1, double X, double Y, double Z = 0)
+        {
+            return new CDPoint(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
         }
     }
 }

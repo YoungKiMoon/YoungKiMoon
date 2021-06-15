@@ -7,7 +7,8 @@ namespace DrawLogicLib.Commons
 {
     public enum LogicFile_Type
     {
-        NotSet = 0,
+        NotSet,
         GA,
+        NozzleOrientation,
     }
 }

@@ -1,12 +1,18 @@
+// General
+using GeneralDD
 
-
-refpoint xy 900000,100000
+refpoint xy 300000,100000
 
 
 
 #region Nozzle : Orientation
 	point xy refpointx,refpointy
-	nozzleorientation 
+	orientation
+#endregion
+
+#region Nozzle : Orientation
+	point xy refpointx,refpointy
+	nozzleorientation	
 #endregion
 
 

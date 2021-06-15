@@ -8,6 +8,8 @@
                     <button id="cuArrow00" enabled="true" label=" " getImage="GetCustomImage"  size="large" />
                     <button id="cuGroupButton01" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />
                     <button id="cuArrow01" enabled="true" label=" " getImage="GetCustomImage"  size="large" />
+                    <button id="cuGroupButton07" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />
+                    <button id="cuArrow05" enabled="true" label=" " getImage="GetCustomImage"  size="large" />
                     <button id="cuGroupButton02" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />
                     <button id="cuArrow02" enabled="true" label=" " getImage="GetCustomImage"  size="large" />
                     <button id="cuGroupButton03" getImage="GetCustomImage" size="large" onAction="CallbackButton01" getLabel="GetCustomLabel" />

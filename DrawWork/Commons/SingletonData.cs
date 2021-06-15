@@ -70,5 +70,19 @@ namespace DrawWork.Commons
         }
         private static CDPoint _GAViewPortCenter = new CDPoint();
 
+        public static CDPoint OrientationViewPortSize
+        {
+            get { return _OrientationViewPortSize; }
+            set { _OrientationViewPortSize = value; }
+        }
+        private static CDPoint _OrientationViewPortSize = new CDPoint();
+
+        public static CDPoint OrientationGAViewPortCenter
+        {
+            get { return _OrientationGAViewPortCenter; }
+            set { _OrientationGAViewPortCenter = value; }
+        }
+        private static CDPoint _OrientationGAViewPortCenter = new CDPoint();
+
     }
 }

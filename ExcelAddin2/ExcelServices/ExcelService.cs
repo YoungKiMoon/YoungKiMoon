@@ -128,21 +128,21 @@ namespace ExcelAddIn.ExcelServices
             switch (selSheetType)
             {
                 case EXCELSHEET_LIST.SHEET_ROOF:
-
+                    newModel.ExcelSheet.SelectionChange += ExcelSheetRoof_SelectionChange;
                     switch (currentRoofType)
                     {
                         case ROOF_TYPE.CRT:
                             AddInformationTable(GetSheetTable(EXCELSHEET_LIST.SHEET_ANGLE));
-                            newModel.ExcelSheet.SelectionChange += ExcelSheetRoof_SelectionChange;
                             break;
                         case ROOF_TYPE.IFRT:
                         case ROOF_TYPE.EFRTSingle:
                             SetInformationWindowArea(true, false);
-                            //AddInformationImage(new List<ImageModel> { new ImageModel("Roof_FRTsingleDeck", "Roof_FRTsingleDeck") });
+                            AddInformationImage(new List<ImageModel> { new ImageModel("FRT_Single", "FRT Single Deck") });
+
                             break;
                         case ROOF_TYPE.EFRTDouble:
                             SetInformationWindowArea(true, false);
-                            //AddInformationImage(new List<ImageModel> { new ImageModel("Roof_FRTdoubleDeck", "Roof_FRTdoubleDeck") });
+                            AddInformationImage(new List<ImageModel> { new ImageModel("FRT_Double", "FRT Double Deck") });
                             break;
                     }
                     break;
@@ -156,20 +156,20 @@ namespace ExcelAddIn.ExcelServices
                     break;
 
                 case EXCELSHEET_LIST.SHEET_STRUCTURE:
+                    newModel.ExcelSheet.SelectionChange += ExcelSheetStructure_SelectionChange;
                     switch (currentRoofType)
                     {
                         case ROOF_TYPE.CRT:
                         case ROOF_TYPE.DRT:
-                            newModel.ExcelSheet.SelectionChange += ExcelSheetStructure_SelectionChange;
                             break;
                         case ROOF_TYPE.IFRT:
                         case ROOF_TYPE.EFRTSingle:
                             SetInformationWindowArea(true, false);
-                            //AddInformationImage(new List<ImageModel> { new ImageModel("Structure_FRTsingleDeck", "Structure_FRTsingleDeck") });
+                            //AddInformationImage(new List<ImageModel> { new ImageModel("FRT_Single", "FRT Single Deck") });
                             break;
                         case ROOF_TYPE.EFRTDouble:
                             SetInformationWindowArea(true, false);
-                            //AddInformationImage(new List<ImageModel> { new ImageModel("Structure_FRTdoubleDeck", "Structure_FRTdoubleDeck") });
+                            //AddInformationImage(new List<ImageModel> { new ImageModel("FRT_Double", "FRT Double Deck") });
                             break;
                     }
                     break;
@@ -294,9 +294,9 @@ namespace ExcelAddIn.ExcelServices
         private static void ExcelSheetRoof_SelectionChange(Range Target)
         {
             SetInformationWindowArea(true, false);
-            if (Target.Column == 6)
+            if (Target.Column == 6 || Target.Column == 16 || Target.Column == 27)
             {
-                if (Target.Row == 25)
+                if (Target.Row == 25 || Target.Row == 25)
                 {
                     // Compression Ring
                     List<ImageModel> newImage = new List<ImageModel>();
@@ -410,7 +410,7 @@ namespace ExcelAddIn.ExcelServices
             Excel.Worksheet roofSheet = GetWorkSheet(EXCELSHEET_LIST.SHEET_ROOF);
             if(roofSheet != null)
             {
-                Range tempRange1 = roofSheet.Range[roofSheet.Cells[1, 1], roofSheet.Cells[1, 50]];
+                Range tempRange1 = roofSheet.Range[roofSheet.Cells[1, 1], roofSheet.Cells[1, 51]];
                 tempRange1.EntireColumn.Hidden = true;
                 Range roofViewRange = null;
 
@@ -458,6 +458,8 @@ namespace ExcelAddIn.ExcelServices
                         structureViewRange.EntireColumn.Hidden = false;
                         break;
                     case ROOF_TYPE.IFRT:
+                        structureViewRange = structureSheet.Range[structureSheet.Cells[1, 1], structureSheet.Cells[1, 16]];
+                        structureViewRange.EntireColumn.Hidden = false;
                         structureViewRange = structureSheet.Range[structureSheet.Cells[1, 35], structureSheet.Cells[1, 50]];
                         structureViewRange.EntireColumn.Hidden = false;
                         break;

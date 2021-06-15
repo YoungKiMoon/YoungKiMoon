@@ -20,7 +20,7 @@ namespace DrawWork.DrawBuilders
 {
     public class LogicBuilder : WorkUnit
     {
-        private List<Entity> _EntityList;
+        public EntityList _EntityList;
         private Block _logicBlock;
         
 
@@ -29,7 +29,7 @@ namespace DrawWork.DrawBuilders
         {
             _EntityList = null;
         }
-        public LogicBuilder(List<Entity> selEntityList)
+        public LogicBuilder(EntityList selEntityList)
         {
             _EntityList = selEntityList;
         }
@@ -67,11 +67,11 @@ namespace DrawWork.DrawBuilders
 
             //environment.Entities.BoxSize
 
-            SingletonData.GAViewPortSize.X = environment.Entities.BoxSize.X;
-            SingletonData.GAViewPortSize.Y = environment.Entities.BoxSize.Y;
+            //SingletonData.GAViewPortSize.X = environment.Entities.BoxSize.X;
+            //SingletonData.GAViewPortSize.Y = environment.Entities.BoxSize.Y;
 
-            SingletonData.GAViewPortCenter.X = environment.Entities.BoxMin.X;
-            SingletonData.GAViewPortCenter.Y = environment.Entities.BoxMin.Y;
+            //SingletonData.GAViewPortCenter.X = environment.Entities.BoxMin.X;
+            //SingletonData.GAViewPortCenter.Y = environment.Entities.BoxMin.Y;
 
             // sets trimetric view
             environment.SetView(viewType.Top);

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using devDept.Eyeshot;
 using DrawWork.Commons;
 using System.Windows;
+using DrawWork.DrawServices;
 
 namespace DrawWork.DesignServices
 {
@@ -47,15 +48,18 @@ namespace DrawWork.DesignServices
 
 		// Model
 		private Model singleModel;
+		private Model singleModel2;
 
 		#region CONSTRUCTOR
-		public IntergrationService(string selType, AssemblyModel selTankData, object selModel)
+		public IntergrationService(string selType, AssemblyModel selTankData, object selModel,object selModel2)
         {
 			Info = new DesignInformationModel(selType);
 
 			tankData = selTankData;
 
 			singleModel = selModel as Model;
+
+			singleModel2 = selModel2 as Model;
 
 			commandService = new CommandBasicService(tankData, selModel);
 
@@ -82,13 +86,48 @@ namespace DrawWork.DesignServices
 			commandService.SetCommandData(commandService.CommandTextToLower(selCommandArray));
 			// Createt Entity
 			commandService.ExecuteCommand();
+
 			LogicBuilder logicB = new LogicBuilder(commandService.commandEntities);
 
 			return logicB;
 		}
 
+		private void SetScaleValue()
+        {
+            if (singleModel2 != null)
+            {
+				singleModel2.Entities.Clear();
+				singleModel2.Entities.AddRange(commandService.commandEntities);
+				singleModel2.Entities.Regen();
+			}
 
-		public bool CreateLogic(double selScale,string[] selCommandArray, out LogicBuilder outLogicBuilder, bool clearEntities = true)
+
+			switch (Info.TypeName)
+            {
+				case "GA":
+
+
+
+					SingletonData.GAViewPortSize.X = singleModel2.Entities.BoxSize.X;
+					SingletonData.GAViewPortSize.Y = singleModel2.Entities.BoxSize.Y;
+					SingletonData.GAViewPortCenter.X = singleModel2.Entities.BoxMin.X;
+					SingletonData.GAViewPortCenter.Y = singleModel2.Entities.BoxMin.Y;
+					break;
+				case "ORIENTATION":
+
+					SingletonData.OrientationViewPortSize.X = singleModel2.Entities.BoxSize.X;
+					SingletonData.OrientationViewPortSize.Y = singleModel2.Entities.BoxSize.Y;
+					SingletonData.OrientationGAViewPortCenter.X = singleModel2.Entities.BoxMin.X;
+					SingletonData.OrientationGAViewPortCenter.Y = singleModel2.Entities.BoxMin.Y;
+					break;
+			}
+
+			if (singleModel2 != null)
+				singleModel2.Entities.Clear();
+		}
+
+
+		public bool CreateLogic(double selScale,string[] selCommandArray, out LogicBuilder outLogicBuilder, bool clearEntities = false)
         {
 			outLogicBuilder = null;
 			bool returnValue = false;
@@ -96,11 +135,14 @@ namespace DrawWork.DesignServices
             {
 				LogicBuilder testBuilder = GetLogicBuilder(selScale, selCommandArray);
 
-				if (clearEntities)
-					singleModel.Entities.Clear();
-
-				singleModel.StartWork(testBuilder);
+				//if (clearEntities)
+				//	singleModel.Entities.Clear();
+				singleModel.Entities.AddRange(testBuilder._EntityList);
+				//singleModel.StartWork(testBuilder);
 				//outLogicBuilder = testBuilder;
+
+				SetScaleValue();
+
 				returnValue = true;
 
 			}

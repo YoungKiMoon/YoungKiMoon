@@ -38,6 +38,7 @@ using Microsoft.Win32;
 using DrawWork.ImportServices;
 using PaperSetting.Utils;
 using DrawWork.DrawBuilders;
+using devDept.Eyeshot;
 
 namespace PaperSetting
 {
@@ -61,7 +62,9 @@ namespace PaperSetting
 
         public string workbookName = "";
         public object activeCustomWorkbook = null;
-        
+
+        private BlockKeyedCollection tempImportBlocks;
+        private BlockKeyedCollection tempImportOrientationBlocks;
 
         #region One Click
         private long _oneClickFirsttime = (long)0;
@@ -90,13 +93,16 @@ namespace PaperSetting
 
             InitializeComponent();
 
+            gridLoading.Visibility = Visibility.Visible;
+
             busyAreaSource.Visibility = Visibility.Hidden;
 
-            tabDetail.SelectedItem = viewview;
+            tabDetail.SelectedItem = tabletable;
 
             testDraw.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
             testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
 
+            testModel.Renderer = rendererType.OpenGL;
             testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Wireframe;
             testModel.ActiveViewport.Background.TopColor = new SolidColorBrush(Color.FromRgb(59, 68, 83));
 
@@ -110,6 +116,9 @@ namespace PaperSetting
             testDraw.PaperColor = new SolidColorBrush(Color.FromRgb(59,68,83));
 
 
+            testModel2.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
+            drawSetting.SetModelSpace(testModel2);
+
             workbookName = "TankDesign_0527_1.xlsm";
             workbookName = "TEST 2019-3.xlsm";
             workbookName = "TEST-002.xlsm";
@@ -118,7 +127,12 @@ namespace PaperSetting
             workbookName = "TankDesign_0528.xlsm";
             workbookName = "TankDesign_0528-1.xlsm";
             workbookName = "DRT TEST-1.xlsm";
-            //workbookName = "TankDesign_TEST-2.xlsm";
+            workbookName = "DRT TEST_20210610.xlsm";
+            workbookName = "1.CRT.xlsm";
+            //workbookName = "2.DRT.xlsm";
+            //workbookName = "3.IFRT.xlsm";
+            //workbookName = "4.FRT_Single.xlsm";
+            //workbookName = "5.FRT_Double.xlsm";
 
 
             // Create Block
@@ -173,6 +187,8 @@ namespace PaperSetting
             //CreateDrawSample();
             if (One_Click())
             {
+                //tabDetail.SelectedItem = viewview;
+                tabDetail.SelectedItem = previewpreview;
                 //BusyStartSource(true);
                 //CreateDraw1st
                 testBack();
@@ -208,8 +224,15 @@ namespace PaperSetting
             };
             bgWorker.RunWorkerCompleted += (ssender, ee) =>
             {
+                //PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+                DrawScaleService scaleService = new DrawScaleService();
+                double autoScale = scaleService.GetAIScale(selView.newTankData);
+                SampleDraw(selView.newTankData, autoScale);
+
                 customBusyIndicator.IsBusy = false;
                 IsBusy = false;
+
+
 
                 gridLoading.Visibility = Visibility.Collapsed;
             };
@@ -282,6 +305,11 @@ namespace PaperSetting
                         //your code
                         //DoEvents();
                         CreateDraw1st();
+
+
+                        DrawScaleService scaleService = new DrawScaleService();
+                        double autoScale = scaleService.GetAIScale(selView.newTankData);
+                        SampleDraw(selView.newTankData, autoScale);
                     }));
 
                 }
@@ -313,7 +341,7 @@ namespace PaperSetting
         public void CreateDraw1st()
         {
 
-
+            bool visibleValue = false;
 
             // SingletonData Reset
             SingletonData.LeaderPublicList.Clear();
@@ -323,78 +351,174 @@ namespace PaperSetting
             AssemblyDataService assemblyService = new AssemblyDataService();
             AssemblyModel newTankData = assemblyService.CreateMappingData(workbookName, activeCustomWorkbook);
 
-            // Logic
-            DrawLogicDBService newLogic = new DrawLogicDBService();
-            DrawLogicModel newLogicData = newLogic.GetLogicCommand(DrawLogicLib.Commons.LogicFile_Type.GA);
+            
 
 
-            //DWG Load
-            //DWGFileService dwgService = new DWGFileService();
-            //string dwgFilePath = dwgService.FileFilecopy();
-            //if (dwgFilePath != "")
-            //{
-            //    BackgroundSettings temp = new BackgroundSettings();
-            //    temp.TopColor = new SolidColorBrush(Color.FromRgb(225, 225, 225));
-            //    testModel.Viewports[0].Background = temp;
 
-            //    //ReadFileAsync rfa = GetReader(importFileDialog.FileName);
-            //    //if (rfa != null)
-            //    //    testModel.StartWork(rfa);
+            if (visibleValue)
+            {
+                //DWG Load
+                //DWGFileService dwgService = new DWGFileService();
+                //string dwgFilePath = dwgService.FileFilecopy();
+                //if (dwgFilePath != "")
+                //{
+                //    BackgroundSettings temp = new BackgroundSettings();
+                //    temp.TopColor = new SolidColorBrush(Color.FromRgb(225, 225, 225));
+                //    testModel.Viewports[0].Background = temp;
 
-            //    Thread.Sleep(100);
-            //    ReadAutodesk ra = new ReadAutodesk(dwgFilePath);
-            //    if (ra != null)
-            //    {
-            //        testModel.StartWork(ra);
-            //        testModel.Refresh();
-            //    }
-            //    this.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
+                //    //ReadFileAsync rfa = GetReader(importFileDialog.FileName);
+                //    //if (rfa != null)
+                //    //    testModel.StartWork(rfa);
 
-            //    Thread.Sleep(1000);
-            //}
+                //    Thread.Sleep(100);
+                //    ReadAutodesk ra = new ReadAutodesk(dwgFilePath);
+                //    if (ra != null)
+                //    {
+                //        testModel.StartWork(ra);
+                //        testModel.Refresh();
+                //    }
+                //    this.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
+
+                //    Thread.Sleep(1000);
+                //}
 
 
-            // Ligic File
-            //TextFileService newFileService = new TextFileService();
-            //string[] newComData = newFileService.GetTextFileArray(logicFile.Text);
+                // Ligic File
+                //TextFileService newFileService = new TextFileService();
+                //string[] newComData = newFileService.GetTextFileArray(logicFile.Text);
 
-            // Virtual Design
-            //DesignService designS = new DesignService();
-            //designS.CreateDesignCRTModel(newTankData);
+                // Virtual Design
+                //DesignService designS = new DesignService();
+                //designS.CreateDesignCRTModel(newTankData);
 
-            // 시트 값을 가져와야 함 : Assembly.Create Mapping Data
+                // 시트 값을 가져와야 함 : Assembly.Create Mapping Data
 
-            // 버추얼 디자인의 True False
+                // 버추얼 디자인의 True False
 
-            // Logic을 수동으로 연결
+                // Logic을 수동으로 연결
+            }
 
-            // 형상 그리는 것은 완료
-            List<string> newAll = new List<string>();
-            newAll.AddRange(newLogicData.UsingList);
-            newAll.AddRange(newLogicData.ReferencePointList);
-            foreach (DrawCommandModel eachCommand in newLogicData.CommandList)
-                newAll.AddRange(eachCommand.Command);
-
-            //newAll.ToArray()
-            DrawScaleService scaleService = new DrawScaleService();
-            double autoScale = scaleService.GetAIScale(newTankData);
 
             LogicBuilder outBuilder = null;
-            IntergrationService newInterService = new IntergrationService("CRT", newTankData, testModel);
-            if (newInterService.CreateLogic(autoScale, newAll.ToArray(), out outBuilder))
-            {
 
-                //bgWorker.ReportProgress(99999);
-                //MessageBox.Show("생성 완료", "안내");
-                //DoEvents();
 
-            }
-            else
+            // Block 보존
+            tempImportBlocks = testModel.Blocks;
+            //testModel2.Blocks = tempImportBlocks;
+
+            // Delete
+            testModel.Entities.Clear();
+            testModel.Purge();
+            testModel.Invalidate();
+
+            // Create Setting
+            DrawSettingService drawSetting = new DrawSettingService();
+            drawSetting.SetModelSpace(testModel);
+            //drawSetting.SetPaperSpace(testDraw);
+            testModel2 = new Model();
+            testModel2.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
+            testModel2.Purge();
+            drawSetting.SetModelSpace(testModel2);
+
+
+            // Block Loading
+            if (testModel.Blocks.Count == 1)
             {
-                //bgWorker.ReportProgress(88888);
-                MessageBox.Show("생성 실패", "안내");
-                //DoEvents();
+                if (tempImportBlocks != null)
+                {
+                    testModel.Blocks = tempImportBlocks;
+                    foreach(devDept.Eyeshot.Block eachBlock in testModel.Blocks)
+                    {
+                        if (eachBlock.Name != "RootBlock")
+                        {
+                            devDept.Eyeshot.Block newBlock = (devDept.Eyeshot.Block)eachBlock.Clone();
+                            testModel2.Blocks.Add(newBlock);
+                        }
+                    }
+
+                }
             }
+
+            if (true)
+            {
+                // Logic
+                DrawLogicDBService newLogic = new DrawLogicDBService();
+                DrawLogicModel newLogicData = newLogic.GetLogicCommand(DrawLogicLib.Commons.LogicFile_Type.GA);
+                // 형상 그리는 것은 완료
+                List<string> newAll = new List<string>();
+                newAll.AddRange(newLogicData.UsingList);
+                newAll.AddRange(newLogicData.ReferencePointList);
+                foreach (DrawCommandModel eachCommand in newLogicData.CommandList)
+                    newAll.AddRange(eachCommand.Command);
+
+                //newAll.ToArray()
+                DrawScaleService scaleService = new DrawScaleService();
+                double autoScale = scaleService.GetAIScale(newTankData);
+
+
+                IntergrationService newInterService = new IntergrationService("GA", newTankData, testModel,testModel2);
+                if (newInterService.CreateLogic(autoScale, newAll.ToArray(), out outBuilder))
+                {
+
+                    //bgWorker.ReportProgress(99999);
+                    //MessageBox.Show("생성 완료", "안내");
+                    //DoEvents();
+
+                }
+                else
+                {
+                    //bgWorker.ReportProgress(88888);
+                    MessageBox.Show("생성 실패", "안내");
+                    //DoEvents();
+                }
+            }
+
+
+            if (true)
+            {
+                // Logic
+                DrawLogicDBService newLogic = new DrawLogicDBService();
+                DrawLogicModel newLogicData = newLogic.GetLogicCommand(DrawLogicLib.Commons.LogicFile_Type.NozzleOrientation);
+                // 형상 그리는 것은 완료
+                List<string> newAll = new List<string>();
+                newAll.AddRange(newLogicData.UsingList);
+                newAll.AddRange(newLogicData.ReferencePointList);
+                foreach (DrawCommandModel eachCommand in newLogicData.CommandList)
+                    newAll.AddRange(eachCommand.Command);
+
+                //newAll.ToArray()
+                DrawScaleService scaleService = new DrawScaleService();
+                double autoScale = scaleService.GetAIScale(newTankData);
+
+
+                IntergrationService newInterService = new IntergrationService("ORIENTATION", newTankData, testModel,testModel2);
+                if (newInterService.CreateLogic(autoScale, newAll.ToArray(), out outBuilder))
+                {
+
+                    //bgWorker.ReportProgress(99999);
+                    //MessageBox.Show("생성 완료", "안내");
+                    //DoEvents();
+
+                }
+                else
+                {
+                    //bgWorker.ReportProgress(88888);
+                    MessageBox.Show("생성 실패", "안내");
+                    //DoEvents();
+                }
+            }
+
+            testModel.Entities.Regen();
+            testModel.SetView(viewType.Top);
+
+            // fits the model in the viewport
+            testModel.ZoomFit();
+            testModel.Refresh();
+
+            testModel2.Dispose();
+            testModel2 = null;
+
+            #region ETC 안쓰는 것
             //SampleDraw(newTankData, autoScale);
 
             //    }
@@ -465,6 +589,8 @@ namespace PaperSetting
             //    //MessageBox.Show("오류");
             //}
             //SampleDraw(newTankData);
+
+            #endregion
         }
 
 
@@ -824,10 +950,10 @@ namespace PaperSetting
             else
             {
                 
-                    PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
-                    DrawScaleService scaleService = new DrawScaleService();
-                    double autoScale = scaleService.GetAIScale(selView.newTankData);
-                    SampleDraw(selView.newTankData, autoScale);
+                    //PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+                    //DrawScaleService scaleService = new DrawScaleService();
+                    //double autoScale = scaleService.GetAIScale(selView.newTankData);
+                    //SampleDraw(selView.newTankData, autoScale);
                 testDraw.ZoomFit();
                     
             }
@@ -892,6 +1018,16 @@ namespace PaperSetting
             Console.WriteLine(e.Progress);
 
             
+        }
+
+        private void btnRegen_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            this.testModel.Entities.RegenAllCurved(0.0005);
+            this.testModel.Refresh();
+
+            this.testDraw.Entities.RegenAllCurved(0.0005);
+            this.testDraw.Refresh();
+            //this.testDraw.ZoomFit();
         }
     }
 }

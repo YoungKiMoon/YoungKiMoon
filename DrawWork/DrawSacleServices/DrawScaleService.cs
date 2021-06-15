@@ -82,8 +82,8 @@ namespace DrawWork.DrawSacleServices
                 foreach (ModelScaleModel eachScale in assemblyData.ModelScaleList)
                 {
                     returnString2 = eachScale.HorizontalScale;
-                    double eachValue = valueService.GetDoubleValue(eachScale.HorizontalH);
-                    if (tankHeight < eachValue)
+                    double eachValue = valueService.GetDoubleValue(eachScale.HorizontalID);
+                    if (tankWidth < eachValue)
                         break;
                 }
             }

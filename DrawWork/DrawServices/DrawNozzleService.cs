@@ -293,7 +293,8 @@ namespace DrawWork.DrawServices
             #region Tank Plan : Adjust
             // EFRT : Roof 노즐 제거
             if(SingletonData.TankType==TANK_TYPE.EFRTSingle ||
-               SingletonData.TankType == TANK_TYPE.EFRTDouble)
+               SingletonData.TankType == TANK_TYPE.EFRTDouble ||
+               SingletonData.TankType == TANK_TYPE.IFRT)
             {
                 for (int i = newList.Count - 1; i >= 0; i--)
                 {
@@ -317,7 +318,8 @@ namespace DrawWork.DrawServices
                         }
                         else
                         {
-                            newList.RemoveAt(i);
+                            if(SingletonData.TankType != TANK_TYPE.IFRT)
+                                newList.RemoveAt(i);
                         }
 
                     }
@@ -2305,7 +2307,10 @@ namespace DrawWork.DrawServices
 
                 List<Point3D> currentPoint = new List<Point3D>();
                 currentPoint.Add(GetSumPoint(refPoint, selSizeNominalID/2 + selCleanoutWidth, 0));
-                Point3D newDrawPoint = GetSumPoint(refPoint, selSizeNominalID / 2 + selCleanoutWidth +W/2, 0);
+                double tempSelCleanoutWidth = 0;
+                if(selCleanoutWidth>0)
+                    tempSelCleanoutWidth = selCleanoutWidth + W / 2;
+                Point3D newDrawPoint = GetSumPoint(refPoint, selSizeNominalID / 2 + tempSelCleanoutWidth, 0);
 
                 Line lineBottom = new Line(GetSumPoint(newDrawPoint, 0, 0), GetSumPoint(newDrawPoint, W / 2, 0));
                 customEntity.Add(lineBottom);
@@ -2697,19 +2702,19 @@ namespace DrawWork.DrawServices
                 if (selNozzle.Mixer == checkValue)
                 {
                     string seriesValue = selNozzle.ASMESeries.Replace(" ", "").ToLower().Replace("series", "");
-                    if (seriesValue.Contains("a"))
+                    if (seriesValue.Contains("b"))
                     {
-                        blockName = string.Format("BLOCK-MIXER_A_{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                        blockName = string.Format("BLOCK-MIXER_B_{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
                     }
                     else
                     {
-                        blockName = string.Format("BLOCK-MIXER_B_{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                        blockName = string.Format("BLOCK-MIXER-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
                     }
 
                 }
                 else  if (selNozzle.GaugeHatch == checkValue)
                 {
-                    blockName = string.Format("BLOCK-GQUGE_HATCH-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                    blockName = string.Format("BLOCK-GAUGE_HATCH-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
 
                     // Leader
                     SingletonData.LeaderPublicList.Add(new LeaderPointModel()
@@ -2793,8 +2798,17 @@ namespace DrawWork.DrawServices
 
             // Block Point 매우 중요함
             blockEntity = null;
-            if (drawPoint!=null)
-                blockEntity=blockImportService.Draw_ImportBlock(new CDPoint(drawPoint.X,drawPoint.Y,0), blockName, layerService.LayerBlock, scaleFactor);
+            if (drawPoint != null)
+            {
+                blockEntity = blockImportService.Draw_ImportBlock(new CDPoint(drawPoint.X, drawPoint.Y, 0), blockName, layerService.LayerBlock, scaleFactor);
+                if(blockEntity != null)
+                {
+                    if (selNozzle.Mixer == checkValue)
+                    {
+                        blockEntity.Rotate(Utility.DegToRad(90), Vector3D.AxisZ, new Point3D(drawPoint.X, drawPoint.Y, 0));
+                    }
+                }
+            }
             
             return returnValue;
         }

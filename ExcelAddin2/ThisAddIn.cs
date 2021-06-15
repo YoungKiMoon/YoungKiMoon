@@ -35,7 +35,7 @@ namespace ExcelAddIn
             customProcessTaskPane = this.CustomTaskPanes.Add(customProcessPane, processName);
 
             customProcessTaskPane.DockPosition = Office.MsoCTPDockPosition.msoCTPDockPositionTop;
-            customProcessTaskPane.Height = 103;
+            customProcessTaskPane.Height = 123;
 
             customProcessTaskPane.Visible = true;
 

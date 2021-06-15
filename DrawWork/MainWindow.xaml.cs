@@ -51,6 +51,7 @@ namespace DrawWork
 
         private Drawings tempPaper;
 
+        private BlockKeyedCollection tempImportBlocks;
         public MainWindow()
         {
             InitializeComponent();
@@ -395,7 +396,27 @@ namespace DrawWork
             }
 
 
-            IntergrationService newInterService = new IntergrationService("CRT", newTankData, testModel);
+            tempImportBlocks = testModel.Blocks;
+
+            // Delete
+            testModel.Entities.Clear();
+            testModel.Purge();
+            testModel.Invalidate();
+
+
+            // Create Setting
+            DrawSettingService drawSetting = new DrawSettingService();
+            drawSetting.SetModelSpace(testModel);
+
+            if (testModel.Blocks.Count == 1)
+            {
+                if (tempImportBlocks != null)
+                {
+                    testModel.Blocks = tempImportBlocks;
+                }
+            }
+
+            IntergrationService newInterService = new IntergrationService("CRT", newTankData, testModel,null);
 
             LogicBuilder outBuilder = null;
             if (newInterService.CreateLogic(Convert.ToDouble(autoScale), newComData,out outBuilder))
@@ -406,6 +427,12 @@ namespace DrawWork
             {
                 //MessageBox.Show("오류");
             }
+
+            testModel.Entities.Regen();
+            testModel.SetView(viewType.Top);
+
+            // fits the model in the viewport
+            testModel.ZoomFit();
 
         }
 
@@ -421,6 +448,7 @@ namespace DrawWork
         {
 
             this.testModel.Entities.RegenAllCurved(0.0005);
+            this.testModel.Refresh();
 
         }
     }

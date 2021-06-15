@@ -55,7 +55,7 @@
     <EmbeddedResource Include="BlockFiles\BLOCK_20210527.dwg" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DrawLogicFiles\Orientation.txt" />
+    <EmbeddedResource Include="DrawLogicFiles\Orientation.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

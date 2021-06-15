@@ -99,10 +99,13 @@
     </ApplicationDefinition>
     <Compile Include="Commons\Common.cs" />
     <Compile Include="CustomControl\CustomDataGrid.cs" />
+    <Compile Include="EYEServices\DrawEditingService.cs" />
+    <Compile Include="EYEServices\DrawShapeService.cs" />
     <Compile Include="EYEServices\EYECADService.cs" />
     <Compile Include="EYEServices\ModelDrawService.cs" />
     <Compile Include="EYEServices\PaperBlockService.cs" />
     <Compile Include="EYEServices\PaperDrawService.cs" />
+    <Compile Include="EYEServices\StyleFunctionService.cs" />
     <Compile Include="Models\DockModel.cs" />
     <Compile Include="Models\IBaseModel.cs" />
     <Compile Include="Models\PointModel.cs" />

@@ -165,7 +165,8 @@ namespace DrawWork.DrawServices
                         newPosition = "topright";
                         currentPoint.X += radiusValue * 2;
                     }
-                    eachLeaderList = drawService.Draw_Leader(currentPoint, newLength, newPosition, "", "", newText, newTextSub, singleModel, scaleValue, layerName);
+                    if(SingletonData.TankType==TANK_TYPE.CRT || SingletonData.TankType == TANK_TYPE.DRT || SingletonData.TankType == TANK_TYPE.IFRT)
+                        eachLeaderList = drawService.Draw_Leader(currentPoint, newLength, newPosition, "", "", newText, newTextSub, singleModel, scaleValue, layerName);
 
                 }
                 else if (eachPart == "shell")

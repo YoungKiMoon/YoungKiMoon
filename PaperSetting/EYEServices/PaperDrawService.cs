@@ -33,8 +33,12 @@ namespace PaperSetting.EYEServices
         #region Service
         ValueService valueService;
         DrawScaleService scaleService;
-        LayerStyleService styleService;
+        LayerStyleService layerService;
         TextStyleService textService;
+        DrawEditingService editingService;
+        StyleFunctionService styleService;
+
+        DrawShapeService shapeService;
         #endregion
 
         #region Property
@@ -58,8 +62,11 @@ namespace PaperSetting.EYEServices
         {
             valueService = new ValueService();
             scaleService = new DrawScaleService();
-            styleService = new LayerStyleService();
+            layerService = new LayerStyleService();
             textService = new TextStyleService();
+            shapeService = new DrawShapeService();
+            editingService = new DrawEditingService();
+            styleService = new StyleFunctionService();
 
             singleModel = selModel;
             singleDraw = selDraw;
@@ -78,6 +85,7 @@ namespace PaperSetting.EYEServices
 
             singleDraw.Sheets.Clear();
             singleDraw.Blocks.Remove("newView");
+            singleDraw.Blocks.Remove("newView2");
 
             for (int i = singleDraw.Blocks.Count - 1; i > -1; i--)
             {
@@ -133,15 +141,15 @@ namespace PaperSetting.EYEServices
                 //     CreateNoteBlock(eachModel, newSheet,eachPaper.Basic.No);
 
 
-                //ViewPort 임시로 제외
-                foreach (PaperViewportModel eachView in eachPaper.ViewPorts)
-                {
-                    if (sheetIndex == 0)
-                        CreateVectorViewGA(newSheet, eachView.ViewPort, scaleValue, assemblyData);
-                    //CreateVectorView(newSheet, eachView, eachView.Name);
-                    else
-                        CreateVectorView2(newSheet, eachView, eachView.Name + sheetIndex.ToString() + eachView.No);
-                }
+                //-> 아래 쪽에 적용
+                //foreach (PaperViewportModel eachView in eachPaper.ViewPorts)
+                //{
+                //    if (sheetIndex == 0)
+                //        CreateVectorViewGA(newSheet, eachView.ViewPort, scaleValue, assemblyData);
+                //    //CreateVectorView(newSheet, eachView, eachView.Name);
+                //    else
+                //        CreateVectorView2(newSheet, eachView, eachView.Name + sheetIndex.ToString() + eachView.No);
+                //}
 
 
                 // 아직 미적용
@@ -150,15 +158,32 @@ namespace PaperSetting.EYEServices
                 //
                 if (eachPaper.Basic.Title == "GENERAL ASSEMBLY(1-2)")
                 {
+                    CreateVectorViewGA(newSheet, eachPaper.ViewPorts[0].ViewPort, scaleValue, assemblyData);
+
                     CreateTableBlockGADesign(eachPaper.Tables[0], newSheet, eachPaper.Tables[0].No, assemblyData);
                     CreateTableBlockGA(eachPaper.Tables[1], newSheet, eachPaper.Tables[1].No, assemblyData);
                     CreateTableBlockGA2(eachPaper.Tables[2], newSheet, eachPaper.Tables[2].No, assemblyData);
+                    CreateTableBlockGANozzleProjection(eachPaper.Tables[3], newSheet, eachPaper.Tables[3].No, assemblyData);
                 }
+
                 if (eachPaper.Basic.Title == "GENERAL ASSEMBLY(2-2)")
                 {
                     CreateNoteBlockGA(eachPaper.Notes[0], newSheet, eachPaper.Notes[0].No, assemblyData);
                 }
 
+                if (eachPaper.Basic.Title == "NOZZLE ORIENTATION")
+                {
+                    CreateVectorViewOrientation(newSheet, eachPaper.ViewPorts[0].ViewPort, scaleValue, assemblyData);
+
+                    CreateTableBlockGA(eachPaper.Tables[0], newSheet, eachPaper.Tables[0].No, assemblyData);
+                    CreateTableBlockGA2(eachPaper.Tables[1], newSheet, eachPaper.Tables[1].No, assemblyData);
+                    CreateTableBlockGANozzleProjection(eachPaper.Tables[2], newSheet, eachPaper.Tables[2].No, assemblyData);
+                    CreateTableBlockDirection(eachPaper.Tables[3], newSheet, eachPaper.Tables[3].No, assemblyData);
+                    CreateTableBlockDia(eachPaper.Tables[4], newSheet, eachPaper.Tables[4].No, assemblyData);
+
+
+
+                }
 
                 //singleModel.UpdateBoundingBox();
                 //singleDraw.Invalidate();
@@ -266,8 +291,8 @@ namespace PaperSetting.EYEServices
 
 
                 Camera newnewCamera = new Camera(targetPoint,0,Viewport.GetCameraRotation(viewType.Top),projectionType.Orthographic,0,1);
-                VectorView newnewView = new VectorView(334,
-                                                    363,
+                VectorView newnewView = new VectorView(valueService.GetDoubleValue(selViewPort.LocationX),
+                                                    valueService.GetDoubleValue(selViewPort.LocationY),
                                                     newnewCamera,
                                                     scaleService.GetViewScale(scaleValue),
                                                     "newView",
@@ -281,7 +306,7 @@ namespace PaperSetting.EYEServices
                 newnewView.KeepEntityColor = true;
 
 
-                newnewView.LayerName = styleService.LayerViewport;
+                newnewView.LayerName = layerService.LayerViewport;
 
                 //selSheet.AddViewPlaceHolder(newRaster, singleModel, singleDraw, "GAPlaceHolder");
                 selSheet.AddViewPlaceHolder(newnewView, singleModel, singleDraw, "GAPlaceHolder");
@@ -348,6 +373,81 @@ namespace PaperSetting.EYEServices
 
         }
 
+        public void CreateVectorViewOrientation(Sheet selSheet, ViewPortModel selViewPort, double scaleValue, AssemblyModel assemData)
+        {
+
+            bool first = false;
+            
+            first = true;
+
+
+
+            if (first)
+            {
+
+
+                
+                double extensionAmount = Math.Min(selSheet.Width, selSheet.Height) / 594;
+
+
+
+                Point3D targetPoint = new Point3D();
+                targetPoint.X = SingletonData.OrientationGAViewPortCenter.X + SingletonData.OrientationViewPortSize.X / 2;
+                targetPoint.Y = SingletonData.OrientationGAViewPortCenter.Y + SingletonData.OrientationViewPortSize.Y / 2;
+
+
+                Camera newnewCamera = new Camera(targetPoint, 0, Viewport.GetCameraRotation(viewType.Top), projectionType.Orthographic, 0, 1);
+                VectorView newnewView = new VectorView(valueService.GetDoubleValue(selViewPort.LocationX),
+                                                    valueService.GetDoubleValue(selViewPort.LocationY),
+                                                    newnewCamera,
+                                                    scaleService.GetViewScale(scaleValue),
+                                                    "newView2",
+                                                    valueService.GetDoubleValue(selViewPort.SizeX),
+                                                    valueService.GetDoubleValue(selViewPort.SizeY)
+                                                    );
+
+                newnewView.CenterlinesExtensionAmount = extensionAmount;
+
+
+                newnewView.KeepEntityColor = true;
+
+
+                newnewView.LayerName = layerService.LayerViewport;
+
+                //selSheet.AddViewPlaceHolder(newRaster, singleModel, singleDraw, "GAPlaceHolder");
+                selSheet.AddViewPlaceHolder(newnewView, singleModel, singleDraw, "OrientationPlaceHolder");
+
+                //selCount++;
+                //selSheet.Entities.Clear();
+
+            }
+
+            // Nozzle Title
+            // Title
+            Point3D referencePoint = new Point3D(280, 40);
+            List<Entity> titleList = new List<Entity>();
+            Point3D titleBaseCenter1 = GetSumPoint(referencePoint, 0, 7);
+            Point3D titleBaseCenter2 = GetSumPoint(referencePoint, 0, 8);
+            Point3D titleTextCenter = GetSumPoint(referencePoint, 0, 9);
+
+            double baseLineWidth = 65;
+            Line titleBaseLine1 = new Line(GetSumPoint(titleBaseCenter1, -baseLineWidth / 2, 0), GetSumPoint(titleBaseCenter1, baseLineWidth / 2, 0));
+            styleService.SetLayer(ref titleBaseLine1, layerService.LayerOutLine);
+            Line titleBaseLine2 = new Line(GetSumPoint(titleBaseCenter2, -baseLineWidth / 2, 0), GetSumPoint(titleBaseCenter2, baseLineWidth / 2, 0));
+            styleService.SetLayer(ref titleBaseLine2, layerService.LayerDimension);
+            Text titleText = new Text(titleTextCenter, "NOZZLE PROJECTION", 4);
+            titleText.Alignment = Text.alignmentType.BaselineCenter;
+            titleText.ColorMethod = colorMethodType.byEntity;
+            titleText.Color = Color.Yellow;
+            titleList.AddRange(new Entity[] { titleBaseLine1, titleBaseLine2, titleText });
+
+            selSheet.Entities.AddRange(titleList);
+
+
+            singleDraw.Entities.Regen();
+
+        }
+
         private Sheet CreateSheet(PaperDwgModel selPaper)
         {
             Sheet newSheet = new Sheet(linearUnitsType.Millimeters, selPaper.SheetSize.Width, selPaper.SheetSize.Height, selPaper.Basic.Title.ToString());
@@ -369,7 +469,7 @@ namespace PaperSetting.EYEServices
 
             }
             BlockReference newBr = new BlockReference(0, 0, 0, sheetFrameName, 1, 1, 1, 0);
-            newBr.LayerName = styleService.LayerPaper;
+            newBr.LayerName = layerService.LayerPaper;
             selSheet.Entities.Add(newBr);
         }
         private void CreateTitleBlock(PaperDwgModel selPaper, Sheet selSheet)
@@ -381,7 +481,7 @@ namespace PaperSetting.EYEServices
             newBr.Attributes["TITLE"] = new AttributeReference(selPaper.Basic.Title);
             newBr.Attributes["DWG. NO."] = new AttributeReference(selPaper.Basic.DwgNo);
 
-            newBr.LayerName = styleService.LayerPaper;
+            newBr.LayerName = layerService.LayerPaper;
             // Add : Just One
             selSheet.Entities.Add(newBr);
         }
@@ -390,7 +490,7 @@ namespace PaperSetting.EYEServices
             List<Entity> newList = BuildPaperRevision(selPaper, selectionTitleBlock);
 
             foreach (Entity eachEntity in newList)
-                eachEntity.LayerName = styleService.LayerPaper;
+                eachEntity.LayerName = layerService.LayerPaper;
 
             selSheet.Entities.AddRange(newList);
             //selSheet.Entities.Add(new Line(0, 0, 200, 200) { ColorMethod = colorMethodType.byEntity, Color = Color.Red });
@@ -412,7 +512,7 @@ namespace PaperSetting.EYEServices
         {
             BlockReference newBr = BuildPaperNoteGA(selNote, assemblyData, out Block noteBlock);
 
-            newBr.LayerName = styleService.LayerBlock;
+            newBr.LayerName = layerService.LayerBlock;
 
             noteBlock.Name += bName;
             newBr.BlockName = noteBlock.Name;
@@ -442,9 +542,9 @@ namespace PaperSetting.EYEServices
         {
             BlockReference newBr = BuildPaperTableGA(selTable, assemblyData, out Block tableBlock);
 
-            newBr.LayerName = styleService.LayerBlock;
+            newBr.LayerName = layerService.LayerBlock;
 
-            tableBlock.Name += bName;
+            tableBlock.Name += bName + "_" + singleDraw.Blocks.Count;
             newBr.BlockName = tableBlock.Name;
 
             singleDraw.Blocks.Add(tableBlock);
@@ -454,20 +554,69 @@ namespace PaperSetting.EYEServices
         private void CreateTableBlockGA2(PaperTableModel selTable, Sheet selSheet, string bName, AssemblyModel assemblyData)
         {
             BlockReference newBr = BuildPaperTableGA2(selTable, assemblyData, out Block tableBlock);
-            newBr.LayerName = styleService.LayerBlock;
+            newBr.LayerName = layerService.LayerBlock;
 
-            tableBlock.Name += bName;
+            tableBlock.Name += bName + "_" + singleDraw.Blocks.Count;
             newBr.BlockName = tableBlock.Name;
 
             singleDraw.Blocks.Add(tableBlock);
             selSheet.Entities.Add(newBr);
             oneSheetBlock.Add(newBr.BlockName, selTable.Dock);
         }
+        private void CreateTableBlockGANozzleProjection(PaperTableModel selTable, Sheet selSheet, string bName, AssemblyModel assemblyData)
+        {
+            BlockReference newBr = BuildPaperTableNozzleProjection(selTable, assemblyData, out Block tableBlock);
+            newBr.LayerName = layerService.LayerBlock;
+
+            tableBlock.Name += bName + "_" + singleDraw.Blocks.Count;
+            newBr.BlockName = tableBlock.Name;
+
+            singleDraw.Blocks.Add(tableBlock);
+            selSheet.Entities.Add(newBr);
+            oneSheetBlock.Add(newBr.BlockName, selTable.Dock);
+        }
+        
+        private void CreateTableBlockDirection(PaperTableModel selTable, Sheet selSheet, string bName, AssemblyModel assemblyData)
+        {
+            BlockReference newBr = BuildPaperTableDirection(selTable, assemblyData, out Block tableBlock);
+            newBr.LayerName = layerService.LayerBlock;
+
+            tableBlock.Name += bName + "_" + singleDraw.Blocks.Count;
+            newBr.BlockName = tableBlock.Name;
+            //newBr.InsertionPoint.X = 50;
+            //newBr.InsertionPoint.Y = 594 - 50;
+
+            singleDraw.Blocks.Add(tableBlock);
+            newBr.Regen(new RegenParams(0, singleDraw));
+            newBr.InsertionPoint = new Point3D(50, 594 - 50 - newBr.BoxSize.Y);
+            selSheet.Entities.Add(newBr);
+            oneSheetBlock.Add(newBr.BlockName, selTable.Dock);
+        }
+
+        private void CreateTableBlockDia(PaperTableModel selTable, Sheet selSheet, string bName, AssemblyModel assemblyData)
+        {
+            BlockReference newBr = BuildPaperTableDia(selTable, assemblyData, out Block tableBlock);
+            newBr.LayerName = layerService.LayerBlock;
+
+            tableBlock.Name += bName + "_" + singleDraw.Blocks.Count;
+            newBr.BlockName = tableBlock.Name;
+            //newBr.InsertionPoint.X = 50;
+            //newBr.InsertionPoint.Y = 594 - 50;
+
+            singleDraw.Blocks.Add(tableBlock);
+            //newBr.Regen(new RegenParams(0, singleDraw));
+            //newBr.InsertionPoint = new Point3D(50, 594 - 50 - newBr.BoxSize.Y);
+            selSheet.Entities.Add(newBr);
+            oneSheetBlock.Add(newBr.BlockName, selTable.Dock);
+        }
+
+        
+
         private void CreateTableBlockGADesign(PaperTableModel selTable, Sheet selSheet, string bName, AssemblyModel assemblyData)
         {
             BlockReference newBr = BuildPaperTableGADesign(selTable, assemblyData, out Block tableBlock);
 
-            newBr.LayerName= styleService.LayerBlock;
+            newBr.LayerName= layerService.LayerBlock;
 
             tableBlock.Name += bName;
             newBr.BlockName = tableBlock.Name;
@@ -640,14 +789,14 @@ namespace PaperSetting.EYEServices
             // Line
             foreach (Entity eachEntity in newList)
             {
-                eachEntity.LayerName = styleService.LayerPaper;
+                eachEntity.LayerName = layerService.LayerPaper;
                 eachEntity.LineTypeMethod = colorMethodType.byLayer;
                 eachEntity.ColorMethod = colorMethodType.byLayer;
             }
 
             foreach (Entity eachEntity in newTextList)
             {
-                eachEntity.LayerName = styleService.LayerPaper;
+                eachEntity.LayerName = layerService.LayerPaper;
                 eachEntity.ColorMethod = colorMethodType.byEntity;
                 eachEntity.Color = textYellow;
 
@@ -873,52 +1022,52 @@ namespace PaperSetting.EYEServices
                     defaultCount = assemblyData.NozzleShellInputModel.Count;
 
             // 행
-            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
             currentY += titleRowHeight;
-            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
             currentY += rowHeight;
-            newList.Add(new Line(GetSumPoint(refPoint, titleRowHeight, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+            newList.Add(new Line(GetSumPoint(refPoint, titleRowHeight, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
 
             for (int i = 0; i < defaultCount - 1; i++)
             {
                 currentY += rowHeight;
                 // 마지막 행
-                newList.Add(new Line(GetSumPoint(refPoint, titleRowHeight, currentY), GetSumPoint(refPoint, partOneWidth, currentY)) { Color = Color.White, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
-                newList.Add(new Line(GetSumPoint(refPoint, partTwoWidth, currentY), GetSumPoint(refPoint, partThrWidth, currentY)) { Color = Color.White, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+                newList.Add(new Line(GetSumPoint(refPoint, titleRowHeight, currentY), GetSumPoint(refPoint, partOneWidth, currentY)) { Color = Color.White, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
+                newList.Add(new Line(GetSumPoint(refPoint, partTwoWidth, currentY), GetSumPoint(refPoint, partThrWidth, currentY)) { Color = Color.White, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
             }
             currentY += rowHeight;
             // 마지막
-            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
 
             // 열
             double colCount = 0;
             currentX = 0;
-            newList.Add(new Line(GetSumPoint(refPoint, currentX, 0), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+            newList.Add(new Line(GetSumPoint(refPoint, currentX, 0), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
             foreach (double eachCol in widthList)
             {
                 colCount++;
                 currentX += eachCol;
                 if (colCount == 1)
-                    newList.Add(new Line(GetSumPoint(refPoint, currentX, titleRowHeight), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+                    newList.Add(new Line(GetSumPoint(refPoint, currentX, titleRowHeight), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
                 else if (colCount == 11)
-                    newList.Add(new Line(GetSumPoint(refPoint, currentX, 0), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+                    newList.Add(new Line(GetSumPoint(refPoint, currentX, 0), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
                 else
-                    newList.Add(new Line(GetSumPoint(refPoint, currentX, titleRowHeight), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.White, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+                    newList.Add(new Line(GetSumPoint(refPoint, currentX, titleRowHeight), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.White, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
             }
 
 
             // 마지막 텍스트
-            Text newTitle01 = new Text(GetSumPoint(refPoint, tableWidth / 2, titleRowHeight / 2), "CONNECTION SCHEDULE", fontHeightTitle);
+            Text newTitle01 = new Text(GetSumPoint(refPoint, tableWidth / 2, titleRowHeight / 2), "NOZZLE SCHEDULE", fontHeightTitle);
             newTitle01.Alignment = Text.alignmentType.MiddleCenter;
             newTitle01.StyleName = textService.TextROMANS;
-            newTitle01.LayerName = styleService.LayerDimension;
+            newTitle01.LayerName = layerService.LayerDimension;
             newTitle01.ColorMethod = colorMethodType.byEntity;
             newTitle01.Color = Color.Yellow;
 
             Text newTitle02 = new Text(GetSumPoint(refPoint, titleRowHeight / 2, (currentY + titleRowHeight) / 2), "SHELL NOZZLE", fontHeightTitle);
             newTitle02.Alignment = Text.alignmentType.MiddleCenter;
             newTitle02.StyleName = textService.TextROMANS;
-            newTitle02.LayerName = styleService.LayerDimension;
+            newTitle02.LayerName = layerService.LayerDimension;
             newTitle02.ColorMethod = colorMethodType.byEntity;
             newTitle02.Color = Color.Yellow;
             newTitle02.Rotate(Utility.DegToRad(90), Vector3D.AxisZ, GetSumPoint(refPoint, titleRowHeight / 2, (currentY + titleRowHeight) / 2));
@@ -926,7 +1075,7 @@ namespace PaperSetting.EYEServices
             Text newTitle03 = new Text(GetSumPoint(refPoint, partOneWidth + 10 / 2, (currentY + titleRowHeight + 6) / 2), "-SEE ORIENTATION DWG.-", fontHeight);
             newTitle03.Alignment = Text.alignmentType.MiddleCenter;
             newTitle03.StyleName = textService.TextROMANS;
-            newTitle03.LayerName = styleService.LayerDimension;
+            newTitle03.LayerName = layerService.LayerDimension;
             newTitle03.ColorMethod = colorMethodType.byEntity;
             newTitle03.Color = Color.White;
             newTitle03.WidthFactor = 0.95;
@@ -1108,52 +1257,52 @@ namespace PaperSetting.EYEServices
                     defaultCount = assemblyData.NozzleRoofInputModel.Count;
 
             // 행
-            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
             currentY += titleRowHeight;
-            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
             currentY += rowHeight;
-            newList.Add(new Line(GetSumPoint(refPoint, titleRowHeight, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+            newList.Add(new Line(GetSumPoint(refPoint, titleRowHeight, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
 
             for (int i = 0; i < defaultCount - 1; i++)
             {
                 currentY += rowHeight;
                 // 마지막 행
-                newList.Add(new Line(GetSumPoint(refPoint, titleRowHeight, currentY), GetSumPoint(refPoint, partOneWidth, currentY)) { Color = Color.White, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
-                newList.Add(new Line(GetSumPoint(refPoint, partTwoWidth, currentY), GetSumPoint(refPoint, partThrWidth, currentY)) { Color = Color.White, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+                newList.Add(new Line(GetSumPoint(refPoint, titleRowHeight, currentY), GetSumPoint(refPoint, partOneWidth, currentY)) { Color = Color.White, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
+                newList.Add(new Line(GetSumPoint(refPoint, partTwoWidth, currentY), GetSumPoint(refPoint, partThrWidth, currentY)) { Color = Color.White, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
             }
             currentY += rowHeight;
             // 마지막
-            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
 
             // 열
             double colCount = 0;
             currentX = 0;
-            newList.Add(new Line(GetSumPoint(refPoint, currentX, 0), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+            newList.Add(new Line(GetSumPoint(refPoint, currentX, 0), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
             foreach (double eachCol in widthList)
             {
                 colCount++;
                 currentX += eachCol;
                 if (colCount == 1)
-                    newList.Add(new Line(GetSumPoint(refPoint, currentX, titleRowHeight), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+                    newList.Add(new Line(GetSumPoint(refPoint, currentX, titleRowHeight), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
                 else if (colCount == 11)
-                    newList.Add(new Line(GetSumPoint(refPoint, currentX, 0), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+                    newList.Add(new Line(GetSumPoint(refPoint, currentX, 0), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.Yellow, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
                 else
-                    newList.Add(new Line(GetSumPoint(refPoint, currentX, titleRowHeight), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.White, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = styleService.LayerDimension });
+                    newList.Add(new Line(GetSumPoint(refPoint, currentX, titleRowHeight), GetSumPoint(refPoint, currentX, currentY)) { Color = Color.White, ColorMethod = colorMethodType.byEntity, LineTypeMethod = colorMethodType.byLayer, LayerName = layerService.LayerDimension });
             }
 
 
             // 마지막 텍스트
-            Text newTitle01 = new Text(GetSumPoint(refPoint, tableWidth / 2, titleRowHeight / 2), "CONNECTION SCHEDULE", fontHeightTitle);
+            Text newTitle01 = new Text(GetSumPoint(refPoint, tableWidth / 2, titleRowHeight / 2), "NOZZLE SCHEDULE", fontHeightTitle);
             newTitle01.Alignment = Text.alignmentType.MiddleCenter;
             newTitle01.StyleName = textService.TextROMANS;
-            newTitle01.LayerName = styleService.LayerDimension;
+            newTitle01.LayerName = layerService.LayerDimension;
             newTitle01.ColorMethod = colorMethodType.byEntity;
             newTitle01.Color = Color.Yellow;
 
             Text newTitle02 = new Text(GetSumPoint(refPoint, titleRowHeight / 2, (currentY + titleRowHeight) / 2), "ROOF NOZZLE", fontHeightTitle);
             newTitle02.Alignment = Text.alignmentType.MiddleCenter;
             newTitle02.StyleName = textService.TextROMANS;
-            newTitle02.LayerName = styleService.LayerDimension;
+            newTitle02.LayerName = layerService.LayerDimension;
             newTitle02.ColorMethod = colorMethodType.byEntity;
             newTitle02.Color = Color.Yellow;
             newTitle02.Rotate(Utility.DegToRad(90), Vector3D.AxisZ, GetSumPoint(refPoint, titleRowHeight / 2, (currentY + titleRowHeight) / 2));
@@ -1161,7 +1310,7 @@ namespace PaperSetting.EYEServices
             Text newTitle03 = new Text(GetSumPoint(refPoint, partOneWidth + 10 / 2, (currentY + titleRowHeight + 6) / 2), "-SEE ORIENTATION DWG.-", fontHeight);
             newTitle03.Alignment = Text.alignmentType.MiddleCenter;
             newTitle03.StyleName = textService.TextROMANS;
-            newTitle03.LayerName = styleService.LayerDimension;
+            newTitle03.LayerName = layerService.LayerDimension;
             newTitle03.ColorMethod = colorMethodType.byEntity;
             newTitle03.Color = Color.White;
             newTitle03.WidthFactor = 0.95;
@@ -1297,6 +1446,581 @@ namespace PaperSetting.EYEServices
                     currentY += rowHeight;
                 }
             }
+
+
+            BlockReference newBr = new BlockReference(selTable.Location.X, selTable.Location.Y, 0, "PAPER_TABLE" + selTable.No, 1, 1, 1, 0);
+
+            Block newBl = new Block("PAPER_TABLE_" + selTable.No);
+            newBl.Entities.AddRange(newList);
+            selBlock = newBl;
+            return newBr;
+
+        }
+
+
+        private BlockReference BuildPaperTableNozzleProjection (PaperTableModel selTable, AssemblyModel assemblyData, out Block selBlock)
+        {
+
+
+
+            List<Entity> newList = new List<Entity>();
+            // Default
+
+            Point3D refPoint = new Point3D(0, 0);
+
+            List<Point3D> outPointList = new List<Point3D>();
+
+            TANK_TYPE refTankType = SingletonData.TankType;
+            // Left : Lower
+
+            // Outline
+            double boxHeight = 99;
+            double boxWidth = 99;
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+
+            newList.AddRange(shapeService.GetRectangle(out outPointList, GetSumPoint(referencePoint, 0, 0), boxWidth, boxHeight, 0, 0, 3));
+
+            // Tank : Basic
+            double tankID = 52;
+            double tankRadius = tankID / 2;
+            double tankHeight = 48;
+
+            double tankBottomWidth = 60;
+            double tankBottomThickness = 1;
+            double tankBottomOutWidth = (tankBottomWidth - tankID) / 2;
+
+            double tankRoofWidth = 58;
+            double tankRoofHeight = 0;
+            double tankRoofOutWidth = (tankRoofWidth - tankID) / 2;
+
+
+            // TankRoof Height
+            switch (refTankType)
+            {
+                case TANK_TYPE.CRT:
+                case TANK_TYPE.DRT:
+                case TANK_TYPE.IFRT:
+                    tankRoofHeight = 4;
+                    break;
+                case TANK_TYPE.EFRTSingle:
+                case TANK_TYPE.EFRTDouble:
+                    tankRoofHeight = 0;
+                    break;
+            }
+
+            Point3D tankPoint = GetSumPoint(referencePoint, 15.6, 24.1);
+            Point3D tankBottomPoint = GetSumPoint(tankPoint, -tankBottomOutWidth, 0);
+            Point3D tankRoofPoint = GetSumPoint(tankPoint, 0, tankHeight);
+            Point3D tankRoofCenterTopPoint = GetSumPoint(tankRoofPoint, tankRadius, tankRoofHeight);
+
+            // Tank : Shell
+            newList.AddRange(shapeService.GetRectangle(out outPointList, GetSumPoint(tankPoint, 0, 0), tankID, tankHeight, 0, 0, 3, new bool[] { false, true, false, true }));
+
+            // Tank : Bottom
+            newList.AddRange(shapeService.GetRectangle(out outPointList, GetSumPoint(tankBottomPoint, 0, 0), tankBottomWidth, tankBottomThickness, 0, 0, 0));
+
+            // Tank : Roof : Lower
+            newList.Add(new Line(GetSumPoint(tankRoofPoint, -tankRoofOutWidth, 0), GetSumPoint(tankRoofPoint, tankID + tankRoofOutWidth, 0)));
+            Line rightRoof = null;
+            Arc domeRoof = null;
+
+            // TankRoof Height
+            switch (refTankType)
+            {
+                case TANK_TYPE.CRT:
+                case TANK_TYPE.IFRT:
+                    newList.Add(new Line(GetSumPoint(tankRoofPoint, -tankRoofOutWidth, 0), GetSumPoint(tankRoofCenterTopPoint, 0, 0)));
+                    rightRoof = new Line(GetSumPoint(tankRoofPoint, tankID + tankRoofOutWidth, 0), GetSumPoint(tankRoofCenterTopPoint, 0, 0));
+                    newList.Add(rightRoof);
+                    break;
+                case TANK_TYPE.DRT:
+                    domeRoof = new Arc(Plane.XY, GetSumPoint(tankRoofPoint, tankID, 0), GetSumPoint(tankRoofCenterTopPoint, 0, 0), GetSumPoint(tankRoofPoint, 0, 0), false);
+                    newList.Add(domeRoof);
+                    break;
+            }
+
+
+            // Nozzle
+            double roofNozzleRadius = 20;
+            double shellNozzleElevation = 10;
+            double nozzleHeight = 6;
+            double flangeOD = 3;
+            double flangeODHalf = flangeOD / 2;
+            Point3D roofNozzlePoint = GetSumPoint(tankRoofPoint, tankRadius + roofNozzleRadius, 0);
+            Line roofNozzlePipe = new Line(GetSumPoint(roofNozzlePoint, 0, 0), GetSumPoint(roofNozzlePoint, 0, nozzleHeight));
+            Line roofNozzleFlange = new Line(GetSumPoint(roofNozzlePoint, -flangeODHalf, nozzleHeight), GetSumPoint(roofNozzlePoint, flangeODHalf, nozzleHeight));
+            newList.Add(roofNozzlePipe);
+            newList.Add(roofNozzleFlange);
+
+            Point3D[] nozzlePipeInter = null;
+
+            switch (refTankType)
+            {
+                case TANK_TYPE.CRT:
+                case TANK_TYPE.IFRT:
+                    nozzlePipeInter = roofNozzlePipe.IntersectWith(rightRoof);
+                    if (nozzlePipeInter.Length > 0)
+                        roofNozzlePipe.TrimBy(nozzlePipeInter[0], true);
+                    break;
+                case TANK_TYPE.DRT:
+                    nozzlePipeInter = roofNozzlePipe.IntersectWith(domeRoof);
+                    if (nozzlePipeInter.Length > 0)
+                        roofNozzlePipe.TrimBy(nozzlePipeInter[0], true);
+                    break;
+            }
+
+
+
+            Point3D shellNozzlePoint = GetSumPoint(tankPoint, tankID, shellNozzleElevation);
+            Line shellNozzlePipe = new Line(GetSumPoint(shellNozzlePoint, 0, 0), GetSumPoint(shellNozzlePoint, nozzleHeight, 0));
+            Line shellNozzleFlange = new Line(GetSumPoint(shellNozzlePoint, nozzleHeight, flangeODHalf), GetSumPoint(shellNozzlePoint, nozzleHeight, -flangeODHalf));
+            newList.Add(shellNozzlePipe);
+            newList.Add(shellNozzleFlange);
+
+
+            // Pontoon
+            double pontoonWidth = 10;
+            double pontoonMinHeight = 2.5;
+            double pontoonElevation = 23;
+            double pontoonShellWidth = 1.5;
+            double pontoonSlopeHeight = 1;
+            double pontoonSingleFlatHeight = 1;
+
+            Point3D pontoonLeftPoint = GetSumPoint(tankPoint, pontoonShellWidth, pontoonElevation);
+            Point3D pontoonRightPoint = GetSumPoint(tankPoint, tankID - pontoonShellWidth, pontoonElevation);
+
+
+            double ponLeftNozzleRadius = 10;
+            double ponRightNozzleRadius = 20;
+            Line leftPonNozzleFlangeAll = null;
+            Line leftPonNozzlePipeAll = null; ;
+            Line rightPonNozzleFlangeAll = null;
+            Line rightPonNozzlePipeAll = null;
+
+            Point3D deckPoint = null;
+            Point3D pontoonPoint = null;
+
+            switch (refTankType)
+            {
+                case TANK_TYPE.IFRT:
+                case TANK_TYPE.EFRTSingle:
+                    if (true)
+                    {
+                        Line leftPon1 = new Line(GetSumPoint(pontoonLeftPoint, 0, 0), GetSumPoint(pontoonLeftPoint, pontoonWidth, 0));
+                        Line leftPon2 = new Line(GetSumPoint(pontoonLeftPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonLeftPoint, pontoonWidth, pontoonMinHeight));
+                        Line leftPon3 = new Line(GetSumPoint(pontoonLeftPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonLeftPoint, 0, 0));
+                        Line leftPon4 = new Line(GetSumPoint(pontoonLeftPoint, pontoonWidth, 0), GetSumPoint(pontoonLeftPoint, pontoonWidth, pontoonMinHeight));
+
+                        Line rightPon1 = new Line(GetSumPoint(pontoonRightPoint, 0, 0), GetSumPoint(pontoonRightPoint, -pontoonWidth, 0));
+                        Line rightPon2 = new Line(GetSumPoint(pontoonRightPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonRightPoint, -pontoonWidth, pontoonMinHeight));
+                        Line rightPon3 = new Line(GetSumPoint(pontoonRightPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonRightPoint, 0, 0));
+                        Line rightPon4 = new Line(GetSumPoint(pontoonRightPoint, -pontoonWidth, 0), GetSumPoint(pontoonRightPoint, -pontoonWidth, pontoonMinHeight));
+
+                        Line ponFlat = new Line(GetSumPoint(pontoonLeftPoint, pontoonWidth, pontoonSingleFlatHeight), GetSumPoint(pontoonRightPoint, -pontoonWidth, pontoonSingleFlatHeight));
+                        newList.AddRange(new Entity[] { leftPon1, leftPon2, leftPon3, leftPon4, rightPon1, rightPon2, rightPon3, rightPon4, ponFlat });
+
+                        // Leader Point
+                        deckPoint = GetSumPoint(ponFlat.MidPoint, 2, 0);
+                        pontoonPoint = GetSumPoint(leftPon1.StartPoint, 2, 0);
+
+                        // Left Nozzle
+                        Point3D ponLeftNozzlePoint = GetSumPoint(pontoonLeftPoint, -pontoonShellWidth + tankRadius - ponLeftNozzleRadius, pontoonSingleFlatHeight);
+                        leftPonNozzlePipeAll = new Line(GetSumPoint(ponLeftNozzlePoint, 0, 0), GetSumPoint(ponLeftNozzlePoint, 0, nozzleHeight));
+                        leftPonNozzleFlangeAll = new Line(GetSumPoint(ponLeftNozzlePoint, -flangeODHalf, nozzleHeight), GetSumPoint(ponLeftNozzlePoint, flangeODHalf, nozzleHeight));
+                        newList.Add(leftPonNozzlePipeAll);
+                        newList.Add(leftPonNozzleFlangeAll);
+
+
+                        // Right Nozzle
+                        Point3D ponRightNozzlePointTemp = GetSumPoint(pontoonLeftPoint, -pontoonShellWidth + tankRadius + ponRightNozzleRadius, pontoonSingleFlatHeight);
+                        Point3D ponRightNozzlePoint = null;
+                        Line vRightNozzleLine = new Line(GetSumPoint(ponRightNozzlePointTemp, 0, 0), GetSumPoint(ponRightNozzlePointTemp, 0, 100));
+                        Point3D[] ponRightInter = vRightNozzleLine.IntersectWith(rightPon2);
+                        if (ponRightInter.Length > 0)
+                        {
+                            ponRightNozzlePoint = ponRightInter[0];
+                            double nozzleHeightAdj = nozzleHeight - 1;
+                            rightPonNozzlePipeAll = new Line(GetSumPoint(ponRightNozzlePoint, 0, 0), GetSumPoint(ponRightNozzlePoint, 0, nozzleHeightAdj));
+                            rightPonNozzleFlangeAll = new Line(GetSumPoint(ponRightNozzlePoint, -flangeODHalf, nozzleHeightAdj), GetSumPoint(ponRightNozzlePoint, flangeODHalf, nozzleHeightAdj));
+                            newList.Add(rightPonNozzlePipeAll);
+                            newList.Add(rightPonNozzleFlangeAll);
+                        }
+
+                    }
+                    break;
+                case TANK_TYPE.EFRTDouble:
+                    if (true)
+                    {
+                        Line leftPon1 = new Line(GetSumPoint(pontoonLeftPoint, 0, 0), GetSumPoint(pontoonLeftPoint, pontoonWidth, 0));
+                        Line leftPon2 = new Line(GetSumPoint(pontoonLeftPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonLeftPoint, pontoonWidth, pontoonMinHeight));
+                        Line leftPon3 = new Line(GetSumPoint(pontoonLeftPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonLeftPoint, 0, 0));
+                        Line leftPon4 = new Line(GetSumPoint(pontoonLeftPoint, pontoonWidth, 0), GetSumPoint(pontoonLeftPoint, pontoonWidth, pontoonMinHeight));
+
+                        Line rightPon1 = new Line(GetSumPoint(pontoonRightPoint, 0, 0), GetSumPoint(pontoonRightPoint, -pontoonWidth, 0));
+                        Line rightPon2 = new Line(GetSumPoint(pontoonRightPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonRightPoint, -pontoonWidth, pontoonMinHeight));
+                        Line rightPon3 = new Line(GetSumPoint(pontoonRightPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonRightPoint, 0, 0));
+                        Line rightPon4 = new Line(GetSumPoint(pontoonRightPoint, -pontoonWidth, 0), GetSumPoint(pontoonRightPoint, -pontoonWidth, pontoonMinHeight));
+
+                        Line ponFlat1 = new Line(GetSumPoint(pontoonLeftPoint, pontoonWidth, pontoonMinHeight), GetSumPoint(pontoonRightPoint, -pontoonWidth, pontoonMinHeight));
+                        Line ponFlat2 = new Line(GetSumPoint(pontoonLeftPoint, pontoonWidth, 0), GetSumPoint(pontoonRightPoint, -pontoonWidth, 0));
+                        newList.AddRange(new Entity[] { leftPon1, leftPon2, leftPon3, leftPon4, rightPon1, rightPon2, rightPon3, rightPon4, ponFlat1, ponFlat2 });
+
+                        // Leader Point
+                        deckPoint = GetSumPoint(ponFlat1.MidPoint, 2, 0);
+                        pontoonPoint = GetSumPoint(leftPon1.StartPoint, 2, 0);
+
+                        // Left Nozzle
+                        Point3D ponLeftNozzlePoint = GetSumPoint(pontoonLeftPoint, -pontoonShellWidth + tankRadius - ponLeftNozzleRadius, pontoonMinHeight);
+                        leftPonNozzlePipeAll = new Line(GetSumPoint(ponLeftNozzlePoint, 0, 0), GetSumPoint(ponLeftNozzlePoint, 0, nozzleHeight));
+                        leftPonNozzleFlangeAll = new Line(GetSumPoint(ponLeftNozzlePoint, -flangeODHalf, nozzleHeight), GetSumPoint(ponLeftNozzlePoint, flangeODHalf, nozzleHeight));
+                        newList.Add(leftPonNozzlePipeAll);
+                        newList.Add(leftPonNozzleFlangeAll);
+
+                        // Right Nozzle
+                        Point3D ponRightNozzlePointTemp = GetSumPoint(pontoonLeftPoint, -pontoonShellWidth + tankRadius + ponRightNozzleRadius, pontoonSingleFlatHeight);
+                        Point3D ponRightNozzlePoint = null;
+                        Line vRightNozzleLine = new Line(GetSumPoint(ponRightNozzlePointTemp, 0, 0), GetSumPoint(ponRightNozzlePointTemp, 0, 100));
+                        Point3D[] ponRightInter = vRightNozzleLine.IntersectWith(rightPon2);
+                        if (ponRightInter.Length > 0)
+                        {
+                            ponRightNozzlePoint = ponRightInter[0];
+                            double nozzleHeightAdj = nozzleHeight - 1;
+                            rightPonNozzlePipeAll = new Line(GetSumPoint(ponRightNozzlePoint, 0, 0), GetSumPoint(ponRightNozzlePoint, 0, nozzleHeightAdj));
+                            rightPonNozzleFlangeAll = new Line(GetSumPoint(ponRightNozzlePoint, -flangeODHalf, nozzleHeightAdj), GetSumPoint(ponRightNozzlePoint, flangeODHalf, nozzleHeightAdj));
+                            newList.Add(rightPonNozzlePipeAll);
+                            newList.Add(rightPonNozzleFlangeAll);
+                        }
+                    }
+                    break;
+            }
+
+
+            // Center Line
+            double exLength = 2;
+            List<Entity> centerLineList = editingService.GetCenterLine(GetSumPoint(tankPoint, tankRadius, -tankBottomThickness), GetSumPoint(tankRoofCenterTopPoint, 0, 0), exLength, 1);
+            styleService.SetLayerListEntity(ref centerLineList, layerService.LayerCenterLine);
+
+
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+            // Dimension
+            double dimTextHeight = 2.5;
+            double dimCenterLineHeight = 12;
+            double dimCenterLineHeight2 = 12;
+            Plane planeLeft = new Plane(Point3D.Origin, Vector3D.AxisY, -1 * Vector3D.AxisX); // plane.XY, vertical writing;
+
+            // Dimension : Roof : R
+            if (refTankType == TANK_TYPE.IFRT || refTankType == TANK_TYPE.EFRTSingle || refTankType == TANK_TYPE.EFRTDouble)
+                dimCenterLineHeight2 = 6;
+
+
+            List<LinearDim> dimList = new List<LinearDim>();
+            List<Entity> leaderList = new List<Entity>();
+
+
+            Point3D dimLeft1 = ((ICurve)centerLineList[2]).EndPoint;
+            Point3D dimRight1 = roofNozzleFlange.MidPoint;
+            Point3D dimMid1 = GetSumPoint(dimLeft1, (dimRight1.X - dimLeft1.X) / 2, dimCenterLineHeight);
+            dimList.Add(new LinearDim(Plane.XY, dimLeft1, dimRight1, dimMid1, dimTextHeight) { TextOverride = "\"R\"" });
+
+            // Dimension : Shell : R
+            Point3D dimLeft2 = GetSumPoint(tankPoint, tankRadius, shellNozzleElevation + flangeODHalf);
+            Point3D dimRight2 = GetSumPoint(shellNozzlePoint, nozzleHeight, flangeODHalf);
+            Point3D dimMid2 = GetSumPoint(dimLeft2, (dimRight2.X - dimLeft2.X) / 2, dimCenterLineHeight2);
+            dimList.Add(new LinearDim(Plane.XY, dimLeft2, dimRight2, dimMid2, dimTextHeight) { TextOverride = "\"R\"", ShowExtLine1 = false });
+
+            // Dimension : Roof : H
+            Point3D dimLeft3 = GetSumPoint(roofNozzleFlange.EndPoint, 0, 0);
+            Point3D dimRight3 = GetSumPoint(tankPoint, tankID + tankBottomOutWidth, -tankBottomThickness);
+            Point3D dimMid3 = GetSumPoint(dimRight3, dimCenterLineHeight * 1.4, (dimLeft3.Y - dimRight3.Y) / 2);
+            dimList.Add(new LinearDim(planeLeft, dimLeft3, dimRight3, dimMid3, dimTextHeight) { TextOverride = "\"H\"" });
+
+            // Dimension : Shell : H
+            Point3D dimLeft4 = GetSumPoint(shellNozzleFlange.MidPoint, 0, 0);
+            Point3D dimRight4 = GetSumPoint(tankPoint, tankID + tankBottomOutWidth, -tankBottomThickness);
+            Point3D dimMid4 = GetSumPoint(dimLeft4, dimCenterLineHeight * 0.6, (dimRight4.Y - dimLeft4.Y) / 2);
+            dimList.Add(new LinearDim(planeLeft, dimLeft4, dimRight4, dimMid4, dimTextHeight) { TextOverride = "\"H\"", ArrowsLocation = elementPositionType.Inside, ShowExtLine1 = false });
+
+            if (refTankType == TANK_TYPE.IFRT || refTankType == TANK_TYPE.EFRTSingle || refTankType == TANK_TYPE.EFRTDouble)
+            {
+                dimCenterLineHeight = 10;
+                if (refTankType == TANK_TYPE.EFRTDouble)
+                    dimCenterLineHeight = dimCenterLineHeight - (2.5 / 2);
+
+                Point3D dimPonLeft1 = leftPonNozzleFlangeAll.MidPoint;
+                Point3D dimPonRight1 = GetSumPoint(dimPonLeft1, ponLeftNozzleRadius, 0);
+                Point3D dimPonMid1 = GetSumPoint(dimPonLeft1, (dimPonRight1.X - dimPonLeft1.X) / 2, dimCenterLineHeight);
+                dimList.Add(new LinearDim(Plane.XY, dimPonLeft1, dimPonRight1, dimPonMid1, dimTextHeight) { TextOverride = "\"R\"", ArrowsLocation = elementPositionType.Inside, ShowExtLine2 = false });
+
+                Point3D dimPonRight2 = rightPonNozzleFlangeAll.MidPoint;
+                Point3D dimPonLeft2 = GetSumPoint(dimPonRight2, -ponRightNozzleRadius, 0);
+                Point3D dimPonMid2 = new Point3D(GetSumPoint(dimPonLeft2, (dimPonRight2.X - dimPonLeft2.X) / 2, dimCenterLineHeight).X, dimPonMid1.Y);
+                dimList.Add(new LinearDim(Plane.XY, dimPonLeft2, dimPonRight2, dimPonMid2, dimTextHeight) { TextOverride = "\"R\"", ShowExtLine1 = false });
+
+                // Dimension : Shell : H
+                Point3D dimPonLeft4 = GetSumPoint(leftPonNozzleFlangeAll.EndPoint, 0, 0);
+                Point3D dimPonRight4 = GetSumPoint(leftPonNozzlePipeAll.StartPoint, 0, 0);
+                Point3D dimPonMid4 = GetSumPoint(dimPonLeft4, dimCenterLineHeight * 0.4, (dimPonRight4.Y - dimPonLeft4.Y) / 2);
+                dimList.Add(new LinearDim(planeLeft, dimPonLeft4, dimPonRight4, dimPonMid4, dimTextHeight) { TextOverride = "\"H\"", ArrowsLocation = elementPositionType.Outside, TextLocation = elementPositionType.Outside, ShowExtLine1 = false });
+
+                // Dimension : Shell : H
+                Point3D dimPonLeft5 = GetSumPoint(rightPonNozzleFlangeAll.EndPoint, 0, 0);
+                Point3D dimPonRight5 = GetSumPoint(rightPonNozzlePipeAll.StartPoint, 0, 0);
+                Point3D dimPonMid5 = new Point3D(dimMid4.X, GetSumPoint(dimPonLeft5, dimCenterLineHeight * 0.4, 0).Y);
+                dimList.Add(new LinearDim(planeLeft, dimPonLeft5, dimPonRight5, dimPonMid5, dimTextHeight) { TextOverride = "\"H\"", ArrowsLocation = elementPositionType.Outside, TextLocation = elementPositionType.Outside });
+
+
+
+                Point3D deckTextPoint = GetSumPoint(deckPoint, 4, 8);
+                Leader deckLeader = new Leader(Plane.XY, new Point3D[] { deckPoint, deckTextPoint, GetSumPoint(deckTextPoint, 11, 0) });
+                Text deckText = new Text(GetSumPoint(deckTextPoint, 1, 0.5), "DECK", 2.5);
+                deckText.Alignment = Text.alignmentType.BaselineLeft;
+                leaderList.Add(deckLeader);
+
+                Point3D ponTextPoint = GetSumPoint(pontoonPoint, 3, -14);
+                Leader ponLeader = new Leader(Plane.XY, new Point3D[] { pontoonPoint, ponTextPoint, GetSumPoint(ponTextPoint, 18.5, 0) });
+                Text ponText = new Text(GetSumPoint(ponTextPoint, 1, 0.5), "PONTOON", 2.5);
+                ponText.Alignment = Text.alignmentType.BaselineLeft;
+                leaderList.Add(ponLeader);
+
+                styleService.SetLayerListEntity(ref leaderList, layerService.LayerDimension);
+                styleService.SetLayer(ref deckText, layerService.LayerDimension);
+                styleService.SetLayer(ref ponText, layerService.LayerDimension);
+                leaderList.Add(deckText);
+                leaderList.Add(ponText);
+
+            }
+
+            foreach (LinearDim eachDim in dimList)
+            {
+                eachDim.LayerName = layerService.LayerDimension;
+                eachDim.LineTypeMethod = colorMethodType.byLayer;
+                eachDim.ColorMethod = colorMethodType.byLayer;
+            }
+
+            // Text
+            List<Entity> textList = new List<Entity>();
+            double textHeight = 2.5;
+            Point3D textCenter = GetSumPoint(tankPoint, tankID + tankBottomOutWidth + 12 * 1.4 / 2, tankBottomThickness);
+            Text newUnderText1 = new Text(GetSumPoint(textCenter, 0, -textHeight * 2 - 0.5), "UNDER", textHeight);
+            newUnderText1.Alignment = Text.alignmentType.BottomCenter;
+            Text newUnderText2 = new Text(GetSumPoint(textCenter, 0, -textHeight * 3 - 1), "OF BTM.", textHeight);
+            newUnderText2.Alignment = Text.alignmentType.BottomCenter;
+            textList.Add(newUnderText1);
+            textList.Add(newUnderText2);
+
+            styleService.SetLayerListEntity(ref textList, layerService.LayerDimension);
+
+            // Title
+            List<Entity> titleList = new List<Entity>();
+            Point3D titleBaseCenter1 = GetSumPoint(referencePoint, boxWidth / 2, 7);
+            Point3D titleBaseCenter2 = GetSumPoint(referencePoint, boxWidth / 2, 8);
+            Point3D titleTextCenter = GetSumPoint(referencePoint, boxWidth / 2, 9);
+
+            double baseLineWidth = 65;
+            Line titleBaseLine1 = new Line(GetSumPoint(titleBaseCenter1, -baseLineWidth / 2, 0), GetSumPoint(titleBaseCenter1, baseLineWidth / 2, 0));
+            styleService.SetLayer(ref titleBaseLine1, layerService.LayerOutLine);
+            Line titleBaseLine2 = new Line(GetSumPoint(titleBaseCenter2, -baseLineWidth / 2, 0), GetSumPoint(titleBaseCenter2, baseLineWidth / 2, 0));
+            styleService.SetLayer(ref titleBaseLine2, layerService.LayerDimension);
+            Text titleText = new Text(titleTextCenter, "NOZZLE PROJECTION", 4);
+            titleText.Alignment = Text.alignmentType.BaselineCenter;
+            titleText.ColorMethod = colorMethodType.byEntity;
+            titleText.Color = Color.Yellow;
+            titleList.AddRange(new Entity[] { titleBaseLine1, titleBaseLine2, titleText });
+
+            newList.AddRange(dimList);
+            newList.AddRange(centerLineList);
+            newList.AddRange(textList);
+            newList.AddRange(leaderList);
+            newList.AddRange(titleList);
+
+
+
+            BlockReference newBr = new BlockReference(selTable.Location.X, selTable.Location.Y, 0, "PAPER_TABLE" + selTable.No, 1, 1, 1, 0);
+
+            Block newBl = new Block("PAPER_TABLE_" + selTable.No);
+            newBl.Entities.AddRange(newList);
+            selBlock = newBl;
+            return newBr;
+
+        }
+
+        private BlockReference BuildPaperTableDirection(PaperTableModel selTable, AssemblyModel assemblyData, out Block selBlock)
+        {
+
+
+
+            List<Entity> newList = new List<Entity>();
+            // Default
+            Point3D referencePoint = new Point3D(0, 0);
+            //List<Entity> tempList = CreateNozzleProjection(referencePoint);
+
+            double circleBox = 40;
+            double circleOD = 22.5;
+            double circleRadius = circleOD / 2;
+
+            Point3D circleCenterPoint = GetSumPoint(referencePoint, circleBox / 2, circleBox / 2);
+            Circle centerCircle = new Circle(circleCenterPoint, circleRadius);
+            newList.Add(centerCircle);
+
+
+            Point3D circleCenterTopPoint = GetSumPoint(circleCenterPoint, 0, circleRadius);
+            Line centerLine = new Line(GetSumPoint(circleCenterPoint, 0, circleRadius), GetSumPoint(circleCenterPoint, 0, -circleRadius));
+            Line leftLine1 = (Line)centerLine.Clone();
+            leftLine1.Rotate(Utility.DegToRad(15), Vector3D.AxisZ, circleCenterTopPoint);
+            Line rightLine1 = (Line)centerLine.Clone();
+            rightLine1.Rotate(-Utility.DegToRad(15), Vector3D.AxisZ, circleCenterTopPoint);
+
+            Point3D leftLineIntetr = editingService.GetIntersectWidth(leftLine1, centerCircle, 1);
+            Point3D rightLineIntetr = editingService.GetIntersectWidth(rightLine1, centerCircle, 1);
+
+            Line centerSlope = new Line(GetSumPoint(circleCenterTopPoint, 0, 0), GetSumPoint(leftLineIntetr, 0, 0));
+            centerSlope.Rotate(Utility.DegToRad(30), Vector3D.AxisZ, leftLineIntetr);
+            Point3D centerLineIntetr = editingService.GetIntersectWidth(centerSlope, centerLine, 0);
+
+            Line dLine1 = new Line(GetSumPoint(circleCenterTopPoint, 0, 0), GetSumPoint(leftLineIntetr, 0, 0));
+            Line dLine2 = new Line(GetSumPoint(circleCenterTopPoint, 0, 0), GetSumPoint(rightLineIntetr, 0, 0));
+            Line dLine3 = new Line(GetSumPoint(centerLineIntetr, 0, 0), GetSumPoint(leftLineIntetr, 0, 0));
+            Line dLine4 = new Line(GetSumPoint(centerLineIntetr, 0, 0), GetSumPoint(rightLineIntetr, 0, 0));
+            Line dLine5 = new Line(GetSumPoint(circleCenterTopPoint, 0, 0), GetSumPoint(centerLineIntetr, 0, 0));
+
+            newList.AddRange(new Line[] { dLine1, dLine2, dLine3, dLine4 });
+
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerDimension);
+
+
+
+            // Center Line
+            double exLength = 2;
+            List<Entity> centerLineList = new List<Entity>();
+            centerLineList.AddRange(editingService.GetCenterLine(GetSumPoint(circleCenterPoint, 0, circleRadius), GetSumPoint(circleCenterPoint, 0, -circleRadius), exLength, 1));
+            centerLineList.AddRange(editingService.GetCenterLine(GetSumPoint(circleCenterPoint, circleRadius, 0), GetSumPoint(circleCenterPoint, -circleRadius, 0), exLength, 1));
+            styleService.SetLayerListEntity(ref centerLineList, layerService.LayerCenterLine);
+            newList.AddRange(centerLineList);
+
+            // hatch
+            Triangle cc = new Triangle(circleCenterTopPoint, leftLineIntetr, centerLineIntetr);
+
+            //HatchRegion hatchDirection = new HatchRegion((ICurve)cc );
+            List<ICurve> hatchLine = new List<ICurve>();
+            hatchLine.AddRange(new Line[] { dLine1, dLine2, dLine5 });
+            HatchRegion hatchDirection = new HatchRegion(hatchLine, Plane.XY);
+            hatchDirection.Color = Color.White;
+            hatchDirection.HatchName = "aa";
+
+            //CustomRenderedHatch hhh = new CustomRenderedHatch(hatchDirection);
+            newList.Add(hatchDirection);
+            // Text
+
+            double extLength = 4;
+            double textHeight = 2.5;
+            List<Entity> textList = new List<Entity>();
+            Text Text01 = new Text(GetSumPoint(circleCenterPoint, 0, circleRadius + extLength), "0˚", textHeight);
+            Text Text02 = new Text(GetSumPoint(circleCenterPoint, circleRadius + extLength + 2, 0), "90˚", textHeight);
+            Text Text03 = new Text(GetSumPoint(circleCenterPoint, 0, -(circleRadius + extLength)), "180˚", textHeight);
+            Text Text04 = new Text(GetSumPoint(circleCenterPoint, -(circleRadius + extLength + 2), 0), "270˚", textHeight);
+            textList.AddRange(new Text[] { Text01, Text02, Text03, Text04 });
+            foreach (Text eachText in textList)
+            {
+                eachText.ColorMethod = colorMethodType.byEntity;
+                eachText.Color = Color.Yellow;
+                eachText.LayerName = layerService.LayerDimension;
+                eachText.Alignment = Text.alignmentType.MiddleCenter;
+            }
+
+            Text TextTop = new Text(GetSumPoint(circleCenterPoint, 0, circleRadius + extLength + 5), "P.N", 3.75);
+            TextTop.Alignment = Text.alignmentType.MiddleCenter;
+            styleService.SetLayer(ref TextTop, layerService.LayerDimension);
+            textList.Add(TextTop);
+            newList.AddRange(textList);
+
+
+
+            BlockReference newBr = new BlockReference(selTable.Location.X, selTable.Location.Y, 0, "PAPER_TABLE" + selTable.No, 1, 1, 1, 0);
+
+            Block newBl = new Block("PAPER_TABLE_" + selTable.No);
+            newBl.Entities.AddRange(newList);
+            selBlock = newBl;
+            return newBr;
+
+        }
+
+
+        private BlockReference BuildPaperTableDia(PaperTableModel selTable, AssemblyModel assemblyData, out Block selBlock)
+        {
+
+
+
+            List<Entity> newList = new List<Entity>();
+            // Default
+            //List<Entity> tempList = CreateNozzleProjection(referencePoint);
+
+
+            Point3D refPoint = new Point3D(0, 0);
+
+
+            List<Entity> newTextList = new List<Entity>();
+            List<Tuple<string, string>> textList = new List<Tuple<string, string>>();
+
+
+            textList.Add(new Tuple<string, string>("SP", "ROOF STRUCTURE CENTERLINE"));
+            textList.Add(new Tuple<string, string>("NP", "ROOF PLATE CENTERLINE"));
+            textList.Add(new Tuple<string, string>("EL", "BOTTOM PLATE CENTERLINE"));
+            textList.Add(new Tuple<string, string>("ST", "SPIRAL STARIRWAY START POINT"));
+            textList.Add(new Tuple<string, string>("SS", "SETTLEMENT CHECK PIECE START POINT (10EA)"));
+            textList.Add(new Tuple<string, string>("BC", "EARTH LUG START POINT (6EA)"));
+            textList.Add(new Tuple<string, string>("RC", "NAME PLATE"));
+            textList.Add(new Tuple<string, string>("RS", "1st COURSE SHELL PLATE START POINT"));
+
+
+            double textHeight = 2.5;
+            double cirDia = 11.5470;
+            double cirRadius = cirDia / 2;
+            double leftGap = 10;
+            double currentY = cirRadius;
+            foreach (Tuple<string, string> eachTuple in textList)
+            {
+                Point3D referencePoint = GetSumPoint(refPoint, cirRadius, currentY);
+                Circle eachCircle = new Circle(GetSumPoint(referencePoint, 0, 0), cirRadius);
+                Line vLine1 = new Line(GetSumPoint(referencePoint, 0, cirDia), GetSumPoint(referencePoint, 0, -cirDia));
+                Line vLine2 = (Line)vLine1.Clone();
+                Line vLine3 = (Line)vLine1.Clone();
+                vLine1.Rotate(Utility.DegToRad(30), Vector3D.AxisZ, GetSumPoint(referencePoint, 0, 0));
+                vLine2.Rotate(-Utility.DegToRad(30), Vector3D.AxisZ, GetSumPoint(referencePoint, 0, 0));
+                vLine3.Rotate(-Utility.DegToRad(90), Vector3D.AxisZ, GetSumPoint(referencePoint, 0, 0));
+
+                Point3D[] vInter1 = eachCircle.IntersectWith(vLine1);
+                Point3D[] vInter2 = eachCircle.IntersectWith(vLine2);
+                Point3D[] vInter3 = eachCircle.IntersectWith(vLine3);
+
+                Text eachText = new Text(GetSumPoint(referencePoint, 0, 0), eachTuple.Item1, 3.5);
+                eachText.Alignment = Text.alignmentType.MiddleCenter;
+                styleService.SetLayer(ref eachText, layerService.LayerDimension);
+                newTextList.Add(eachText);
+
+                Text eachText2 = new Text(GetSumPoint(referencePoint, leftGap, 0), eachTuple.Item2, textHeight);
+                eachText2.Alignment = Text.alignmentType.MiddleLeft;
+                styleService.SetLayer(ref eachText2, layerService.LayerDimension);
+                newTextList.Add(eachText2);
+
+                newList.Add(new Line(GetSumPoint(vInter1[0], 0, 0), GetSumPoint(vInter2[0], 0, 0)));
+                newList.Add(new Line(GetSumPoint(vInter2[0], 0, 0), GetSumPoint(vInter3[1], 0, 0)));
+                newList.Add(new Line(GetSumPoint(vInter3[1], 0, 0), GetSumPoint(vInter1[1], 0, 0)));
+                newList.Add(new Line(GetSumPoint(vInter1[1], 0, 0), GetSumPoint(vInter2[1], 0, 0)));
+                newList.Add(new Line(GetSumPoint(vInter2[1], 0, 0), GetSumPoint(vInter3[0], 0, 0)));
+                newList.Add(new Line(GetSumPoint(vInter3[0], 0, 0), GetSumPoint(vInter1[0], 0, 0)));
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerDimension);
+                newList.AddRange(newTextList);
+
+                currentY += cirDia + 0.5;
+            }
+
+
+
+
 
 
             BlockReference newBr = new BlockReference(selTable.Location.X, selTable.Location.Y, 0, "PAPER_TABLE" + selTable.No, 1, 1, 1, 0);
@@ -2010,7 +2734,7 @@ namespace PaperSetting.EYEServices
             {
                 Alignment = selAlign,
                 StyleName = textService.TextROMANS,
-                LayerName = styleService.LayerDimension,
+                LayerName = layerService.LayerDimension,
                 ColorMethod = colorMethodType.byLayer,
                 LineTypeMethod = colorMethodType.byLayer,
                 WidthFactor = WidhtF
@@ -2024,7 +2748,7 @@ namespace PaperSetting.EYEServices
             {
                 Alignment = selAlign,
                 StyleName = textService.TextROMANS,
-                LayerName = styleService.LayerDimension,
+                LayerName = layerService.LayerDimension,
                 ColorMethod = colorMethodType.byEntity,
                 Color = Color.Yellow,
                 LineTypeMethod = colorMethodType.byLayer,
@@ -2039,7 +2763,7 @@ namespace PaperSetting.EYEServices
                 Color = Color.Yellow, 
                 ColorMethod = colorMethodType.byEntity, 
                 LineTypeMethod = colorMethodType.byLayer, 
-                LayerName = styleService.LayerDimension 
+                LayerName = layerService.LayerDimension 
             };
         }
         private Line GetNewLineWhite(Point3D selPoint1, Point3D selPoint2)
@@ -2049,7 +2773,7 @@ namespace PaperSetting.EYEServices
                 Color = Color.White,
                 ColorMethod = colorMethodType.byEntity,
                 LineTypeMethod = colorMethodType.byLayer,
-                LayerName = styleService.LayerDimension
+                LayerName = layerService.LayerDimension
             };
         }
 
@@ -2071,6 +2795,7 @@ namespace PaperSetting.EYEServices
             Dictionary<string, int> rightDic = new Dictionary<string, int>();
             Dictionary<string, int> topDic = new Dictionary<string, int>();
             Dictionary<string, int> bottomDic = new Dictionary<string, int>();
+            Dictionary<string, int> bottomRightDic = new Dictionary<string, int>();
             Dictionary<string, int> floatDic = new Dictionary<string, int>();
             int dicCount = -1;
             foreach (DockModel eachDock in dockList)
@@ -2088,7 +2813,14 @@ namespace PaperSetting.EYEServices
                         rightDic.Add(bNameList[dicCount], eachDock.DockPriority);
                         break;
                     case DOCKPOSITION_TYPE.BOTTOM:
-                        bottomDic.Add(bNameList[dicCount], eachDock.DockPriority);
+                        if (eachDock.HorizontalAlignment == HORIZONTALALIGNMENT_TYPE.LEFT)
+                        {
+                            bottomDic.Add(bNameList[dicCount], eachDock.DockPriority);
+                        }
+                        else if (eachDock.HorizontalAlignment == HORIZONTALALIGNMENT_TYPE.RIGHT)
+                        {
+                            bottomRightDic.Add(bNameList[dicCount], eachDock.DockPriority);
+                        }
                         break;
                     case DOCKPOSITION_TYPE.FLOATING:
                         floatDic.Add(bNameList[dicCount], eachDock.DockPriority);
@@ -2098,7 +2830,7 @@ namespace PaperSetting.EYEServices
 
             // right
             var rightDicOrderby= rightDic.OrderBy(num => num.Value).ToDictionary(pair=>pair.Key,pair=>pair.Value);
-            double rightTopX = 841 - 7 - 175;
+            double rightTopX = 841 - 7;
             double rightTopY = 594 - 7;
 
 
@@ -2116,9 +2848,13 @@ namespace PaperSetting.EYEServices
                             if (eachName.Contains("NOTE"))
                                 rightTopY -= 0.5;
                             rightTopY -= selBlock.BoxSize.Y;
-                            selBlock.InsertionPoint = new Point3D(rightTopX, rightTopY);
 
-                                
+                            // 임시적용
+                            selBlock.InsertionPoint = new Point3D(rightTopX -selBlock.BoxSize.X, rightTopY);
+
+                            if(eachName.Contains("995"))
+                                selBlock.InsertionPoint = new Point3D(rightTopX - 281, rightTopY-15);
+
 
 
                         }
@@ -2173,6 +2909,41 @@ namespace PaperSetting.EYEServices
                 }
             }
 
+            var bottomRightDicOrderby = bottomRightDic.OrderBy(num => num.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+            double bottomRightX =841 -166 - 7;
+            double bottomRightY = 7;
+
+
+            foreach (string eachName in bottomRightDicOrderby.Keys)
+            {
+                foreach (Entity eachEntity in singleDraw.Sheets[selIndex].Entities)
+                {
+                    string eachType = eachEntity.GetType().Name;
+                    if (eachType.Contains("BlockReference"))
+                    {
+                        BlockReference selBlock = eachEntity as BlockReference;
+                        selBlock.Regen(new RegenParams(0, singleDraw));
+                        //newText01.Regen(new RegenParams(0, ssModel));
+                        if (eachName == selBlock.BlockName)
+                        {
+                            selBlock.InsertionPoint = new Point3D(bottomRightX- selBlock.BoxSize.X, bottomRightY);
+                            bottomRightX += selBlock.BoxSize.X;
+                        }
+                    }
+                    else if (eachType.Contains("VectorView"))
+                    {
+                        VectorView selView = eachEntity as VectorView;
+                        if (eachName == selView.BlockName)
+                        {
+                            selView.InsertionPoint = new Point3D(bottomRightX + selView.BoxSize.X, bottomRightY);
+                            bottomRightY = selView.BoxSize.Y;
+                            bottomRightX += selView.BoxSize.X;
+                        }
+                    }
+
+                }
+            }
+
             // Float
             //var floatDicOrderby = floatDic.OrderBy(num => num.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
             //double topLeftX = 7;
@@ -2209,7 +2980,7 @@ namespace PaperSetting.EYEServices
             //    }
             //}
 
-         }
+        }
         #endregion
     }
 }

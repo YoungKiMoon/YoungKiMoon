@@ -35,7 +35,7 @@ namespace DrawWork.CommandServices
         public DrawEntityModel drawEntity;
 
         public DrawScaleModel scaleData;
-        public List<Entity> commandEntities;
+        public EntityList commandEntities;
 
         //public List<Entity[]> commandDimensionEntities;
         //public List<Entity[]> commandNozzleEntities;
@@ -58,7 +58,7 @@ namespace DrawWork.CommandServices
 
 
             drawEntity = new DrawEntityModel();
-            commandEntities = new List<Entity>();
+            commandEntities = new EntityList();
 
             scaleData = new DrawScaleModel();
         }
@@ -79,7 +79,7 @@ namespace DrawWork.CommandServices
 
 
             drawEntity = new DrawEntityModel();
-            commandEntities = new List<Entity>();
+            commandEntities = new EntityList();
 
             scaleData = new DrawScaleModel();
         }
@@ -196,9 +196,13 @@ namespace DrawWork.CommandServices
 
             // Adjust : Dimension
             AutomationDimensionService autoDimService = new AutomationDimensionService();
-            commandEntities.AddRange(autoDimService.SetLineBreak(singleModel as Model, drawEntity));
-            
-            commandEntities.AddRange(drawEntity.blockList);
+
+            List<Entity> tempRegenList = new List<Entity>();
+            tempRegenList.AddRange(autoDimService.SetLineBreak(singleModel as Model, drawEntity));
+            tempRegenList.AddRange(drawEntity.blockList);
+
+            commandEntities.AddRange(tempRegenList);
+
 
 
         }

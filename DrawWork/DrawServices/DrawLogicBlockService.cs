@@ -2264,7 +2264,7 @@ namespace DrawWork.DrawServices
                     {
                         double currentPointValue = valueService.GetDoubleValue(eachRafter.Radius);
                         double currentMidPointValue = (currentPointValue - rafterStartPointValue) / 2;
-                        CDPoint rafterPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjLeftRoofUp, currentPointValue - currentMidPointValue, ref refPoint, ref curPoint);
+                        CDPoint rafterPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, currentPointValue - currentMidPointValue, ref refPoint, ref curPoint);
 
                         // Leader
                         SingletonData.LeaderPublicList.Add(new LeaderPointModel()
@@ -2486,8 +2486,9 @@ namespace DrawWork.DrawServices
             double pontoonRightFlatWidth = 220;
             double pontoonRightFlatOverlap = 40;
 
-            double pontoonWidth = 6500;     // Single Deck : 값 가져오기
-            double pontoonLenghtG = 150;    // Default : Ring Plate Height 
+            double pontoonWidth = valueService.GetDoubleValue(assemblyData.RoofIFRTInput[0].PonttonWidth);
+
+                double pontoonLenghtG = 150;    // Default : Ring Plate Height 
 
             // 중앙까지 계산 해야 함
             double pontoonFlatLength = tankIDHalf - (shellLeft + pontoonWidth + pontoonRightFlatWidth - pontoonRightFlatOverlap);
@@ -2533,9 +2534,45 @@ namespace DrawWork.DrawServices
             styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
 
 
+            // Seal
+            string sealTypeString = GetFRTSealType();
+            if (sealTypeString.Contains("mechanical"))
+                sealTypeString = "MECHANICAL SEAL STYTEM";
+            else if (sealTypeString.Contains("soft"))
+                sealTypeString = "SOFT SEAL STYTEM";
+            // Leader
+            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+            {
+
+                leaderPoint = GetSumCDPoint(ABottomLeftPoint, -shellLeft-30, pontoonLeftHeight),
+                lineTextList = new List<string>() { sealTypeString },
+                Position = "topleft"
+            });
+
+
+            // Leader
+            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+            {
+
+                leaderPoint = GetSumCDPoint(CTopLeftPoint, pontoonWidth /2,-30),
+                lineTextList = new List<string>() { "PONTOON" },
+                lineLength = -50,
+                Position = "bottomright"
+            });
+
+            // Leader
+            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+            {
+
+                leaderPoint = GetSumCDPoint(DBottomRightPoint, 1000, -10),
+                lineTextList = new List<string>() { "DECK PLATE(t10)" },
+                lineLength = -50,
+                Position = "bottomright"
+            });
 
             // Deck Support
             List<Point3D> deckSupportPointList = new List<Point3D>();
+            List<string> deckSupportNumCountList = new List<string>();
             // flat Thickness 만큼 내려 줘야 함
             Point3D deckBottomPoint = GetSumPoint(FTopLeftPoint, 0, -pontoonThkF);
             deckBottomPoint.X = tankBottomMidPoint.X;
@@ -2545,7 +2582,10 @@ namespace DrawWork.DrawServices
                 {
                     string eachRadius = eachDeck.Radius.Trim();
                     if (eachRadius != "")
+                    {
                         deckSupportPointList.Add(GetSumPoint(deckBottomPoint, -valueService.GetDoubleValue(eachRadius), 0));
+                        deckSupportNumCountList.Add(eachDeck.Qty);
+                    }
                 }
             }
             else if (SingletonData.TankType == TANK_TYPE.EFRTSingle)
@@ -2554,14 +2594,33 @@ namespace DrawWork.DrawServices
                 {
                     string eachRadius = eachDeck.Radius.Trim();
                     if (eachRadius != "")
+                    {
                         deckSupportPointList.Add(GetSumPoint(deckBottomPoint, -valueService.GetDoubleValue(eachRadius), 0));
+                        deckSupportNumCountList.Add(eachDeck.Qty);
+                    }
                 }
             }
 
+            double tempDeckSupportLowerHeight = 1250 + 450 +10;
+            double tempDeckSupportMidXValue=GetSumPoint(refPoint, tankIDHalf / 2, 0).X;
+            string tempDeckSupportPostion = "";
+            int tempDeckSupportNum = 0;
             List<Entity> deckSupportList = new List<Entity>();
             foreach (Point3D eachPoint in deckSupportPointList)
             {
                 deckSupportList.AddRange(drawFRT.DrawFRT_DeckSupport(eachPoint, selScaleValue));
+                // Leader
+                tempDeckSupportPostion = "bottomleft";
+                if (eachPoint.X > tempDeckSupportMidXValue)
+                    tempDeckSupportPostion = "bottomright";
+                SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                {
+                    leaderPoint = GetSumCDPoint(eachPoint, 0, -tempDeckSupportLowerHeight),
+                    lineTextList = new List<string>() { deckSupportNumCountList[tempDeckSupportNum] + "-DECK POSTS", "(3\" SCH.80)" },
+                    lineLength = -60,
+                    Position = tempDeckSupportPostion
+                });
+                tempDeckSupportNum++;
             }
             newList.AddRange(deckSupportList);
 
@@ -2596,7 +2655,7 @@ namespace DrawWork.DrawServices
                     Point3D upperPoint = null;
                     Point3D lowerPoint = new Point3D(tankBottomMidPoint.X - roofDrainSumpRadius, DBottomRightPoint.Y + pontoonLenghtG);
 
-                    nozzleOneList.AddRange(drawFRT.DrawFRT_Nozzle_RoofDrainSump(GetSumPoint(refPoint,0,0), GetSumPoint(lowerPoint, 0, 0), GetSumPoint(upperPoint, 0, 0),  eachNozzle, topSlopeDegree, selScaleValue, ref assemblyData));
+                    nozzleOneList.AddRange(drawFRT.DrawFRT_Nozzle_RoofDrainSump(GetSumPoint(refPoint,0,0), GetSumPoint(lowerPoint, 0, 0), upperPoint,  eachNozzle, topSlopeDegree, selScaleValue, ref assemblyData));
                 }
             }
             newList.AddRange(nozzleList);
@@ -2607,6 +2666,10 @@ namespace DrawWork.DrawServices
                 newList.AddRange(drawFRT.DrawFRT_SealMechanical(GetSumPoint(ABottomLeftPoint, 0, pontoonLeftHeight + pontoonTopLeftExt)));
             else if (sealType.Contains("soft"))
                 newList.AddRange(drawFRT.DrawFRT_SealSoft(GetSumPoint(ABottomLeftPoint, 0, pontoonLeftHeight + pontoonTopLeftExt), selScaleValue));
+
+
+
+
 
             // Right Mirror
             Plane mirrorPlane = Plane.YZ;
@@ -2630,7 +2693,6 @@ namespace DrawWork.DrawServices
                 runWayList.AddRange(drawFRT.DrawFRT_RunWay(runWayPoint, runWayWidth));
 
                 customBlockList.AddRange(runWayList);
-
 
                 // Rolling Ladder
                 double tankLastShellThickness = 0;
@@ -2776,9 +2838,54 @@ namespace DrawWork.DrawServices
             styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
 
 
+            // Seal
+            string sealTypeString = GetFRTSealType();
+            if (sealTypeString.Contains("mechanical"))
+                sealTypeString = "MECHANICAL SEAL STYTEM";
+            else if (sealTypeString.Contains("soft"))
+                sealTypeString = "SOFT SEAL STYTEM";
+            // Leader
+            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+            {
+
+                leaderPoint = GetSumCDPoint(ABottomLeftPoint, -shellLeft - 30, pontoonLeftHeight),
+                lineTextList = new List<string>() { sealTypeString },
+                Position = "topleft"
+            });
+
+            // Leader
+            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+            {
+
+                leaderPoint = GetSumCDPoint(CTopLeftPoint, pontoonWidth / 2,-30),
+                lineTextList = new List<string>() { "PONTOON" },
+                lineLength = -50,
+                Position = "bottomright"
+            });
+
+            // Leader
+            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+            {
+
+                leaderPoint = GetSumCDPoint(DTopRightPoint, 300, 10),
+                lineTextList = new List<string>() { "UPPER DECK(t5)" },
+                lineLength = 0,
+                Position = "topright"
+            });
+            // Leader
+            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+            {
+
+                leaderPoint = GetSumCDPoint(DBottomRightPoint, 300, -10),
+                lineTextList = new List<string>() { "LOWER DECK(t7)" },
+                lineLength = -50,
+                Position = "bottomright"
+            });
+
 
             // Deck Support
             List<Point3D> deckSupportPointList = new List<Point3D>();
+            List<string> deckSupportNumCountList = new List<string>();
             // flat Thickness 만큼 내려 줘야 함
             Point3D deckBottomPoint = GetSumPoint(DBottomRightPoint, 0, 0);
             deckBottomPoint.X = tankBottomMidPoint.X;
@@ -2787,16 +2894,35 @@ namespace DrawWork.DrawServices
             {
                 string eachRadius = eachDeck.Radius.Trim();
                 if (eachRadius != "")
+                {
                     deckSupportPointList.Add(GetSumPoint(deckBottomPoint, -valueService.GetDoubleValue(eachRadius), 0));
+                    deckSupportNumCountList.Add(eachDeck.Qty);
+                }
             }
 
-
+            double tempDeckSupportLowerHeight = 1250 + 450 + 10;
+            double tempDeckSupportMidXValue = GetSumPoint(refPoint, tankIDHalf / 2, 0).X;
+            string tempDeckSupportPostion = "";
+            int tempDeckSupportNum = 0;
             List<Entity> deckSupportList = new List<Entity>();
             foreach (Point3D eachPoint in deckSupportPointList)
             {
                 deckSupportList.AddRange(drawFRT.DrawFRT_DeckSupport(eachPoint, selScaleValue));
+                // Leader
+                tempDeckSupportPostion = "bottomleft";
+                if (eachPoint.X > tempDeckSupportMidXValue)
+                    tempDeckSupportPostion = "bottomright";
+                SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                {
+                    leaderPoint = GetSumCDPoint(eachPoint, 0, -tempDeckSupportLowerHeight),
+                    lineTextList = new List<string>() { deckSupportNumCountList[tempDeckSupportNum] + "-DECK POSTS","(3\" SCH.80)" },
+                    lineLength = -60,
+                    Position = tempDeckSupportPostion
+                });
+                tempDeckSupportNum++;
             }
             newList.AddRange(deckSupportList);
+
 
 
             // Nozzle
@@ -2891,7 +3017,6 @@ namespace DrawWork.DrawServices
                     eachEntity.Rotate(-topSlopeDegree, Vector3D.AxisZ, runWayPoint);
 
                 customBlockList.AddRange(runWayList);
-
 
                 // Rolling Ladder
                 double tankLastShellThickness = 24;

@@ -247,15 +247,24 @@ namespace DrawWork.DrawServices
                 {
                     newList.Add(platformBlock);
                     // Leader
-                    //SingletonData.LeaderPublicList.Add(new LeaderPointModel()
-                    //{
-                    //    leaderPoint = GetSumCDPoint(etcBasePoint, 1000, 1500),
-                    //    lineTextList = new List<string>() { "NAME PLATE" },
-                    //    Position = "topright"
-                    //});
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumCDPoint(FRTPoint, -1165, 1600),
+                        lineTextList = new List<string>() {  "W/HANDRAIL", "GAUGING P/F" },
+                        lineLength = -50,
+                        Position = "topleft"
+                    });
+                    // Leader
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumCDPoint(FRTPoint, -910, 250),
+                        lineTextList = new List<string>() { "SPIRAL STAIRWAY", "GAUGING P/F" },
+                        lineLength = -50,
+                        Position = "topleft"
+                    });
                 }
 
-                // Platform
+                // Stairway
                 string stairwayName = "FRT-WIND_GIRDER_&_SPIRALSTAIRWAY";
                 //double stairwayShiftXValue = 500;
                 //double stairwayShiftYValue = 900;
@@ -264,12 +273,13 @@ namespace DrawWork.DrawServices
                 {
                     newList.Add(stairwayBlock);
                     // Leader
-                    //SingletonData.LeaderPublicList.Add(new LeaderPointModel()
-                    //{
-                    //    leaderPoint = GetSumCDPoint(etcBasePoint, 1000, 1500),
-                    //    lineTextList = new List<string>() { "NAME PLATE" },
-                    //    Position = "topright"
-                    //});
+                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                    {
+                        leaderPoint = GetSumCDPoint(FRTPoint, -780, -1834),
+                        lineTextList = new List<string>() { "W/INTERMEDIATE PLATFORM & HANDIRAIL", "SPIRAL STAIRWAY" },
+                        lineLength = -50,
+                        Position = "topleft"
+                    });
                 }
             }
             #endregion

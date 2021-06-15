@@ -280,14 +280,54 @@ namespace DrawWork.DrawServices
             #endregion
 
             #region Tank Plan : Adjust
+            // EFRT : Roof 노즐 제거
             if (SingletonData.TankType == TANK_TYPE.EFRTSingle ||
                SingletonData.TankType == TANK_TYPE.EFRTDouble)
             {
-                // Roof 제외하기
                 for (int i = newList.Count - 1; i >= 0; i--)
                 {
                     if (newList[i].Position == "roof")
-                        newList.RemoveAt(i);
+                    {
+                        //if (newList[i].AutoBleederVent == "yes" ||
+                        //    newList[i].RimVent == "yes" ||
+                        //    newList[i].RoofDrainSump == "yes" ||
+                        //    newList[i].NozzleOnPlateform == "yes")
+                        if (newList[i].RoofDrainSump == "yes" ||
+                            newList[i].NozzleOnPlateform == "yes")
+                        {
+                            if (newList[i].RoofDrainSump == "yes")
+                            {
+                                newList[i].Position = "shell";
+                                newList[i].LR = "left";
+                                newList[i].HRSort = valueService.GetDoubleValue(newList[i].H);
+                                double roofDrainSumpR = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID) / 2 + 235;//235는 고정
+                                newList[i].R = roofDrainSumpR.ToString();
+                            }
+                        }
+                        else
+                        {
+                            newList.RemoveAt(i);
+                        }
+
+                    }
+                }
+            }
+            // CRT & DRT : FRT 노즐 제거
+            else if (SingletonData.TankType == TANK_TYPE.CRT ||
+                     SingletonData.TankType == TANK_TYPE.DRT)
+            {
+                for (int i = newList.Count - 1; i >= 0; i--)
+                {
+                    if (newList[i].Position == "roof")
+                    {
+                        if (newList[i].AutoBleederVent == "yes" ||
+                            newList[i].RimVent == "yes" ||
+                            newList[i].RoofDrainSump == "yes" ||
+                            newList[i].NozzleOnPlateform == "yes")
+                        {
+                            newList.RemoveAt(i);
+                        }
+                    }
                 }
             }
             #endregion
@@ -1029,19 +1069,19 @@ namespace DrawWork.DrawServices
                 if (selNozzle.Mixer == checkValue)
                 {
                     string seriesValue = selNozzle.ASMESeries.Replace(" ", "").ToLower().Replace("series", "");
-                    if (seriesValue.Contains("a"))
+                    if (seriesValue.Contains("b"))
                     {
-                        blockName = string.Format("BLOCK-MIXER_A_{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                        blockName = string.Format("BLOCK-MIXER_B_{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
                     }
                     else
                     {
-                        blockName = string.Format("BLOCK-MIXER_B_{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                        blockName = string.Format("BLOCK-MIXER-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
                     }
 
                 }
                 else if (selNozzle.GaugeHatch == checkValue)
                 {
-                    blockName = string.Format("BLOCK-GQUGE_HATCH-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
+                    blockName = string.Format("BLOCK-GAUGE_HATCH-{0}\"_{1}", selNozzle.Size, selNozzle.Rating);
 
                     // Leader
                     SingletonData.LeaderPublicList.Add(new LeaderPointModel()
@@ -1126,8 +1166,16 @@ namespace DrawWork.DrawServices
             // Block Point 매우 중요함
             blockEntity = null;
             if (drawPoint != null)
-                if(blockName!="")
-                    blockEntity = blockImportService.Draw_ImportBlock(new CDPoint(drawPoint.X, drawPoint.Y, 0), blockName, layerService.LayerBlock, scaleFactor);
+            {
+                blockEntity = blockImportService.Draw_ImportBlock(new CDPoint(drawPoint.X, drawPoint.Y, 0), blockName, layerService.LayerBlock, scaleFactor);
+                if (blockEntity != null)
+                {
+                    if (selNozzle.Mixer == checkValue)
+                    {
+                        blockEntity.Rotate(Utility.DegToRad(90), Vector3D.AxisZ, new Point3D(drawPoint.X, drawPoint.Y, 0));
+                    }
+                }
+            }
 
             return returnValue;
         }

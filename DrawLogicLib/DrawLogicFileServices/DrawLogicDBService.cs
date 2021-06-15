@@ -26,6 +26,9 @@ namespace DrawLogicLib.DrawLogicFileServices
                 case LogicFile_Type.GA:
                     selFileAddress += "GA.txt";
                     break;
+                case LogicFile_Type.NozzleOrientation:
+                    selFileAddress += "Orientation.txt";
+                    break;
             }
 
             //return logicFileService.GetTextFileArray(selFileAddress);

@@ -53,7 +53,8 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Border CornerRadius="4" Margin="2" Padding="0,4,0,0" BorderBrush="#FF63ADBD" BorderThickness="0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button x:Name="btnRebuild" Content="REBUILD" Style="{StaticResource customButton}" Margin="10,2,2,0" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Padding="10,0" Background="#FF90E0F1"/>
+                            <Button x:Name="btnRebuild" Content="REBUILD" Style="{StaticResource customButton}" Margin="10,2,2,0" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Padding="10,0" Background="#FFF0BBBB"/>
+                            <Button x:Name="btnRegen" Content="REGEN" Style="{StaticResource customButton}" Margin="10,2,2,0" Padding="10,0" Background="#FF6FBBCB" PreviewMouseLeftButtonUp="btnRegen_PreviewMouseLeftButtonUp"/>
                             <Button x:Name="btnBlock" Content="BLOCK LOAD" Style="{StaticResource customButton}" Margin="10,2,2,0"  Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnBlock_PreviewMouseLeftButtonUp"/>
                             <Button x:Name="btnEnvironment" Content="ENVIRONMENT" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnEnvironment_PreviewMouseLeftButtonUp"/>
                             <Button x:Name="btnTitleBlock" Content="TITLE BLOCK" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnTitleBlock_PreviewMouseLeftButtonUp"/>
@@ -277,7 +278,7 @@
                                     </DataGrid>
                                 </Grid>
                             </TabItem>
-                            <TabItem Header="TABLE" MinWidth ="100" BorderThickness="0">
+                            <TabItem x:Name="tabletable" Header="TABLE" MinWidth ="100" BorderThickness="0">
                                 <Grid>
                                     <DataGrid Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
                       ItemsSource="{Binding PaperListSelection.Tables}" HorizontalScrollBarVisibility="Visible"
@@ -347,7 +348,7 @@
                                     </DataGrid>
                                 </Grid>
                             </TabItem>
-                            <TabItem Header="*PREVIEW*" MinWidth="100" BorderThickness="0" >
+                            <TabItem x:Name="previewpreview" Header="*PREVIEW*" MinWidth="100" BorderThickness="0" >
                                 <ddes:Drawings x:Name="testDraw"/>
                             </TabItem>
                             <TabItem x:Name="viewview" Header="*TEMPMODEL*" MinWidth="100" BorderThickness="0" >
@@ -417,11 +418,22 @@
                 </StackPanel>
             </Grid>
             <!--#endregion-->
-            <Grid x:Name="gridLoading">
+            <Grid x:Name="gridLoading" Visibility="Collapsed">
                 <Border Background="White" />
                 <Border Background="#FFE6F8FF" />
 
                 <TextBlock Text="TABAS 데이터 로딩 중입니다." FontSize="26" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF087474"/>
+
+                <ddes:Model x:Name="testModel2" Visibility="Collapsed">
+                    <ddes:Model.ProgressBar>
+                        <ddes:ProgressBar Lighting="False"/>
+                    </ddes:Model.ProgressBar>
+                    <ddes:Model.Viewports>
+                        <ddes:Viewport DisplayMode="Wireframe" InitialView="Other">
+                            
+                        </ddes:Viewport>
+                    </ddes:Model.Viewports>
+                </ddes:Model>
             </Grid>
         </Grid>
     </telerik:RadBusyIndicator>

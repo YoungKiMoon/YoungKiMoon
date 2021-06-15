@@ -6,6 +6,7 @@ using ExcelAddIn.Service;
 using ExcelAddIn.Utils;
 using ExcelAddIn.Windows;
 using Microsoft.Office.Core;
+using Microsoft.Office.Interop.Excel;
 using PaperSetting;
 using System;
 using System.Collections.Generic;
@@ -110,6 +111,10 @@ namespace ExcelAddIn
             {
                 return "INFO";
             }
+            else if (control.Id == "cuGroupButton07")
+            {
+                return "NOZZLE INFORM";
+            }
             else
             {
                 return "";
@@ -145,6 +150,10 @@ namespace ExcelAddIn
                 return Resources.iTank2;
             }
             else if (control.Id == "cuGroupButton06")
+            {
+                return Resources.list;
+            }
+            else if (control.Id == "cuGroupButton07")
             {
                 return Resources.list;
             }
@@ -187,14 +196,21 @@ namespace ExcelAddIn
             }
             else if (control.Id == "cuGroupButton01")
             {
-                FileBaseService newFile = new FileBaseService();
-                newFile.SelectFileOfCal();
+                //FileBaseService newFile = new FileBaseService();
+                //newFile.SelectFileOfCal();
+                if (CheckTABASWorkbook())
+                {
+                    //Globals.ThisAddIn.Application.Run("a0loadAME1.loadNozzle");
+                    string aa = "";
+                    RunMacro(Globals.ThisAddIn.Application, Globals.ThisAddIn.Application.ActiveWorkbook, "loadAME_All", out aa);
+                }
             }
             else if (control.Id == "cuGroupButton02")
             {
                 FileBaseService newFile = new FileBaseService();
                 newFile.SelectFileOfOther();
                 //Globals.ThisAddIn.ShowPaneRomData();
+
             }
             else if (control.Id == "cuGroupButton03")
             {
@@ -232,6 +248,53 @@ namespace ExcelAddIn
                 //Service.PaneWindowService paneService = new Service.PaneWindowService();
                 //paneService.VisiblePane(Commons.CUSTOMPANE_LIST.NotSet, false, true);
                 //ExcelServices.ExcelService.ChangeSheet(Commons.EXCELSHEET_LIST.SHEET_MAIN);
+            }
+            else if (control.Id == "cuGroupButton07")
+            {
+                if (CheckTABASWorkbook())
+                {
+                    //Globals.ThisAddIn.Application.Run("a0loadAME1.loadNozzle");
+                    string aa = "";
+                    RunMacro(Globals.ThisAddIn.Application, Globals.ThisAddIn.Application.ActiveWorkbook, "loadNozzle", out aa);
+                }
+            }
+        }
+
+        private bool CheckTABASWorkbook()
+        {
+            if(Globals.ThisAddIn.Application !=null)
+                if(Globals.ThisAddIn.Application.ActiveWorkbook !=null)
+                    foreach (Worksheet eachSheet in Globals.ThisAddIn.Application.ActiveWorkbook.Worksheets)
+                    {
+                        if (eachSheet.Name.ToLower().Contains("amedata"))
+                        {
+                            return true;
+                        }
+                    }
+            return false;   
+        }
+        private void RunMacro(Microsoft.Office.Interop.Excel.Application xlApp, Workbook xlWB, string MacroName, out string status)
+        {
+            Worksheet xlWS;
+            status = string.Empty;
+            if (xlApp != null)
+            {
+
+                xlWS = (Worksheet)xlWB.Worksheets.get_Item("AMEdata");
+                if (MacroName != String.Empty)
+                {
+                    xlWS.GetType().InvokeMember("Run", System.Reflection.BindingFlags.Default | System.Reflection.BindingFlags.InvokeMethod, null, xlApp, new Object[] { MacroName });
+
+                }
+                else
+                {
+                    status = "Failure - Macro name should not be empty";
+                }
+
+            }
+            else
+            {
+                status = "Failure - Worksheet name is not valid.";
             }
         }
 

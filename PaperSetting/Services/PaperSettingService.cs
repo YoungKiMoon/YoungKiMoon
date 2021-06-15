@@ -105,7 +105,7 @@ namespace PaperSetting.Services
                     newTable02.TableSelection = "SHELL_NOZZLES";
                     newTable02.Dock.DockPosition = DOCKPOSITION_TYPE.BOTTOM;
                     newTable02.Dock.HorizontalAlignment = HORIZONTALALIGNMENT_TYPE.LEFT;
-                    newTable02.Dock.DockPriority = 1;
+                    newTable02.Dock.DockPriority = 2;
 
                     PaperTableModel newTable03 = new PaperTableModel();
                     newTable03.No = "3";
@@ -113,35 +113,48 @@ namespace PaperSetting.Services
                     newTable03.TableSelection = "ROOF_NOZZLES";
                     newTable03.Dock.DockPosition = DOCKPOSITION_TYPE.BOTTOM;
                     newTable03.Dock.HorizontalAlignment = HORIZONTALALIGNMENT_TYPE.LEFT;
-                    newTable03.Dock.DockPriority = 1;
+                    newTable03.Dock.DockPriority = 3;
+
+                    PaperTableModel newTable04 = new PaperTableModel();
+                    newTable04.No = "4";
+                    newTable04.Name = "NOZZLE PROJECTION";
+                    newTable04.TableSelection = "NOZZLE_PROJECTION";
+                    newTable04.Dock.DockPosition = DOCKPOSITION_TYPE.BOTTOM;
+                    newTable04.Dock.HorizontalAlignment = HORIZONTALALIGNMENT_TYPE.RIGHT;
+                    newTable04.Dock.DockPriority = 4;
 
                     newPaper01.Tables.Add(newTable01);
                     newPaper01.Tables.Add(newTable02);
                     newPaper01.Tables.Add(newTable03);
+                    newPaper01.Tables.Add(newTable04);
 
 
                     // Note : 없음
 
+                    if (true)
+                    {
 
-                    // ViewPort
-                    PaperViewportModel newView01 = new PaperViewportModel();
-                    newView01.No = "00";
-                    newView01.Name = "GA";
-                    newView01.AssemblySelection = "GeneralAssembly";
+                    
+                        // ViewPort
+                        PaperViewportModel newView01 = new PaperViewportModel();
+                        newView01.No = "00";
+                        newView01.Name = "GA";
+                        newView01.AssemblySelection = "GeneralAssembly";
 
-                    ViewPortModel cuView = new ViewPortModel();
-                    cuView.ScaleStr = "90";
-                    cuView.TargetX = "27000";
-                    cuView.TargetY = "24000";
-                    //cuView.TargetX = "17000";
-                    //cuView.TargetY = "14000";
-                    cuView.LocationX = "330";
-                    cuView.LocationY = "360";
-                    cuView.SizeX = "600";
-                    cuView.SizeY = "400";
+                        ViewPortModel cuView = new ViewPortModel();
+                        cuView.ScaleStr = "90";
+                        cuView.TargetX = "27000";
+                        cuView.TargetY = "24000";
+                        //cuView.TargetX = "17000";
+                        //cuView.TargetY = "14000";
+                        cuView.LocationX = "334";
+                        cuView.LocationY = "363";
+                        cuView.SizeX = "600";
+                        cuView.SizeY = "400";
 
-                    newView01.ViewPort = cuView;
-                    newPaper01.ViewPorts.Add(newView01);
+                        newView01.ViewPort = cuView;
+                        newPaper01.ViewPorts.Add(newView01);
+                    }
 
                     newList.Add(newPaper01);
                 }
@@ -153,7 +166,7 @@ namespace PaperSetting.Services
                     newPaper.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
 
                     // Basic
-                    newPaper.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                    newPaper.Basic = new PaperBasicModel(true, etcIndex.ToString("02"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
 
                     // Note
                     PaperNoteModel newNote01 = new PaperNoteModel();
@@ -169,6 +182,107 @@ namespace PaperSetting.Services
                     newPaper.Notes.Add(newNote01);
 
                     newList.Add(newPaper);
+                }
+                else if(newDescription=="NOZZLE ORIENTATION")
+                {
+                    PaperDwgModel newPaper01 = new PaperDwgModel();
+
+                    // Sheet
+                    newPaper01.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+
+                    // Basic
+                    newPaper01.Basic = new PaperBasicModel(true, "03", newDescription, "VP-210220-MF-001", "AS BUILT");
+
+                    // Revision : 빈곳
+                    PaperRevisionModel newRevision = new PaperRevisionModel();
+                    newRevision.RevString = "A";
+                    newRevision.Description = "FOR APPROVAL";
+                    newRevision.DateString = "21/05/13";
+                    newRevision.DRWN = "KDM1";
+                    newRevision.CHKD = "KDM2";
+                    newRevision.REVD = "KDM3";
+                    newRevision.APVD = "KDM4";
+                    newPaper01.Revisions.Add(newRevision);
+
+                    // Table
+                    // Table : Shell : Nozzle
+                    // Table : Sheel : Roof
+                    // Table : Tank Specification Data
+                    
+                    PaperTableModel newTable02 = new PaperTableModel();
+                    newTable02.No = "1";
+                    newTable02.Name = "CONNECTION SCHEDULE";
+                    newTable02.TableSelection = "SHELL_NOZZLES";
+                    newTable02.Dock.DockPosition = DOCKPOSITION_TYPE.RIGHT;
+                    newTable02.Dock.VerticalAlignment = VERTICALALIGNMENT_TYPE.TOP;
+                    newTable02.Dock.DockPriority = 1;
+
+                    PaperTableModel newTable03 = new PaperTableModel();
+                    newTable03.No = "2";
+                    newTable03.Name = "CONNECTION SCHEDULE";
+                    newTable03.TableSelection = "ROOF_NOZZLES";
+                    newTable03.Dock.DockPosition = DOCKPOSITION_TYPE.RIGHT;
+                    newTable03.Dock.VerticalAlignment = VERTICALALIGNMENT_TYPE.TOP;
+                    newTable03.Dock.DockPriority = 1;
+
+                    PaperTableModel newTable04 = new PaperTableModel();
+                    newTable04.No = "3";
+                    newTable04.Name = "NOZZLE PROJECTION";
+                    newTable04.TableSelection = "NOZZLE_PROJECTION";
+                    newTable04.Dock.DockPosition = DOCKPOSITION_TYPE.BOTTOM;
+                    newTable04.Dock.HorizontalAlignment = HORIZONTALALIGNMENT_TYPE.RIGHT;
+                    newTable04.Dock.DockPriority = 3;
+
+                    PaperTableModel newTable05 = new PaperTableModel();
+                    newTable05.No = "4";
+                    newTable05.Name = "DIRECTION MARK";
+                    newTable05.TableSelection = "DIRECTION_MARK";
+                    newTable05.Dock.DockPosition = DOCKPOSITION_TYPE.FLOATING;
+                    newTable05.Dock.HorizontalAlignment = HORIZONTALALIGNMENT_TYPE.RIGHT;
+                    newTable05.Dock.DockPriority = 4;
+
+                    PaperTableModel newTable06 = new PaperTableModel();
+                    newTable06.No = "995";
+                    newTable06.Name = "ETC POSITION MARK";
+                    newTable06.TableSelection = "ETC_POSITION_MARK";
+                    newTable06.Dock.DockPosition = DOCKPOSITION_TYPE.RIGHT;
+                    newTable06.Dock.VerticalAlignment = VERTICALALIGNMENT_TYPE.TOP;
+                    newTable06.Dock.DockPriority = 4;
+
+                    newPaper01.Tables.Add(newTable02);
+                    newPaper01.Tables.Add(newTable03);
+                    newPaper01.Tables.Add(newTable04);
+                    newPaper01.Tables.Add(newTable05);
+                    newPaper01.Tables.Add(newTable06);
+
+                    newList.Add(newPaper01);
+
+
+
+                    if (true)
+                    {
+
+
+                        // ViewPort
+                        PaperViewportModel newView01 = new PaperViewportModel();
+                        newView01.No = "00";
+                        newView01.Name = "NozzleOrientation";
+                        newView01.AssemblySelection = "NozzleOrientation";
+
+                        ViewPortModel cuView = new ViewPortModel();
+                        cuView.ScaleStr = "90";
+                        cuView.TargetX = "27000";
+                        cuView.TargetY = "24000";
+                        //cuView.TargetX = "17000";
+                        //cuView.TargetY = "14000";
+                        cuView.LocationX = "280";
+                        cuView.LocationY = "297";
+                        cuView.SizeX = "500";
+                        cuView.SizeY = "570";
+
+                        newView01.ViewPort = cuView;
+                        newPaper01.ViewPorts.Add(newView01);
+                    }
                 }
                 else if(newDescription=="1")
                 {

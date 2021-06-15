@@ -3132,7 +3132,7 @@ namespace DrawWork.DrawServices
                 singleModel.Entities.AddRange(newList);
             }
 
-            if (true) 
+            if (visibleFalse) 
             {
                 double selScaleValue = 90;
                 Point3D referencePoint = new Point3D(10000, 10000);
@@ -3219,6 +3219,186 @@ namespace DrawWork.DrawServices
                 singleModel.Entities.AddRange(newCenterList);
             }
 
+            if (visibleFalse)
+            {
+                Point3D referencePoint = new Point3D(1000, 1000);
+                //List<Entity> tempList = CreateNozzleProjection(referencePoint);
+
+                List<Entity> newList = new List<Entity>();
+
+                double circleBox = 40;
+                double circleOD = 22.5;
+                double circleRadius = circleOD / 2;
+
+                Point3D circleCenterPoint = GetSumPoint(referencePoint, circleBox / 2, circleBox / 2);
+                Circle centerCircle = new Circle(circleCenterPoint, circleRadius);
+                newList.Add(centerCircle);
+
+
+                Point3D circleCenterTopPoint = GetSumPoint(circleCenterPoint, 0, circleRadius);
+                Line centerLine= new Line(GetSumPoint(circleCenterPoint, 0, circleRadius), GetSumPoint(circleCenterPoint, 0, -circleRadius));
+                Line leftLine1 = (Line)centerLine.Clone();
+                leftLine1.Rotate(Utility.DegToRad(15), Vector3D.AxisZ, circleCenterTopPoint);
+                Line rightLine1 = (Line)centerLine.Clone();
+                rightLine1.Rotate(-Utility.DegToRad(15), Vector3D.AxisZ, circleCenterTopPoint);
+
+                Point3D leftLineIntetr = editingService.GetIntersectWidth(leftLine1, centerCircle, 1);
+                Point3D rightLineIntetr = editingService.GetIntersectWidth(rightLine1, centerCircle, 1);
+
+                Line centerSlope = new Line(GetSumPoint(circleCenterTopPoint, 0, 0), GetSumPoint(leftLineIntetr, 0, 0));
+                centerSlope.Rotate(Utility.DegToRad(30), Vector3D.AxisZ, leftLineIntetr);
+                Point3D centerLineIntetr = editingService.GetIntersectWidth(centerSlope, centerLine, 0);
+
+                Line dLine1 = new Line(GetSumPoint(circleCenterTopPoint, 0, 0), GetSumPoint(leftLineIntetr, 0, 0));
+                Line dLine2 = new Line(GetSumPoint(circleCenterTopPoint, 0, 0), GetSumPoint(rightLineIntetr, 0, 0));
+                Line dLine3 = new Line(GetSumPoint(centerLineIntetr, 0, 0), GetSumPoint(leftLineIntetr, 0, 0));
+                Line dLine4 = new Line(GetSumPoint(centerLineIntetr, 0, 0), GetSumPoint(rightLineIntetr, 0, 0));
+                Line dLine5= new Line(GetSumPoint(circleCenterTopPoint, 0, 0), GetSumPoint(centerLineIntetr, 0, 0));
+
+                newList.AddRange(new Line[] { dLine1, dLine2, dLine3, dLine4 });
+
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerDimension);
+
+
+
+                // Center Line
+                double exLength = 2;
+                List<Entity> centerLineList = new List<Entity>();
+                centerLineList.AddRange(editingService.GetCenterLine(GetSumPoint(circleCenterPoint, 0, circleRadius), GetSumPoint(circleCenterPoint, 0, -circleRadius), exLength, 1));
+                centerLineList.AddRange(editingService.GetCenterLine(GetSumPoint(circleCenterPoint, circleRadius, 0), GetSumPoint(circleCenterPoint, -circleRadius, 0), exLength, 1));
+                styleService.SetLayerListEntity(ref centerLineList, layerService.LayerCenterLine);
+                newList.AddRange(centerLineList);
+
+                // hatch
+                Triangle cc = new Triangle(circleCenterTopPoint, leftLineIntetr, centerLineIntetr);
+                
+                //HatchRegion hatchDirection = new HatchRegion((ICurve)cc );
+                List<ICurve> hatchLine = new List<ICurve>();
+                hatchLine.AddRange(new Line[] { dLine1, dLine2, dLine5 });
+                HatchRegion hatchDirection = new HatchRegion(hatchLine,Plane.XY);
+                hatchDirection.Color = Color.White;
+                hatchDirection.HatchName = "aa";
+
+                CustomRenderedHatch hhh = new CustomRenderedHatch(hatchDirection);
+                newList.Add(hatchDirection);
+                // Text
+
+                double extLength = 4;
+                double textHeight = 2.5;
+                List<Entity> textList = new List<Entity>();
+                Text Text01 = new Text(GetSumPoint(circleCenterPoint, 0, circleRadius + extLength), "0˚", textHeight);
+                Text Text02 = new Text(GetSumPoint(circleCenterPoint, circleRadius + extLength +2, 0), "90˚", textHeight);
+                Text Text03 = new Text(GetSumPoint(circleCenterPoint, 0, -(circleRadius + extLength )), "180˚", textHeight);
+                Text Text04 = new Text(GetSumPoint(circleCenterPoint, -(circleRadius + extLength+2), 0), "270˚", textHeight);
+                textList.AddRange(new Text[] { Text01, Text02, Text03, Text04 });
+                foreach(Text eachText in textList)
+                {
+                    eachText.ColorMethod = colorMethodType.byEntity;
+                    eachText.Color = Color.Yellow;
+                    eachText.LayerName = layerService.LayerDimension;
+                    eachText.Alignment = Text.alignmentType.MiddleCenter;
+                }
+
+                Text TextTop = new Text(GetSumPoint(circleCenterPoint, 0, circleRadius + extLength +5), "P.N", 3.75);
+                TextTop.Alignment = Text.alignmentType.MiddleCenter;
+                styleService.SetLayer(ref TextTop, layerService.LayerDimension);
+                textList.Add(TextTop);
+                newList.AddRange(textList);
+
+
+
+                singleModel.Entities.AddRange(newList);
+            }
+
+            if (false)
+            {
+                Point3D referencePoint = new Point3D(1000, 1000);
+                Line newLine = new Line(GetSumPoint(referencePoint, 0, 0),GetSumPoint(referencePoint, 1000, 0));
+                Point3D[] xx = newLine.GetPointsByLength(500);
+
+                Line newLine2 = new Line(GetSumPoint(xx[1], 0, 0), GetSumPoint(xx[1],0 , 100));
+
+
+                Line newLine11 = new Line(GetSumPoint(referencePoint, 0, 0), GetSumPoint(referencePoint, 1000, 0));
+                newLine11.Rotate(-Utility.DegToRad(20), Vector3D.AxisZ, GetSumPoint(referencePoint, 0, 0));
+                Point3D[] xx1 = newLine11.GetPointsByLength(500);
+                Line newLine22 = new Line(GetSumPoint(xx1[1], 0, 0), GetSumPoint(xx1[1], 0, 500));
+
+                singleModel.Entities.Add(newLine);
+                singleModel.Entities.Add(newLine2);
+                singleModel.Entities.Add(newLine11);
+                singleModel.Entities.Add(newLine22);
+            }
+
+            if (true)
+            {
+
+                Point3D refPoint = new Point3D(1000, 1000);
+
+                List<Entity> newList = new List<Entity>();
+                List<Entity> newTextList = new List<Entity>();
+                List<Tuple<string, string>> textList = new List<Tuple<string, string>>();
+
+
+                textList.Add(new Tuple<string, string>("SP","ROOF STRUCTURE CENTERLINE"));
+                textList.Add(new Tuple<string, string>("NP", "ROOF PLATE CENTERLINE"));
+                textList.Add(new Tuple<string, string>("EL", "BOTTOM PLATE CENTERLINE"));
+                textList.Add(new Tuple<string, string>("ST", "SPIRAL STARIRWAY START POINT"));
+                textList.Add(new Tuple<string, string>("SS", "SETTLEMENT CHECK PIECE START POINT (10EA)"));
+                textList.Add(new Tuple<string, string>("BC", "EARTH LUG START POINT (6EA)"));
+                textList.Add(new Tuple<string, string>("RC", "NAME PLATE"));
+                textList.Add(new Tuple<string, string>("RS", "1st COURSE SHELL PLATE START POINT"));
+
+
+                double textHeight = 2.5;
+                double cirDia = 11.5470;
+                double cirRadius = cirDia / 2;
+                double leftGap = 10;
+                double currentY = cirRadius;
+                foreach(Tuple<string, string> eachTuple in textList)
+                {
+                    Point3D referencePoint = GetSumPoint(refPoint, cirRadius, currentY);
+                    Circle eachCircle = new Circle(GetSumPoint(referencePoint, 0, 0), cirRadius);
+                    Line vLine1 = new Line(GetSumPoint(referencePoint, 0, cirDia), GetSumPoint(referencePoint, 0, -cirDia));
+                    Line vLine2 = (Line)vLine1.Clone();
+                    Line vLine3 = (Line)vLine1.Clone();
+                    vLine1.Rotate(Utility.DegToRad(30), Vector3D.AxisZ, GetSumPoint(referencePoint, 0, 0));
+                    vLine2.Rotate(-Utility.DegToRad(30), Vector3D.AxisZ, GetSumPoint(referencePoint, 0, 0));
+                    vLine3.Rotate(-Utility.DegToRad(90), Vector3D.AxisZ, GetSumPoint(referencePoint, 0, 0));
+
+                    Point3D[] vInter1 = eachCircle.IntersectWith(vLine1);
+                    Point3D[] vInter2 = eachCircle.IntersectWith(vLine2);
+                    Point3D[] vInter3 = eachCircle.IntersectWith(vLine3);
+
+                    Text eachText = new Text(GetSumPoint(referencePoint, 0, 0), eachTuple.Item1, 3.5);
+                    eachText.Alignment = Text.alignmentType.MiddleCenter;
+                    styleService.SetLayer(ref eachText, layerService.LayerDimension);
+                    newTextList.Add(eachText);
+
+                    Text eachText2 = new Text(GetSumPoint(referencePoint, leftGap, 0), eachTuple.Item2, textHeight);
+                    eachText2.Alignment = Text.alignmentType.MiddleLeft;
+                    styleService.SetLayer(ref eachText2, layerService.LayerDimension);
+                    newTextList.Add(eachText2);
+
+                    newList.Add(new Line(GetSumPoint(vInter1[0], 0, 0), GetSumPoint(vInter2[0], 0, 0)));
+                    newList.Add(new Line(GetSumPoint(vInter2[0], 0, 0), GetSumPoint(vInter3[1], 0, 0)));
+                    newList.Add(new Line(GetSumPoint(vInter3[1], 0, 0), GetSumPoint(vInter1[1], 0, 0)));
+                    newList.Add(new Line(GetSumPoint(vInter1[1], 0, 0), GetSumPoint(vInter2[1], 0, 0)));
+                    newList.Add(new Line(GetSumPoint(vInter2[1], 0, 0), GetSumPoint(vInter3[0], 0, 0)));
+                    newList.Add(new Line(GetSumPoint(vInter3[0], 0, 0), GetSumPoint(vInter1[0], 0, 0)));
+
+                    styleService.SetLayerListEntity(ref newList, layerService.LayerDimension);
+                    newList.AddRange(newTextList);
+
+                    currentY += cirDia + 0.5;
+                }
+
+
+
+
+                singleModel.Entities.AddRange(newList);
+            }
 
             singleModel.Entities.Regen();
             singleModel.ZoomFit();
@@ -3229,7 +3409,379 @@ namespace DrawWork.DrawServices
         }
 
 
+        public List<Entity> CreateNozzleProjection(Point3D refPoint)
+        {
+            List<Point3D> outPointList = new List<Point3D>();
+            List<Entity> newList = new List<Entity>();
 
+            TANK_TYPE refTankType = TANK_TYPE.EFRTDouble;
+            // Left : Lower
+
+            // Outline
+            double boxHeight = 100;
+            double boxWidth = 100;
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+
+            newList.AddRange(shapeService.GetRectangle(out outPointList,GetSumPoint(referencePoint,0,0),boxWidth,boxHeight,0,0,3));
+
+            // Tank : Basic
+            double tankID = 52;
+            double tankRadius = tankID / 2;
+            double tankHeight = 48;
+
+            double tankBottomWidth = 60;
+            double tankBottomThickness = 1;
+            double tankBottomOutWidth = (tankBottomWidth-tankID)/2;
+
+            double tankRoofWidth = 58;
+            double tankRoofHeight = 0;
+            double tankRoofOutWidth=(tankRoofWidth- tankID) / 2;
+
+
+            // TankRoof Height
+            switch (refTankType)
+            {
+                case TANK_TYPE.CRT:
+                case TANK_TYPE.DRT:
+                case TANK_TYPE.IFRT:
+                    tankRoofHeight = 4;
+                    break;
+                case TANK_TYPE.EFRTSingle:
+                case TANK_TYPE.EFRTDouble:
+                    tankRoofHeight = 0;
+                    break;
+            }
+
+            Point3D tankPoint = GetSumPoint(referencePoint, 15.6, 24.1);
+            Point3D tankBottomPoint = GetSumPoint(tankPoint, -tankBottomOutWidth, 0);
+            Point3D tankRoofPoint = GetSumPoint(tankPoint, 0, tankHeight);
+            Point3D tankRoofCenterTopPoint = GetSumPoint(tankRoofPoint,tankRadius,tankRoofHeight);
+
+            // Tank : Shell
+            newList.AddRange(shapeService.GetRectangle(out outPointList, GetSumPoint(tankPoint, 0, 0), tankID, tankHeight, 0, 0, 3,new bool[] {false,true,false,true }));
+
+            // Tank : Bottom
+            newList.AddRange(shapeService.GetRectangle(out outPointList, GetSumPoint(tankBottomPoint, 0, 0), tankBottomWidth, tankBottomThickness, 0, 0, 0));
+
+            // Tank : Roof : Lower
+            newList.Add(new Line(GetSumPoint(tankRoofPoint, -tankRoofOutWidth, 0), GetSumPoint(tankRoofPoint, tankID + tankRoofOutWidth, 0)));
+            Line rightRoof = null;
+            Arc domeRoof = null;
+
+            // TankRoof Height
+            switch (refTankType)
+            {
+                case TANK_TYPE.CRT:
+                case TANK_TYPE.IFRT:
+                    newList.Add(new Line(GetSumPoint(tankRoofPoint, -tankRoofOutWidth, 0), GetSumPoint(tankRoofCenterTopPoint, 0, 0)));
+                    rightRoof = new Line(GetSumPoint(tankRoofPoint, tankID + tankRoofOutWidth, 0), GetSumPoint(tankRoofCenterTopPoint, 0, 0));
+                    newList.Add(rightRoof);
+                    break;
+                case TANK_TYPE.DRT:
+                    domeRoof = new Arc(Plane.XY, GetSumPoint(tankRoofPoint, tankID, 0), GetSumPoint(tankRoofCenterTopPoint, 0, 0), GetSumPoint(tankRoofPoint, 0, 0), false);
+                    newList.Add(domeRoof);
+                    break;
+            }
+
+
+            // Nozzle
+            double roofNozzleRadius = 20;
+            double shellNozzleElevation = 10;
+            double nozzleHeight = 6;
+            double flangeOD = 3;
+            double flangeODHalf = flangeOD/2;
+            Point3D roofNozzlePoint = GetSumPoint(tankRoofPoint, tankRadius + roofNozzleRadius, 0);
+            Line roofNozzlePipe = new Line(GetSumPoint(roofNozzlePoint, 0, 0), GetSumPoint(roofNozzlePoint, 0, nozzleHeight));
+            Line roofNozzleFlange = new Line(GetSumPoint(roofNozzlePoint, -flangeODHalf, nozzleHeight), GetSumPoint(roofNozzlePoint, flangeODHalf, nozzleHeight));
+            newList.Add(roofNozzlePipe);
+            newList.Add(roofNozzleFlange);
+
+            Point3D[] nozzlePipeInter = null;
+
+            switch (refTankType)
+            {
+                case TANK_TYPE.CRT:
+                case TANK_TYPE.IFRT:
+                    nozzlePipeInter = roofNozzlePipe.IntersectWith(rightRoof);
+                    if (nozzlePipeInter.Length > 0)
+                        roofNozzlePipe.TrimBy(nozzlePipeInter[0], true);
+                    break;
+                case TANK_TYPE.DRT:
+                    nozzlePipeInter = roofNozzlePipe.IntersectWith(domeRoof);
+                    if (nozzlePipeInter.Length > 0)
+                        roofNozzlePipe.TrimBy(nozzlePipeInter[0], true);
+                    break;
+            }
+
+
+
+            Point3D shellNozzlePoint = GetSumPoint(tankPoint, tankID, shellNozzleElevation);
+            Line shellNozzlePipe = new Line(GetSumPoint(shellNozzlePoint, 0, 0), GetSumPoint(shellNozzlePoint, nozzleHeight, 0));
+            Line shellNozzleFlange = new Line(GetSumPoint(shellNozzlePoint, nozzleHeight ,flangeODHalf), GetSumPoint(shellNozzlePoint, nozzleHeight,-flangeODHalf));
+            newList.Add(shellNozzlePipe);
+            newList.Add(shellNozzleFlange);
+
+
+            // Pontoon
+            double pontoonWidth = 10;
+            double pontoonMinHeight = 2.5;
+            double pontoonElevation = 23;
+            double pontoonShellWidth = 1.5;
+            double pontoonSlopeHeight = 1;
+            double pontoonSingleFlatHeight = 1;
+
+            Point3D pontoonLeftPoint = GetSumPoint(tankPoint, pontoonShellWidth, pontoonElevation);
+            Point3D pontoonRightPoint = GetSumPoint(tankPoint, tankID - pontoonShellWidth, pontoonElevation);
+
+
+            double ponLeftNozzleRadius = 10;
+            double ponRightNozzleRadius = 20;
+            Line leftPonNozzleFlangeAll = null;
+            Line leftPonNozzlePipeAll = null; ;
+            Line rightPonNozzleFlangeAll = null;
+            Line rightPonNozzlePipeAll = null;
+
+            Point3D deckPoint = null;
+            Point3D pontoonPoint = null;
+
+            switch (refTankType)
+            {
+                case TANK_TYPE.IFRT:
+                case TANK_TYPE.EFRTSingle:
+                    if (true)
+                    {
+                        Line leftPon1 = new Line(GetSumPoint(pontoonLeftPoint, 0, 0),GetSumPoint(pontoonLeftPoint,pontoonWidth,0));
+                        Line leftPon2 = new Line(GetSumPoint(pontoonLeftPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonLeftPoint, pontoonWidth, pontoonMinHeight));
+                        Line leftPon3 = new Line(GetSumPoint(pontoonLeftPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonLeftPoint, 0, 0));
+                        Line leftPon4 = new Line(GetSumPoint(pontoonLeftPoint, pontoonWidth, 0), GetSumPoint(pontoonLeftPoint, pontoonWidth, pontoonMinHeight));
+
+                        Line rightPon1 = new Line(GetSumPoint(pontoonRightPoint, 0, 0), GetSumPoint(pontoonRightPoint, -pontoonWidth, 0));
+                        Line rightPon2 = new Line(GetSumPoint(pontoonRightPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonRightPoint, -pontoonWidth, pontoonMinHeight));
+                        Line rightPon3 = new Line(GetSumPoint(pontoonRightPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonRightPoint, 0, 0));
+                        Line rightPon4 = new Line(GetSumPoint(pontoonRightPoint, -pontoonWidth, 0), GetSumPoint(pontoonRightPoint,-pontoonWidth, pontoonMinHeight));
+
+                        Line ponFlat = new Line(GetSumPoint(pontoonLeftPoint, pontoonWidth, pontoonSingleFlatHeight), GetSumPoint(pontoonRightPoint, -pontoonWidth, pontoonSingleFlatHeight));
+                        newList.AddRange(new Entity[] { leftPon1, leftPon2, leftPon3, leftPon4, rightPon1, rightPon2, rightPon3, rightPon4, ponFlat });
+
+                        // Leader Point
+                        deckPoint = GetSumPoint(ponFlat.MidPoint, 2, 0);
+                        pontoonPoint = GetSumPoint(leftPon1.StartPoint, 2, 0);
+
+                        // Left Nozzle
+                        Point3D ponLeftNozzlePoint = GetSumPoint(pontoonLeftPoint, -pontoonShellWidth + tankRadius - ponLeftNozzleRadius, pontoonSingleFlatHeight);
+                        leftPonNozzlePipeAll = new Line(GetSumPoint(ponLeftNozzlePoint, 0, 0), GetSumPoint(ponLeftNozzlePoint, 0, nozzleHeight));
+                        leftPonNozzleFlangeAll = new Line(GetSumPoint(ponLeftNozzlePoint, -flangeODHalf, nozzleHeight), GetSumPoint(ponLeftNozzlePoint, flangeODHalf, nozzleHeight));
+                        newList.Add(leftPonNozzlePipeAll);
+                        newList.Add(leftPonNozzleFlangeAll);
+
+
+                        // Right Nozzle
+                        Point3D ponRightNozzlePointTemp = GetSumPoint(pontoonLeftPoint, -pontoonShellWidth + tankRadius + ponRightNozzleRadius, pontoonSingleFlatHeight);
+                        Point3D ponRightNozzlePoint = null;
+                        Line vRightNozzleLine = new Line(GetSumPoint(ponRightNozzlePointTemp, 0, 0), GetSumPoint(ponRightNozzlePointTemp, 0, 100));
+                        Point3D[] ponRightInter = vRightNozzleLine.IntersectWith(rightPon2);
+                        if (ponRightInter.Length > 0)
+                        {
+                            ponRightNozzlePoint = ponRightInter[0];
+                            double nozzleHeightAdj = nozzleHeight - 1;
+                            rightPonNozzlePipeAll = new Line(GetSumPoint(ponRightNozzlePoint, 0, 0), GetSumPoint(ponRightNozzlePoint, 0, nozzleHeightAdj));
+                            rightPonNozzleFlangeAll = new Line(GetSumPoint(ponRightNozzlePoint, -flangeODHalf, nozzleHeightAdj), GetSumPoint(ponRightNozzlePoint, flangeODHalf, nozzleHeightAdj));
+                            newList.Add(rightPonNozzlePipeAll);
+                            newList.Add(rightPonNozzleFlangeAll);
+                        }
+
+                    }
+                    break;
+                case TANK_TYPE.EFRTDouble:
+                    if (true)
+                    {
+                        Line leftPon1 = new Line(GetSumPoint(pontoonLeftPoint, 0, 0), GetSumPoint(pontoonLeftPoint, pontoonWidth, 0));
+                        Line leftPon2 = new Line(GetSumPoint(pontoonLeftPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonLeftPoint, pontoonWidth, pontoonMinHeight));
+                        Line leftPon3 = new Line(GetSumPoint(pontoonLeftPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonLeftPoint, 0, 0));
+                        Line leftPon4 = new Line(GetSumPoint(pontoonLeftPoint, pontoonWidth, 0), GetSumPoint(pontoonLeftPoint, pontoonWidth, pontoonMinHeight));
+
+                        Line rightPon1 = new Line(GetSumPoint(pontoonRightPoint, 0, 0), GetSumPoint(pontoonRightPoint, -pontoonWidth, 0));
+                        Line rightPon2 = new Line(GetSumPoint(pontoonRightPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonRightPoint, -pontoonWidth, pontoonMinHeight));
+                        Line rightPon3 = new Line(GetSumPoint(pontoonRightPoint, 0, pontoonMinHeight + pontoonSlopeHeight), GetSumPoint(pontoonRightPoint, 0, 0));
+                        Line rightPon4 = new Line(GetSumPoint(pontoonRightPoint, -pontoonWidth, 0), GetSumPoint(pontoonRightPoint, -pontoonWidth, pontoonMinHeight));
+
+                        Line ponFlat1 = new Line(GetSumPoint(pontoonLeftPoint, pontoonWidth, pontoonMinHeight), GetSumPoint(pontoonRightPoint, -pontoonWidth, pontoonMinHeight));
+                        Line ponFlat2 = new Line(GetSumPoint(pontoonLeftPoint, pontoonWidth, 0), GetSumPoint(pontoonRightPoint, -pontoonWidth, 0));
+                        newList.AddRange(new Entity[] { leftPon1, leftPon2, leftPon3, leftPon4, rightPon1, rightPon2, rightPon3, rightPon4, ponFlat1, ponFlat2 });
+
+                        // Leader Point
+                        deckPoint = GetSumPoint(ponFlat1.MidPoint, 2, 0);
+                        pontoonPoint = GetSumPoint(leftPon1.StartPoint, 2, 0);
+
+                        // Left Nozzle
+                        Point3D ponLeftNozzlePoint = GetSumPoint(pontoonLeftPoint, -pontoonShellWidth + tankRadius - ponLeftNozzleRadius, pontoonMinHeight);
+                        leftPonNozzlePipeAll = new Line(GetSumPoint(ponLeftNozzlePoint, 0, 0), GetSumPoint(ponLeftNozzlePoint, 0, nozzleHeight));
+                        leftPonNozzleFlangeAll = new Line(GetSumPoint(ponLeftNozzlePoint, -flangeODHalf, nozzleHeight), GetSumPoint(ponLeftNozzlePoint, flangeODHalf, nozzleHeight));
+                        newList.Add(leftPonNozzlePipeAll);
+                        newList.Add(leftPonNozzleFlangeAll);
+
+                        // Right Nozzle
+                        Point3D ponRightNozzlePointTemp = GetSumPoint(pontoonLeftPoint, -pontoonShellWidth + tankRadius + ponRightNozzleRadius, pontoonSingleFlatHeight);
+                        Point3D ponRightNozzlePoint = null;
+                        Line vRightNozzleLine = new Line(GetSumPoint(ponRightNozzlePointTemp, 0, 0), GetSumPoint(ponRightNozzlePointTemp, 0, 100));
+                        Point3D[] ponRightInter = vRightNozzleLine.IntersectWith(rightPon2);
+                        if (ponRightInter.Length > 0)
+                        {
+                            ponRightNozzlePoint = ponRightInter[0];
+                            double nozzleHeightAdj = nozzleHeight - 1;
+                            rightPonNozzlePipeAll = new Line(GetSumPoint(ponRightNozzlePoint, 0, 0), GetSumPoint(ponRightNozzlePoint, 0, nozzleHeightAdj));
+                            rightPonNozzleFlangeAll = new Line(GetSumPoint(ponRightNozzlePoint, -flangeODHalf, nozzleHeightAdj), GetSumPoint(ponRightNozzlePoint, flangeODHalf, nozzleHeightAdj));
+                            newList.Add(rightPonNozzlePipeAll);
+                            newList.Add(rightPonNozzleFlangeAll);
+                        }
+                    }
+                    break;
+            }
+
+            
+            // Center Line
+            double exLength = 2;
+            List<Entity> centerLineList = editingService.GetCenterLine(GetSumPoint(tankPoint, tankRadius, -tankBottomThickness), GetSumPoint(tankRoofCenterTopPoint, 0, 0), exLength, 1);
+            styleService.SetLayerListEntity(ref centerLineList, layerService.LayerCenterLine);
+
+
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+            // Dimension
+            double dimTextHeight = 2.5;
+            double dimCenterLineHeight = 12;
+            double dimCenterLineHeight2 = 12;
+            Plane planeLeft = new Plane(Point3D.Origin, Vector3D.AxisY, -1 * Vector3D.AxisX); // plane.XY, vertical writing;
+
+            // Dimension : Roof : R
+            if (refTankType==TANK_TYPE.IFRT || refTankType == TANK_TYPE.EFRTSingle || refTankType== TANK_TYPE.EFRTDouble)
+                dimCenterLineHeight2 = 6;
+
+
+            List<LinearDim> dimList = new List<LinearDim>();
+            List<Entity> leaderList = new List<Entity>();
+
+
+            Point3D dimLeft1 = ((ICurve)centerLineList[2]).EndPoint;
+            Point3D dimRight1 = roofNozzleFlange.MidPoint;
+            Point3D dimMid1 = GetSumPoint(dimLeft1, (dimRight1.X- dimLeft1.X)/2, dimCenterLineHeight);
+            dimList.Add(new LinearDim(Plane.XY, dimLeft1, dimRight1, dimMid1, dimTextHeight){TextOverride = "\"R\""});
+
+            // Dimension : Shell : R
+            Point3D dimLeft2 = GetSumPoint(tankPoint,tankRadius,shellNozzleElevation+flangeODHalf);
+            Point3D dimRight2 = GetSumPoint(shellNozzlePoint, nozzleHeight, flangeODHalf );
+            Point3D dimMid2 = GetSumPoint(dimLeft2, (dimRight2.X - dimLeft2.X) / 2, dimCenterLineHeight2);
+            dimList.Add(new LinearDim(Plane.XY, dimLeft2, dimRight2, dimMid2, dimTextHeight) { TextOverride = "\"R\"",ShowExtLine1=false });
+
+            // Dimension : Roof : H
+            Point3D dimLeft3 = GetSumPoint(roofNozzleFlange.EndPoint, 0,0);
+            Point3D dimRight3 = GetSumPoint(tankPoint, tankID +tankBottomOutWidth, -tankBottomThickness);
+            Point3D dimMid3 = GetSumPoint(dimRight3,  dimCenterLineHeight*1.4, (dimLeft3.Y - dimRight3.Y) / 2);
+            dimList.Add(new LinearDim(planeLeft, dimLeft3, dimRight3, dimMid3, dimTextHeight) { TextOverride = "\"H\""});
+
+            // Dimension : Shell : H
+            Point3D dimLeft4 = GetSumPoint(shellNozzleFlange.MidPoint, 0, 0);
+            Point3D dimRight4 = GetSumPoint(tankPoint, tankID + tankBottomOutWidth, -tankBottomThickness);
+            Point3D dimMid4 = GetSumPoint(dimLeft4, dimCenterLineHeight*0.6 , (dimRight4.Y - dimLeft4.Y) / 2);
+            dimList.Add(new LinearDim(planeLeft, dimLeft4, dimRight4, dimMid4, dimTextHeight) { TextOverride = "\"H\"",ArrowsLocation=elementPositionType.Inside, ShowExtLine1 = false });
+
+            if(refTankType==TANK_TYPE.IFRT || refTankType == TANK_TYPE.EFRTSingle  || refTankType == TANK_TYPE.EFRTDouble)
+            {
+                dimCenterLineHeight = 10;
+                if (refTankType == TANK_TYPE.EFRTDouble)
+                    dimCenterLineHeight = dimCenterLineHeight - (2.5 / 2);
+
+                Point3D dimPonLeft1 = leftPonNozzleFlangeAll.MidPoint;
+                Point3D dimPonRight1 = GetSumPoint(dimPonLeft1, ponLeftNozzleRadius, 0);
+                Point3D dimPonMid1 = GetSumPoint(dimPonLeft1, (dimPonRight1.X - dimPonLeft1.X) / 2, dimCenterLineHeight);
+                dimList.Add(new LinearDim(Plane.XY, dimPonLeft1, dimPonRight1, dimPonMid1, dimTextHeight) { TextOverride = "\"R\"",ArrowsLocation=elementPositionType.Inside, ShowExtLine2=false });
+
+                Point3D dimPonRight2 = rightPonNozzleFlangeAll.MidPoint;
+                Point3D dimPonLeft2 = GetSumPoint(dimPonRight2, -ponRightNozzleRadius, 0);
+                Point3D dimPonMid2 = new Point3D(GetSumPoint(dimPonLeft2, (dimPonRight2.X - dimPonLeft2.X) / 2, dimCenterLineHeight).X,dimPonMid1.Y);
+                dimList.Add(new LinearDim(Plane.XY, dimPonLeft2, dimPonRight2, dimPonMid2, dimTextHeight) { TextOverride = "\"R\"", ShowExtLine1 = false });
+
+                // Dimension : Shell : H
+                Point3D dimPonLeft4 = GetSumPoint(leftPonNozzleFlangeAll.EndPoint, 0, 0);
+                Point3D dimPonRight4 = GetSumPoint(leftPonNozzlePipeAll.StartPoint, 0, 0);
+                Point3D dimPonMid4 = GetSumPoint(dimPonLeft4, dimCenterLineHeight * 0.4, (dimPonRight4.Y - dimPonLeft4.Y) / 2);
+                dimList.Add(new LinearDim(planeLeft, dimPonLeft4, dimPonRight4, dimPonMid4, dimTextHeight) { TextOverride = "\"H\"", ArrowsLocation = elementPositionType.Outside,TextLocation=elementPositionType.Outside, ShowExtLine1 = false });
+
+                // Dimension : Shell : H
+                Point3D dimPonLeft5 = GetSumPoint(rightPonNozzleFlangeAll.EndPoint, 0, 0);
+                Point3D dimPonRight5 = GetSumPoint(rightPonNozzlePipeAll.StartPoint, 0, 0);
+                Point3D dimPonMid5=new Point3D(dimMid4.X, GetSumPoint(dimPonLeft5, dimCenterLineHeight * 0.4, 0).Y);
+                dimList.Add(new LinearDim(planeLeft, dimPonLeft5, dimPonRight5, dimPonMid5, dimTextHeight) { TextOverride = "\"H\"", ArrowsLocation = elementPositionType.Outside, TextLocation = elementPositionType.Outside });
+
+
+
+                Point3D deckTextPoint = GetSumPoint(deckPoint, 4, 8);
+                Leader deckLeader = new Leader(Plane.XY, new Point3D[] { deckPoint, deckTextPoint,GetSumPoint(deckTextPoint,11,0) });
+                Text deckText = new Text(GetSumPoint(deckTextPoint, 1,0.5), "DECK", 2.5);
+                deckText.Alignment = Text.alignmentType.BaselineLeft;
+                leaderList.Add(deckLeader);
+
+                Point3D ponTextPoint = GetSumPoint(pontoonPoint, 3, -14);
+                Leader ponLeader = new Leader(Plane.XY, new Point3D[] { pontoonPoint, ponTextPoint, GetSumPoint(ponTextPoint, 18.5, 0) });
+                Text ponText = new Text(GetSumPoint(ponTextPoint, 1, 0.5), "PONTOON", 2.5);
+                ponText.Alignment = Text.alignmentType.BaselineLeft;
+                leaderList.Add(ponLeader);
+
+                styleService.SetLayerListEntity(ref leaderList, layerService.LayerDimension);
+                styleService.SetLayer(ref deckText, layerService.LayerDimension);
+                styleService.SetLayer(ref ponText, layerService.LayerDimension);
+                leaderList.Add(deckText);
+                leaderList.Add(ponText);
+
+            }
+
+            foreach (LinearDim eachDim in dimList)
+            {
+                eachDim.LayerName = layerService.LayerDimension;
+                eachDim.LineTypeMethod = colorMethodType.byLayer;
+                eachDim.ColorMethod = colorMethodType.byLayer;
+            }
+
+            // Text
+            List<Entity> textList = new List<Entity>();
+            double textHeight = 2.5;
+            Point3D textCenter = GetSumPoint(tankPoint, tankID + tankBottomOutWidth + 12 * 1.4 / 2,tankBottomThickness);
+            Text newUnderText1 = new Text(GetSumPoint(textCenter,0, -textHeight*2 -0.5), "UNDER", textHeight);
+            newUnderText1.Alignment = Text.alignmentType.BottomCenter;
+            Text newUnderText2 = new Text(GetSumPoint(textCenter,0,-textHeight*3-1), "OF BTM.", textHeight);
+            newUnderText2.Alignment = Text.alignmentType.BottomCenter;
+            textList.Add(newUnderText1);
+            textList.Add(newUnderText2);
+
+            styleService.SetLayerListEntity(ref textList, layerService.LayerDimension);
+
+            // Title
+            List<Entity> titleList = new List<Entity>();
+            Point3D titleBaseCenter1 = GetSumPoint(referencePoint, boxWidth / 2, 7);
+            Point3D titleBaseCenter2 = GetSumPoint(referencePoint, boxWidth / 2, 8);
+            Point3D titleTextCenter = GetSumPoint(referencePoint, boxWidth / 2, 9);
+
+            double baseLineWidth = 65;
+            Line titleBaseLine1 = new Line(GetSumPoint(titleBaseCenter1, -baseLineWidth / 2, 0), GetSumPoint(titleBaseCenter1, baseLineWidth / 2, 0));
+            styleService.SetLayer(ref titleBaseLine1, layerService.LayerOutLine);
+            Line titleBaseLine2 = new Line(GetSumPoint(titleBaseCenter2, -baseLineWidth / 2, 0), GetSumPoint(titleBaseCenter2, baseLineWidth / 2, 0));
+            styleService.SetLayer(ref titleBaseLine2, layerService.LayerDimension);
+            Text titleText = new Text(titleTextCenter, "NOZZLE PROJECTION", 4);
+            titleText.Alignment = Text.alignmentType.BaselineCenter;
+            titleText.ColorMethod = colorMethodType.byEntity;
+            titleText.Color = Color.Yellow;
+            titleList.AddRange(new Entity[] { titleBaseLine1, titleBaseLine2, titleText });
+
+            newList.AddRange(dimList);
+            newList.AddRange(centerLineList);
+            newList.AddRange(textList);
+            newList.AddRange(leaderList);
+            newList.AddRange(titleList);
+
+
+            return newList;
+        }
 
 
         #region Nozzle : 공통
@@ -3618,3 +4170,4 @@ namespace DrawWork.DrawServices
         #endregion
     }
 }
+
