@@ -1923,7 +1923,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:PaperSetting, Version=2.4.5.8, Culture=neutral, processorArchitecture=AMD64"
+            "AssemblyAsmDisplayName" = "8:PaperSetting, Version=2.4.6.4, Culture=neutral, processorArchitecture=AMD64"
                 "ScatterAssemblies"
                 {
                     "_AEBCBB7326882D3EFCCC6A9419E1FBAA"
@@ -2316,15 +2316,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TABASAddin"
-        "ProductCode" = "8:{1C4FE0AD-1D6F-482A-B7EF-373F8201ED68}"
-        "PackageCode" = "8:{C5E807CB-06F3-40C9-B7C5-FFCD9AD448CB}"
+        "ProductCode" = "8:{94B75081-421A-44D1-8E1E-60D0EED4CD57}"
+        "PackageCode" = "8:{C54AD210-233D-407F-BA34-C4785156DD8A}"
         "UpgradeCode" = "8:{BCEF9ECD-E03B-408F-8CED-85BF5E673867}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
-        "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:2.4.58"
+        "InstallAllUsers" = "11:TRUE"
+        "ProductVersion" = "8:2.4.64"
         "Manufacturer" = "8:SamsungEngMoogongEng"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

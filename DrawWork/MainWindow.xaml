@@ -7,7 +7,9 @@
         xmlns:vm="clr-namespace:DrawWork.ViewModels"
     
     
-        xmlns:ddes="http://schemas.devdept.com/winfx/2008/xaml/control" xmlns:ddgr="http://schemas.devdept.com/winfx/2008/xaml/graphics" x:Class="DrawWork.MainWindow"
+        xmlns:ddes="http://schemas.devdept.com/winfx/2008/xaml/control" 
+        xmlns:ddgr="http://schemas.devdept.com/winfx/2008/xaml/graphics" 
+        x:Class="DrawWork.MainWindow"
     
         mc:Ignorable="d"
         Title="Draw Logic Preview" Height="450" Width="800" WindowStartupLocation="CenterScreen" Closed="Window_Closed">

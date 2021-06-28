@@ -39,6 +39,7 @@ using DrawWork.ImportServices;
 using PaperSetting.Utils;
 using DrawWork.DrawBuilders;
 using devDept.Eyeshot;
+using System.Diagnostics;
 
 namespace PaperSetting
 {
@@ -129,6 +130,11 @@ namespace PaperSetting
             workbookName = "DRT TEST-1.xlsm";
             workbookName = "DRT TEST_20210610.xlsm";
             workbookName = "1.CRT.xlsm";
+            workbookName = "1.CRT_Test.xlsm";
+            workbookName = "TABAS_20210614_blank_CRT.xlsm";
+            workbookName = "TABAS_20210614_data_CRT.xlsm";
+            //workbookName = "TABAS_20210614_blank_DRT.xlsm";
+
             //workbookName = "2.DRT.xlsm";
             //workbookName = "3.IFRT.xlsm";
             //workbookName = "4.FRT_Single.xlsm";
@@ -837,9 +843,12 @@ namespace PaperSetting
 
         private void btnTitleBlock_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            TitleBlockWindow cc = new TitleBlockWindow();
-            cc.Owner = this;
-            cc.ShowDialog();
+            //TitleBlockWindow cc = new TitleBlockWindow();
+            //cc.Owner = this;
+            //cc.ShowDialog();
+
+
+            BusyStartSource(true);
         }
 
 
@@ -976,6 +985,16 @@ namespace PaperSetting
             IsBusy = selBusy;
             BusyAngle = 0;
 
+            int imageMin = 1;
+            int imageCurrent = imageMin;
+            int imageMax = 90;
+
+            int ringMin = 1;
+            int ringCurrent = ringMin;
+            int ringMax = 3;
+
+            Stopwatch sw = new Stopwatch();
+
             busyAreaSource.Visibility = Visibility.Visible;
 
             BusyWorker = new BackgroundWorker();
@@ -983,23 +1002,43 @@ namespace PaperSetting
             BusyWorker.WorkerSupportsCancellation = true;
             BusyWorker.ProgressChanged += (ssender, ee) =>
             {
-                BusyAngle += 30;
-                if (BusyAngle == 360)
-                    BusyAngle = 0;
-                RotateTransform rt = new RotateTransform();
-                rt.Angle = BusyAngle;
-                rt.CenterX = 50;
-                rt.CenterY = 50;
+                //BusyAngle += 30;
+                //if (BusyAngle == 360)
+                //    BusyAngle = 0;
+                //RotateTransform rt = new RotateTransform();
+                //rt.Angle = BusyAngle;
+                //rt.CenterX = 50;
+                //rt.CenterY = 50;
 
-                busyImageSource.RenderTransform = rt;
+                //busyImageSource.RenderTransform = rt;
+                string imageString = @"/PaperSetting;component/BusyImage/" + imageCurrent + ".png";
+                busyImageSource.Source = new BitmapImage(new Uri(@imageString, UriKind.Relative));
+
+                imageCurrent++;
+                if (imageMax == imageCurrent)
+                    imageCurrent = imageMin;
+
+                //string imageRing = @"/DesignBoard;component/BusyImage/raser_bottom_light0" + ringCurrent + ".png";
+                //busysdRing.Source = new BitmapImage(new Uri(imageRing, UriKind.Relative));
+                //ringCurrent++;
+                //if (ringMax == ringCurrent)
+                //    ringCurrent = ringMin;
+
+                if (sw.ElapsedMilliseconds > 7100)
+                {
+                    IsBusy = false;
+                }
             };
             BusyWorker.RunWorkerCompleted += (ssender, ee) =>
             {
+                tabDetail.SelectedItem = previewpreview;
                 busyAreaSource.Visibility = Visibility.Hidden;
                 selCursor.Dispose();
+
             };
             BusyWorker.DoWork += (ssender, ee) =>
             {
+                sw.Start();
                 while (IsBusy)
                 {
                     BusyWorker.ReportProgress(1);
@@ -1008,7 +1047,6 @@ namespace PaperSetting
             };
             BusyWorker.RunWorkerAsync();
         }
-
         #endregion
 
         private void testModel_ProgressChanged(object sender, devDept.Eyeshot.ProgressChangedEventArgs e)
@@ -1027,7 +1065,7 @@ namespace PaperSetting
 
             this.testDraw.Entities.RegenAllCurved(0.0005);
             this.testDraw.Refresh();
-            //this.testDraw.ZoomFit();
+            this.testDraw.ZoomFit();
         }
     }
 }

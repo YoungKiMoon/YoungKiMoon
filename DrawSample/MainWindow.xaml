@@ -1,0 +1,124 @@
+﻿<Window x:Class="DrawSample.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DrawSample"
+        
+        xmlns:ddes="http://schemas.devdept.com/winfx/2008/xaml/control" 
+        xmlns:ddgr="http://schemas.devdept.com/winfx/2008/xaml/graphics" 
+        xmlns:vm="clr-namespace:DrawSample.ViewModels"
+        
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="56"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0" Margin="10,0,0,0">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="btnDraw" Content="ReDraw"  Click="btnDraw_Click"/>
+                <Button x:Name="btnDetection" Content="ReDetection" Margin="10,0,0,0" Click="btnDetection_Click" />
+                <Button x:Name="btnMark" Content="Mark" Margin="10,0,0,0" Click="btnMark_Click"  />
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1" Margin="10,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Intersect Total : "/>
+                    <TextBox x:Name="tbIntersect"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Visibility="Collapsed">
+                    <TextBlock Text="Outline Intersect : "/>
+                    <TextBox x:Name="tbOutline"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Visibility="Collapsed">
+                    <TextBlock Text="Shape Intersect : "/>
+                    <TextBox x:Name="tbShape"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+            <ddes:Model x:Name="testModel" MouseDown="testModel_MouseDown" >
+                <ddes:Model.ProgressBar>
+                    <ddes:ProgressBar Lighting="False"/>
+                </ddes:Model.ProgressBar>
+                <ddes:Model.Viewports>
+                    <ddes:Viewport DisplayMode="Wireframe" InitialView="Other">
+                        <ddes:Viewport.Background>
+                            <ddgr:BackgroundSettings BottomColor="#FF00BFFF" StyleMode="Solid" TopColor="#FFFFFFFF"/>
+                        </ddes:Viewport.Background>
+                        <ddes:Viewport.CoordinateSystemIcon>
+                            <ddes:CoordinateSystemIcon Lighting="False"/>
+                        </ddes:Viewport.CoordinateSystemIcon>
+                        <ddes:Viewport.Camera>
+                            <ddes:Camera Distance="97.257904648780809" ProjectionMode="Orthographic" Rotation="0.5, 0.5, 0.5, 0.5" Target="0, 2, 47" ZoomFactor="1.9901795294851166"/>
+                        </ddes:Viewport.Camera>
+                        <ddes:Viewport.Grids>
+                            <ddes:Grid Lighting="False" Visible="False"/>
+                        </ddes:Viewport.Grids>
+                        <ddes:Viewport.OriginSymbols>
+                            <ddes:OriginSymbol Lighting="False"/>
+                        </ddes:Viewport.OriginSymbols>
+                        <ddes:Viewport.Rotate>
+                            <ddes:RotateSettings Enabled="False"/>
+                        </ddes:Viewport.Rotate>
+                        <ddes:Viewport.ToolBars>
+                            <ddes:ToolBar>
+                                <ddes:ToolBar.Buttons>
+                                    <ddes:MagnifyingGlassToolBarButton/>
+                                    <ddes:ZoomWindowToolBarButton/>
+                                    <ddes:ZoomToolBarButton/>
+                                    <ddes:PanToolBarButton/>
+                                    <ddes:ZoomFitToolBarButton/>
+                                </ddes:ToolBar.Buttons>
+                            </ddes:ToolBar>
+                        </ddes:Viewport.ToolBars>
+                        <ddes:Viewport.ViewCubeIcon>
+                            <ddes:ViewCubeIcon Lighting="False" Visible="False"/>
+                        </ddes:Viewport.ViewCubeIcon>
+                    </ddes:Viewport>
+                </ddes:Model.Viewports>
+            </ddes:Model>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="200"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button x:Name="shiftLeft" Content="LEFT" Grid.Row="1" Grid.Column="0" Click="shiftLeft_Click"/>
+                    <Button x:Name="shiftRight" Content="RIGHT" Grid.Row="1" Grid.Column="2" Click="shiftRight_Click"/>
+                    <Button x:Name="shiftBottom" Content="BOTTOM" Grid.Row="2" Grid.Column="1" Click="shiftBottom_Click"/>
+                    <Button x:Name="shiftTop" Content="TOP" Grid.Row="0" Grid.Column="1" Click="shiftTop_Click"/>
+                </Grid>
+            </Grid>
+        </Grid>
+
+    </Grid>
+</Window>

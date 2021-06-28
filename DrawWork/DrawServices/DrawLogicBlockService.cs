@@ -474,8 +474,23 @@ namespace DrawWork.DrawServices
 
             List<Entity> customLine = new List<Entity>();
 
-            // Roof Slope
-            string roofSlopeString = assemblyData.RoofCompressionRing[firstIndex].RoofSlope;
+
+            if (StructureDivService.columnType == "column")
+            {
+                if(assemblyData.StructureCRTColumnInput.Count==0)
+                    return customBlockList.ToArray();
+                if (assemblyData.StructureCRTRafterInput.Count == 0)
+                    return customBlockList.ToArray();
+            }
+            else if (StructureDivService.columnType == "centering")
+            {
+                if(assemblyData.StructureCRTRafterInput.Count==0)
+                    return customBlockList.ToArray();
+            }
+
+
+                // Roof Slope
+                string roofSlopeString = assemblyData.RoofCompressionRing[firstIndex].RoofSlope;
             double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
 
 
@@ -1803,548 +1818,555 @@ namespace DrawWork.DrawServices
             double centerRadius = 0; // Center
 
 
-            // DRT : Only Centering
-            if (StructureDivService.columnType == "centering")
+            // Rafter Check
+            if (assemblyData.StructureDRTRafterInput.Count > 0)
             {
-                if (StructureDivService.centeringInEx == "internal")
+
+            
+
+
+                // DRT : Only Centering
+                if (StructureDivService.columnType == "centering")
                 {
-                    // Shell Side Pad
-                    #region Support Clip Shell Side
-                    StructureClipShellSideModel eachSupportClip = new StructureClipShellSideModel();
-                    if (assemblyData.StructureDRTClipShellSideOutput.Count > 0)
-                        eachSupportClip = assemblyData.StructureDRTClipShellSideOutput[firstIndex];
-
-                    double scA = valueService.GetDoubleValue(eachSupportClip.A);
-                    double scB = valueService.GetDoubleValue(eachSupportClip.B);
-                    double scC = valueService.GetDoubleValue(eachSupportClip.C);
-                    double scD = valueService.GetDoubleValue(eachSupportClip.D);
-                    double scE = valueService.GetDoubleValue(eachSupportClip.E);
-                    double scF = valueService.GetDoubleValue(eachSupportClip.F);
-                    double scG = valueService.GetDoubleValue(eachSupportClip.G);
-                    double scHoleQty = valueService.GetDoubleValue(eachSupportClip.HoleQty);
-
-                    double boltHoleHeight = valueService.GetDoubleValue(eachSupportClip.SlotholeHt);
-                    double boltHoleWidth = valueService.GetDoubleValue(eachSupportClip.SlotholeWd);
-
-
-                    double scG1 = valueService.GetDoubleValue(eachSupportClip.G1);
-                    double scA1 = valueService.GetDoubleValue(eachSupportClip.A1);
-
-                    double scB1 = valueService.GetDoubleValue(eachSupportClip.B1);
-                    double shellClipPadWidth = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness);
-                    double scC1 = valueService.GetDoubleValue(eachSupportClip.C1);
-                    double scD1 = valueService.GetDoubleValue(eachSupportClip.D1);
-                    double scH1 = valueService.GetDoubleValue(eachSupportClip.H1);
-                    double scE1 = valueService.GetDoubleValue(eachSupportClip.E1);
-                    double scF1 = valueService.GetDoubleValue(eachSupportClip.F1);
-
-
-
-
-                    // Sheel Pad
-                    Line shellClipPad1 = new Line(GetSumPoint(leftTankTop, 0, -scB1), GetSumPoint(leftTankTop, 0, -scB1 - scF));
-                    Line shellClipPad2 = new Line(GetSumPoint(leftTankTop, shellClipPadWidth, -scB1), GetSumPoint(leftTankTop, shellClipPadWidth, -scB1 - scF));
-                    Line shellClipPad3 = new Line(GetSumPoint(leftTankTop, 0, -scB1), GetSumPoint(leftTankTop, shellClipPadWidth, -scB1));
-                    Line shellClipPad4 = new Line(GetSumPoint(leftTankTop, 0, -scB1 - scF), GetSumPoint(leftTankTop, shellClipPadWidth, -scB1 - scF));
-                    customBlockList.AddRange(new Line[] { shellClipPad1, shellClipPad2, shellClipPad3, shellClipPad4 });
-
-
-
-
-
-
-                    // 수직 방향 이동 : 아래쪽
-                    CDPoint leftTankRoofTopOrigin = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjLeftRoofDown, scD1, ref refPoint, ref curPoint);
-
-                    Vector3D leftTankRoofTopOriginDirection = new Vector3D(GetSumPoint(leftTankRoofTopOrigin, 0, 0), workingPointService.DRTWorkingData.RoofCenterPoint);
-                    leftTankRoofTopOriginDirection.Normalize();
-
-                    Vector3D rafterDirection = new Vector3D(GetSumPoint(leftTankRoofTopOrigin, 0, 0), workingPointService.DRTWorkingData.RoofCenterPoint);
-                    rafterDirection.Normalize();
-
-                    Vector3D rafterDirectionUp = new Vector3D(workingPointService.DRTWorkingData.RoofCenterPoint, GetSumPoint(leftTankRoofTopOrigin, 0, 0));
-                    rafterDirectionUp.Normalize();
-
-                    // Compression Ring
-                    double compressionRingThicknees = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].ThicknessT1);
-                    Point3D LeftCompressionPoint = new Point3D();
-                    Line newLineCompressionC = null;
-                    if (assemblyData.RoofCompressionRing[0].CompressionRingType == "Detail i")
+                    if (StructureDivService.centeringInEx == "internal")
                     {
-                        scB = scA - scA1 - compressionRingThicknees;
+                        // Shell Side Pad
+                        #region Support Clip Shell Side
+                        StructureClipShellSideModel eachSupportClip = new StructureClipShellSideModel();
+                        if (assemblyData.StructureDRTClipShellSideOutput.Count > 0)
+                            eachSupportClip = assemblyData.StructureDRTClipShellSideOutput[firstIndex];
 
-                        double comDegree = workingPointService.DRTWorkingData.CompressionRingDegree;
+                        double scA = valueService.GetDoubleValue(eachSupportClip.A);
+                        double scB = valueService.GetDoubleValue(eachSupportClip.B);
+                        double scC = valueService.GetDoubleValue(eachSupportClip.C);
+                        double scD = valueService.GetDoubleValue(eachSupportClip.D);
+                        double scE = valueService.GetDoubleValue(eachSupportClip.E);
+                        double scF = valueService.GetDoubleValue(eachSupportClip.F);
+                        double scG = valueService.GetDoubleValue(eachSupportClip.G);
+                        double scHoleQty = valueService.GetDoubleValue(eachSupportClip.HoleQty);
 
-                        double leftTankRoofPointHeight = valueService.GetOppositeByWidth(comDegree, shellMaxThickness + scD1);
-                        CDPoint leftTankRoofTopOriginCompression = GetSumCDPoint(leftTankTop, scD1, leftTankRoofPointHeight);
+                        double boltHoleHeight = valueService.GetDoubleValue(eachSupportClip.SlotholeHt);
+                        double boltHoleWidth = valueService.GetDoubleValue(eachSupportClip.SlotholeWd);
 
-                        // Direction
-                        Line newDirectionLine = new Line(GetSumPoint(refPoint, 0, 0), GetSumPoint(refPoint, 100, 0));
-                        newDirectionLine.Rotate(comDegree, Vector3D.AxisZ, GetSumPoint(refPoint, 0, 0));
-                        newDirectionLine.Rotate(Utility.DegToRad(-90), Vector3D.AxisZ, GetSumPoint(refPoint, 0, 0));
-                        Vector3D compressionDirection = new Vector3D(newDirectionLine.StartPoint, newDirectionLine.EndPoint);
-                        compressionDirection.Normalize();
-                        // 적용
 
+                        double scG1 = valueService.GetDoubleValue(eachSupportClip.G1);
+                        double scA1 = valueService.GetDoubleValue(eachSupportClip.A1);
 
+                        double scB1 = valueService.GetDoubleValue(eachSupportClip.B1);
+                        double shellClipPadWidth = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness);
+                        double scC1 = valueService.GetDoubleValue(eachSupportClip.C1);
+                        double scD1 = valueService.GetDoubleValue(eachSupportClip.D1);
+                        double scH1 = valueService.GetDoubleValue(eachSupportClip.H1);
+                        double scE1 = valueService.GetDoubleValue(eachSupportClip.E1);
+                        double scF1 = valueService.GetDoubleValue(eachSupportClip.F1);
 
-                        leftTankRoofTopOrigin = GetSumCDPoint(leftTankRoofTopOriginCompression, 0, 0);
-                        leftTankRoofTopOriginDirection = compressionDirection;
 
 
 
-                        // Compressionring : i type
-                        double A = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].OutsideProjectionA);
-                        double B = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].WidthB);
-                        double C = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].OverlapOfRoofAndCompRingC);
-                        double t1 = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].ThicknessT1);
+                        // Sheel Pad
+                        Line shellClipPad1 = new Line(GetSumPoint(leftTankTop, 0, -scB1), GetSumPoint(leftTankTop, 0, -scB1 - scF));
+                        Line shellClipPad2 = new Line(GetSumPoint(leftTankTop, shellClipPadWidth, -scB1), GetSumPoint(leftTankTop, shellClipPadWidth, -scB1 - scF));
+                        Line shellClipPad3 = new Line(GetSumPoint(leftTankTop, 0, -scB1), GetSumPoint(leftTankTop, shellClipPadWidth, -scB1));
+                        Line shellClipPad4 = new Line(GetSumPoint(leftTankTop, 0, -scB1 - scF), GetSumPoint(leftTankTop, shellClipPadWidth, -scB1 - scF));
+                        customBlockList.AddRange(new Line[] { shellClipPad1, shellClipPad2, shellClipPad3, shellClipPad4 });
 
-                        // left Compression Point
-                        double comLength = B - A;// 임시로 고정, 50 값 수정 해야 함
-                        Point3D newLineCompressionA = GetSumPoint(leftTankTop,
-                                                        -shellMaxThickness + valueService.GetAdjacentByHypotenuse(comDegree, comLength),
-                                                        valueService.GetOppositeByHypotenuse(comDegree, comLength));
-                        comLength += 50;// 임시로 고정, 50 값 수정 해야 함
-                        Point3D newLineCompressionB = GetSumPoint(leftTankTop,
-                                                        -shellMaxThickness + valueService.GetAdjacentByHypotenuse(comDegree, comLength),
-                                                        valueService.GetOppositeByHypotenuse(comDegree, comLength));
 
-                        Line lineA = new Line(GetSumPoint(newLineCompressionA, 0, 0), GetSumPoint(newLineCompressionB, 0, 0));
 
-                        newLineCompressionC = new Line(GetSumPoint(newLineCompressionB, 0, 0), GetSumPoint(newLineCompressionB, 0, 0) + (rafterDirectionUp * t1 * 100));
-                        Point3D leftTopComressPoint = editingService.GetIntersectWidth(newLineCompressionC, workingPointService.DRTWorkingData.circleRoofLower, 0);
 
-                        Line lineB = new Line(GetSumPoint(leftTopComressPoint, 0, 0), GetSumPoint(newLineCompressionB, 0, 0));
 
-                        customBlockList.Add(lineA);
-                        customBlockList.Add(lineB);
-                    }
 
+                        // 수직 방향 이동 : 아래쪽
+                        CDPoint leftTankRoofTopOrigin = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjLeftRoofDown, scD1, ref refPoint, ref curPoint);
 
+                        Vector3D leftTankRoofTopOriginDirection = new Vector3D(GetSumPoint(leftTankRoofTopOrigin, 0, 0), workingPointService.DRTWorkingData.RoofCenterPoint);
+                        leftTankRoofTopOriginDirection.Normalize();
 
-                    Point3D leftTankRoofTop1 = GetSumPoint(leftTankRoofTopOrigin, 0, 0) + (leftTankRoofTopOriginDirection * scA1);
+                        Vector3D rafterDirection = new Vector3D(GetSumPoint(leftTankRoofTopOrigin, 0, 0), workingPointService.DRTWorkingData.RoofCenterPoint);
+                        rafterDirection.Normalize();
 
-                    Line topPadLine = new Line(GetSumPoint(leftTankRoofTop1, 0, 0), GetSumPoint(leftTankRoofTop1, 0, 0));
-                    topPadLine.EndPoint = topPadLine.EndPoint + (leftTankRoofTopOriginDirection * scG1);
-                    topPadLine.Rotate(Utility.DegToRad(90), Vector3D.AxisZ, GetSumPoint(leftTankRoofTop1, 0, 0));
-                    Point3D leftTankRoofTop2 = GetSumPoint(topPadLine.EndPoint, 0, 0);
-                    Line topPadLine2 = new Line(GetSumPoint(leftTankRoofTop2, 0, 0), leftTankRoofTop2 + (leftTankRoofTopOriginDirection * scB));
-                    Point3D leftTankRoofTop3 = GetSumPoint(topPadLine2.EndPoint, 0, 0);
+                        Vector3D rafterDirectionUp = new Vector3D(workingPointService.DRTWorkingData.RoofCenterPoint, GetSumPoint(leftTankRoofTopOrigin, 0, 0));
+                        rafterDirectionUp.Normalize();
 
+                        // Compression Ring
+                        double compressionRingThicknees = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].ThicknessT1);
+                        Point3D LeftCompressionPoint = new Point3D();
+                        Line newLineCompressionC = null;
+                        if (assemblyData.RoofCompressionRing[0].CompressionRingType == "Detail i")
+                        {
+                            scB = scA - scA1 - compressionRingThicknees;
 
-                    Line shellClipTri1 = new Line(GetSumPoint(leftTankTop, shellClipPadWidth, -scB1 - scC1), GetSumPoint(leftTankRoofTop1, 0, 0));
-                    Line shellClipTri4 = new Line(GetSumPoint(leftTankRoofTop3, 0, 0), GetSumPoint(leftTankTop, shellClipPadWidth + scH1, -scB1 - scF + scC1));
-                    Line shellClipTri5 = new Line(GetSumPoint(leftTankTop, shellClipPadWidth, -scB1 - scF + scC1), GetSumPoint(leftTankTop, shellClipPadWidth + scH1, -scB1 - scF + scC1));
-                    customBlockList.AddRange(new Line[] { shellClipTri1, topPadLine, topPadLine2, shellClipTri4, shellClipTri5 });
+                            double comDegree = workingPointService.DRTWorkingData.CompressionRingDegree;
 
+                            double leftTankRoofPointHeight = valueService.GetOppositeByWidth(comDegree, shellMaxThickness + scD1);
+                            CDPoint leftTankRoofTopOriginCompression = GetSumCDPoint(leftTankTop, scD1, leftTankRoofPointHeight);
 
+                            // Direction
+                            Line newDirectionLine = new Line(GetSumPoint(refPoint, 0, 0), GetSumPoint(refPoint, 100, 0));
+                            newDirectionLine.Rotate(comDegree, Vector3D.AxisZ, GetSumPoint(refPoint, 0, 0));
+                            newDirectionLine.Rotate(Utility.DegToRad(-90), Vector3D.AxisZ, GetSumPoint(refPoint, 0, 0));
+                            Vector3D compressionDirection = new Vector3D(newDirectionLine.StartPoint, newDirectionLine.EndPoint);
+                            compressionDirection.Normalize();
+                            // 적용
 
-                    // Hole
-                    Point3D firstHolePoint = GetSumPoint(leftTankRoofTop1, 0, 0) + (leftTankRoofTopOriginDirection * scC);
-                    Point3D secondHolePoint = GetSumPoint(leftTankRoofTop1, 0, 0) + (leftTankRoofTopOriginDirection * scD);
 
 
-                    Line holeLine01 = new Line(GetSumPoint(firstHolePoint, 0, 0), GetSumPoint(firstHolePoint, 0, 0) + (leftTankRoofTopOriginDirection * scE1));
-                    holeLine01.Rotate(Utility.DegToRad(90), Vector3D.AxisZ, GetSumPoint(firstHolePoint, 0, 0));
-                    Line holeLine02 = new Line(GetSumPoint(firstHolePoint, 0, 0), GetSumPoint(firstHolePoint, 0, 0) + (leftTankRoofTopOriginDirection * (scE1 + scF1)));
-                    holeLine02.Rotate(Utility.DegToRad(90), Vector3D.AxisZ, GetSumPoint(firstHolePoint, 0, 0));
-                    Point3D holePoint01 = GetSumPoint(holeLine01.EndPoint, 0, 0);
-                    Point3D holePoint02 = GetSumPoint(holeLine02.EndPoint, 0, 0);
+                            leftTankRoofTopOrigin = GetSumCDPoint(leftTankRoofTopOriginCompression, 0, 0);
+                            leftTankRoofTopOriginDirection = compressionDirection;
 
-                    Vector3D holeAngle = new Vector3D(GetSumPoint(holeLine01.StartPoint, 0, 0), GetSumPoint(holeLine01.EndPoint, 0, 0));
 
-                    CompositeCurve hole01 = GetBoltHoleHorizontal(holePoint01, boltHoleWidth, boltHoleHeight);
-                    hole01.Rotate(holeAngle.Angle, Vector3D.AxisZ, holePoint01);
-                    CompositeCurve hole02 = GetBoltHoleHorizontal(holePoint02, boltHoleWidth, boltHoleHeight);
-                    hole02.Rotate(holeAngle.Angle, Vector3D.AxisZ, holePoint02);
-                    customBlockList.AddRange(new CompositeCurve[] { hole01, hole02 });
 
-                    List<Entity> circle01 = DrawReference_Hole(holePoint01, boltHoleHeight / 2, holeAngle.Angle, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
-                    List<Entity> circle02 = DrawReference_Hole(holePoint02, boltHoleHeight / 2, holeAngle.Angle, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
-                    customLine.AddRange(circle01);
-                    customLine.AddRange(circle02);
+                            // Compressionring : i type
+                            double A = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].OutsideProjectionA);
+                            double B = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].WidthB);
+                            double C = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].OverlapOfRoofAndCompRingC);
+                            double t1 = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].ThicknessT1);
 
-                    if (scHoleQty == 4)
-                    {
-                        Line holeLine03 = (Line)holeLine01.Offset(scD, Vector3D.AxisZ, 0.01, true);// 아래로
-                        Line holeLine04 = (Line)holeLine02.Offset(scD, Vector3D.AxisZ, 0.01, true);// 아래로
-                        Point3D holePoint03 = GetSumPoint(holeLine03.EndPoint, 0, 0);
-                        Point3D holePoint04 = GetSumPoint(holeLine04.EndPoint, 0, 0);
+                            // left Compression Point
+                            double comLength = B - A;// 임시로 고정, 50 값 수정 해야 함
+                            Point3D newLineCompressionA = GetSumPoint(leftTankTop,
+                                                            -shellMaxThickness + valueService.GetAdjacentByHypotenuse(comDegree, comLength),
+                                                            valueService.GetOppositeByHypotenuse(comDegree, comLength));
+                            comLength += 50;// 임시로 고정, 50 값 수정 해야 함
+                            Point3D newLineCompressionB = GetSumPoint(leftTankTop,
+                                                            -shellMaxThickness + valueService.GetAdjacentByHypotenuse(comDegree, comLength),
+                                                            valueService.GetOppositeByHypotenuse(comDegree, comLength));
 
-                        CompositeCurve hole03 = GetBoltHoleHorizontal(holePoint03, boltHoleWidth, boltHoleHeight);
-                        hole03.Rotate(holeAngle.Angle, Vector3D.AxisZ, holePoint03);
-                        CompositeCurve hole04 = GetBoltHoleHorizontal(holePoint04, boltHoleWidth, boltHoleHeight);
-                        hole04.Rotate(holeAngle.Angle, Vector3D.AxisZ, holePoint04);
-                        customBlockList.AddRange(new CompositeCurve[] { hole03, hole04 });
+                            Line lineA = new Line(GetSumPoint(newLineCompressionA, 0, 0), GetSumPoint(newLineCompressionB, 0, 0));
 
-                        List<Entity> circle03 = DrawReference_Hole(holePoint03, boltHoleHeight / 2, holeAngle.Angle, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
-                        List<Entity> circle04 = DrawReference_Hole(holePoint04, boltHoleHeight / 2, holeAngle.Angle, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
-                        customLine.AddRange(circle03);
-                        customLine.AddRange(circle04);
-                    }
+                            newLineCompressionC = new Line(GetSumPoint(newLineCompressionB, 0, 0), GetSumPoint(newLineCompressionB, 0, 0) + (rafterDirectionUp * t1 * 100));
+                            Point3D leftTopComressPoint = editingService.GetIntersectWidth(newLineCompressionC, workingPointService.DRTWorkingData.circleRoofLower, 0);
 
-                    #endregion
+                            Line lineB = new Line(GetSumPoint(leftTopComressPoint, 0, 0), GetSumPoint(newLineCompressionB, 0, 0));
 
+                            customBlockList.Add(lineA);
+                            customBlockList.Add(lineB);
+                        }
 
 
 
+                        Point3D leftTankRoofTop1 = GetSumPoint(leftTankRoofTopOrigin, 0, 0) + (leftTankRoofTopOriginDirection * scA1);
 
+                        Line topPadLine = new Line(GetSumPoint(leftTankRoofTop1, 0, 0), GetSumPoint(leftTankRoofTop1, 0, 0));
+                        topPadLine.EndPoint = topPadLine.EndPoint + (leftTankRoofTopOriginDirection * scG1);
+                        topPadLine.Rotate(Utility.DegToRad(90), Vector3D.AxisZ, GetSumPoint(leftTankRoofTop1, 0, 0));
+                        Point3D leftTankRoofTop2 = GetSumPoint(topPadLine.EndPoint, 0, 0);
+                        Line topPadLine2 = new Line(GetSumPoint(leftTankRoofTop2, 0, 0), leftTankRoofTop2 + (leftTankRoofTopOriginDirection * scB));
+                        Point3D leftTankRoofTop3 = GetSumPoint(topPadLine2.EndPoint, 0, 0);
 
-                    #region CenterRing
-                    StructureDRTCenteringInputModel centeringInput = new StructureDRTCenteringInputModel();
-                    if (assemblyData.StructureDRTCenteringInput.Count > 0)
-                        centeringInput = assemblyData.StructureDRTCenteringInput[firstIndex];
 
-                    StructureCenteringModel centeringOutput = new StructureCenteringModel();
-                    if (assemblyData.StructureDRTCenteringOutput.Count > 0)
-                        centeringOutput = assemblyData.StructureDRTCenteringOutput[firstIndex];
+                        Line shellClipTri1 = new Line(GetSumPoint(leftTankTop, shellClipPadWidth, -scB1 - scC1), GetSumPoint(leftTankRoofTop1, 0, 0));
+                        Line shellClipTri4 = new Line(GetSumPoint(leftTankRoofTop3, 0, 0), GetSumPoint(leftTankTop, shellClipPadWidth + scH1, -scB1 - scF + scC1));
+                        Line shellClipTri5 = new Line(GetSumPoint(leftTankTop, shellClipPadWidth, -scB1 - scF + scC1), GetSumPoint(leftTankTop, shellClipPadWidth + scH1, -scB1 - scF + scC1));
+                        customBlockList.AddRange(new Line[] { shellClipTri1, topPadLine, topPadLine2, shellClipTri4, shellClipTri5 });
 
-                    double centeringOD = valueService.GetDoubleValue(centeringInput.CenteringOD);
-                    double centeringID = 0;// 계산함
-                    double centeringA = valueService.GetDoubleValue(centeringOutput.A);
-                    double centeringB = valueService.GetDoubleValue(centeringOutput.B);
-                    double centeringC = valueService.GetDoubleValue(centeringOutput.C);
-                    double centeringD = valueService.GetDoubleValue(centeringOutput.D);
-                    double centeringE = valueService.GetDoubleValue(centeringOutput.E);
-                    double centeringT1 = valueService.GetDoubleValue(centeringOutput.t1);
-                    double centeringT2 = valueService.GetDoubleValue(centeringOutput.t2);
-                    //Cal
 
-                    centeringID = (centeringOD - (centeringD * 2)) / 2;
-                    centeringE = (centeringOD + (centeringC * 2)) / 2;
-                    double centeringIDHalf = centeringOD / 2;
 
+                        // Hole
+                        Point3D firstHolePoint = GetSumPoint(leftTankRoofTop1, 0, 0) + (leftTankRoofTopOriginDirection * scC);
+                        Point3D secondHolePoint = GetSumPoint(leftTankRoofTop1, 0, 0) + (leftTankRoofTopOriginDirection * scD);
 
 
+                        Line holeLine01 = new Line(GetSumPoint(firstHolePoint, 0, 0), GetSumPoint(firstHolePoint, 0, 0) + (leftTankRoofTopOriginDirection * scE1));
+                        holeLine01.Rotate(Utility.DegToRad(90), Vector3D.AxisZ, GetSumPoint(firstHolePoint, 0, 0));
+                        Line holeLine02 = new Line(GetSumPoint(firstHolePoint, 0, 0), GetSumPoint(firstHolePoint, 0, 0) + (leftTankRoofTopOriginDirection * (scE1 + scF1)));
+                        holeLine02.Rotate(Utility.DegToRad(90), Vector3D.AxisZ, GetSumPoint(firstHolePoint, 0, 0));
+                        Point3D holePoint01 = GetSumPoint(holeLine01.EndPoint, 0, 0);
+                        Point3D holePoint02 = GetSumPoint(holeLine02.EndPoint, 0, 0);
 
+                        Vector3D holeAngle = new Vector3D(GetSumPoint(holeLine01.StartPoint, 0, 0), GetSumPoint(holeLine01.EndPoint, 0, 0));
 
+                        CompositeCurve hole01 = GetBoltHoleHorizontal(holePoint01, boltHoleWidth, boltHoleHeight);
+                        hole01.Rotate(holeAngle.Angle, Vector3D.AxisZ, holePoint01);
+                        CompositeCurve hole02 = GetBoltHoleHorizontal(holePoint02, boltHoleWidth, boltHoleHeight);
+                        hole02.Rotate(holeAngle.Angle, Vector3D.AxisZ, holePoint02);
+                        customBlockList.AddRange(new CompositeCurve[] { hole01, hole02 });
 
-                    CDPoint centeringWP = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, centerRadius + centeringE, ref refPoint, ref curPoint);
-                    //CDPoint centeringWP2 = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, centerRadius + centeringE, ref refPoint, ref curPoint);
+                        List<Entity> circle01 = DrawReference_Hole(holePoint01, boltHoleHeight / 2, holeAngle.Angle, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                        List<Entity> circle02 = DrawReference_Hole(holePoint02, boltHoleHeight / 2, holeAngle.Angle, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                        customLine.AddRange(circle01);
+                        customLine.AddRange(circle02);
 
-                    Point3D centeringSideTopLeft = GetSumPoint(centeringWP, 0, -centeringT1);
-                    Point3D centeringSideTopRight = GetSumPoint(centeringWP, centeringC, -centeringT1);
-                    Point3D centeringSideBottomLeft = GetSumPoint(centeringSideTopLeft, 0, -centeringB);
-                    Point3D centeringSideBottomRight = GetSumPoint(centeringSideTopRight, 0, -centeringB);
+                        if (scHoleQty == 4)
+                        {
+                            Line holeLine03 = (Line)holeLine01.Offset(scD, Vector3D.AxisZ, 0.01, true);// 아래로
+                            Line holeLine04 = (Line)holeLine02.Offset(scD, Vector3D.AxisZ, 0.01, true);// 아래로
+                            Point3D holePoint03 = GetSumPoint(holeLine03.EndPoint, 0, 0);
+                            Point3D holePoint04 = GetSumPoint(holeLine04.EndPoint, 0, 0);
 
-                    Line cLine01 = new Line(GetSumPoint(centeringWP, 0, 0), GetSumPoint(centeringWP, centeringE, 0));
-                    Line cLine02 = new Line(GetSumPoint(centeringWP, 0, -centeringT1), GetSumPoint(centeringWP, centeringE, -centeringT1));
-                    Line cLine03 = new Line(GetSumPoint(centeringWP, 0, -centeringA + centeringT1), GetSumPoint(centeringWP, centeringE, -centeringA + centeringT1));
-                    Line cLine04 = new Line(GetSumPoint(centeringWP, 0, -centeringA), GetSumPoint(centeringWP, centeringE, -centeringA));
+                            CompositeCurve hole03 = GetBoltHoleHorizontal(holePoint03, boltHoleWidth, boltHoleHeight);
+                            hole03.Rotate(holeAngle.Angle, Vector3D.AxisZ, holePoint03);
+                            CompositeCurve hole04 = GetBoltHoleHorizontal(holePoint04, boltHoleWidth, boltHoleHeight);
+                            hole04.Rotate(holeAngle.Angle, Vector3D.AxisZ, holePoint04);
+                            customBlockList.AddRange(new CompositeCurve[] { hole03, hole04 });
 
-                    Line cLineV01 = new Line(GetSumPoint(centeringWP, 0, 0), GetSumPoint(centeringWP, 0, -centeringT1));
-                    Line cLineV02 = new Line(GetSumPoint(centeringWP, centeringC + centeringD, 0), GetSumPoint(centeringWP, centeringC + centeringD, -centeringT1));
-                    Line cLineV03 = new Line(GetSumPoint(centeringWP, 0, -centeringA + centeringT1), GetSumPoint(centeringWP, 0, -centeringA));
-                    Line cLineV04 = new Line(GetSumPoint(centeringWP, centeringC + centeringD, -centeringA + centeringT1), GetSumPoint(centeringWP, centeringC + centeringD, -centeringA));
+                            List<Entity> circle03 = DrawReference_Hole(holePoint03, boltHoleHeight / 2, holeAngle.Angle, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                            List<Entity> circle04 = DrawReference_Hole(holePoint04, boltHoleHeight / 2, holeAngle.Angle, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                            customLine.AddRange(circle03);
+                            customLine.AddRange(circle04);
+                        }
 
-                    Line cLineLongV01 = new Line(GetSumPoint(centeringWP, centeringC, -centeringT1), GetSumPoint(centeringWP, centeringC, -centeringA + centeringT1));
-                    Line cLineLongV02 = new Line(GetSumPoint(centeringWP, centeringC + centeringT2, -centeringT1), GetSumPoint(centeringWP, centeringC + centeringT2, -centeringA + centeringT1));
+                        #endregion
 
-                    customBlockList.AddRange(new Line[] { cLine01, cLine02, cLine03, cLine04, cLineV01, cLineV02, cLineV03, cLineV04, cLineLongV01, cLineLongV02 });
-                    #endregion
 
-                    // Leader
-                    SingletonData.LeaderPublicList.Add(new LeaderPointModel()
-                    {
-                        leaderPoint = GetSumCDPoint(cLine01.EndPoint, 0, 0),
-                        lineTextList = new List<string>() {"C350x100x11x11",
-                                                            "CENTER RING"
-                                                             },
-                        lineLength = 30,
-                        Position = "topleft"
-                    });
 
 
 
-                    #region Clip Center Side
 
+                        #region CenterRing
+                        StructureDRTCenteringInputModel centeringInput = new StructureDRTCenteringInputModel();
+                        if (assemblyData.StructureDRTCenteringInput.Count > 0)
+                            centeringInput = assemblyData.StructureDRTCenteringInput[firstIndex];
 
-                    StructureCenteringRafterModel firstRafter = new StructureCenteringRafterModel();
-                    if (assemblyData.StructureDRTCenteringRafterOutput.Count > 0)
-                        firstRafter = assemblyData.StructureDRTCenteringRafterOutput[0];
+                        StructureCenteringModel centeringOutput = new StructureCenteringModel();
+                        if (assemblyData.StructureDRTCenteringOutput.Count > 0)
+                            centeringOutput = assemblyData.StructureDRTCenteringOutput[firstIndex];
 
-                    double frA = valueService.GetDoubleValue(firstRafter.A);
-                    double frB = valueService.GetDoubleValue(firstRafter.B);
-                    double frC = valueService.GetDoubleValue(firstRafter.C);
-                    double frD = valueService.GetDoubleValue(firstRafter.D);
-                    double frE = valueService.GetDoubleValue(firstRafter.E);
+                        double centeringOD = valueService.GetDoubleValue(centeringInput.CenteringOD);
+                        double centeringID = 0;// 계산함
+                        double centeringA = valueService.GetDoubleValue(centeringOutput.A);
+                        double centeringB = valueService.GetDoubleValue(centeringOutput.B);
+                        double centeringC = valueService.GetDoubleValue(centeringOutput.C);
+                        double centeringD = valueService.GetDoubleValue(centeringOutput.D);
+                        double centeringE = valueService.GetDoubleValue(centeringOutput.E);
+                        double centeringT1 = valueService.GetDoubleValue(centeringOutput.t1);
+                        double centeringT2 = valueService.GetDoubleValue(centeringOutput.t2);
+                        //Cal
 
-                    StructureClipCenteringSideModel centeringSideClip = new StructureClipCenteringSideModel();
-                    if (assemblyData.StructureDRTClipCenteringSideOutput.Count > 0)
-                        centeringSideClip = assemblyData.StructureDRTClipCenteringSideOutput[firstIndex];
+                        centeringID = (centeringOD - (centeringD * 2)) / 2;
+                        centeringE = (centeringOD + (centeringC * 2)) / 2;
+                        double centeringIDHalf = centeringOD / 2;
 
-                    double cClipA = valueService.GetDoubleValue(centeringSideClip.A);
-                    double cClipB = valueService.GetDoubleValue(centeringSideClip.B);
-                    double cClipC = valueService.GetDoubleValue(centeringSideClip.C);
-                    double cClipD = valueService.GetDoubleValue(centeringSideClip.D);
-                    double cClipE = valueService.GetDoubleValue(centeringSideClip.E);
-                    double cClipHoleQty = valueService.GetDoubleValue(centeringSideClip.HoleQty);
-                    double cClipA1 = valueService.GetDoubleValue(centeringSideClip.A1);
-                    double cClipB1 = valueService.GetDoubleValue(centeringSideClip.B1);
-                    double cClipC1 = valueService.GetDoubleValue(centeringSideClip.C1);
-                    double cClipD1 = valueService.GetDoubleValue(centeringSideClip.D1);
-                    double cClipE1 = valueService.GetDoubleValue(centeringSideClip.E1);
-                    double cClipF1 = valueService.GetDoubleValue(centeringSideClip.F1);
 
-                    double centeringBoltHoleHeight = valueService.GetDoubleValue(centeringSideClip.SlotHoleHt);
-                    double centeringBboltHoleWidth = valueService.GetDoubleValue(centeringSideClip.SlotHoleWd);
 
 
 
-                    // Clip
-                    Line Line01 = new Line(GetSumPoint(centeringSideTopLeft, 0, 0), GetSumPoint(centeringSideTopRight, -cClipE1, 0));
-                    Line Line02 = new Line(GetSumPoint(centeringSideTopRight, -cClipE1, 0), GetSumPoint(centeringSideTopRight, 0, -cClipE1));
-                    Line Line03 = new Line(GetSumPoint(centeringSideTopRight, 0, -cClipE1), GetSumPoint(centeringSideBottomRight, 0, cClipE1));
-                    Line Line04 = new Line(GetSumPoint(centeringSideBottomRight, 0, cClipE1), GetSumPoint(centeringSideBottomRight, -cClipE1, 0));
-                    Line Line05 = new Line(GetSumPoint(centeringSideBottomRight, -cClipE1, 0), GetSumPoint(centeringSideBottomLeft, 0, 0));
 
+                        CDPoint centeringWP = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, centerRadius + centeringE, ref refPoint, ref curPoint);
+                        //CDPoint centeringWP2 = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, centerRadius + centeringE, ref refPoint, ref curPoint);
 
+                        Point3D centeringSideTopLeft = GetSumPoint(centeringWP, 0, -centeringT1);
+                        Point3D centeringSideTopRight = GetSumPoint(centeringWP, centeringC, -centeringT1);
+                        Point3D centeringSideBottomLeft = GetSumPoint(centeringSideTopLeft, 0, -centeringB);
+                        Point3D centeringSideBottomRight = GetSumPoint(centeringSideTopRight, 0, -centeringB);
 
-                    // Rafter Height
-                    CDPoint rafterStartRightTop = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, centerRadius + centeringE + cClipA1, ref refPoint, ref curPoint);
-                    Circle rafterCircleLower = new Circle(GetSumPoint(workingPointService.DRTWorkingData.RoofCenterPoint, 0, 0), workingPointService.DRTWorkingData.DomeRaidus - frB);
-                    Line vRafterLine = new Line(GetSumPoint(rafterStartRightTop, 0, 0), GetSumPoint(rafterStartRightTop, 0, -(frB * 2)));
-                    Point3D[] rafterStartRightBottomTemp = vRafterLine.IntersectWith(rafterCircleLower);
-                    Point3D rafterStartRightBottom = new Point3D();
-                    if (rafterStartRightBottomTemp.Length > 0)
-                        rafterStartRightBottom = GetSumPoint(rafterStartRightBottomTemp[0], 0, 0);
+                        Line cLine01 = new Line(GetSumPoint(centeringWP, 0, 0), GetSumPoint(centeringWP, centeringE, 0));
+                        Line cLine02 = new Line(GetSumPoint(centeringWP, 0, -centeringT1), GetSumPoint(centeringWP, centeringE, -centeringT1));
+                        Line cLine03 = new Line(GetSumPoint(centeringWP, 0, -centeringA + centeringT1), GetSumPoint(centeringWP, centeringE, -centeringA + centeringT1));
+                        Line cLine04 = new Line(GetSumPoint(centeringWP, 0, -centeringA), GetSumPoint(centeringWP, centeringE, -centeringA));
 
-                    Point3D centeringSideLeftBottom = GetSumPoint(rafterStartRightBottom, -cClipB1 - cClipB1 - cClipC1, cClipB);
-                    Point3D centeringSideLeftTop = GetSumPoint(centeringSideLeftBottom, 0, cClipC);
-                    Point3D centeringSideRightTop = GetSumPoint(centeringSideLeftTop, +cClipB1 + cClipB1 + cClipC1, 0);
+                        Line cLineV01 = new Line(GetSumPoint(centeringWP, 0, 0), GetSumPoint(centeringWP, 0, -centeringT1));
+                        Line cLineV02 = new Line(GetSumPoint(centeringWP, centeringC + centeringD, 0), GetSumPoint(centeringWP, centeringC + centeringD, -centeringT1));
+                        Line cLineV03 = new Line(GetSumPoint(centeringWP, 0, -centeringA + centeringT1), GetSumPoint(centeringWP, 0, -centeringA));
+                        Line cLineV04 = new Line(GetSumPoint(centeringWP, centeringC + centeringD, -centeringA + centeringT1), GetSumPoint(centeringWP, centeringC + centeringD, -centeringA));
 
+                        Line cLineLongV01 = new Line(GetSumPoint(centeringWP, centeringC, -centeringT1), GetSumPoint(centeringWP, centeringC, -centeringA + centeringT1));
+                        Line cLineLongV02 = new Line(GetSumPoint(centeringWP, centeringC + centeringT2, -centeringT1), GetSumPoint(centeringWP, centeringC + centeringT2, -centeringA + centeringT1));
 
-                    Line Line06 = new Line(GetSumPoint(centeringSideBottomLeft, 0, 0), GetSumPoint(centeringSideLeftBottom, 0, 0));
-                    Line Line07 = new Line(GetSumPoint(centeringSideLeftBottom, 0, 0), GetSumPoint(centeringSideLeftTop, 0, 0));
-                    Line Line08 = new Line(GetSumPoint(centeringSideLeftTop, 0, 0), GetSumPoint(centeringSideRightTop, 0, 0));
-
-                    Line LineFillet01 = new Line(GetSumPoint(centeringSideRightTop, 0, 0), new Point3D(centeringWP.X, centeringSideRightTop.Y));
-                    Line LineFillet02 = new Line(GetSumPoint(centeringWP, 0, 0), new Point3D(centeringWP.X, centeringSideRightTop.Y));
-                    Arc arcFillet01;
-                    if (Curve.Fillet(LineFillet01, LineFillet02, 20, true, false, true, true, out arcFillet01))
-                        customBlockList.Add(arcFillet01);
-
-                    customBlockList.AddRange(new Line[] { Line01, Line02, Line03, Line04, Line05, Line06, Line07, Line08, LineFillet01, LineFillet02 });
-
-
-                    // Hole
-                    Line centeringHoleLine01 = new Line(GetSumPoint(centeringSideLeftTop, cClipB1, -cClipD), GetSumPoint(centeringSideLeftTop, cClipB1 + cClipC1, -cClipD));
-                    CompositeCurve centringHole01 = GetBoltHoleHorizontal(centeringHoleLine01.StartPoint, centeringBboltHoleWidth, centeringBoltHoleHeight);
-                    CompositeCurve centringHole02 = GetBoltHoleHorizontal(centeringHoleLine01.EndPoint, centeringBboltHoleWidth, centeringBoltHoleHeight);
-                    customBlockList.AddRange(new CompositeCurve[] { centringHole01, centringHole02 });
-
-                    List<Entity> centeringCircle01 = DrawReference_Hole(centeringHoleLine01.StartPoint, centeringBoltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
-                    List<Entity> centeringCircle02 = DrawReference_Hole(centeringHoleLine01.EndPoint, centeringBoltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
-                    customLine.AddRange(centeringCircle01);
-                    customLine.AddRange(centeringCircle02);
-
-                    if (cClipHoleQty == 4)
-                    {
-                        Line centeringHoleLine02 = (Line)centeringHoleLine01.Offset(cClipE, Vector3D.AxisZ, 0.01, true);// 아래로
-                        CompositeCurve centringHole03 = GetBoltHoleHorizontal(centeringHoleLine02.StartPoint, centeringBboltHoleWidth, centeringBoltHoleHeight);
-                        CompositeCurve centringHole04 = GetBoltHoleHorizontal(centeringHoleLine02.EndPoint, centeringBboltHoleWidth, centeringBoltHoleHeight);
-                        customBlockList.AddRange(new CompositeCurve[] { centringHole03, centringHole04 });
-
-                        List<Entity> centeringCircle03 = DrawReference_Hole(centeringHoleLine02.StartPoint, centeringBoltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
-                        List<Entity> centeringCircle04 = DrawReference_Hole(centeringHoleLine02.EndPoint, centeringBoltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
-                        customLine.AddRange(centeringCircle03);
-                        customLine.AddRange(centeringCircle04);
-                    }
-                    #endregion
-
-
-                    #region Centering Rafter
-
-
-
-                    StructureCenteringRafterModel lastRafter = new StructureCenteringRafterModel();
-                    if (assemblyData.StructureDRTCenteringRafterOutput.Count > 0)
-                        lastRafter = assemblyData.StructureDRTCenteringRafterOutput[assemblyData.StructureDRTCenteringRafterOutput.Count - 1];
-
-                    double lrA = valueService.GetDoubleValue(lastRafter.A);
-                    double lrB = valueService.GetDoubleValue(lastRafter.B);
-                    double lrC = valueService.GetDoubleValue(lastRafter.C);
-                    double lrD = valueService.GetDoubleValue(lastRafter.D);
-                    double lrE = valueService.GetDoubleValue(lastRafter.E);
-                    double lrJ = valueService.GetDoubleValue(lastRafter.J);
-
-                    Point3D lastRafterPointUp = GetSumPoint(leftTankRoofTopOrigin, 0, 0);
-                    Point3D lastRafterPointDown = GetSumPoint(lastRafterPointUp, 0, 0) + (rafterDirection * lrB);
-                    Point3D firstRafterPointUp = GetSumPoint(rafterStartRightTop, 0, 0);
-                    Point3D firstRafterPointDown = GetSumPoint(rafterStartRightBottom, 0, 0);
-
-                    Line rafterLeftLine = new Line(GetSumPoint(lastRafterPointUp, 0, 0), GetSumPoint(lastRafterPointDown, 0, 0));
-                    Line rafterRightLine = new Line(GetSumPoint(firstRafterPointUp, 0, 0), GetSumPoint(firstRafterPointDown, 0, 0));
-                    Arc roofBottom = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, lastRafterPointDown, firstRafterPointDown);
-
-
-
-
-
-
-                    // HBeam
-                    HBeamModel firstRafterHBeam = new HBeamModel();
-                    HBeamModel lastRafterHBeam = new HBeamModel();
-                    if (assemblyData.StructureDRTRafterHBeamOutput.Count > 0)
-                    {
-                        firstRafterHBeam = assemblyData.StructureDRTRafterHBeamOutput[0];
-                        lastRafterHBeam = assemblyData.StructureDRTRafterHBeamOutput[assemblyData.StructureDRTRafterHBeamOutput.Count - 1];
-                    }
-                    double firtHBeamT2 = valueService.GetDoubleValue(firstRafterHBeam.t2);
-                    double lastHBeamT2 = valueService.GetDoubleValue(lastRafterHBeam.t2);
-
-                    // HBeam Up
-                    Circle firstRafterPointHBeamTopCircle = new Circle(GetSumPoint(workingPointService.DRTWorkingData.RoofCenterPoint, 0, 0), workingPointService.DRTWorkingData.DomeRaidus - firtHBeamT2);
-                    Point3D firstRafterPointHBeamTop = editingService.GetIntersectWidth(firstRafterPointHBeamTopCircle, rafterRightLine, 0);
-                    Point3D lastRafterPointHBeamTop = editingService.GetIntersectWidth(firstRafterPointHBeamTopCircle, rafterLeftLine, 0);
-
-                    Arc roofHBeamUp = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, lastRafterPointHBeamTop, firstRafterPointHBeamTop);
-
-                    if (assemblyData.RoofCompressionRing[0].CompressionRingType == "Detail i")
-                    {
-                        Point3D newPoint = editingService.GetIntersectWidth(firstRafterPointHBeamTopCircle, newLineCompressionC, 0);
-                        roofHBeamUp = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, newPoint, firstRafterPointHBeamTop);
-                        Line newLineA = new Line(GetSumPoint(lastRafterPointUp, 0, 0), GetSumPoint(lastRafterPointUp, 0, 0) + (rafterDirection * lrB));
-                        Circle newCircle = new Circle(workingPointService.DRTWorkingData.RoofCenterPoint, workingPointService.DRTWorkingData.DomeRaidus - lrB);
-                        Point3D newCircleInter = editingService.GetIntersectWidth(newCircle, newLineA, 0);
-
-
-                        rafterLeftLine = new Line(GetSumPoint(lastRafterPointUp, 0, 0), GetSumPoint(newCircleInter, 0, 0));
-                        roofBottom = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, newCircleInter, firstRafterPointDown);
-
-
-
-                    }
-
-
-                    customBlockList.Add(rafterLeftLine);
-                    customBlockList.Add(rafterRightLine);
-                    customBlockList.Add(roofBottom);
-                    customBlockList.Add(roofHBeamUp);
-
-                    // HBeam Down
-                    Circle firstRafterPointHBeamDownCircle = new Circle(GetSumPoint(workingPointService.DRTWorkingData.RoofCenterPoint, 0, 0), workingPointService.DRTWorkingData.DomeRaidus - lrB + firtHBeamT2);
-                    Point3D firstRafterPointHBeamDown = editingService.GetIntersectWidth(firstRafterPointHBeamDownCircle, rafterRightLine, 0);
-                    Point3D lastRafterPointHBeamDown = editingService.GetIntersectWidth(firstRafterPointHBeamDownCircle, rafterLeftLine, 0);
-
-                    Arc roofHBeamDown = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, lastRafterPointHBeamDown, firstRafterPointHBeamDown);
-                    //customBlockList.Add(roofHBeamDown);
-
-                    // Circle
-                    Point3D firstRafterPointHBeamDownAdj = editingService.GetIntersectLength(roofHBeamDown, lrJ, true);
-                    Point3D lastRafterPointHBeamDownAdj = editingService.GetIntersectLength(roofHBeamDown, lrJ, false);
-
-                    Point3D firstRafterPointDownAdj = editingService.GetIntersectLength(roofBottom, lrJ, true);
-                    Point3D lastRafterPointDownAdj = editingService.GetIntersectLength(roofBottom, lrJ, false);
-
-                    Arc roofHBeamDownAdj = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, lastRafterPointHBeamDownAdj, firstRafterPointHBeamDownAdj);
-                    customBlockList.Add(roofHBeamDownAdj);
-
-
-                    Line newHBeamVLine01 = new Line(GetSumPoint(lastRafterPointHBeamDownAdj, 0, 0), GetSumPoint(lastRafterPointDownAdj, 0, 0));
-                    Line newHBeamVLine02 = new Line(GetSumPoint(firstRafterPointHBeamDownAdj, 0, 0), GetSumPoint(firstRafterPointDownAdj, 0, 0));
-                    customBlockList.Add(newHBeamVLine01);
-                    customBlockList.Add(newHBeamVLine02);
-
-                    // Middle 용
-                    Line newLineAMiddle = new Line(GetSumPoint(lastRafterPointUp, 0, 0), GetSumPoint(lastRafterPointUp, 0, 0) + (rafterDirection * lrB));
-                    Circle newCircleMiddle = new Circle(workingPointService.DRTWorkingData.RoofCenterPoint, workingPointService.DRTWorkingData.DomeRaidus - lrB / 2);
-                    Point3D newCircleMiddleInterLeft = editingService.GetIntersectWidth(newCircleMiddle, newLineAMiddle, 0);
-                    Point3D newCircleMiddleInterRight = editingService.GetIntersectWidth(newCircleMiddle, rafterRightLine, 0);
-
-                    Arc roofMiddle = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, newCircleMiddleInterLeft, newCircleMiddleInterRight);
-                    styleService.SetLayer(ref roofMiddle, layerService.LayerCenterLine);
-                    customLine.Add(roofMiddle);
-
-                    #endregion
-
-                    double rafterStartPointValue = 0;
-                    double counti = 0;
-                    foreach (StructureDRTRafterInputModel eachRafter in assemblyData.StructureDRTRafterInput)
-                    {
-                        double currentPointValue = valueService.GetDoubleValue(eachRafter.Radius);
-                        double currentMidPointValue = (currentPointValue - rafterStartPointValue) / 2;
-                        CDPoint rafterPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, currentPointValue - currentMidPointValue, ref refPoint, ref curPoint);
+                        customBlockList.AddRange(new Line[] { cLine01, cLine02, cLine03, cLine04, cLineV01, cLineV02, cLineV03, cLineV04, cLineLongV01, cLineLongV02 });
+                        #endregion
 
                         // Leader
                         SingletonData.LeaderPublicList.Add(new LeaderPointModel()
                         {
-                            leaderPoint = GetSumCDPoint(rafterPoint, 0, -30),
-                            lineTextList = new List<string>() {eachRafter.Size,
-                                                            eachRafter.Qty + "-" + valueService.GetOrdinalNumber(counti+1) + " RAFTERS"
-                                                             },
+                            leaderPoint = GetSumCDPoint(cLine01.EndPoint, 0, 0),
+                            lineTextList = new List<string>() {"C350x100x11x11",
+                                                                "CENTER RING"
+                                                                 },
                             lineLength = 30,
                             Position = "topleft"
                         });
 
-                        rafterStartPointValue = currentPointValue;
-                        counti++;
-                    }
 
-                    #region Girder
-                    Circle girderCircle = new Circle(GetSumPoint(workingPointService.DRTWorkingData.RoofCenterPoint, 0, 0), workingPointService.DRTWorkingData.DomeRaidus);
-                    for (int i = 0; i < assemblyData.StructureDRTGirderInput.Count; i++)
-                    {
-                        StructureDRTGirderInputModel eachGirder = assemblyData.StructureDRTGirderInput[i];
-                        HBeamModel eachHBream = assemblyData.StructureDRTGirderHBeamOutput[i];
-                        double girderRadius = valueService.GetDoubleValue(eachGirder.Radius);
-                        double hbreamSize = valueService.GetDoubleValue(eachHBream.A);
-                        double hbreamSizeHalf = hbreamSize / 2;
-                        double girderB = valueService.GetDoubleValue(eachHBream.B);
-                        double girderBHalf = girderB / 2;
 
-                        CDPoint eachGirderPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, centerRadius + girderRadius, ref refPoint, ref curPoint);
+                        #region Clip Center Side
 
-                        Vector3D girderDirection = new Vector3D(GetSumPoint(eachGirderPoint, 0, 0), workingPointService.DRTWorkingData.RoofCenterPoint);
-                        girderDirection.Normalize();
-                        Line girderCenterLine = new Line(GetSumPoint(eachGirderPoint, 0, 0), GetSumPoint(eachGirderPoint, 0, 0) + (girderDirection * girderBHalf));
-                        Line girderLineRight = (Line)girderCenterLine.Offset(-hbreamSizeHalf, Vector3D.AxisZ, 0.01, true);// 위로
-                        Line girderLineLeft = (Line)girderCenterLine.Offset(hbreamSizeHalf, Vector3D.AxisZ, 0.01, true);// 위로
 
-                        Point3D girderLineRightPoint = editingService.GetIntersectWidth(girderCircle, girderLineRight, 0);
-                        Line girderLineRightNew = new Line(GetSumPoint(girderLineRightPoint, 0, 0), GetSumPoint(girderLineRightPoint, 0, 0) + (girderDirection * girderBHalf));
+                        StructureCenteringRafterModel firstRafter = new StructureCenteringRafterModel();
+                        if (assemblyData.StructureDRTCenteringRafterOutput.Count > 0)
+                            firstRafter = assemblyData.StructureDRTCenteringRafterOutput[0];
 
-                        Point3D girderLineLeftPoint = editingService.GetIntersectWidth(girderCircle, girderLineLeft, 0);
-                        Line girderLineLefttNew = new Line(GetSumPoint(girderLineLeftPoint, 0, 0), GetSumPoint(girderLineLeftPoint, 0, 0) + (girderDirection * girderBHalf));
+                        double frA = valueService.GetDoubleValue(firstRafter.A);
+                        double frB = valueService.GetDoubleValue(firstRafter.B);
+                        double frC = valueService.GetDoubleValue(firstRafter.C);
+                        double frD = valueService.GetDoubleValue(firstRafter.D);
+                        double frE = valueService.GetDoubleValue(firstRafter.E);
 
-                        Point3D girderCenterPoint = girderLineRightNew.EndPoint;
+                        StructureClipCenteringSideModel centeringSideClip = new StructureClipCenteringSideModel();
+                        if (assemblyData.StructureDRTClipCenteringSideOutput.Count > 0)
+                            centeringSideClip = assemblyData.StructureDRTClipCenteringSideOutput[firstIndex];
 
-                        Entity[] eachGirderList = refBlockService.DrawReference_HBeam(GetSumCDPoint(girderCenterPoint, 0, 0), eachHBream);
-                        foreach (Entity eachEntity in eachGirderList)
-                            eachEntity.Rotate(girderDirection.Angle, Vector3D.AxisZ, GetSumPoint(girderCenterPoint, 0, 0));
+                        double cClipA = valueService.GetDoubleValue(centeringSideClip.A);
+                        double cClipB = valueService.GetDoubleValue(centeringSideClip.B);
+                        double cClipC = valueService.GetDoubleValue(centeringSideClip.C);
+                        double cClipD = valueService.GetDoubleValue(centeringSideClip.D);
+                        double cClipE = valueService.GetDoubleValue(centeringSideClip.E);
+                        double cClipHoleQty = valueService.GetDoubleValue(centeringSideClip.HoleQty);
+                        double cClipA1 = valueService.GetDoubleValue(centeringSideClip.A1);
+                        double cClipB1 = valueService.GetDoubleValue(centeringSideClip.B1);
+                        double cClipC1 = valueService.GetDoubleValue(centeringSideClip.C1);
+                        double cClipD1 = valueService.GetDoubleValue(centeringSideClip.D1);
+                        double cClipE1 = valueService.GetDoubleValue(centeringSideClip.E1);
+                        double cClipF1 = valueService.GetDoubleValue(centeringSideClip.F1);
 
-                        customBlockList.AddRange(eachGirderList);
-                        //customBlockList.Add(girderCenterLine);
-                        //customBlockList.Add(girderLineRight);
+                        double centeringBoltHoleHeight = valueService.GetDoubleValue(centeringSideClip.SlotHoleHt);
+                        double centeringBboltHoleWidth = valueService.GetDoubleValue(centeringSideClip.SlotHoleWd);
 
-                        // Leader
-                        SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+
+
+                        // Clip
+                        Line Line01 = new Line(GetSumPoint(centeringSideTopLeft, 0, 0), GetSumPoint(centeringSideTopRight, -cClipE1, 0));
+                        Line Line02 = new Line(GetSumPoint(centeringSideTopRight, -cClipE1, 0), GetSumPoint(centeringSideTopRight, 0, -cClipE1));
+                        Line Line03 = new Line(GetSumPoint(centeringSideTopRight, 0, -cClipE1), GetSumPoint(centeringSideBottomRight, 0, cClipE1));
+                        Line Line04 = new Line(GetSumPoint(centeringSideBottomRight, 0, cClipE1), GetSumPoint(centeringSideBottomRight, -cClipE1, 0));
+                        Line Line05 = new Line(GetSumPoint(centeringSideBottomRight, -cClipE1, 0), GetSumPoint(centeringSideBottomLeft, 0, 0));
+
+
+
+                        // Rafter Height
+                        CDPoint rafterStartRightTop = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, centerRadius + centeringE + cClipA1, ref refPoint, ref curPoint);
+                        Circle rafterCircleLower = new Circle(GetSumPoint(workingPointService.DRTWorkingData.RoofCenterPoint, 0, 0), workingPointService.DRTWorkingData.DomeRaidus - frB);
+                        Line vRafterLine = new Line(GetSumPoint(rafterStartRightTop, 0, 0), GetSumPoint(rafterStartRightTop, 0, -(frB * 2)));
+                        Point3D[] rafterStartRightBottomTemp = vRafterLine.IntersectWith(rafterCircleLower);
+                        Point3D rafterStartRightBottom = new Point3D();
+                        if (rafterStartRightBottomTemp.Length > 0)
+                            rafterStartRightBottom = GetSumPoint(rafterStartRightBottomTemp[0], 0, 0);
+
+                        Point3D centeringSideLeftBottom = GetSumPoint(rafterStartRightBottom, -cClipB1 - cClipB1 - cClipC1, cClipB);
+                        Point3D centeringSideLeftTop = GetSumPoint(centeringSideLeftBottom, 0, cClipC);
+                        Point3D centeringSideRightTop = GetSumPoint(centeringSideLeftTop, +cClipB1 + cClipB1 + cClipC1, 0);
+
+
+                        Line Line06 = new Line(GetSumPoint(centeringSideBottomLeft, 0, 0), GetSumPoint(centeringSideLeftBottom, 0, 0));
+                        Line Line07 = new Line(GetSumPoint(centeringSideLeftBottom, 0, 0), GetSumPoint(centeringSideLeftTop, 0, 0));
+                        Line Line08 = new Line(GetSumPoint(centeringSideLeftTop, 0, 0), GetSumPoint(centeringSideRightTop, 0, 0));
+
+                        Line LineFillet01 = new Line(GetSumPoint(centeringSideRightTop, 0, 0), new Point3D(centeringWP.X, centeringSideRightTop.Y));
+                        Line LineFillet02 = new Line(GetSumPoint(centeringWP, 0, 0), new Point3D(centeringWP.X, centeringSideRightTop.Y));
+                        Arc arcFillet01;
+                        if (Curve.Fillet(LineFillet01, LineFillet02, 20, true, false, true, true, out arcFillet01))
+                            customBlockList.Add(arcFillet01);
+
+                        customBlockList.AddRange(new Line[] { Line01, Line02, Line03, Line04, Line05, Line06, Line07, Line08, LineFillet01, LineFillet02 });
+
+
+                        // Hole
+                        Line centeringHoleLine01 = new Line(GetSumPoint(centeringSideLeftTop, cClipB1, -cClipD), GetSumPoint(centeringSideLeftTop, cClipB1 + cClipC1, -cClipD));
+                        CompositeCurve centringHole01 = GetBoltHoleHorizontal(centeringHoleLine01.StartPoint, centeringBboltHoleWidth, centeringBoltHoleHeight);
+                        CompositeCurve centringHole02 = GetBoltHoleHorizontal(centeringHoleLine01.EndPoint, centeringBboltHoleWidth, centeringBoltHoleHeight);
+                        customBlockList.AddRange(new CompositeCurve[] { centringHole01, centringHole02 });
+
+                        List<Entity> centeringCircle01 = DrawReference_Hole(centeringHoleLine01.StartPoint, centeringBoltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                        List<Entity> centeringCircle02 = DrawReference_Hole(centeringHoleLine01.EndPoint, centeringBoltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                        customLine.AddRange(centeringCircle01);
+                        customLine.AddRange(centeringCircle02);
+
+                        if (cClipHoleQty == 4)
                         {
-                            leaderPoint = GetSumCDPoint(girderLineLefttNew.EndPoint, 0, 0),
-                            lineTextList = new List<string>() {eachGirder.Qty + "-" + valueService.GetOrdinalNumber(i+1) + " GIRDERS",
-                                                            eachGirder.Size },
+                            Line centeringHoleLine02 = (Line)centeringHoleLine01.Offset(cClipE, Vector3D.AxisZ, 0.01, true);// 아래로
+                            CompositeCurve centringHole03 = GetBoltHoleHorizontal(centeringHoleLine02.StartPoint, centeringBboltHoleWidth, centeringBoltHoleHeight);
+                            CompositeCurve centringHole04 = GetBoltHoleHorizontal(centeringHoleLine02.EndPoint, centeringBboltHoleWidth, centeringBoltHoleHeight);
+                            customBlockList.AddRange(new CompositeCurve[] { centringHole03, centringHole04 });
 
-                            Position = "bottomleft"
-                        });
+                            List<Entity> centeringCircle03 = DrawReference_Hole(centeringHoleLine02.StartPoint, centeringBoltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                            List<Entity> centeringCircle04 = DrawReference_Hole(centeringHoleLine02.EndPoint, centeringBoltHoleHeight / 2, 0, new DrawCenterLineModel() { scaleValue = scaleValue, zeroEx = true });
+                            customLine.AddRange(centeringCircle03);
+                            customLine.AddRange(centeringCircle04);
+                        }
+                        #endregion
+
+
+                        #region Centering Rafter
+
+
+
+                        StructureCenteringRafterModel lastRafter = new StructureCenteringRafterModel();
+                        if (assemblyData.StructureDRTCenteringRafterOutput.Count > 0)
+                            lastRafter = assemblyData.StructureDRTCenteringRafterOutput[assemblyData.StructureDRTCenteringRafterOutput.Count - 1];
+
+                        double lrA = valueService.GetDoubleValue(lastRafter.A);
+                        double lrB = valueService.GetDoubleValue(lastRafter.B);
+                        double lrC = valueService.GetDoubleValue(lastRafter.C);
+                        double lrD = valueService.GetDoubleValue(lastRafter.D);
+                        double lrE = valueService.GetDoubleValue(lastRafter.E);
+                        double lrJ = valueService.GetDoubleValue(lastRafter.J);
+
+                        Point3D lastRafterPointUp = GetSumPoint(leftTankRoofTopOrigin, 0, 0);
+                        Point3D lastRafterPointDown = GetSumPoint(lastRafterPointUp, 0, 0) + (rafterDirection * lrB);
+                        Point3D firstRafterPointUp = GetSumPoint(rafterStartRightTop, 0, 0);
+                        Point3D firstRafterPointDown = GetSumPoint(rafterStartRightBottom, 0, 0);
+
+                        Line rafterLeftLine = new Line(GetSumPoint(lastRafterPointUp, 0, 0), GetSumPoint(lastRafterPointDown, 0, 0));
+                        Line rafterRightLine = new Line(GetSumPoint(firstRafterPointUp, 0, 0), GetSumPoint(firstRafterPointDown, 0, 0));
+                        Arc roofBottom = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, lastRafterPointDown, firstRafterPointDown);
+
+
+
+
+
+
+                        // HBeam
+                        HBeamModel firstRafterHBeam = new HBeamModel();
+                        HBeamModel lastRafterHBeam = new HBeamModel();
+                        if (assemblyData.StructureDRTRafterHBeamOutput.Count > 0)
+                        {
+                            firstRafterHBeam = assemblyData.StructureDRTRafterHBeamOutput[0];
+                            lastRafterHBeam = assemblyData.StructureDRTRafterHBeamOutput[assemblyData.StructureDRTRafterHBeamOutput.Count - 1];
+                        }
+                        double firtHBeamT2 = valueService.GetDoubleValue(firstRafterHBeam.t2);
+                        double lastHBeamT2 = valueService.GetDoubleValue(lastRafterHBeam.t2);
+
+                        // HBeam Up
+                        Circle firstRafterPointHBeamTopCircle = new Circle(GetSumPoint(workingPointService.DRTWorkingData.RoofCenterPoint, 0, 0), workingPointService.DRTWorkingData.DomeRaidus - firtHBeamT2);
+                        Point3D firstRafterPointHBeamTop = editingService.GetIntersectWidth(firstRafterPointHBeamTopCircle, rafterRightLine, 0);
+                        Point3D lastRafterPointHBeamTop = editingService.GetIntersectWidth(firstRafterPointHBeamTopCircle, rafterLeftLine, 0);
+
+                        Arc roofHBeamUp = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, lastRafterPointHBeamTop, firstRafterPointHBeamTop);
+
+                        if (assemblyData.RoofCompressionRing[0].CompressionRingType == "Detail i")
+                        {
+                            Point3D newPoint = editingService.GetIntersectWidth(firstRafterPointHBeamTopCircle, newLineCompressionC, 0);
+                            roofHBeamUp = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, newPoint, firstRafterPointHBeamTop);
+                            Line newLineA = new Line(GetSumPoint(lastRafterPointUp, 0, 0), GetSumPoint(lastRafterPointUp, 0, 0) + (rafterDirection * lrB));
+                            Circle newCircle = new Circle(workingPointService.DRTWorkingData.RoofCenterPoint, workingPointService.DRTWorkingData.DomeRaidus - lrB);
+                            Point3D newCircleInter = editingService.GetIntersectWidth(newCircle, newLineA, 0);
+
+
+                            rafterLeftLine = new Line(GetSumPoint(lastRafterPointUp, 0, 0), GetSumPoint(newCircleInter, 0, 0));
+                            roofBottom = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, newCircleInter, firstRafterPointDown);
+
+
+
+                        }
+
+
+                        customBlockList.Add(rafterLeftLine);
+                        customBlockList.Add(rafterRightLine);
+                        customBlockList.Add(roofBottom);
+                        customBlockList.Add(roofHBeamUp);
+
+                        // HBeam Down
+                        Circle firstRafterPointHBeamDownCircle = new Circle(GetSumPoint(workingPointService.DRTWorkingData.RoofCenterPoint, 0, 0), workingPointService.DRTWorkingData.DomeRaidus - lrB + firtHBeamT2);
+                        Point3D firstRafterPointHBeamDown = editingService.GetIntersectWidth(firstRafterPointHBeamDownCircle, rafterRightLine, 0);
+                        Point3D lastRafterPointHBeamDown = editingService.GetIntersectWidth(firstRafterPointHBeamDownCircle, rafterLeftLine, 0);
+
+                        Arc roofHBeamDown = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, lastRafterPointHBeamDown, firstRafterPointHBeamDown);
+                        //customBlockList.Add(roofHBeamDown);
+
+                        // Circle
+                        Point3D firstRafterPointHBeamDownAdj = editingService.GetIntersectLength(roofHBeamDown, lrJ, true);
+                        Point3D lastRafterPointHBeamDownAdj = editingService.GetIntersectLength(roofHBeamDown, lrJ, false);
+
+                        Point3D firstRafterPointDownAdj = editingService.GetIntersectLength(roofBottom, lrJ, true);
+                        Point3D lastRafterPointDownAdj = editingService.GetIntersectLength(roofBottom, lrJ, false);
+
+                        Arc roofHBeamDownAdj = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, lastRafterPointHBeamDownAdj, firstRafterPointHBeamDownAdj);
+                        customBlockList.Add(roofHBeamDownAdj);
+
+
+                        Line newHBeamVLine01 = new Line(GetSumPoint(lastRafterPointHBeamDownAdj, 0, 0), GetSumPoint(lastRafterPointDownAdj, 0, 0));
+                        Line newHBeamVLine02 = new Line(GetSumPoint(firstRafterPointHBeamDownAdj, 0, 0), GetSumPoint(firstRafterPointDownAdj, 0, 0));
+                        customBlockList.Add(newHBeamVLine01);
+                        customBlockList.Add(newHBeamVLine02);
+
+                        // Middle 용
+                        Line newLineAMiddle = new Line(GetSumPoint(lastRafterPointUp, 0, 0), GetSumPoint(lastRafterPointUp, 0, 0) + (rafterDirection * lrB));
+                        Circle newCircleMiddle = new Circle(workingPointService.DRTWorkingData.RoofCenterPoint, workingPointService.DRTWorkingData.DomeRaidus - lrB / 2);
+                        Point3D newCircleMiddleInterLeft = editingService.GetIntersectWidth(newCircleMiddle, newLineAMiddle, 0);
+                        Point3D newCircleMiddleInterRight = editingService.GetIntersectWidth(newCircleMiddle, rafterRightLine, 0);
+
+                        Arc roofMiddle = new Arc(workingPointService.DRTWorkingData.RoofCenterPoint, newCircleMiddleInterLeft, newCircleMiddleInterRight);
+                        styleService.SetLayer(ref roofMiddle, layerService.LayerCenterLine);
+                        customLine.Add(roofMiddle);
+
+                        #endregion
+
+                        double rafterStartPointValue = 0;
+                        double counti = 0;
+                        foreach (StructureDRTRafterInputModel eachRafter in assemblyData.StructureDRTRafterInput)
+                        {
+                            double currentPointValue = valueService.GetDoubleValue(eachRafter.Radius);
+                            double currentMidPointValue = (currentPointValue - rafterStartPointValue) / 2;
+                            CDPoint rafterPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofUp, currentPointValue - currentMidPointValue, ref refPoint, ref curPoint);
+
+                            // Leader
+                            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                            {
+                                leaderPoint = GetSumCDPoint(rafterPoint, 0, -30),
+                                lineTextList = new List<string>() {eachRafter.Size,
+                                                                eachRafter.Qty + "-" + valueService.GetOrdinalNumber(counti+1) + " RAFTERS"
+                                                                 },
+                                lineLength = 30,
+                                Position = "topleft"
+                            });
+
+                            rafterStartPointValue = currentPointValue;
+                            counti++;
+                        }
+
+                        #region Girder
+                        Circle girderCircle = new Circle(GetSumPoint(workingPointService.DRTWorkingData.RoofCenterPoint, 0, 0), workingPointService.DRTWorkingData.DomeRaidus);
+                        for (int i = 0; i < assemblyData.StructureDRTGirderInput.Count; i++)
+                        {
+                            StructureDRTGirderInputModel eachGirder = assemblyData.StructureDRTGirderInput[i];
+                            HBeamModel eachHBream = assemblyData.StructureDRTGirderHBeamOutput[i];
+                            double girderRadius = valueService.GetDoubleValue(eachGirder.Radius);
+                            double hbreamSize = valueService.GetDoubleValue(eachHBream.A);
+                            double hbreamSizeHalf = hbreamSize / 2;
+                            double girderB = valueService.GetDoubleValue(eachHBream.B);
+                            double girderBHalf = girderB / 2;
+
+                            CDPoint eachGirderPoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.AdjCenterRoofDown, centerRadius + girderRadius, ref refPoint, ref curPoint);
+
+                            Vector3D girderDirection = new Vector3D(GetSumPoint(eachGirderPoint, 0, 0), workingPointService.DRTWorkingData.RoofCenterPoint);
+                            girderDirection.Normalize();
+                            Line girderCenterLine = new Line(GetSumPoint(eachGirderPoint, 0, 0), GetSumPoint(eachGirderPoint, 0, 0) + (girderDirection * girderBHalf));
+                            Line girderLineRight = (Line)girderCenterLine.Offset(-hbreamSizeHalf, Vector3D.AxisZ, 0.01, true);// 위로
+                            Line girderLineLeft = (Line)girderCenterLine.Offset(hbreamSizeHalf, Vector3D.AxisZ, 0.01, true);// 위로
+
+                            Point3D girderLineRightPoint = editingService.GetIntersectWidth(girderCircle, girderLineRight, 0);
+                            Line girderLineRightNew = new Line(GetSumPoint(girderLineRightPoint, 0, 0), GetSumPoint(girderLineRightPoint, 0, 0) + (girderDirection * girderBHalf));
+
+                            Point3D girderLineLeftPoint = editingService.GetIntersectWidth(girderCircle, girderLineLeft, 0);
+                            Line girderLineLefttNew = new Line(GetSumPoint(girderLineLeftPoint, 0, 0), GetSumPoint(girderLineLeftPoint, 0, 0) + (girderDirection * girderBHalf));
+
+                            Point3D girderCenterPoint = girderLineRightNew.EndPoint;
+
+                            Entity[] eachGirderList = refBlockService.DrawReference_HBeam(GetSumCDPoint(girderCenterPoint, 0, 0), eachHBream);
+                            foreach (Entity eachEntity in eachGirderList)
+                                eachEntity.Rotate(girderDirection.Angle, Vector3D.AxisZ, GetSumPoint(girderCenterPoint, 0, 0));
+
+                            customBlockList.AddRange(eachGirderList);
+                            //customBlockList.Add(girderCenterLine);
+                            //customBlockList.Add(girderLineRight);
+
+                            // Leader
+                            SingletonData.LeaderPublicList.Add(new LeaderPointModel()
+                            {
+                                leaderPoint = GetSumCDPoint(girderLineLefttNew.EndPoint, 0, 0),
+                                lineTextList = new List<string>() {eachGirder.Qty + "-" + valueService.GetOrdinalNumber(i+1) + " GIRDERS",
+                                                                eachGirder.Size },
+
+                                Position = "bottomleft"
+                            });
+                        }
+                        #endregion
+
+
                     }
-                    #endregion
+                    else if (StructureDivService.centeringInEx == "external")
+                    {
 
-
+                    }
                 }
-                else if (StructureDivService.centeringInEx == "external")
-                {
 
-                }
+
+
+
+                styleService.SetLayerListEntity(ref customBlockList, layerService.LayerOutLine);
+
+                customBlockList.AddRange(customLine);
+
             }
-
-
-
-
-            styleService.SetLayerListEntity(ref customBlockList, layerService.LayerOutLine);
-
-            customBlockList.AddRange(customLine);
-
-
 
             return customBlockList.ToArray();
         }

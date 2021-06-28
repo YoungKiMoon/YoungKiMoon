@@ -1,0 +1,200 @@
+﻿<Window x:Class="DesignBoard.Windows.DataInputWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        
+        xmlns:local="clr-namespace:DesignBoard.Windows"
+        
+        xmlns:vm="clr-namespace:DesignBoard.ViewModels"
+        xmlns:winre="clr-namespace:DesignBoard.Resizer"
+        
+        mc:Ignorable="d"
+        Title="DataInputWindow" Height="450" Width="900"
+        WindowStartupLocation="CenterScreen" 
+        WindowStyle="None" 
+        Background="{x:Null}" AllowsTransparency="True" FontFamily="Calibri">
+    <Window.DataContext>
+        <vm:DataInputWindowViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <Style x:Key="SimpleListBoxItem" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="FrameworkElement.FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FrameworkElement.Cursor" Value="Hand" />
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border Name="Border" Margin="4" CornerRadius="10" BorderThickness="2">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="ListBoxItem.IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Border.Background" Value="#FF75C7F5" />
+                            </Trigger>
+                            <Trigger Property="ListBoxItem.IsSelected" Value="False">
+                                <Setter TargetName="Border" Property="Border.Background" Value="#FFDCE6F2" />
+                            </Trigger>
+                            <Trigger Property="UIElement.IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Border.BorderBrush" Value="#FF70C0E7" />
+                            </Trigger>
+                            <Trigger Property="UIElement.IsMouseOver" Value="False">
+                                <Setter TargetName="Border" Property="Border.BorderBrush" Value="#FFDCE6F2" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Border x:Name="winOutlineBorder"  BorderThickness="1" BorderBrush="#FF3E8BF9"  />
+        <Grid Margin="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="#FF333F50" />
+            <TextBlock Text="DATA INPUT" FontSize="24" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFC8CACF" FontFamily="Calibri"/>
+            <Image x:Name="btnClose" Height="22" Margin="0,0,10,0" HorizontalAlignment="Right" Source="/DesignBoard;component/Resources/close-button.png" Cursor="Hand" PreviewMouseLeftButtonUp="btnClose_PreviewMouseLeftButtonUp" ToolTip="Exit"/>
+            <Border Grid.Row="1" Background="#FFD6DCE5" />
+
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,0,0,0">
+                    <Border x:Name="btnWaterSpray" Grid.Row="0" BorderThickness="0" CornerRadius="6" Background="#FF385723" Height="30" Width="160" VerticalAlignment="Center" HorizontalAlignment="Right"  Cursor="Hand" PreviewMouseLeftButtonUp="btnWaterSpray_PreviewMouseLeftButtonUp" >
+
+                        <TextBlock Text="WATER SPRAY INFORM"  FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=btnWaterSpray, Path=IsMouseOver}" Value="True">
+                                            <Setter Property="Foreground" Value="Cyan" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                    <Border x:Name="btnFoamSystem" Grid.Row="0" BorderThickness="0" CornerRadius="6" Background="#FF385723" Height="30" Width="160" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"  Cursor="Hand" PreviewMouseLeftButtonUp="btnFoamSystem_PreviewMouseLeftButtonUp" >
+
+                        <TextBlock Text="FOAM SYSTEM INFORM"  FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=btnFoamSystem, Path=IsMouseOver}" Value="True">
+                                            <Setter Property="Foreground" Value="Cyan" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
+                    <Border x:Name="btnApply" Grid.Row="0" BorderThickness="0" CornerRadius="6" Background="#FF2E75B6" Height="30" Width="120" VerticalAlignment="Center" HorizontalAlignment="Right"  Cursor="Hand"  PreviewMouseLeftButtonUp="btnApply_PreviewMouseLeftButtonUp" >
+
+                        <TextBlock Text="DATA APPLY"  FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=btnApply, Path=IsMouseOver}" Value="True">
+                                            <Setter Property="Foreground" Value="Cyan" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="200"/>
+                    </Grid.ColumnDefinitions>
+
+
+                    <ListBox Name="groupList" ItemContainerStyle="{StaticResource SimpleListBoxItem}" Margin="10,0,0,10" AllowDrop="True" Background="#FFADB9CA" ScrollViewer.PanningMode="None" ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalContentAlignment="Center" Grid.Column="0"   BorderThickness="0" Padding="2" ItemsSource="{Binding GroupList}" BorderBrush="{x:Null}" SelectionChanged="groupList_SelectionChanged" >
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" TextBlock.FontWeight="Bold" HorizontalAlignment="Center" TextBlock.Foreground="#FF214E78" Padding="0,6,0,6" TextBlock.FontSize="16" Text="{Binding Name}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Grid Grid.Column="1" Margin="10,0,10,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Border>
+                            <Border.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#FF75C7F5" Offset="0"/>
+                                    <GradientStop Color="#FF75C7F5" Offset="1"/>
+                                    <GradientStop Color="#FFADDFFB" Offset="0.5"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <TextBlock Text="{Binding currentDataList.Name}" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF3F434B"/>
+                        </Border>
+                        <DataGrid x:Name="dgAME" Grid.Row="1" BorderThickness="0" CanUserAddRows="False" AutoGenerateColumns="False" Foreground="#FF3F5072" FontSize="12" SelectionMode="Single" SelectionUnit="FullRow"
+                    ItemsSource="{Binding currentDataList.List}" HorizontalScrollBarVisibility="Visible"
+                    VerticalGridLinesBrush="#FFECECEC" HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFEEF5FF" RowHeight="24" FontFamily="Malgun Gothic">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="NAME" Width="200" Binding="{Binding Name}"/>
+                                <DataGridTextColumn Header="VALUE" Width="160" Binding="{Binding Value}"/>
+                                <DataGridTextColumn Header="DESCRIPTION" Width="140" Binding="{Binding Description}"/>
+
+
+                            </DataGrid.Columns>
+
+                            <DataGrid.CellStyle>
+                                <Style TargetType="{x:Type DataGridCell}">
+                                    <Setter Property="Padding" Value="2,2,0,0"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                    <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGrid.CellStyle>
+
+                        </DataGrid>
+                    </Grid>
+                    <Grid Grid.Column="2" Margin="0,0,10,10">
+                        <Border Background="#FFADB9CA" />
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel x:Name="imageArea" Orientation="Vertical" >
+
+                            </StackPanel>
+                        </ScrollViewer>
+
+                    </Grid>
+                </Grid>
+
+
+
+            </Grid>
+        </Grid>
+
+
+    </Grid>
+</Window>

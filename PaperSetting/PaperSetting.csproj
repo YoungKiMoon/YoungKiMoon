@@ -196,5 +196,106 @@
   <ItemGroup>
     <Resource Include="Resources\ssp.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="BusyImage\1.png" />
+    <Resource Include="BusyImage\10.png" />
+    <Resource Include="BusyImage\11.png" />
+    <Resource Include="BusyImage\12.png" />
+    <Resource Include="BusyImage\13.png" />
+    <Resource Include="BusyImage\14.png" />
+    <Resource Include="BusyImage\15.png" />
+    <Resource Include="BusyImage\16.png" />
+    <Resource Include="BusyImage\17.png" />
+    <Resource Include="BusyImage\18.png" />
+    <Resource Include="BusyImage\19.png" />
+    <Resource Include="BusyImage\2.png" />
+    <Resource Include="BusyImage\20.png" />
+    <Resource Include="BusyImage\21.png" />
+    <Resource Include="BusyImage\22.png" />
+    <Resource Include="BusyImage\23.png" />
+    <Resource Include="BusyImage\24.png" />
+    <Resource Include="BusyImage\25.png" />
+    <Resource Include="BusyImage\26.png" />
+    <Resource Include="BusyImage\27.png" />
+    <Resource Include="BusyImage\28.png" />
+    <Resource Include="BusyImage\29.png" />
+    <Resource Include="BusyImage\3.png" />
+    <Resource Include="BusyImage\30.png" />
+    <Resource Include="BusyImage\31.png" />
+    <Resource Include="BusyImage\32.png" />
+    <Resource Include="BusyImage\33.png" />
+    <Resource Include="BusyImage\34.png" />
+    <Resource Include="BusyImage\35.png" />
+    <Resource Include="BusyImage\36.png" />
+    <Resource Include="BusyImage\37.png" />
+    <Resource Include="BusyImage\38.png" />
+    <Resource Include="BusyImage\39.png" />
+    <Resource Include="BusyImage\4.png" />
+    <Resource Include="BusyImage\40.png" />
+    <Resource Include="BusyImage\41.png" />
+    <Resource Include="BusyImage\42.png" />
+    <Resource Include="BusyImage\43.png" />
+    <Resource Include="BusyImage\44.png" />
+    <Resource Include="BusyImage\45.png" />
+    <Resource Include="BusyImage\46.png" />
+    <Resource Include="BusyImage\47.png" />
+    <Resource Include="BusyImage\48.png" />
+    <Resource Include="BusyImage\49.png" />
+    <Resource Include="BusyImage\5.png" />
+    <Resource Include="BusyImage\50.png" />
+    <Resource Include="BusyImage\51.png" />
+    <Resource Include="BusyImage\52.png" />
+    <Resource Include="BusyImage\53.png" />
+    <Resource Include="BusyImage\54.png" />
+    <Resource Include="BusyImage\55.png" />
+    <Resource Include="BusyImage\56.png" />
+    <Resource Include="BusyImage\57.png" />
+    <Resource Include="BusyImage\58.png" />
+    <Resource Include="BusyImage\59.png" />
+    <Resource Include="BusyImage\6.png" />
+    <Resource Include="BusyImage\60.png" />
+    <Resource Include="BusyImage\61.png" />
+    <Resource Include="BusyImage\62.png" />
+    <Resource Include="BusyImage\63.png" />
+    <Resource Include="BusyImage\64.png" />
+    <Resource Include="BusyImage\65.png" />
+    <Resource Include="BusyImage\66.png" />
+    <Resource Include="BusyImage\67.png" />
+    <Resource Include="BusyImage\68.png" />
+    <Resource Include="BusyImage\69.png" />
+    <Resource Include="BusyImage\7.png" />
+    <Resource Include="BusyImage\70.png" />
+    <Resource Include="BusyImage\71.png" />
+    <Resource Include="BusyImage\72.png" />
+    <Resource Include="BusyImage\73.png" />
+    <Resource Include="BusyImage\74.png" />
+    <Resource Include="BusyImage\75.png" />
+    <Resource Include="BusyImage\76.png" />
+    <Resource Include="BusyImage\77.png" />
+    <Resource Include="BusyImage\78.png" />
+    <Resource Include="BusyImage\79.png" />
+    <Resource Include="BusyImage\8.png" />
+    <Resource Include="BusyImage\80.png" />
+    <Resource Include="BusyImage\81.png" />
+    <Resource Include="BusyImage\82.png" />
+    <Resource Include="BusyImage\83.png" />
+    <Resource Include="BusyImage\84.png" />
+    <Resource Include="BusyImage\85.png" />
+    <Resource Include="BusyImage\86.png" />
+    <Resource Include="BusyImage\87.png" />
+    <Resource Include="BusyImage\88.png" />
+    <Resource Include="BusyImage\89.png" />
+    <Resource Include="BusyImage\9.png" />
+    <Resource Include="BusyImage\90.png" />
+    <Resource Include="BusyImage\raser_Bottom_light01.png" />
+    <Resource Include="BusyImage\raser_bottom_light02.png" />
+    <Resource Include="BusyImage\raser_bottom_light03.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="BusyImage\backimage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Windows\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -3,10 +3,402 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DesignBoard"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
         
+        xmlns:local="clr-namespace:DesignBoard"
+        
+        xmlns:vm="clr-namespace:DesignBoard.ViewModels"
+        xmlns:winre="clr-namespace:DesignBoard.Resizer"
+        
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="940" 
+        WindowStartupLocation="CenterScreen" 
+        WindowStyle="None" 
+        Background="{x:Null}" AllowsTransparency="True"
+        Closing="Window_Closing">
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <!--#region Resizer-->
+        <Grid >
+
+            <Border Background="#FF565761" Margin="30,0,30,0" Height="10" VerticalAlignment="Top" winre:WindowResizer.Direction="Top" BorderBrush="#FF0080FF" BorderThickness="0,1,0,0"/>
+            <Border Background="#FF565761" Margin="30,0,30,0" Height="10" VerticalAlignment="Bottom" winre:WindowResizer.Direction="Bottom" BorderBrush="#FF0080FF" BorderThickness="0,0,0,1"/>
+            <Border Background="#FF565761" Margin="0,30,0,30" Width="10" HorizontalAlignment="Left" winre:WindowResizer.Direction="Left" BorderBrush="#FF0080FF" BorderThickness="1,0,0,0"/>
+            <Border Background="#FF565761" Margin="0,30,0,30" Width="10" HorizontalAlignment="Right" winre:WindowResizer.Direction="Right" BorderBrush="#FF0080FF" BorderThickness="0,0,1,0"/>
+
+            <Border Background="#FF565761" Height="30" Width="30"  VerticalAlignment="Top" HorizontalAlignment="Left" winre:WindowResizer.Direction="TopLeft"  BorderBrush="#FF0080FF" BorderThickness="1,1,0,0" />
+            <Border Background="#FF565761" Height="30" Width="30" VerticalAlignment="Top" HorizontalAlignment="Right" winre:WindowResizer.Direction="TopRight" BorderBrush="#FF0080FF" BorderThickness="0,1,1,0"/>
+            <Border Background="#FF565761" Height="30" Width="30" VerticalAlignment="Bottom" HorizontalAlignment="Left" winre:WindowResizer.Direction="BottomLeft" BorderBrush="#FF0080FF" BorderThickness="1,0,0,1"/>
+            <Border Background="#FF565761" Height="30" Width="30" VerticalAlignment="Bottom" HorizontalAlignment="Right" winre:WindowResizer.Direction="BottomRight" BorderBrush="#FF0080FF" BorderThickness="0,0,1,1"/>
+
+            <Border x:Name="winOutlineBorder" Visibility="Collapsed" BorderThickness="0" BorderBrush="#FF3E8BF9"  >
+            </Border>
+        </Grid>
+
+        <!--#endregion-->
+
+
+
+        <Grid Margin="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+
+            <!--#region Move-->
+            <Border  Grid.Row="0" BorderThickness="0" Margin="0" MouseDown="Rectangle_MouseDown" Background="#FF44546A"/>
+            <Border  Grid.Row="1" BorderThickness="0" Margin="0" MouseDown="Rectangle_MouseDown" Background="#FF333F50"/>
+            <!--#endregion-->
+
+
+            <Border Grid.Row="0" Margin="2,2,2,0" BorderThickness="0"  Background="#FF44546A"/>
+            <Border Grid.Row="1" Margin="2,0,2,2" BorderThickness="0"  Background="#FF333F50"/>
+
+            <!--#region Main Image-->
+            <Image Grid.RowSpan="2" Source="Resources/drt_main.png" Height="280" Width="280" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="60,0,0,20"/>
+            <!--#endregion-->
+
+            <!--#region Title-->
+            <StackPanel Grid.RowSpan="2" Orientation="Vertical" Margin="20,10,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="T" Margin="0,0,0,0" Foreground="#FFDAE3F3" FontSize="100" FontWeight="Bold" FontFamily="Arial"/>
+                    <TextBlock Text="A" Margin="3,0,0,0" Foreground="#FFDAE3F3" FontSize="100" FontWeight="Bold" FontFamily="Arial"/>
+                    <TextBlock Text="B" Margin="3,0,0,0" Foreground="#FFDAE3F3" FontSize="100" FontWeight="Bold" FontFamily="Arial"/>
+                    <TextBlock Text="A" Margin="3,0,0,0" Foreground="#FFDAE3F3" FontSize="100" FontWeight="Bold" FontFamily="Arial"/>
+                    <TextBlock Text="S" Margin="3,0,0,0" Foreground="#FFDAE3F3" FontSize="100" FontWeight="Bold" FontFamily="Arial"/>
+                    <TextBlock Text="T" Margin="10,16,0,0" Foreground="#FFDAE3F3" FontSize="28" FontWeight="Bold" FontFamily="Arial"/>
+                    <TextBlock Text="M" Margin="3,16,0,0" Foreground="#FFDAE3F3" FontSize="28" FontWeight="Bold" FontFamily="Arial"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="TAnk Basic design Automation System" Foreground="#FFB4C7E7" FontSize="23" FontFamily="Arial"/>
+                    <TextBlock Text="SAMSUNG ENGINEERING" Margin="110,10,0,0" Foreground="White" FontSize="23" FontFamily="Arial"/>
+                </StackPanel>
+
+            </StackPanel>
+
+            <!--#endregion-->
+
+            <!--#region Version-->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10" VerticalAlignment="Top">
+                <TextBlock Text="{Binding designBoardVersion}" Foreground="#FFB4C7E7" Margin="0,-2,30,0"  FontSize="18" FontFamily="Arial"/>
+                <Image x:Name="btnClose" Height="22" Source="Resources/close-button.png" Cursor="Hand" PreviewMouseLeftButtonUp="btnClose_PreviewMouseLeftButtonUp" ToolTip="Exit Design Board"/>
+            </StackPanel>
+            <!--#endregion-->
+
+            <!--#region Button Upper-->
+            <Grid Grid.Row="0" Width="500" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="140"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Border x:Name="btnAME" Grid.Column="0" BorderThickness="0" CornerRadius="10" BorderBrush="#FF2E75B6" Background="#FF2E75B6" Height="60" VerticalAlignment="Top" SnapsToDevicePixels="True" Cursor="Hand" Margin="0,0,14,0" PreviewMouseLeftButtonUp="btnAME_PreviewMouseLeftButtonUp">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
+                        </Border.Effect>
+                        <TextBlock  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                            <Run Text="AMETank"/>
+                            <LineBreak/>
+                            <Run Text="DATA LOAD"/>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=btnAME, Path=IsMouseOver}" Value="True">
+                                            <Setter Property="Foreground" Value="Cyan" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                    <Border x:Name="btnExisting" Grid.Column="1" BorderThickness="0" CornerRadius="10" BorderBrush="#FF2E75B6" Background="#FF2E75B6" Height="60" VerticalAlignment="Top" SnapsToDevicePixels="True" Cursor="Hand" Margin="0,0,14,0" PreviewMouseLeftButtonUp="btnExisting_PreviewMouseLeftButtonUp" >
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
+                        </Border.Effect>
+                        <TextBlock  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                            <Run Text="ESISTING"/>
+                            <LineBreak/>
+                            <Run Text="DATA LOAD"/>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=btnExisting, Path=IsMouseOver}" Value="True">
+                                            <Setter Property="Foreground" Value="Cyan" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                    <Border x:Name="btnNew" Grid.Column="2" BorderThickness="0" CornerRadius="10" BorderBrush="#FF2E75B6" Background="#FF2E75B6" Height="60" VerticalAlignment="Top" SnapsToDevicePixels="True" Cursor="Hand" Margin="0,0,14,0" MouseLeftButtonUp="btnNew_MouseLeftButtonUp">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
+                        </Border.Effect>
+                        <TextBlock FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                            <Run Text="NEW"/>
+                            <LineBreak/>
+                            <Run Text="DATA"/>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=btnNew, Path=IsMouseOver}" Value="True">
+                                            <Setter Property="Foreground" Value="Cyan" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                </Grid>
+                <Grid Grid.Row="1" Margin="0,14,14,14">
+                    <Border  BorderThickness="1" CornerRadius="10" BorderBrush="#FF2E75B6" SnapsToDevicePixels="True"  />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0" Margin="0,10,0,10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <Rectangle Grid.Row="0" Grid.ColumnSpan="4" Height="4" Fill="#FF8497B0" Margin="40,0"/>
+                            <Ellipse Grid.Row="0" Grid.Column="0" Width="30" Height="30" Fill="{Binding checkList.AMETankCheck.checkColor}" SnapsToDevicePixels="True" Cursor="Hand"/>
+                            <Ellipse Grid.Row="0" Grid.Column="0" Width="12" Height="12" Fill="#FFDAE3F3" SnapsToDevicePixels="True" Cursor="Hand"/>
+
+                            <Ellipse Grid.Row="0" Grid.Column="1" Width="30" Height="30" Fill="{Binding checkList.DataInput.checkColor}" SnapsToDevicePixels="True" Cursor="Hand"/>
+                            <Ellipse Grid.Row="0" Grid.Column="1" Width="12" Height="12" Fill="#FFDAE3F3" SnapsToDevicePixels="True" Cursor="Hand"/>
+
+                            <Ellipse Grid.Row="0" Grid.Column="2" Width="30" Height="30" Fill="{Binding checkList.NozzleInput.checkColor}" SnapsToDevicePixels="True" Cursor="Hand"/>
+                            <Ellipse Grid.Row="0" Grid.Column="2" Width="12" Height="12" Fill="#FFDAE3F3" SnapsToDevicePixels="True" Cursor="Hand"/>
+
+                            <Ellipse Grid.Row="0" Grid.Column="3" Width="30" Height="30" Fill="{Binding checkList.DataCheck.checkColor}" SnapsToDevicePixels="True" Cursor="Hand"/>
+                            <Ellipse Grid.Row="0" Grid.Column="3" Width="12" Height="12" Fill="#FFDAE3F3" SnapsToDevicePixels="True" Cursor="Hand"/>
+
+                            <Border x:Name="btnAMECheck" Grid.Row="1" Grid.Column="0" BorderThickness="0" VerticalAlignment="Top" Cursor="Hand" PreviewMouseLeftButtonUp="btnAMECheck_PreviewMouseLeftButtonUp" >
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
+                                </Border.Effect>
+                                <TextBlock  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                                    <Run Text="AMETank"/>
+                                    <LineBreak/>
+                                    <Run Text="CHECK"/>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=btnAMECheck, Path=IsMouseOver}" Value="True">
+                                                    <Setter Property="Foreground" Value="Cyan" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
+                            <Border x:Name="btnDataInput" Grid.Row="1" Grid.Column="1" BorderThickness="0" VerticalAlignment="Top" Cursor="Hand" PreviewMouseLeftButtonUp="btnDataInput_PreviewMouseLeftButtonUp" >
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
+                                </Border.Effect>
+                                <TextBlock  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                                    <Run Text="DATA"/>
+                                    <LineBreak/>
+                                    <Run Text="INPUT"/>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=btnDataInput, Path=IsMouseOver}" Value="True">
+                                                    <Setter Property="Foreground" Value="Cyan" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
+                            <Border x:Name="btnNozzleInput" Grid.Row="1" Grid.Column="2" BorderThickness="0" VerticalAlignment="Top" Cursor="Hand" PreviewMouseLeftButtonUp="btnNozzleInput_PreviewMouseLeftButtonUp" >
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
+                                </Border.Effect>
+                                <TextBlock  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                                    <Run Text="NOZZLE"/>
+                                    <LineBreak/>
+                                    <Run Text="INPUT"/>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=btnNozzleInput, Path=IsMouseOver}" Value="True">
+                                                    <Setter Property="Foreground" Value="Cyan" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
+                            <Border x:Name="btnDataCheck" Grid.Row="1" Grid.Column="3" BorderThickness="0" VerticalAlignment="Top" Cursor="Hand" PreviewMouseLeftButtonUp="btnDataCheck_PreviewMouseLeftButtonUp" >
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
+                                </Border.Effect>
+                                <TextBlock  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                                    <Run Text="DATA"/>
+                                    <LineBreak/>
+                                    <Run Text="CHECK"/>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=btnDataCheck, Path=IsMouseOver}" Value="True">
+                                                    <Setter Property="Foreground" Value="Cyan" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
+
+                        </Grid>
+
+                        <Border x:Name="btnEngEdit" Grid.Column="1" BorderThickness="1" CornerRadius="10" BorderBrush="#FF2E75B6" Background="#FF203864" Height="60" VerticalAlignment="Center" SnapsToDevicePixels="True" Cursor="Hand" Margin="10,0,14,0" >
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
+                            </Border.Effect>
+                            <TextBlock  x:Name="btnCreatetText"  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                            <Run Text="DETAIL ENG"/>
+                            <LineBreak/>
+                            <Run Text="DATA EDIT"/>
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=btnEngEdit, Path=IsMouseOver}" Value="True">
+                                                <Setter Property="Foreground" Value="Cyan" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <!--#endregion-->
+
+            <!--#region Button Lower-->
+            <Grid Grid.Row="1" Width="500" HorizontalAlignment="Right" VerticalAlignment="Top" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="80"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" Height="30" CornerRadius="4" BorderThickness="1" BorderBrush="#FF2E75B6" SnapsToDevicePixels="True" Background="Black" Margin="0,0,14,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="6,0">
+                        <TextBlock Text="ENG FILE : " Foreground="#FFD6DCE5" FontSize="16"/>
+                        <TextBlock Text="Test_CRT.xlsm" Foreground="Cyan" FontSize="16"/>
+                    </StackPanel>
+                </Border>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Border x:Name="btnPreview" Grid.Column="0" BorderThickness="1" CornerRadius="10" BorderBrush="#FF2E75B6" Background="#FF1F4E79" Height="60" VerticalAlignment="Top" SnapsToDevicePixels="True" Cursor="Hand" Margin="0,0,14,0" PreviewMouseLeftButtonUp="btnPreview_PreviewMouseLeftButtonUp">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
+                        </Border.Effect>
+                        <TextBlock  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                            <Run Text="DRAWING"/>
+                            <LineBreak/>
+                            <Run Text="PREVIEW"/>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=btnPreview, Path=IsMouseOver}" Value="True">
+                                            <Setter Property="Foreground" Value="Cyan" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                    <Border x:Name="btnCreate" Grid.Column="1" BorderThickness="1" CornerRadius="10" BorderBrush="#FF2E75B6" Background="#FF1F4E79" Height="60" VerticalAlignment="Top" SnapsToDevicePixels="True" Cursor="Hand" Margin="0,0,14,0" >
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
+                        </Border.Effect>
+                        <TextBlock  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                            <Run Text="CREATE"/>
+                            <LineBreak/>
+                            <Run Text="DRAWING"/>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=btnCreate, Path=IsMouseOver}" Value="True">
+                                            <Setter Property="Foreground" Value="Cyan" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                    <Border x:Name="btnExport" Grid.Column="2" BorderThickness="1" CornerRadius="10" BorderBrush="#FF2E75B6" Background="#FF1F4E79" Height="60" VerticalAlignment="Top" SnapsToDevicePixels="True" Cursor="Hand" Margin="0,0,14,0">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
+                        </Border.Effect>
+                        <TextBlock FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
+                            <Run Text="INFORM"/>
+                            <LineBreak/>
+                            <Run Text="EXPORT"/>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#FFD6DCE5" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=btnExport, Path=IsMouseOver}" Value="True">
+                                            <Setter Property="Foreground" Value="Cyan" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                </Grid>
+                
+            </Grid>
+            <!--#endregion-->
+        </Grid>
+
+        <!--#region TANK LOADING-->
+        <Grid x:Name="busyAreaSource"  Visibility="Visible">
+            <Image x:Name="busyBack" Source="AssemblyImage/backimage.png" Stretch="Fill"/>
+            
+            <Border Grid.RowSpan="3" Background="#66454549" Visibility="Collapsed"  />
+            
+            <StackPanel Grid.Row="2" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Image x:Name="busyImageSource"  Source="BusyImage/85.png" Width="600" Height="400"/>
+            </StackPanel>
+            <Image x:Name="busysdRing" Height="140" Width="500" Margin="0,0,0,60" Source="BusyImage/raser_Bottom_light01.png" Stretch="Fill" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
+            <Border Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,360,0,0" Padding="40,2" CornerRadius="10" Background="#FFA2E0F7" >
+                <TextBlock x:Name="busyAreaSourceText" Text="데이터 로딩 중" FontSize="14" FontWeight="Bold" Foreground="#FF3A4E93"/>
+            </Border>
+        </Grid>
+        <!--#endregion-->
     </Grid>
+
+
 </Window>

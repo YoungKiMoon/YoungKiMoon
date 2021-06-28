@@ -3331,7 +3331,7 @@ namespace DrawWork.DrawServices
                 singleModel.Entities.Add(newLine22);
             }
 
-            if (true)
+            if (false)
             {
 
                 Point3D refPoint = new Point3D(1000, 1000);
@@ -3398,6 +3398,36 @@ namespace DrawWork.DrawServices
 
 
                 singleModel.Entities.AddRange(newList);
+            }
+
+            if (true)
+            {
+                Point3D refPoint = new Point3D(100000, 100000);
+
+                List<Point3D> outList = new List<Point3D>();
+                List<Entity> newList = new List<Entity>();
+                double refRadius = 40000;
+                Circle refCircle = new Circle(GetSumPoint(refPoint, 0, 0), refRadius);
+
+                double refWidth = 2000;
+                double refHeight = 1000;
+
+                double currentY = 0;
+                double currentX = 0;
+                double maxHeight = refPoint.Y + refRadius;
+
+                bool exitRoof = false;
+                do 
+                {
+                    //가로
+                    List<Entity> eachRec=shapeService.GetRectangle(out outList, GetSumPoint(refPoint, currentX, currentY), refWidth, refHeight, 0, 0, 4);
+                    currentY += refHeight;
+                    //세로
+                }
+                while (exitRoof);
+
+                singleModel.Entities.AddRange(newList);
+
             }
 
             singleModel.Entities.Regen();
