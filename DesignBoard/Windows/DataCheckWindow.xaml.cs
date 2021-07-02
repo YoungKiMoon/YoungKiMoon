@@ -62,7 +62,7 @@ namespace DesignBoard.Windows
 
         private void btnApply_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            MessageBox.Show("적용 완료", "안내");
+            MessageBox.Show("Check Complete.", "Information");
             Close();
         }
 

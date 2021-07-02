@@ -76,6 +76,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commons\CommonBase.cs" />
     <Compile Include="DrawService\DrawEditingService.cs" />
     <Compile Include="DrawService\DrawSettingService.cs" />
     <Compile Include="DrawService\DrawShapeServices.cs" />

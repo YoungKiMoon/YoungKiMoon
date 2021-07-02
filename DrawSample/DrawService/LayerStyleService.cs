@@ -42,9 +42,9 @@ namespace DrawSample.DrawService
             List<Layer> newList = new List<Layer>();
 
             // Model
-            newList.Add(GetLayer(LayerCenterLine, Color.Red, "CENTER2", 2f, true));
+            newList.Add(GetLayer(LayerCenterLine, Color.Red, "CENTER2", 0.25f, true));
             newList.Add(GetLayer(LayerVirtualLine, Color.FromArgb(0, 128, 0), "PHANTOM2", 0.25f, true));
-            newList.Add(GetLayer(LayerOutLine, Color.Yellow, "CONTINU", 2f, true));
+            newList.Add(GetLayer(LayerOutLine, Color.Yellow, "CONTINU", 0.25f, true));
             //newList.Add(GetLayer(LayerHiddenLine, Color.FromArgb(135, 206, 235), "HIDDEN", 0.25f, true));
             newList.Add(GetLayer(LayerHiddenLine, Color.FromArgb(0, 255, 255), "HIDDEN", 0.25f, true));
             newList.Add(GetLayer(LayerBasicLine, Color.White, "CONTINU", 0.25f, true));

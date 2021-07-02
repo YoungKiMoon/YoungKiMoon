@@ -51,6 +51,9 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>TABAS_ICOn.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="devDept.Eyeshot.Control.Wpf.v2020, Version=2020.3.528.0, Culture=neutral, PublicKeyToken=5385d83d2fb4d7d9, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -99,6 +102,7 @@
     </ApplicationDefinition>
     <Compile Include="Commons\Common.cs" />
     <Compile Include="CustomControl\CustomDataGrid.cs" />
+    <Compile Include="DrawSample\DrawAdj.cs" />
     <Compile Include="EYEServices\DrawEditingService.cs" />
     <Compile Include="EYEServices\DrawShapeService.cs" />
     <Compile Include="EYEServices\EYECADService.cs" />
@@ -123,7 +127,11 @@
     <Compile Include="Services\SampleService.cs" />
     <Compile Include="Utils\CustomCursor.cs" />
     <Compile Include="Utils\Notifier.cs" />
-    <Compile Include="ViewModel\PaperSettingViewModel.cs" />
+    <Compile Include="ViewModels\OrientationAdjWindowViewModel.cs" />
+    <Compile Include="ViewModels\PaperSettingViewModel.cs" />
+    <Compile Include="Windows\OrientationAdjWindow.xaml.cs">
+      <DependentUpon>OrientationAdjWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="PaperSettingWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -136,6 +144,10 @@
       <DependentUpon>PaperSettingWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Windows\OrientationAdjWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -295,7 +307,7 @@
     <Resource Include="BusyImage\backimage.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Windows\" />
+    <Resource Include="TABAS_ICOn.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

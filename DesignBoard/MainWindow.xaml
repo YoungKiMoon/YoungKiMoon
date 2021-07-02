@@ -123,7 +123,7 @@
                             <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
                         </Border.Effect>
                         <TextBlock  FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontFamily="Calibri" >
-                            <Run Text="ESISTING"/>
+                            <Run Text="EXISTING"/>
                             <LineBreak/>
                             <Run Text="DATA LOAD"/>
                             <TextBlock.Style>
@@ -384,7 +384,7 @@
         </Grid>
 
         <!--#region TANK LOADING-->
-        <Grid x:Name="busyAreaSource"  Visibility="Visible">
+        <Grid x:Name="busyAreaSource"  Visibility="Hidden">
             <Image x:Name="busyBack" Source="AssemblyImage/backimage.png" Stretch="Fill"/>
             
             <Border Grid.RowSpan="3" Background="#66454549" Visibility="Collapsed"  />

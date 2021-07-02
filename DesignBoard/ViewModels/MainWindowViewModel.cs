@@ -183,10 +183,70 @@ namespace DesignBoard.ViewModels
 
                 }
 
+                DataListModel newModel04 = new DataListModel();
+                if (true)
+                {
+                    newModel04.Name = "SHELL";
+                    newModel04.List.Add(new DataModel() { Name = "Shell Plate Width", Value = "2720", Description = "" });
+                    newModel04.List.Add(new DataModel() { Name = "Shell Plate Max. Length", Value = "10000", Description = "" });
+                    newModel04.List.Add(new DataModel() { Name = "Insulation Thickness", Value = "NONE", Description = "" });
+                    newModel04.List.Add(new DataModel() { Name = "Insulation Density", Value = "", Description = "" });
+                    newModel04.List.Add(new DataModel() { Name = "Insulation Type", Value = "", Description = "" });
+
+
+                }
+
+                DataListModel newModel05 = new DataListModel();
+                if (true)
+                {
+                    newModel05.Name = "BOTTOM";
+                    newModel05.List.Add(new DataModel() { Name = "Slope", Value = "1/100", Description = "" });
+                    newModel05.List.Add(new DataModel() { Name = "Thickness", Value = "9", Description = "" });
+                    newModel05.List.Add(new DataModel() { Name = "Width", Value = "2438", Description = "" });
+                    newModel05.List.Add(new DataModel() { Name = "Length", Value = "6096", Description = "" });
+                    newModel05.List.Add(new DataModel() { Name = "Arrangement type", Value = "Cone Up", Description = "" });
+                    newModel05.List.Add(new DataModel() { Name = "Weld Type", Value = "Lap joint", Description = "" });
+                    newModel05.List.Add(new DataModel() { Name = "Annular Plate", Value = "1831", Description = "" });
+                    newModel05.List.Add(new DataModel() { Name = "Annular Thickness", Value = "15", Description = "" });
+                    newModel05.List.Add(new DataModel() { Name = "Annular Type", Value = "Circular", Description = "" });
+
+
+
+                }
+
+                DataListModel newModel06 = new DataListModel();
+                if (true)
+                {
+                    newModel06.Name = "ACCESS";
+                    newModel06.List.Add(new DataModel() { Name = "Spiral Stairway vs Ladder", Value = "Spiral Stairway", Description = "" });
+                    newModel06.List.Add(new DataModel() { Name = "Spiral Stairway : Start Angle", Value = "30", Description = "" });
+                    newModel06.List.Add(new DataModel() { Name = "Ladder : Start Angle", Value = "", Description = "" });
+                    newModel06.List.Add(new DataModel() { Name = "Roof Platform : Elevation", Value = "1000", Description = "" });
+                    newModel06.List.Add(new DataModel() { Name = "Foam Maintenance Platform", Value = "YES", Description = "" });
+
+
+                }
+                DataListModel newModel07 = new DataListModel();
+                if (true)
+                {
+                    newModel07.Name = "APPURTENANCES";
+                    newModel07.List.Add(new DataModel() { Name = "Name Plate", Value = "Yes", Description = "" });
+                    newModel07.List.Add(new DataModel() { Name = "Settlement Check Piece", Value = "Yes", Description = "" });
+                    newModel07.List.Add(new DataModel() { Name = "Water Spray", Value = "Yes", Description = "" });
+                    newModel07.List.Add(new DataModel() { Name = "Earth Lug", Value = "Yes", Description = "" });
+                    newModel07.List.Add(new DataModel() { Name = "Scaffold Cable Support", Value = "Yes", Description = "" });
+
+
+                }
+
 
                 DataList.Add(newModel01);
                 DataList.Add(newModel02);
+                DataList.Add(newModel04);
+                DataList.Add(newModel05);
                 DataList.Add(newModel03);
+                DataList.Add(newModel06);
+                DataList.Add(newModel07);
 
             }
 

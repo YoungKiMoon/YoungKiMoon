@@ -42,7 +42,7 @@ namespace DesignBoard.Windows
 
         private void btnApply_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            MessageBox.Show("적용 완료", "안내");
+            MessageBox.Show("AMETank Data Applied.", "Information");
             Close();
         }
 
@@ -55,13 +55,13 @@ namespace DesignBoard.Windows
             ListCollectionView tempCheck= selView.GetErrorData();
             if (tempCheck.Count == 0)
             {
-                MessageBox.Show("Error 데이터가 없습니다.", "안내");
+                MessageBox.Show("No Error Data.", "Information");
                 rbAll.IsChecked = true;
                 FilterAllData();
             }
             else
             {
-                MessageBox.Show(tempCheck.Count + " 개 : Error 데이터가 있습니다.", "안내");
+                MessageBox.Show(tempCheck.Count + " : Error", "Information");
                 rbError.IsChecked = true;
                 FilterErrorData();
             }

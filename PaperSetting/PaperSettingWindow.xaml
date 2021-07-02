@@ -8,7 +8,7 @@
         xmlns:ddes="http://schemas.devdept.com/winfx/2008/xaml/control" 
         xmlns:ddgr="http://schemas.devdept.com/winfx/2008/xaml/graphics"
         
-        xmlns:vm="clr-namespace:PaperSetting.ViewModel"
+        xmlns:vm="clr-namespace:PaperSetting.ViewModels"
         
         xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation" x:Class="PaperSetting.PaperSettingWindow"
         
@@ -55,7 +55,8 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button x:Name="btnRebuild" Content="REBUILD" Style="{StaticResource customButton}" Margin="10,2,2,0" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Padding="10,0" Background="#FFF0BBBB"/>
                             <Button x:Name="btnRegen" Content="REGEN" Style="{StaticResource customButton}" Margin="10,2,2,0" Padding="10,0" Background="#FF6FBBCB" PreviewMouseLeftButtonUp="btnRegen_PreviewMouseLeftButtonUp"/>
-                            <Button x:Name="btnBlock" Content="BLOCK LOAD" Style="{StaticResource customButton}" Margin="10,2,2,0"  Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnBlock_PreviewMouseLeftButtonUp"/>
+                            <Button x:Name="btnOrientationAdj" Content="ORIENTATION ADJ" Style="{StaticResource customButton}" Margin="10,2,2,0"  Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnOrientationAdj_PreviewMouseLeftButtonUp" />
+                            <Button x:Name="btnBlock" Content="BLOCK LOAD" Style="{StaticResource customButton}" Margin="2,2,2,0"  Padding="2,0,2,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnBlock_PreviewMouseLeftButtonUp"/>
                             <Button x:Name="btnEnvironment" Content="ENVIRONMENT" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnEnvironment_PreviewMouseLeftButtonUp"/>
                             <Button x:Name="btnTitleBlock" Content="TITLE BLOCK" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnTitleBlock_PreviewMouseLeftButtonUp"/>
                         </StackPanel>

@@ -1,4 +1,4 @@
-﻿using PaperSetting.ViewModel;
+﻿using PaperSetting.ViewModels;
 using PaperSetting.EYEServices;
 
 using System;
@@ -40,6 +40,7 @@ using PaperSetting.Utils;
 using DrawWork.DrawBuilders;
 using devDept.Eyeshot;
 using System.Diagnostics;
+using PaperSetting.Windows;
 
 namespace PaperSetting
 {
@@ -1066,6 +1067,14 @@ namespace PaperSetting
             this.testDraw.Entities.RegenAllCurved(0.0005);
             this.testDraw.Refresh();
             this.testDraw.ZoomFit();
+        }
+
+
+
+        private void btnOrientationAdj_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            OrientationAdjWindow newWindow = new OrientationAdjWindow();
+            newWindow.ShowDialog();
         }
     }
 }

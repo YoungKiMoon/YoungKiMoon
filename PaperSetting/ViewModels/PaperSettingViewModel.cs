@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using AssemblyLib.AssemblyModels;
 
-namespace PaperSetting.ViewModel
+namespace PaperSetting.ViewModels
 {
     public class PaperSettingViewModel : Notifier
     {

@@ -9,6 +9,8 @@ using devDept.Eyeshot;
 using devDept.Graphics;
 using devDept.Eyeshot.Entities;
 using devDept.Geometry;
+using DrawSample.Commons;
+using System.Windows;
 
 namespace DrawSample.DrawService
 {
@@ -289,6 +291,241 @@ namespace DrawSample.DrawService
         }
 
 
+
+
+        public void CreateArrangePlate(Model singleModel,string circleDiameter="90000")
+        {
+
+            singleModel.Entities.Clear();
+
+            List<Entity> newList = new List<Entity>();
+            List<Entity> centerLineList = new List<Entity>();
+            List<Entity> plateList = new List<Entity>();
+            List<Line> horizontalLineList = new List<Line>();
+            List<Line> horizontalVList = new List<Line>();
+
+            Point3D referencePoint = new Point3D(1000000000, 1000000000);
+
+            if (true)
+            {
+                double inputDiameter = valueService.GetDoubleValue(circleDiameter);
+                double outCircleDiameter = inputDiameter;
+                double outCircleRadius = outCircleDiameter/2;
+
+                double plateOverlap = 30;
+                double plateOverlapHalf = plateOverlap / 2;
+
+                double plateActualWidth = 2438;
+                double plateActualLength = 9144;
+
+                double plateWidth = plateActualWidth-plateOverlapHalf;
+                double plateLength = plateActualLength-plateOverlapHalf;
+
+                double horizontalMinSpacing = 800;
+                double verticalMinSpacing = 800;
+                double horizontalSpacingShift = horizontalMinSpacing+50;
+
+                // IntersectLength
+                double intersectLength = 100;
+
+
+                // Outer : Circle
+                Circle outCircle = new Circle(GetSumPoint(referencePoint, 0, 0),outCircleRadius);
+                styleService.SetLayer(ref outCircle, layerService.LayerOutLine);
+                newList.Add(outCircle);
+
+                // Center Line
+                centerLineList.AddRange(editingService.GetCenterLine(GetSumPoint(referencePoint, 0, -outCircleRadius), GetSumPoint(referencePoint, 0, outCircleRadius), 20, 90));
+                centerLineList.AddRange(editingService.GetCenterLine(GetSumPoint(referencePoint, -outCircleRadius, 0), GetSumPoint(referencePoint, outCircleRadius,0), 20, 90));
+                styleService.SetLayerListEntity(ref centerLineList, layerService.LayerCenterLine);
+
+
+                // Outer : Circle : Point : apply Intersect Length
+                Point3D outCircleLeftPoint = GetSumPoint(referencePoint, -outCircleRadius - intersectLength, 0);
+                Point3D outCircleRighttPoint = GetSumPoint(referencePoint, outCircleRadius + intersectLength, 0);
+                Point3D outCircleTopPoint = GetSumPoint(referencePoint, 0, outCircleRadius + intersectLength);
+                Point3D outCircleBottomPoint = GetSumPoint(referencePoint, 0, -outCircleRadius - intersectLength);
+
+
+                // Plate : Basic
+                double maxPlateCount =Math.Ceiling( outCircleRadius / plateWidth);
+                double refVerticalPlateCount = 2;
+                double horizontalPlateCount = maxPlateCount - refVerticalPlateCount;
+
+                double firstPlateLeftLength = 2000;
+
+                // Plate : Horizontal
+                double currentTopY = 0;
+                double currentBottomY = plateWidth;
+
+
+                for (int i = 0; i < horizontalPlateCount; i++)
+                {
+
+                    Line vHorizontalLine = new Line(GetSumPoint(outCircleLeftPoint, 0, currentTopY), GetSumPoint(outCircleRighttPoint, 0, currentTopY));
+                    Point3D[] vHorizontalLineInter = outCircle.IntersectWith(vHorizontalLine);
+                    // 0 겹침 없음, 1이면 최상단과 겹침
+                    if (vHorizontalLineInter.Length == 2)
+                    {
+                        Line oneHorizontalLine = new Line(GetSumPoint(vHorizontalLineInter[0], 0, 0), GetSumPoint(vHorizontalLineInter[1], 0, 0));
+                        horizontalLineList.Add(oneHorizontalLine);
+                    }
+                    currentTopY += plateWidth;
+                }
+
+
+
+                for (int i=0; i < horizontalPlateCount; i++)
+                {
+
+                    Line oneHorizontalLine = horizontalLineList[i];
+                    double oneHorizontalDiameter = oneHorizontalLine.Length();
+                    double oneHorizontalRadius = oneHorizontalDiameter / 2;
+
+
+                    List<Line> oneVerticalLineList = new List<Line>();
+                    bool horizonDraw = false;
+                    double currentLastLength = 0;
+
+                    // Event
+                    double currentStartX = 0;
+                    bool evenNumber = IsEvenNumber(i);
+
+
+                    // Right
+
+                    // Case 1
+                    currentStartX = GetStartXValue(CASE_TYPE.CASE_01, evenNumber, plateLength, horizontalSpacingShift);
+                    oneVerticalLineList.AddRange(GetHorizontalRightLine(referencePoint, oneHorizontalLine.StartPoint, outCircle, oneHorizontalRadius, currentStartX, plateWidth, plateLength, out currentLastLength));
+                    // Case 1 : Check
+                    if(currentLastLength < horizontalMinSpacing)
+                    {
+                        oneVerticalLineList.Clear();
+
+                        // Case 2
+                        currentStartX = GetStartXValue(CASE_TYPE.CASE_02, evenNumber, plateLength, horizontalSpacingShift);
+                        oneVerticalLineList.AddRange(GetHorizontalRightLine(referencePoint, oneHorizontalLine.StartPoint, outCircle, oneHorizontalRadius, currentStartX, plateWidth, plateLength, out currentLastLength));
+                        // Case 2 : Check
+                        if (currentLastLength < horizontalMinSpacing)
+                        {
+                            MessageBox.Show("Case 2 적용시 문제 발생");
+                        }
+                    }
+                    
+                    horizontalVList.AddRange(oneVerticalLineList);
+
+                }
+
+                styleService.SetLayerListLine(ref horizontalLineList, layerService.LayerOutLine);
+                styleService.SetLayerListLine(ref horizontalVList, layerService.LayerOutLine);
+                styleService.SetLayerListEntity(ref plateList, layerService.LayerOutLine);
+
+            }
+
+
+            singleModel.Entities.AddRange(horizontalLineList);
+            singleModel.Entities.AddRange(horizontalVList);
+            singleModel.Entities.AddRange(plateList);
+
+            singleModel.Entities.AddRange(newList);
+            singleModel.Entities.AddRange(centerLineList);
+
+            singleModel.Entities.Regen();
+            singleModel.Invalidate();
+
+            singleModel.SetView(viewType.Top);
+            singleModel.ZoomFit();
+
+        }
+
+        public double GetStartXValue(CASE_TYPE caseNumber,bool evenNumber,double plateLength, double horizontalSpacingShift)
+        {
+            double firstPlateLeftLength = 2000;
+            double returnValue = 0;
+            switch (caseNumber)
+            {
+                case CASE_TYPE.CASE_01:
+                    if (evenNumber)
+                    {
+                        // 좌측 : - 2000
+                        returnValue = -firstPlateLeftLength;
+                    }
+                    else
+                    {
+                        // 우측
+                        returnValue = 0;
+                    }
+                    break;
+
+                case CASE_TYPE.CASE_02:
+                    if (evenNumber)
+                    {
+                        // 좌측 : - 2000 + 850
+                        returnValue = -firstPlateLeftLength+ horizontalSpacingShift;
+                    }
+                    else
+                    {
+                        // 중앙
+                        returnValue = -plateLength/2;
+                    }
+                    break;
+
+                case CASE_TYPE.CASE_03:
+                    if (evenNumber)
+                    {
+                        // 양쪽 끼우기
+                        returnValue = -firstPlateLeftLength + horizontalSpacingShift;
+                    }
+                    else
+                    {
+                        // 중앙 끼우기
+                        returnValue = -plateLength / 2;
+                    }
+                    break;
+
+                case CASE_TYPE.CASE_04:
+                    break;
+            }
+
+            return returnValue;
+        }
+
+        public bool IsEvenNumber(int selNumber)
+        {
+            return selNumber % 2 == 0;
+        }
+
+        public List<Line> GetHorizontalRightLine(Point3D centerPoint,Point3D startPointY,Circle outCircle,double oneHorizontalRadius,double firstPlateLeftLength,double plateWidth,double plateLength, out double lastLength)
+        {
+            List<Line> newList = new List<Line>();
+            double currentX = centerPoint.X+ firstPlateLeftLength;
+            double currentXMax = centerPoint.X + oneHorizontalRadius;
+            while (currentX < currentXMax)
+            {
+                Point3D oneVerticalLineTop = new Point3D(currentX, startPointY.Y);
+                Line vOneHorizontalV = new Line(GetSumPoint(oneVerticalLineTop, 0, 0), GetSumPoint(oneVerticalLineTop, 0, plateWidth));
+                Point3D[] vOneHorizontalVInter = outCircle.IntersectWith(vOneHorizontalV);
+                if (vOneHorizontalVInter.Length > 0)
+                {
+                    Line oneHorizontalV = new Line(GetSumPoint(oneVerticalLineTop, 0, 0), GetSumPoint(vOneHorizontalVInter[0], 0, 0));
+                    newList.Add(oneHorizontalV);
+                }
+                else
+                {
+                    newList.Add(vOneHorizontalV);
+                }
+                currentX += plateLength;
+            }
+
+            // Out
+             lastLength= currentXMax - currentX;
+            if (lastLength < 0)
+            {
+                lastLength = currentXMax - currentX + plateLength;
+            }
+
+            return newList;
+        }
 
 
 

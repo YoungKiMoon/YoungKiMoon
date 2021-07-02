@@ -1,0 +1,101 @@
+﻿<Window x:Class="PaperSetting.Windows.OrientationAdjWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        
+        xmlns:ddes="http://schemas.devdept.com/winfx/2008/xaml/control" 
+        xmlns:ddgr="http://schemas.devdept.com/winfx/2008/xaml/graphics"
+        
+        xmlns:local="clr-namespace:PaperSetting.Windows"
+
+        
+        xmlns:vm="clr-namespace:PaperSetting.ViewModels"
+        
+        mc:Ignorable="d"
+        Title="Orientation Adjustment" Height="600" Width="1100" WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <vm:OrientationAdjWindowViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}" x:Key="customButton">
+            <Style.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="4"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="BorderBrush" Value="#FF63ADBD"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                </Style>
+            </Style.Resources>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Background="#FFDFE9F2"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="20,0,0,0">
+
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Text="LAYER : " VerticalAlignment="Center" FontSize="14"/>
+            <Border Background="#FF89D6F9" CornerRadius="10" Margin="5" Padding="10,0,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox x:Name="cbNozzle" Content="Nozzle" IsChecked="True" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,10,0" Cursor="Hand" PreviewMouseLeftButtonUp="cbNozzle_PreviewMouseLeftButtonUp" />
+                    <CheckBox x:Name="cbStructure" Content="Structure" IsChecked="True" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,10,0" Cursor="Hand" PreviewMouseLeftButtonUp="cbStructure_PreviewMouseLeftButtonUp"/>
+                </StackPanel>
+            </Border>
+            <Button x:Name="btnDetection" Content="DETECTION" Style="{StaticResource customButton}" Height="26" BorderThickness="1" Margin="2,2,2,2" Padding="10,0" Background="#FF90E0F1" Cursor="Hand" PreviewMouseLeftButtonUp="btnDetection_PreviewMouseLeftButtonUp"/>
+            <Button x:Name="btnRebuild" Style="{StaticResource customButton}" Height="26" BorderThickness="1" Margin="2,2,2,2" Padding="10,0" Background="#FFF0BBBB" Cursor="Hand" PreviewMouseLeftButtonUp="btnRebuild_PreviewMouseLeftButtonUp">
+                <TextBlock Text="REBUILD"/>
+            </Button>
+            <Button x:Name="btnRegen" Content="REGEN" Style="{StaticResource customButton}" Height="26" BorderThickness="1" Margin="2,2,2,2" Padding="10,0" Background="#FF66A6B4" Cursor="Hand" PreviewMouseLeftButtonUp="btnRegen_PreviewMouseLeftButtonUp"/>
+            <Button x:Name="btnStartAdj" Content="START ADJ" Style="{StaticResource customButton}" Height="26" BorderThickness="1" Margin="2,2,2,2" Padding="10,0" Background="#FF90E0F1" Cursor="Hand" PreviewMouseLeftButtonUp="btnStartAdj_PreviewMouseLeftButtonUp"/>
+        </StackPanel>
+
+
+        <ddes:Model x:Name="testModel" Grid.Row="1" >
+            <ddes:Model.ProgressBar>
+                <ddes:ProgressBar Lighting="False"/>
+            </ddes:Model.ProgressBar>
+            <ddes:Model.Viewports>
+                <ddes:Viewport DisplayMode="Wireframe" InitialView="Other">
+                    <ddes:Viewport.Background>
+                        <ddgr:BackgroundSettings BottomColor="#FF00BFFF" StyleMode="Solid" TopColor="#FFDCDCDC"/>
+                    </ddes:Viewport.Background>
+                    <ddes:Viewport.CoordinateSystemIcon>
+                        <ddes:CoordinateSystemIcon Lighting="False"/>
+                    </ddes:Viewport.CoordinateSystemIcon>
+                    <ddes:Viewport.Camera>
+                        <ddes:Camera Distance="97.257904648780823" ProjectionMode="Orthographic" Rotation="0.5, 0.5, 0.5, 0.5" Target="0, 2, 47" ZoomFactor="0.23763337665493928"/>
+                    </ddes:Viewport.Camera>
+                    <ddes:Viewport.Grids>
+                        <ddes:Grid Lighting="False" Visible="False"/>
+                    </ddes:Viewport.Grids>
+                    <ddes:Viewport.OriginSymbols>
+                        <ddes:OriginSymbol Lighting="False"/>
+                    </ddes:Viewport.OriginSymbols>
+                    <ddes:Viewport.Rotate>
+                        <ddes:RotateSettings Enabled="False"/>
+                    </ddes:Viewport.Rotate>
+                    <ddes:Viewport.ToolBars>
+                        <ddes:ToolBar>
+                            <ddes:ToolBar.Buttons>
+                                <ddes:MagnifyingGlassToolBarButton/>
+                                <ddes:ZoomWindowToolBarButton/>
+                                <ddes:ZoomToolBarButton/>
+                                <ddes:PanToolBarButton/>
+                                <ddes:ZoomFitToolBarButton/>
+                            </ddes:ToolBar.Buttons>
+                        </ddes:ToolBar>
+                    </ddes:Viewport.ToolBars>
+                    <ddes:Viewport.ViewCubeIcon>
+                        <ddes:ViewCubeIcon Lighting="False" Visible="False"/>
+                    </ddes:Viewport.ViewCubeIcon>
+                </ddes:Viewport>
+            </ddes:Model.Viewports>
+        </ddes:Model>
+
+    </Grid>
+</Window>

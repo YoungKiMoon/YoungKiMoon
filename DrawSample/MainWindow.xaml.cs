@@ -110,6 +110,8 @@ namespace DrawSample
             drawSetting.CreateMarkValue(markValue, testModel);
         }
 
+
+        #region Button : Move
         private void shiftLeft_Click(object sender, RoutedEventArgs e)
         {
             if (currentEntity != null)
@@ -272,6 +274,23 @@ namespace DrawSample
 
                 }
             }
+        }
+
+        #endregion
+
+
+        private void btnPlate_Click(object sender, RoutedEventArgs e)
+        {
+
+            drawSetting.CreateArrangePlate(testModel, tbDiameter.Text);
+        }
+
+        private void btnRegen_Click(object sender, RoutedEventArgs e)
+        {
+            testModel.Entities.RegenAllCurved(0.05);
+
+            testModel.Refresh();
+
         }
     }
 }

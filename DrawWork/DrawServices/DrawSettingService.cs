@@ -2789,7 +2789,7 @@ namespace DrawWork.DrawServices
             }
 
             // Orientation
-            if (visibleFalse)
+            if (true)
             {
 
                 double selScaleValue = 90;
@@ -3311,7 +3311,7 @@ namespace DrawWork.DrawServices
                 singleModel.Entities.AddRange(newList);
             }
 
-            if (false)
+            if (visibleFalse)
             {
                 Point3D referencePoint = new Point3D(1000, 1000);
                 Line newLine = new Line(GetSumPoint(referencePoint, 0, 0),GetSumPoint(referencePoint, 1000, 0));
@@ -3400,7 +3400,7 @@ namespace DrawWork.DrawServices
                 singleModel.Entities.AddRange(newList);
             }
 
-            if (true)
+            if (visibleFalse)
             {
                 Point3D refPoint = new Point3D(100000, 100000);
 

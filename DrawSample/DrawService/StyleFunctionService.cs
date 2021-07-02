@@ -82,7 +82,17 @@ namespace DrawSample.DrawService
                 }
             }
         }
-        public void SetLayerListLine(ref Entity[] selEntity, string selLayerName)
+        //public void SetLayerListLine(ref Entity[] selEntity, string selLayerName)
+        //{
+        //    foreach (Line eachEntity in selEntity)
+        //    {
+        //        eachEntity.LayerName = selLayerName;
+        //        eachEntity.LineTypeMethod = colorMethodType.byLayer;
+        //        eachEntity.LineWeightMethod = colorMethodType.byLayer;
+        //        eachEntity.ColorMethod = colorMethodType.byLayer;
+        //    }
+        //}
+        public void SetLayerListLine(ref List<Line> selEntity, string selLayerName)
         {
             foreach (Line eachEntity in selEntity)
             {

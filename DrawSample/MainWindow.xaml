@@ -10,7 +10,7 @@
         xmlns:vm="clr-namespace:DrawSample.ViewModels"
         
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
@@ -26,6 +26,8 @@
                 <Button x:Name="btnDraw" Content="ReDraw"  Click="btnDraw_Click"/>
                 <Button x:Name="btnDetection" Content="ReDetection" Margin="10,0,0,0" Click="btnDetection_Click" />
                 <Button x:Name="btnMark" Content="Mark" Margin="10,0,0,0" Click="btnMark_Click"  />
+                <Button x:Name="btnPlate" Content="CreatePlate" Margin="10,0,0,0" Click="btnPlate_Click" />
+                <Button x:Name="btnRegen" Content="CreatePlate" Margin="10,0,0,0" Click="btnRegen_Click" />
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1" Margin="10,0,0,0">
@@ -44,16 +46,23 @@
                     <TextBlock Text="Outline Intersect : "/>
                     <TextBox x:Name="tbOutline"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Visibility="Collapsed">
+                <StackPanel  Orientation="Horizontal" Visibility="Collapsed">
                     <TextBlock Text="Shape Intersect : "/>
                     <TextBox x:Name="tbShape"/>
                 </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Diameter : "/>
+                    <TextBox x:Name="tbDiameter" Width="100" Text="90000"/>
+                </StackPanel>
+
             </StackPanel>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="0"/>
             </Grid.ColumnDefinitions>
             <ddes:Model x:Name="testModel" MouseDown="testModel_MouseDown" >
                 <ddes:Model.ProgressBar>
@@ -96,7 +105,7 @@
                     </ddes:Viewport>
                 </ddes:Model.Viewports>
             </ddes:Model>
-            <Grid Grid.Column="1">
+            <Grid Grid.Column="1" Visibility="Collapsed">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="200"/>
                     <RowDefinition/>
