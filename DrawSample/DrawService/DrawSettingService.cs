@@ -11,6 +11,7 @@ using devDept.Eyeshot.Entities;
 using devDept.Geometry;
 using DrawSample.Commons;
 using System.Windows;
+using DrawSample.Models;
 
 namespace DrawSample.DrawService
 {
@@ -125,7 +126,7 @@ namespace DrawSample.DrawService
                     newLineList.Add(vertiLine);
                 }
 
-                styleService.SetLayerListEntity(ref newLineList, layerService.LayerOutLine);
+                styleService.SetLayerListEntity(ref newLineList, layerService.LayerBasicLine);
 
 
                 // 
@@ -226,7 +227,8 @@ namespace DrawSample.DrawService
                         Point3D[] eachInter = ((ICurve)eachOut).IntersectWith((ICurve)eachOut2);
                         if (eachInter.Length > 0)
                         {
-                            interOutlineList.Add(eachInter);
+                            foreach(Point3D eachPoint in eachInter)
+                                interOutlineList.Add(eachInter);
                         }
                     }
                 }
@@ -252,8 +254,11 @@ namespace DrawSample.DrawService
                 List<Point3D> outList = new List<Point3D>();
                 foreach(Point3D[] eachPoint in interOutlineList)
                 {
-                    List<Entity> eachRec=shapeService.GetRectangle(out outList, GetSumPoint(eachPoint[0], -markWidth/2, markHeight/2), markWidth, markHeight, 0, 0, 0);
-                    markList.AddRange(eachRec);
+                    foreach(Point3D eachEachPoint in eachPoint)
+                    {
+                        List<Entity> eachRec = shapeService.GetRectangle(out outList, GetSumPoint(eachEachPoint, -markWidth / 2, markHeight / 2), markWidth, markHeight, 0, 0, 0);
+                        markList.AddRange(eachRec);
+                    }
                 }
                 foreach (Point3D[] eachPoint in interShapeList)
                 {
@@ -302,9 +307,14 @@ namespace DrawSample.DrawService
             List<Entity> centerLineList = new List<Entity>();
             List<Entity> plateList = new List<Entity>();
             List<Line> horizontalLineList = new List<Line>();
+            List<Tuple<Point3D,Point3D>> horizontalPointList = new List<Tuple<Point3D, Point3D>>();
             List<Line> horizontalVList = new List<Line>();
 
-            Point3D referencePoint = new Point3D(1000000000, 1000000000);
+            List<CombModel> horizontalCombList = new List<CombModel>();
+
+            List<Entity> textList = new List<Entity>();
+
+            Point3D referencePoint = new Point3D(10000000, 10000000);
 
             if (true)
             {
@@ -324,6 +334,9 @@ namespace DrawSample.DrawService
                 double horizontalMinSpacing = 800;
                 double verticalMinSpacing = 800;
                 double horizontalSpacingShift = horizontalMinSpacing+50;
+
+                double intersectWidth = 300;
+                double intersectWidthHalf = intersectWidth / 2;
 
                 // IntersectLength
                 double intersectLength = 100;
@@ -354,73 +367,87 @@ namespace DrawSample.DrawService
 
                 double firstPlateLeftLength = 2000;
 
-                // Plate : Horizontal
+                #region Plate : Horizontal
                 double currentTopY = 0;
                 double currentBottomY = plateWidth;
-
-
                 for (int i = 0; i < horizontalPlateCount; i++)
                 {
-
                     Line vHorizontalLine = new Line(GetSumPoint(outCircleLeftPoint, 0, currentTopY), GetSumPoint(outCircleRighttPoint, 0, currentTopY));
                     Point3D[] vHorizontalLineInter = outCircle.IntersectWith(vHorizontalLine);
                     // 0 겹침 없음, 1이면 최상단과 겹침
                     if (vHorizontalLineInter.Length == 2)
                     {
-                        Line oneHorizontalLine = new Line(GetSumPoint(vHorizontalLineInter[0], 0, 0), GetSumPoint(vHorizontalLineInter[1], 0, 0));
+                        Point3D leftPoint = vHorizontalLineInter[0];
+                        Point3D rightPoint = vHorizontalLineInter[1];
+                        if (leftPoint.X > rightPoint.X)
+                        {
+                            leftPoint = vHorizontalLineInter[1];
+                            rightPoint = vHorizontalLineInter[0];
+                        }
+                        // Line
+                        Line oneHorizontalLine = new Line(GetSumPoint(leftPoint, 0, 0), GetSumPoint(rightPoint, 0, 0));
                         horizontalLineList.Add(oneHorizontalLine);
+                        // Point
+                        horizontalPointList.Add(new Tuple<Point3D, Point3D>(leftPoint, rightPoint));
                     }
                     currentTopY += plateWidth;
                 }
+                #endregion
 
-
-
-                for (int i=0; i < horizontalPlateCount; i++)
+                #region Create Comb
+                // Circle Comb
+                for (int i = 1; i < horizontalPointList.Count; i++)
                 {
+                    Tuple<Point3D, Point3D> horizontalUnderPoint = horizontalPointList[i - 1];
+                    Tuple<Point3D, Point3D> horizontalOnPoint = horizontalPointList[i];
+                    CombModel newComb = new CombModel();
+                    newComb.Teeth.Add(new CombToothModel(horizontalOnPoint.Item1.X, horizontalUnderPoint.Item1.X, horizontalOnPoint.Item1.X + horizontalMinSpacing));
+                    newComb.Teeth.Add(new CombToothModel(horizontalOnPoint.Item2.X, horizontalUnderPoint.Item2.X-horizontalMinSpacing, horizontalOnPoint.Item2.X ));
+                    horizontalCombList.Add(newComb);
+                }
 
+                #endregion
+
+
+                double ceterX = referencePoint.X;
+                double beforeStartX = 0;
+                double currentStartX = 0;
+
+                CombModel newUnderComb = null;
+                for (int i=1;i< horizontalPlateCount; i++)
+                {
                     Line oneHorizontalLine = horizontalLineList[i];
                     double oneHorizontalDiameter = oneHorizontalLine.Length();
                     double oneHorizontalRadius = oneHorizontalDiameter / 2;
 
-
-                    List<Line> oneVerticalLineList = new List<Line>();
-                    bool horizonDraw = false;
-                    double currentLastLength = 0;
-
-                    // Event
-                    double currentStartX = 0;
-                    bool evenNumber = IsEvenNumber(i);
-
-
-                    // Right
-
                     // Case 1
-                    currentStartX = GetStartXValue(CASE_TYPE.CASE_01, evenNumber, plateLength, horizontalSpacingShift);
-                    oneVerticalLineList.AddRange(GetHorizontalRightLine(referencePoint, oneHorizontalLine.StartPoint, outCircle, oneHorizontalRadius, currentStartX, plateWidth, plateLength, out currentLastLength));
-                    // Case 1 : Check
-                    if(currentLastLength < horizontalMinSpacing)
+                    currentStartX = GetStartXValue2(i,plateLength);
+                    CombModel newOnComb = GetOneHorizontal(currentStartX, oneHorizontalDiameter, plateLength, intersectWidthHalf);
+
+                    if (i == 1)
                     {
-                        oneVerticalLineList.Clear();
-
-                        // Case 2
-                        currentStartX = GetStartXValue(CASE_TYPE.CASE_02, evenNumber, plateLength, horizontalSpacingShift);
-                        oneVerticalLineList.AddRange(GetHorizontalRightLine(referencePoint, oneHorizontalLine.StartPoint, outCircle, oneHorizontalRadius, currentStartX, plateWidth, plateLength, out currentLastLength));
-                        // Case 2 : Check
-                        if (currentLastLength < horizontalMinSpacing)
-                        {
-                            MessageBox.Show("Case 2 적용시 문제 발생");
-                        }
+                        // 비교
                     }
-                    
-                    horizontalVList.AddRange(oneVerticalLineList);
-
+                    else
+                    {
+                        // 비교
+                    }
+                    newUnderComb = newOnComb;
                 }
+
 
                 styleService.SetLayerListLine(ref horizontalLineList, layerService.LayerOutLine);
                 styleService.SetLayerListLine(ref horizontalVList, layerService.LayerOutLine);
                 styleService.SetLayerListEntity(ref plateList, layerService.LayerOutLine);
 
+                styleService.SetLayerListTextEntity(ref textList, layerService.LayerBasicLine);
             }
+
+
+
+            Circle outCircle1 = new Circle(GetSumPoint(referencePoint, 0, 0), 300);
+            styleService.SetLayer(ref outCircle1, layerService.LayerOutLine);
+            newList.Add(outCircle1);
 
 
             singleModel.Entities.AddRange(horizontalLineList);
@@ -430,16 +457,22 @@ namespace DrawSample.DrawService
             singleModel.Entities.AddRange(newList);
             singleModel.Entities.AddRange(centerLineList);
 
+            //singleModel.Entities.AddRange(textList);
             singleModel.Entities.Regen();
-            singleModel.Invalidate();
-
+            //singleModel.Invalidate();
+            singleModel.Entities.RegenAllCurved(0.005);
             singleModel.SetView(viewType.Top);
             singleModel.ZoomFit();
+            singleModel.Refresh();
 
         }
 
+
+        
+
         public double GetStartXValue(CASE_TYPE caseNumber,bool evenNumber,double plateLength, double horizontalSpacingShift)
         {
+            //double firstPlateLeftLength = 4557;
             double firstPlateLeftLength = 2000;
             double returnValue = 0;
             switch (caseNumber)
@@ -490,9 +523,45 @@ namespace DrawSample.DrawService
             return returnValue;
         }
 
+        public double GetStartXValue2( int selNumber, double plateLength)
+        {
+            // Event
+            bool evenNumber = IsEvenNumber(selNumber);
+            double firstPlateLeftLength = 2000;
+            double returnValue = 0;
+
+            if (selNumber == 1)
+                return -firstPlateLeftLength;
+
+            if (evenNumber)
+            {
+                returnValue = 0;
+            }
+            else
+            {
+                returnValue = -plateLength/2;
+            }
+
+            return returnValue;
+        }
+
         public bool IsEvenNumber(int selNumber)
         {
             return selNumber % 2 == 0;
+        }
+
+        public CombModel GetOneHorizontal(double startX,double horizontalLength,double  plateLength,double intersectWidthHalf)
+        {
+            CombModel newComb = new CombModel();
+
+            double leftX = startX - horizontalLength / 2 -plateLength;
+            double rightX = startX + horizontalLength / 2 +plateLength;
+            for (double i = startX; i < rightX; i += plateLength)
+                newComb.Teeth.Add(new CombToothModel(i, i - intersectWidthHalf, i + intersectWidthHalf));
+            for (double i = startX; i > leftX; i -= plateLength)
+                newComb.Teeth.Add(new CombToothModel(i, i - intersectWidthHalf, i + intersectWidthHalf));
+
+            return newComb;
         }
 
         public List<Line> GetHorizontalRightLine(Point3D centerPoint,Point3D startPointY,Circle outCircle,double oneHorizontalRadius,double firstPlateLeftLength,double plateWidth,double plateLength, out double lastLength)

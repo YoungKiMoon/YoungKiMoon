@@ -447,7 +447,7 @@ namespace DrawWork
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
 
-            this.testModel.Entities.RegenAllCurved(0.0005);
+            this.testModel.Entities.RegenAllCurved(0.005);
             this.testModel.Refresh();
 
         }

@@ -18,4 +18,12 @@ namespace DrawSample.Commons
         CASE_07,
 
     }
+    public enum MOVE_TYPE
+    {
+        NotSet,
+        TOP,
+        BOTTOM,
+        LEFT,
+        RIGHT,
+    }
 }

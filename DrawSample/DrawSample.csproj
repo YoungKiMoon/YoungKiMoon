@@ -85,6 +85,7 @@
     <Compile Include="DrawService\StyleFunctionService.cs" />
     <Compile Include="DrawService\TextStyleService.cs" />
     <Compile Include="DrawService\ValueService.cs" />
+    <Compile Include="Models\CombModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

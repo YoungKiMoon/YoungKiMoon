@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 using MColor = System.Windows.Media.Color;
 using Color = System.Drawing.Color;
 using devDept.Eyeshot.Entities;
+using DrawSample.Commons;
 
 namespace DrawSample
 {
@@ -43,10 +44,12 @@ namespace DrawSample
             this.testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
             this.testModel.ActionMode = devDept.Eyeshot.actionType.SelectByPick;
 
+            this.testModel.Renderer = rendererType.OpenGL;
+
             this.testModel.ActiveViewport.Background.TopColor = new SolidColorBrush(MColor.FromRgb(59, 68, 83));
             
             this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Wireframe;
-            this.testModel.Wireframe.SilhouettesDrawingMode = silhouettesDrawingType.Always;
+            //this.testModel.Wireframe.SilhouettesDrawingMode = silhouettesDrawingType.Always;
 
 
             drawSetting = new DrawSettingService();
@@ -99,6 +102,7 @@ namespace DrawSample
 
 
             tbIntersect.Text = totalValue.ToString();
+            tbIntersectPoint.Text = (totalValue * 2).ToString();
             tbOutline.Text = outlineValue.ToString();
             tbShape.Text = shapeValue.ToString();
 
@@ -114,168 +118,69 @@ namespace DrawSample
         #region Button : Move
         private void shiftLeft_Click(object sender, RoutedEventArgs e)
         {
-            if (currentEntity != null)
-            {
-                if(currentEntity is Circle)
-                {
-                    //double refX = ((Circle)currentEntity).Center.X;
-                    //((Circle)currentEntity).Center.X = refX- shiftFactor;
-                    //Console.WriteLine(((Circle)currentEntity).Center.X);
-                    //testModel.Entities.Regen();
-                    //testModel.Refresh();
-                    //testModel.Invalidate();
-
-                    foreach (Entity eachEntity in testModel.Entities)
-                    {
-                        if (eachEntity.Selected)
-                        {
-                            //Circle newDx = eachEntity as Circle;
-                            //Circle newEx = new Circle(newDx.Center, newDx.Radius);
-
-                            //testModel.Entities.Remove(eachEntity);
-
-                            //double refX = newEx.Center.X;
-                            //newEx.Center.X = refX - shiftFactor;
-                            //Console.WriteLine(newEx.Center.X);
-                            //newEx.Selected = true;
-                            //testModel.Entities.Add(newEx);
-                            //testModel.Entities.Regen();
-
-                            ((Circle)eachEntity).Center.X = ((Circle)eachEntity).Center.X - 100;
-                            ((Circle)eachEntity).Radius = ((Circle)eachEntity).Radius;
-                            testModel.Entities.Regen();
-
-                            testModel.Refresh();
-                            testModel.Invalidate();
-                            break;
-
-                        }
-                    }
-
-                }
-            }
+            MoveShape(MOVE_TYPE.LEFT);
         }
 
         private void shiftRight_Click(object sender, RoutedEventArgs e)
         {
-            if (currentEntity != null)
-            {
-                if (currentEntity is Circle)
-                {
-                    //double refX = ((Circle)currentEntity).Center.X;
-                    //((Circle)currentEntity).Center.X = refX- shiftFactor;
-                    //Console.WriteLine(((Circle)currentEntity).Center.X);
-                    //testModel.Entities.Regen();
-                    //testModel.Refresh();
-                    //testModel.Invalidate();
-
-                    foreach (Entity eachEntity in testModel.Entities)
-                    {
-                        if (eachEntity.Selected)
-                        {
-                            Circle newDx = eachEntity as Circle;
-                            Circle newEx = new Circle(newDx.Center, newDx.Radius);
-
-                            testModel.Entities.Remove(eachEntity);
-
-                            double refX = newEx.Center.X;
-                            newEx.Center.X = refX + shiftFactor;
-                            Console.WriteLine(newEx.Center.X);
-                            newEx.Selected = true;
-                            testModel.Entities.Add(newEx);
-                            testModel.Entities.Regen();
-
-                            testModel.Refresh();
-                            testModel.Invalidate();
-                            break;
-
-                        }
-                    }
-
-                }
-            }
+            MoveShape(MOVE_TYPE.RIGHT);
         }
 
         private void shiftBottom_Click(object sender, RoutedEventArgs e)
         {
-            if (currentEntity != null)
-            {
-                if (currentEntity is Circle)
-                {
-                    //double refX = ((Circle)currentEntity).Center.X;
-                    //((Circle)currentEntity).Center.X = refX- shiftFactor;
-                    //Console.WriteLine(((Circle)currentEntity).Center.X);
-                    //testModel.Entities.Regen();
-                    //testModel.Refresh();
-                    //testModel.Invalidate();
-
-                    foreach (Entity eachEntity in testModel.Entities)
-                    {
-                        if (eachEntity.Selected)
-                        {
-                            Circle newDx = eachEntity as Circle;
-                            Circle newEx = new Circle(newDx.Center, newDx.Radius);
-
-                            testModel.Entities.Remove(eachEntity);
-
-                            double refX = newEx.Center.Y;
-                            newEx.Center.Y = refX - shiftFactor;
-                            Console.WriteLine(newEx.Center.Y);
-                            newEx.Selected = true;
-                            testModel.Entities.Add(newEx);
-                            testModel.Entities.Regen();
-
-                            testModel.Refresh();
-                            testModel.Invalidate();
-                            break;
-
-                        }
-                    }
-
-                }
-            }
+            MoveShape(MOVE_TYPE.BOTTOM);
         }
 
         private void shiftTop_Click(object sender, RoutedEventArgs e)
         {
+            MoveShape(MOVE_TYPE.TOP);
+        }
+
+
+        private void MoveShape(MOVE_TYPE selType)
+        {
+            double moveFactor = Convert.ToDouble(tbMoveFactor.Text);
+
+            
+
             if (currentEntity != null)
             {
                 if (currentEntity is Circle)
                 {
-                    //double refX = ((Circle)currentEntity).Center.X;
-                    //((Circle)currentEntity).Center.X = refX- shiftFactor;
-                    //Console.WriteLine(((Circle)currentEntity).Center.X);
-                    //testModel.Entities.Regen();
-                    //testModel.Refresh();
-                    //testModel.Invalidate();
-
                     foreach (Entity eachEntity in testModel.Entities)
                     {
-                        if (eachEntity.Selected)
-                        {
-                            Circle newDx = eachEntity as Circle;
-                            Circle newEx = new Circle(newDx.Center, newDx.Radius);
+                        if (eachEntity is Circle)
+                            if (eachEntity.Selected)
+                            {
+                                Circle eachCircle = ((Circle)eachEntity);
+                                switch (selType)
+                                {
+                                    case MOVE_TYPE.TOP:
+                                        eachCircle.Center.Y = eachCircle.Center.Y + moveFactor;
+                                        break;
+                                    case MOVE_TYPE.BOTTOM:
+                                        eachCircle.Center.Y = eachCircle.Center.Y - moveFactor;
+                                        break;
+                                    case MOVE_TYPE.LEFT:
+                                        eachCircle.Center.X = eachCircle.Center.X - moveFactor;
+                                        break;
+                                    case MOVE_TYPE.RIGHT:
+                                        eachCircle.Center.X = eachCircle.Center.X + moveFactor;
+                                        break;
+                                }
+                                eachCircle.Radius = eachCircle.Radius;
+                                testModel.Entities.Regen();
 
-                            testModel.Entities.Remove(eachEntity);
+                                testModel.Refresh();
+                                testModel.Invalidate();
+                                break;
 
-                            double refX = newEx.Center.Y;
-                            newEx.Center.Y = refX + shiftFactor;
-                            Console.WriteLine(newEx.Center.Y);
-                            newEx.Selected = true;
-                            testModel.Entities.Add(newEx);
-                            testModel.Entities.Regen();
-
-                            testModel.Refresh();
-                            testModel.Invalidate();
-                            break;
-
-                        }
+                            }
                     }
 
                 }
             }
         }
-
         #endregion
 
 
@@ -287,7 +192,7 @@ namespace DrawSample
 
         private void btnRegen_Click(object sender, RoutedEventArgs e)
         {
-            testModel.Entities.RegenAllCurved(0.05);
+            testModel.Entities.RegenAllCurved(0.005);
 
             testModel.Refresh();
 
