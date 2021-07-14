@@ -29,6 +29,9 @@
                 <Button x:Name="btnMark" Content="Mark" Margin="10,0,0,0" Click="btnMark_Click" Background="#FFF0FFBE"  />
                 <Button x:Name="btnPlate" Content="CreatePlate" Margin="10,0,0,0" Click="btnPlate_Click" />
                 <Button x:Name="btnRegen" Content="Regen" Margin="10,0,0,0" Click="btnRegen_Click" />
+
+                <Button x:Name="btn3D" Content="Create3D" Margin="10,0,0,0" Click="btn3D_Click"  />
+                <Button x:Name="btn3DTest" Content="Create3D" Margin="10,0,0,0" Click="btn3DTest_Click" />
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1" Margin="0,0,0,0">
@@ -64,7 +67,7 @@
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0"/>
+                <ColumnDefinition Width="200"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <ddes:Model x:Name="testModel" Grid.Column="1" MouseDown="testModel_MouseDown" >
@@ -89,7 +92,7 @@
                             <ddes:OriginSymbol Lighting="False"/>
                         </ddes:Viewport.OriginSymbols>
                         <ddes:Viewport.Rotate>
-                            <ddes:RotateSettings Enabled="False"/>
+                            <ddes:RotateSettings Enabled="True"/>
                         </ddes:Viewport.Rotate>
                         <ddes:Viewport.ToolBars>
                             <ddes:ToolBar>
@@ -99,6 +102,7 @@
                                     <ddes:ZoomToolBarButton/>
                                     <ddes:PanToolBarButton/>
                                     <ddes:ZoomFitToolBarButton/>
+                                    <ddes:RotateToolBarButton/>
                                 </ddes:ToolBar.Buttons>
                             </ddes:ToolBar>
                         </ddes:Viewport.ToolBars>

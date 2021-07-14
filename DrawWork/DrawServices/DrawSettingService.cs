@@ -1580,7 +1580,7 @@ namespace DrawWork.DrawServices
 
 
 
-            if (visibleFalse)
+            if (true)
             {
                 List<Entity> arrowList = new List<Entity>();
                 double selArrowWidth = 2.5;
@@ -1615,6 +1615,7 @@ namespace DrawWork.DrawServices
                     Line tempVLine = new Line(new Point3D(selArrowPoint.X + (divWidth * i), selArrowPoint.Y + selArrowHeight), new Point3D(selArrowPoint.X + (divWidth * i), selArrowPoint.Y - selArrowHeight));
                     Point3D[] tempInterPoint = arrowPath.IntersectWith(tempVLine);
                     arrowList.Add(new Line(tempInterPoint[0], tempInterPoint[1]));
+                    
 
                 }
 
@@ -2789,7 +2790,7 @@ namespace DrawWork.DrawServices
             }
 
             // Orientation
-            if (true)
+            if (visibleFalse)
             {
 
                 double selScaleValue = 90;
@@ -3331,7 +3332,7 @@ namespace DrawWork.DrawServices
                 singleModel.Entities.Add(newLine22);
             }
 
-            if (false)
+            if (visibleFalse)
             {
 
                 Point3D refPoint = new Point3D(1000, 1000);

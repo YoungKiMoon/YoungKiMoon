@@ -13,6 +13,10 @@ using DrawSample.Commons;
 using System.Windows;
 using DrawSample.Models;
 
+using MColor = System.Windows.Media.Color;
+
+using Color = System.Drawing.Color;
+
 namespace DrawSample.DrawService
 {
     public class DrawSettingService
@@ -468,7 +472,313 @@ namespace DrawSample.DrawService
         }
 
 
-        
+        public void CreateThreeD(Model singleModel, out List<Brep> outNozzleList, out List<Brep> outFlangeList)
+        {
+            Point3D referencePoint = new Point3D(0, 0);
+
+            singleModel.Entities.Clear();
+
+            double shellRadius = 2700;
+            double shellThk = 28;
+            double shellHeight = 56350;
+
+            double shellSeamCount = 1;
+            double oneAngle = 360/shellSeamCount;
+            double oneStartAngle = 0;
+
+            double courseCount = 14;
+            double courseOneHeight = shellHeight / courseCount;
+
+            // Nozzle data
+            double RotateNozzleAngle = 0;
+            double nozzleRadius = 375;
+            double nozzleOutsideRadius = 500;
+            double nozzleInterval = 6750+1000;
+
+            // Flange data
+            List<Brep> flangeList = new List<Brep>();
+
+
+            // Clip data
+            List<Brep> ClipList = new List<Brep>();
+            double clipCount = 5;
+            double clipThick = 300;
+            Point3D clipSize= new Point3D(30, 300);
+            double startClipAngle = 30;
+            double RotateClipAngle = 360 / clipCount;
+
+
+            // SeamLine data
+            List<Brep> horizontalSeamList = new List<Brep>();
+            List<Brep> verticalSeamList = new List<Brep>();
+            double RotateSeamAngle = 0;
+            double SeamLineRadius = 10;
+            
+
+
+
+
+            List<Brep> oneCourse = new List<Brep>();
+            if (true)
+            {
+                for (int j = 0; j < courseCount; j++)
+                {
+                    if (IsEvenNumber(j))
+                        oneStartAngle = 0;
+                    else
+                        oneStartAngle = oneAngle / 1.5;
+
+                    for (int i = 0; i < shellSeamCount; i++)
+                    {
+                        Region shell = Region.CreatePolygon(Plane.YZ, new Point3D[] { GetSumPoint(referencePoint, shellRadius, 0),
+                                                                                      GetSumPoint(referencePoint, shellRadius + shellThk, 0),
+                                                                                      GetSumPoint(referencePoint, shellRadius + shellThk, courseOneHeight),
+                                                                                      GetSumPoint(referencePoint, shellRadius, courseOneHeight)});
+                        
+                        Brep shellsd = shell.RevolveAsBrep(Utility.DegToRad(oneStartAngle), Utility.DegToRad(oneAngle), Vector3D.AxisZ, new Point3D(0, 0, referencePoint.Z));
+
+                        //shellsd.ColorMethod = colorMethodType.byLayer;
+                        //shellsd.Color = Color.Yellow;
+                        shellsd.Selectable = false;
+                        oneCourse.Add(shellsd);
+                        
+
+                        // Vertical SeamLine Draw
+                        Region seamV = Region.CreateCircle(Plane.XY, 0, -(shellRadius + shellThk), SeamLineRadius);
+                        Brep verticalSeam = seamV.ExtrudeAsBrep(courseOneHeight);//   .RevolveAsBrep(Utility.DegToRad(360), Vector3D.AxisZ, new Point3D(0, 0, referencePoint.Z));
+                        verticalSeam.Rotate(Utility.DegToRad(oneStartAngle+180), Vector3D.AxisZ, new Point3D(0, 0, 0));
+                        Vector3D trValue = new Vector3D(0, 0, courseOneHeight*j);
+                        verticalSeam.Translate(trValue);
+
+                        verticalSeamList.Add(verticalSeam);
+                        
+
+                    }
+                    // Horizontal SeamLine Draw
+                    Region seamH = Region.CreateCircle(Plane.YZ, shellRadius + shellThk, referencePoint.Y, SeamLineRadius);
+                    Brep horizontalSeam = seamH.RevolveAsBrep(Utility.DegToRad(360), Vector3D.AxisZ, new Point3D(0, 0, referencePoint.Z));
+
+                    horizontalSeamList.Add(horizontalSeam);
+
+                    referencePoint.Y += courseOneHeight;
+                    oneStartAngle += oneAngle;
+
+                }
+
+            }
+
+
+            // Nozzle
+            List<Brep> nozzleList = new List<Brep>();
+            if(true)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    Region nozzle = Region.CreateCircle(Plane.XZ, 0, ((nozzleInterval*i) + 1400), nozzleRadius);
+                    Brep nozzlesd = nozzle.ExtrudeAsBrep(600);
+                    Vector3D trValue = new Vector3D(0, -shellRadius);
+                    nozzlesd.Rotate(Utility.DegToRad(RotateNozzleAngle), Vector3D.AxisZ, new Point3D(0, shellRadius, 0));
+                    nozzlesd.Translate(trValue);
+
+                    Region nozzleInner = Region.CreateCircle(Plane.XZ, 0, ((nozzleInterval * i) + 1400), (nozzleRadius-20));
+                    nozzlesd.ExtrudeRemove(nozzleInner, new Interval(0,-(shellRadius+ 600)));
+
+
+                    nozzle = Region.CreateCircle(Plane.XZ, 0, ((nozzleInterval * i) + 1400), nozzleOutsideRadius);
+                    Brep flangesd = nozzle.ExtrudeAsBrep(50);
+                    trValue = new Vector3D(0, -(shellRadius+620));
+                    flangesd.Rotate(Utility.DegToRad(RotateNozzleAngle), Vector3D.AxisZ, new Point3D(0, shellRadius, 0));
+                    flangesd.Translate(trValue);
+
+                    nozzleInner = Region.CreateCircle(Plane.XZ, 0, ((nozzleInterval * i) + 1400), (nozzleRadius - 20));
+                    flangesd.ExtrudeRemove(nozzleInner, new Interval(0, -(shellRadius + 1000)));
+
+                    nozzleList.Add(nozzlesd);
+                    flangeList.Add(flangesd);
+
+
+                    // Clip Draw
+                    for (int k = 0; k < clipCount; k++)
+                    {
+                        Region clip = Region.CreatePolygon(Plane.XZ, new Point2D[] {new Point2D(-clipSize.X/2,clipSize.Y/2),
+                                                                                    new Point2D(clipSize.X/2,clipSize.Y/2),
+                                                                                    new Point2D(clipSize.X/2,-clipSize.Y/2),
+                                                                                    new Point2D(-clipSize.X/2,-clipSize.Y/2)});
+                        Brep bClip = clip.ExtrudeAsBrep((clipThick+(shellThk*2)));
+
+                        trValue = new Vector3D(0, -shellRadius, ((nozzleInterval * i) + 400- nozzleRadius));
+                        
+
+                        
+                        bClip.Rotate(Utility.DegToRad(startClipAngle+(RotateClipAngle*k)), Vector3D.AxisZ, new Point3D(0, shellRadius, 0));
+                        bClip.Translate(trValue);
+
+                        ClipList.Add(bClip);
+                    }
+                    
+                }
+
+            }
+
+
+            outNozzleList = nozzleList;
+            outFlangeList = flangeList;
+
+
+            singleModel.Entities.AddRange(oneCourse,Color.Yellow);
+            singleModel.Entities.AddRange(nozzleList, Color.Blue);
+            singleModel.Entities.AddRange(flangeList, Color.YellowGreen);
+            singleModel.Entities.AddRange(ClipList, Color.OrangeRed);
+            singleModel.Entities.AddRange(horizontalSeamList, Color.Silver);
+            singleModel.Entities.AddRange(verticalSeamList, Color.Silver);
+
+            //singleModel.Entities.Add(rev1);
+            //singleModel.Entities.AddRange(textList);
+            singleModel.Entities.Regen();
+            //singleModel.Invalidate();
+            //singleModel.Entities.RegenAllCurved(0.005);
+            singleModel.SetView(viewType.Front);
+            singleModel.ZoomFit();
+            singleModel.Refresh();
+
+        }
+
+        public void CreateThreeD2(Model singleModel)
+        {
+            Point3D referencePoint = new Point3D(0, 0);
+
+            singleModel.Entities.Clear();
+
+            double shellRadius = 2700;
+            double shellThk = 28;
+            double shellHeight = 56350;
+
+            double shellSeamCount = 1;
+            double oneAngle = 360 / shellSeamCount;
+            double oneStartAngle = 0;
+
+            double courseCount = 1;
+            double courseOneHeight = shellHeight / courseCount;
+
+            // Nozzle data
+            double RotateNozzleAngle = 0;
+            double nozzleRadius = 375;
+            double nozzleOutsideRadius = 500;
+            double nozzleInterval = 6750 + 1000;
+
+            // Flange data
+            List<Brep> flangeList = new List<Brep>();
+
+
+            // Clip data
+            List<Brep> ClipList = new List<Brep>();
+            double clipCount = 5;
+            double clipThick = 300;
+            Point3D clipSize = new Point3D(30, 300);
+            double startClipAngle = 30;
+            double RotateClipAngle = 360 / clipCount;
+
+
+            // SeamLine data
+            List<Brep> horizontalSeamList = new List<Brep>();
+            List<Brep> verticalSeamList = new List<Brep>();
+            double RotateSeamAngle = 0;
+            double SeamLineRadius = 10;
+
+
+
+
+
+            List<Brep> oneCourse = new List<Brep>();
+            if (true)
+            {
+                for (int j = 0; j < courseCount; j++)
+                {
+                    if (IsEvenNumber(j))
+                        oneStartAngle = 0;
+                    else
+                        oneStartAngle = oneAngle / 1.5;
+
+                    for (int i = 0; i < shellSeamCount; i++)
+                    {
+                        Region shell = Region.CreatePolygon(Plane.YZ, new Point3D[] { GetSumPoint(referencePoint, shellRadius, 0),
+                                                                                      GetSumPoint(referencePoint, shellRadius + shellThk, 0),
+                                                                                      GetSumPoint(referencePoint, shellRadius + shellThk, courseOneHeight),
+                                                                                      GetSumPoint(referencePoint, shellRadius, courseOneHeight)});
+
+                        Brep shellsd = shell.RevolveAsBrep(Utility.DegToRad(oneStartAngle), Utility.DegToRad(oneAngle), Vector3D.AxisZ, new Point3D(0, 0, referencePoint.Z));
+
+                        //shellsd.ColorMethod = colorMethodType.byLayer;
+                        //shellsd.Color = Color.Yellow;
+
+                        oneCourse.Add(shellsd);
+
+
+                        // Vertical SeamLine Draw
+                        Region seamV = Region.CreateCircle(Plane.XY, 0, -(shellRadius + shellThk), SeamLineRadius);
+                        Brep verticalSeam = seamV.ExtrudeAsBrep(courseOneHeight);//   .RevolveAsBrep(Utility.DegToRad(360), Vector3D.AxisZ, new Point3D(0, 0, referencePoint.Z));
+                        verticalSeam.Rotate(Utility.DegToRad(oneStartAngle + 180), Vector3D.AxisZ, new Point3D(0, 0, 0));
+                        Vector3D trValue = new Vector3D(0, 0, courseOneHeight * j);
+                        verticalSeam.Translate(trValue);
+
+                        verticalSeamList.Add(verticalSeam);
+
+
+                    }
+                    // Horizontal SeamLine Draw
+                    Region seamH = Region.CreateCircle(Plane.YZ, shellRadius + shellThk, referencePoint.Y, SeamLineRadius);
+                    Brep horizontalSeam = seamH.RevolveAsBrep(Utility.DegToRad(360), Vector3D.AxisZ, new Point3D(0, 0, referencePoint.Z));
+
+                    horizontalSeamList.Add(horizontalSeam);
+
+                    referencePoint.Y += courseOneHeight;
+                    oneStartAngle += oneAngle;
+
+                }
+
+            }
+
+
+
+            Region arrowShape = new devDept.Eyeshot.Entities.Region(new LinearPath(Plane.XZ, new Point2D[]
+            {
+                new Point2D(0,-2),
+                new Point2D(4,-2),
+                new Point2D(4,-4),
+                new Point2D(10,0),
+                new Point2D(4,4),
+                new Point2D(4,2),
+                new Point2D(0,2),
+                new Point2D(0,-2),
+            }), Plane.XZ);
+
+            //right arrow
+            arrowShape.ExtrudeAsMesh(2, 0.1, Mesh.natureType.Plain);
+
+            arrowShape.Regen(0.1);
+            singleModel.TempEntities.Add(arrowShape, Color.Yellow);
+            singleModel.TempEntities.UpdateBoundingBox();
+
+            //singleModel.Entities.AddRange(oneCourse, Color.Yellow);
+            //singleModel.Entities.AddRange(nozzleList, Color.Blue);
+            singleModel.Entities.AddRange(flangeList, Color.YellowGreen);
+            singleModel.Entities.AddRange(ClipList, Color.OrangeRed);
+            singleModel.Entities.AddRange(horizontalSeamList, Color.Silver);
+            singleModel.Entities.AddRange(verticalSeamList, Color.Silver);
+
+            //singleModel.Entities.Add(rev1);
+            //singleModel.Entities.AddRange(textList);
+            singleModel.Entities.Regen();
+            //singleModel.Invalidate();
+            //singleModel.Entities.RegenAllCurved(0.005);
+            singleModel.SetView(viewType.Front);
+            singleModel.ZoomFit();
+            singleModel.Refresh();
+
+        }
+
+
+
 
         public double GetStartXValue(CASE_TYPE caseNumber,bool evenNumber,double plateLength, double horizontalSpacingShift)
         {
@@ -653,3 +963,4 @@ namespace DrawSample.DrawService
         
     }
 }
+

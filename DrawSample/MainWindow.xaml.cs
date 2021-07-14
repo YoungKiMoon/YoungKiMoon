@@ -37,9 +37,18 @@ namespace DrawSample
 
         public Entity currentEntity = null;
         private DrawSettingService drawSetting;
+
+
+        public List<Brep> flangeList = null;
+        public List<Brep> nozzleList = null;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            flangeList = new List<Brep>();
+            nozzleList = new List<Brep>();
+
 
             this.testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
             this.testModel.ActionMode = devDept.Eyeshot.actionType.SelectByPick;
@@ -48,9 +57,11 @@ namespace DrawSample
 
             this.testModel.ActiveViewport.Background.TopColor = new SolidColorBrush(MColor.FromRgb(59, 68, 83));
             
-            this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Wireframe;
+            //this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Wireframe;
+            this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Rendered;
             //this.testModel.Wireframe.SilhouettesDrawingMode = silhouettesDrawingType.Always;
 
+            //testModel.AssemblySelectionMode = devDept.Eyeshot.Environment.assemblySelectionType.Branch;
 
             drawSetting = new DrawSettingService();
             drawSetting.SetModelSpace(testModel);
@@ -72,7 +83,7 @@ namespace DrawSample
 
                 if (inspectVertex)
                 {
-
+                    
                     //if (testModel.FindClosestVertex(RenderContextUtility.ConvertPoint(testModel.GetMousePosition(e)), 50, out closest) != -1)
 
                         //testModel.Labels.Add(new devDept.Eyeshot.Labels.LeaderAndText(closest, closest.ToString(), new System.Drawing.Font("Tahoma", 8.25f),Color.Yellow, new Vector2D(0, 50)));
@@ -179,6 +190,57 @@ namespace DrawSample
                     }
 
                 }
+
+                if(currentEntity is Brep)
+                {
+                    double moveAngle = 2;
+                    double moveVertical = 50;
+                    double shellRadius = 2700;
+                    Vector3D trValue = new Vector3D();
+                    Brep eachBrep = ((Brep)currentEntity);
+
+                    Brep eachBrepNozzle = null;
+                    for(int i=0;i<flangeList.Count;i++) 
+                    {
+                        Brep eachFlange = flangeList[i];
+                        if (eachBrep.Equals(eachFlange))
+                        {
+                            eachBrepNozzle = nozzleList[i];
+                            break;
+                        }
+                    }
+
+                    switch (selType)
+                    {
+                        case MOVE_TYPE.TOP:
+
+                            trValue = new Vector3D(0, 0, moveVertical);
+                            eachBrep.Translate(trValue);
+                            if(eachBrepNozzle !=null)
+                                eachBrepNozzle.Translate(trValue);
+                            break;
+                        case MOVE_TYPE.BOTTOM:
+                            trValue = new Vector3D(0, 0, -moveVertical);
+                            eachBrep.Translate(trValue);
+                            if (eachBrepNozzle != null)
+                                eachBrepNozzle.Translate(trValue);
+                            break;
+                        case MOVE_TYPE.LEFT:
+                            eachBrep.Rotate(Utility.DegToRad(-moveAngle), Vector3D.AxisZ, new Point3D(0, 0, 0));
+                            if (eachBrepNozzle != null)
+                                eachBrepNozzle.Rotate(Utility.DegToRad(-moveAngle), Vector3D.AxisZ, new Point3D(0, 0, 0));
+                            break;
+                        case MOVE_TYPE.RIGHT:
+                            eachBrep.Rotate(Utility.DegToRad(moveAngle), Vector3D.AxisZ, new Point3D(0, 0, 0));
+                            if (eachBrepNozzle != null)
+                                eachBrepNozzle.Rotate(Utility.DegToRad(moveAngle), Vector3D.AxisZ, new Point3D(0, 0, 0));
+                            break;
+                    }
+                    testModel.Entities.Regen();
+
+                    testModel.Refresh();
+                    testModel.Invalidate();
+                }
             }
         }
         #endregion
@@ -192,10 +254,21 @@ namespace DrawSample
 
         private void btnRegen_Click(object sender, RoutedEventArgs e)
         {
-            testModel.Entities.RegenAllCurved(0.005);
+            testModel.Entities.RegenAllCurved(0.05);
 
             testModel.Refresh();
 
+        }
+
+        private void btn3D_Click(object sender, RoutedEventArgs e)
+        {
+            drawSetting.CreateThreeD(testModel, out nozzleList,out flangeList);
+            
+        }
+
+        private void btn3DTest_Click(object sender, RoutedEventArgs e)
+        {
+            drawSetting.CreateThreeD2(testModel);
         }
     }
 }
