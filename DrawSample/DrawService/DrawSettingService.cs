@@ -625,7 +625,7 @@ namespace DrawSample.DrawService
             outFlangeList = flangeList;
 
 
-            singleModel.Entities.AddRange(oneCourse,Color.Yellow);
+            singleModel.Entities.AddRange(oneCourse,Color.FromArgb(125,255,255,0));
             singleModel.Entities.AddRange(nozzleList, Color.Blue);
             singleModel.Entities.AddRange(flangeList, Color.YellowGreen);
             singleModel.Entities.AddRange(ClipList, Color.OrangeRed);
