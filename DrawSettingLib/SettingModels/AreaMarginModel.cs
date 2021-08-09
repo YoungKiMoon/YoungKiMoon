@@ -11,13 +11,13 @@ namespace DrawSettingLib.SettingModels
     {
         public AreaMarginModel()
         {
-			InnerMargin = "";
-			OuterMargin = "";
+			InnerMargin = 0;
+			OuterMargin = 0;
 
 		}
 
-		private string _InnerMargin;
-		public string InnerMargin
+		private double _InnerMargin;
+		public double InnerMargin
 		{
 			get { return _InnerMargin; }
 			set
@@ -27,8 +27,8 @@ namespace DrawSettingLib.SettingModels
 			}
 		}
 
-		private string _OuterMargin;
-		public string OuterMargin
+		private double _OuterMargin;
+		public double OuterMargin
 		{
 			get { return _OuterMargin; }
 			set

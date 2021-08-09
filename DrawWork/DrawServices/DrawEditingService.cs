@@ -47,6 +47,26 @@ namespace DrawWork.DrawServices
                 return tempLine;
             }
         }
+        public void SetExtendLine(ref Line selLine, double Length, bool endPoint = true)
+        {
+            if (endPoint)
+            {
+
+                Vector3D direction = new Vector3D(selLine.StartPoint, selLine.EndPoint);
+
+                direction.Normalize();
+                selLine.EndPoint = selLine.EndPoint + direction * Length;
+
+            }
+            else
+            {
+                Vector3D direction = new Vector3D(selLine.EndPoint, selLine.StartPoint);
+
+                direction.Normalize();
+                selLine.StartPoint = selLine.StartPoint + direction * Length;
+
+            }
+        }
 
         //public Arc GetExtendArc(Arc selArc, double Length, bool endPoint = true)
         //{
@@ -121,6 +141,22 @@ namespace DrawWork.DrawServices
                 newEntity.Add(newEachEntity);
             }
             return newEntity;
+        }
+        public void SetMirrorEntity(Plane selPlane, ref Entity selEntity, Point3D selPoint)
+        {
+            Plane pl1 = selPlane;
+            pl1.Origin.X = selPoint.X;
+            pl1.Origin.Y = selPoint.Y;
+            Mirror customMirror = new Mirror(pl1);
+            selEntity.TransformBy(customMirror);
+        }
+        public void SetMirrorEntity(Plane selPlane, ref Triangle selEntity, Point3D selPoint)
+        {
+            Plane pl1 = selPlane;
+            pl1.Origin.X = selPoint.X;
+            pl1.Origin.Y = selPoint.Y;
+            Mirror customMirror = new Mirror(pl1);
+            selEntity.TransformBy(customMirror);
         }
         #endregion
 

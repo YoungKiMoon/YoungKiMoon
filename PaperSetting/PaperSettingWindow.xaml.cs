@@ -41,6 +41,7 @@ using DrawWork.DrawBuilders;
 using devDept.Eyeshot;
 using System.Diagnostics;
 using PaperSetting.Windows;
+using DrawSettingLib.SettingServices;
 
 namespace PaperSetting
 {
@@ -118,9 +119,6 @@ namespace PaperSetting
             testDraw.PaperColor = new SolidColorBrush(Color.FromRgb(59,68,83));
 
 
-            testModel2.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
-            drawSetting.SetModelSpace(testModel2);
-
             workbookName = "TankDesign_0527_1.xlsm";
             workbookName = "TEST 2019-3.xlsm";
             workbookName = "TEST-002.xlsm";
@@ -131,9 +129,11 @@ namespace PaperSetting
             workbookName = "DRT TEST-1.xlsm";
             workbookName = "DRT TEST_20210610.xlsm";
             workbookName = "1.CRT.xlsm";
-            workbookName = "1.CRT_Test.xlsm";
-            workbookName = "TABAS_20210614_blank_CRT.xlsm";
-            workbookName = "TABAS_20210614_data_CRT.xlsm";
+            workbookName = "TABAS_20210614+1.xlsm";
+            
+            //workbookName = "1.CRT_Test.xlsm";
+            //workbookName = "TABAS_20210614_blank_CRT.xlsm";
+            //workbookName = "TABAS_20210614_data_CRT.xlsm";
             //workbookName = "TABAS_20210614_blank_DRT.xlsm";
 
             //workbookName = "2.DRT.xlsm";
@@ -234,7 +234,7 @@ namespace PaperSetting
                 //PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
                 DrawScaleService scaleService = new DrawScaleService();
                 double autoScale = scaleService.GetAIScale(selView.newTankData);
-                SampleDraw(selView.newTankData, autoScale);
+                SampleDraw(selView.newTankData);
 
                 customBusyIndicator.IsBusy = false;
                 IsBusy = false;
@@ -314,9 +314,7 @@ namespace PaperSetting
                         CreateDraw1st();
 
 
-                        DrawScaleService scaleService = new DrawScaleService();
-                        double autoScale = scaleService.GetAIScale(selView.newTankData);
-                        SampleDraw(selView.newTankData, autoScale);
+                        SampleDraw(selView.newTankData);
                     }));
 
                 }
@@ -358,8 +356,12 @@ namespace PaperSetting
             AssemblyDataService assemblyService = new AssemblyDataService();
             AssemblyModel newTankData = assemblyService.CreateMappingData(workbookName, activeCustomWorkbook);
 
-            
 
+            // Scale Setting
+            ModelAreaService areaService = new ModelAreaService();
+            PaperAreaService paperAreaService = new PaperAreaService();
+            SingletonData.GAArea = areaService.GetModelAreaData();
+            SingletonData.PaperArea = paperAreaService.GetPaperAreaData();
 
 
             if (visibleValue)
@@ -422,29 +424,25 @@ namespace PaperSetting
             DrawSettingService drawSetting = new DrawSettingService();
             drawSetting.SetModelSpace(testModel);
             //drawSetting.SetPaperSpace(testDraw);
-            testModel2 = new Model();
-            testModel2.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
-            testModel2.Purge();
-            drawSetting.SetModelSpace(testModel2);
 
 
-            // Block Loading
-            if (testModel.Blocks.Count == 1)
-            {
-                if (tempImportBlocks != null)
-                {
-                    testModel.Blocks = tempImportBlocks;
-                    foreach(devDept.Eyeshot.Block eachBlock in testModel.Blocks)
-                    {
-                        if (eachBlock.Name != "RootBlock")
-                        {
-                            devDept.Eyeshot.Block newBlock = (devDept.Eyeshot.Block)eachBlock.Clone();
-                            testModel2.Blocks.Add(newBlock);
-                        }
-                    }
+            //// Block Loading
+            //if (testModel.Blocks.Count == 1)
+            //{
+            //    if (tempImportBlocks != null)
+            //    {
+            //        testModel.Blocks = tempImportBlocks;
+            //        foreach(devDept.Eyeshot.Block eachBlock in testModel.Blocks)
+            //        {
+            //            if (eachBlock.Name != "RootBlock")
+            //            {
+            //                devDept.Eyeshot.Block newBlock = (devDept.Eyeshot.Block)eachBlock.Clone();
+            //                testModel2.Blocks.Add(newBlock);
+            //            }
+            //        }
 
-                }
-            }
+            //    }
+            //}
 
             if (true)
             {
@@ -463,7 +461,7 @@ namespace PaperSetting
                 double autoScale = scaleService.GetAIScale(newTankData);
 
 
-                IntergrationService newInterService = new IntergrationService("GA", newTankData, testModel,testModel2);
+                IntergrationService newInterService = new IntergrationService("GA", newTankData, testModel);
                 if (newInterService.CreateLogic(autoScale, newAll.ToArray(), out outBuilder))
                 {
 
@@ -498,7 +496,7 @@ namespace PaperSetting
                 double autoScale = scaleService.GetAIScale(newTankData);
 
 
-                IntergrationService newInterService = new IntergrationService("ORIENTATION", newTankData, testModel,testModel2);
+                IntergrationService newInterService = new IntergrationService("ORIENTATION", newTankData, testModel);
                 if (newInterService.CreateLogic(autoScale, newAll.ToArray(), out outBuilder))
                 {
 
@@ -522,8 +520,6 @@ namespace PaperSetting
             testModel.ZoomFit();
             testModel.Refresh();
 
-            testModel2.Dispose();
-            testModel2 = null;
 
             #region ETC 안쓰는 것
             //SampleDraw(newTankData, autoScale);
@@ -608,12 +604,12 @@ namespace PaperSetting
 
 
         #region Sample Draw
-        public void SampleDraw(AssemblyModel assemblyData,double scaleValue)
+        public void SampleDraw(AssemblyModel assemblyData)
         {
             PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
             PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
             //paperService.assemblyData = assemblyData;
-            paperService.CreatePaperDraw(selView.PaperList,assemblyData, scaleValue);
+            paperService.CreatePaperDraw(selView.PaperList,assemblyData);
             //paperService.CreatePaperDraw(selView.PaperListSelectionColl);
         }
         #endregion

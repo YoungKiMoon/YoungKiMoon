@@ -94,6 +94,30 @@ namespace DrawWork.DrawSacleServices
             returnValue +=0;
             return returnValue;
         }
+
+
+
+        // Plate Arrange
+        public double GetPlateHorizontalJointScale(double oneCourseThk)
+        {
+            double scaleValue = 1;
+            if (oneCourseThk >= 31)
+            {
+                scaleValue=8;
+            }
+            else if (oneCourseThk >= 21)
+            {
+                scaleValue = 7;
+            }
+            else
+            {
+                scaleValue = 6;
+            }
+
+            return scaleValue;
+        }
+
+
     }
 
 

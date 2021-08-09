@@ -43,12 +43,12 @@ namespace DrawWork.ViewModels
         public LogicBuilder GetLogicBuilder(double selScale)
         {
             // Scale 1:200
-            commandService.SetScaleData(selScale);
+            //commandService.SetScaleData(selScale);
 
             commandService.SetCommandData(commandData.commandList);
 
             // Create Entiti
-            commandService.ExecuteCommand();
+            commandService.ExecuteCommand("GA");
             LogicBuilder logicB = new LogicBuilder(commandService.commandEntities);
 
             return logicB;

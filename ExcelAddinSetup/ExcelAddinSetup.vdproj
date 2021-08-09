@@ -21,6 +21,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_0CA3751AD004D8A8213669D8CC80AE8F"
+        "OwnerKey" = "8:_66ADE82A7F92438C868DAE6636D320FE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_1B6CA59CA740D4C3E6801C0DCC440D2B"
         "OwnerKey" = "8:_0BA12D7A1AC4417A96F6842BF5B22B73"
         "MsmSig" = "8:_UNDEFINED"
@@ -203,6 +209,12 @@
         {
         "MsmKey" = "8:_593FCC8E31FA0A1568CF0CABB98C8E44"
         "OwnerKey" = "8:_A331115FA7C27DCA9578D1886D0119D3"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_593FCC8E31FA0A1568CF0CABB98C8E44"
+        "OwnerKey" = "8:_AEBCBB7326882D3EFCCC6A9419E1FBAA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -531,12 +543,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_F05F7F4413A9D222D9DCD1DD70A6FCCF"
-        "OwnerKey" = "8:_66ADE82A7F92438C868DAE6636D320FE"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_F4825D7AAED120A9A2047420DDF77B5F"
         "OwnerKey" = "8:_9B5BDDF532A61CFB5F2F5D6030F0B592"
         "MsmSig" = "8:_UNDEFINED"
@@ -616,13 +622,13 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_F05F7F4413A9D222D9DCD1DD70A6FCCF"
+        "OwnerKey" = "8:_59F9C12EDA3DB567FA6A86C0FC83FCE1"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_59F9C12EDA3DB567FA6A86C0FC83FCE1"
+        "OwnerKey" = "8:_0CA3751AD004D8A8213669D8CC80AE8F"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -893,6 +899,37 @@
         }
         "File"
         {
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0CA3751AD004D8A8213669D8CC80AE8F"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:DrawSettingLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64"
+                "ScatterAssemblies"
+                {
+                    "_0CA3751AD004D8A8213669D8CC80AE8F"
+                    {
+                    "Name" = "8:DrawSettingLib.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:DrawSettingLib.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_93BEDAC44DE64F5092E9187E66F42F63"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1B6CA59CA740D4C3E6801C0DCC440D2B"
             {
             "AssemblyRegister" = "3:1"
@@ -1923,7 +1960,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:PaperSetting, Version=2.4.6.4, Culture=neutral, processorArchitecture=AMD64"
+            "AssemblyAsmDisplayName" = "8:PaperSetting, Version=2.8.1.2, Culture=neutral, processorArchitecture=AMD64"
                 "ScatterAssemblies"
                 {
                     "_AEBCBB7326882D3EFCCC6A9419E1FBAA"
@@ -2136,37 +2173,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F05F7F4413A9D222D9DCD1DD70A6FCCF"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:DrawSettingLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64"
-                "ScatterAssemblies"
-                {
-                    "_F05F7F4413A9D222D9DCD1DD70A6FCCF"
-                    {
-                    "Name" = "8:DrawSettingLib.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:DrawSettingLib.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_93BEDAC44DE64F5092E9187E66F42F63"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F4825D7AAED120A9A2047420DDF77B5F"
             {
             "AssemblyRegister" = "3:1"
@@ -2316,15 +2322,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TABASAddin"
-        "ProductCode" = "8:{94B75081-421A-44D1-8E1E-60D0EED4CD57}"
-        "PackageCode" = "8:{C54AD210-233D-407F-BA34-C4785156DD8A}"
+        "ProductCode" = "8:{53A080C9-5F25-49B4-8419-6488E445E30B}"
+        "PackageCode" = "8:{B5F66E3F-9C89-4E8B-80D1-4472DEA346F1}"
         "UpgradeCode" = "8:{BCEF9ECD-E03B-408F-8CED-85BF5E673867}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:2.4.64"
+        "ProductVersion" = "8:2.8.12"
         "Manufacturer" = "8:SamsungEngMoogongEng"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

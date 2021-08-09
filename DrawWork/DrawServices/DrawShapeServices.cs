@@ -11,6 +11,7 @@ using devDept.Eyeshot.Translators;
 using devDept.Geometry;
 using devDept.Serialization;
 using DrawWork.ValueServices;
+using DrawWork.Commons;
 
 namespace DrawWork.DrawServices
 {
@@ -80,6 +81,7 @@ namespace DrawWork.DrawServices
 
             return newList;
         }
+
 
         private Point3D GetSumPoint(Point3D selPoint1, double X, double Y, double Z = 0)
         {

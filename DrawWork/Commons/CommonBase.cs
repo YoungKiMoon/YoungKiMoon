@@ -21,6 +21,13 @@ namespace DrawWork.Commons
         NOZZLE_MARK = 9,
     }
 
+    public enum ANGLE_TYPE
+    {
+        NotSet = 0,
+        DEGREE = 1,
+        RADIAN = 2,
+    }
+
     // Postion
     public enum POSITION_TYPE 
     {
@@ -29,6 +36,17 @@ namespace DrawWork.Commons
         RIGHT = 2,
         BOTTOM = 3,
         TOP = 4,
+        CENTER =5,
+    }
+    
+
+    public enum ORIENTATION_TYPE
+    {
+        NotSet,
+        TOPLEFT,
+        TOPRIGHT,
+        BOTTOMLEFT,
+        BOTTOMRIGHT,
     }
 
     // Tank Assembly
@@ -193,5 +211,13 @@ namespace DrawWork.Commons
         OnlyBlock,
         Flange,
         Other,
+    }
+
+    // Dimension
+    public enum DimHead_Type
+    {
+        NoSet,
+        Arrow,
+        Circle,
     }
 }

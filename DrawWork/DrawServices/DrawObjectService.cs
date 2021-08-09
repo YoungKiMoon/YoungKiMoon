@@ -39,7 +39,7 @@ namespace DrawWork.DrawServices
         private DrawImportBlockService drawImportBlockService;
         private DrawReferenceBlockService drawReferenceBlockService;
 
-        private DrawWorkingPointService workingPointService;
+        public  DrawWorkingPointService workingPointService;
 
         private ValueService valueService;
         private LayerStyleService layerStyle;

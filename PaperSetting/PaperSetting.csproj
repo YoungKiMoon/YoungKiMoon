@@ -55,22 +55,23 @@
     <ApplicationIcon>TABAS_ICOn.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="devDept.Eyeshot.Control.Wpf.v2020, Version=2020.3.528.0, Culture=neutral, PublicKeyToken=5385d83d2fb4d7d9, processorArchitecture=MSIL">
+    <Reference Include="devDept.Eyeshot.Control.Wpf.v2020, Version=2020.3.542.0, Culture=neutral, PublicKeyToken=5385d83d2fb4d7d9, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\devDept.Eyeshot.Control.Wpf.v2020.dll</HintPath>
     </Reference>
-    <Reference Include="devDept.Eyeshot.Control.x64.Wpf.v2020">
+    <Reference Include="devDept.Eyeshot.Control.x64.Wpf.v2020, Version=2020.3.428.0, Culture=neutral, PublicKeyToken=c8a727666e3c0a09, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\x64\devDept.Eyeshot.Control.x64.Wpf.v2020.dll</HintPath>
     </Reference>
-    <Reference Include="devDept.Geometry.v2020, Version=2020.3.528.0, Culture=neutral, PublicKeyToken=9440825e8b4733bc, processorArchitecture=MSIL">
+    <Reference Include="devDept.Geometry.v2020, Version=2020.3.542.0, Culture=neutral, PublicKeyToken=9440825e8b4733bc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\devDept.Geometry.v2020.dll</HintPath>
     </Reference>
-    <Reference Include="devDept.Graphics.Shaders.v2020, Version=2020.3.528.0, Culture=neutral, PublicKeyToken=54ce5f5f803e4b42, processorArchitecture=MSIL">
+    <Reference Include="devDept.Graphics.Shaders.v2020, Version=2020.3.542.0, Culture=neutral, PublicKeyToken=54ce5f5f803e4b42, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\devDept.Graphics.Shaders.v2020.dll</HintPath>
     </Reference>
-    <Reference Include="devDept.Graphics.Wpf.v2020, Version=2020.3.528.0, Culture=neutral, PublicKeyToken=f3cd437f0d8061b5, processorArchitecture=MSIL">
+    <Reference Include="devDept.Graphics.Wpf.v2020, Version=2020.3.542.0, Culture=neutral, PublicKeyToken=f3cd437f0d8061b5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\devDept.Graphics.Wpf.v2020.dll</HintPath>
     </Reference>
@@ -192,6 +193,10 @@
     <ProjectReference Include="..\DrawLogicLib\DrawLogicLib.csproj">
       <Project>{f83adbdc-13a0-4154-bb37-4c355e5f5643}</Project>
       <Name>DrawLogicLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DrawSettingLib\DrawSettingLib.csproj">
+      <Project>{09AF4A28-824A-4EA4-B217-98A964D4B112}</Project>
+      <Name>DrawSettingLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\DrawWork\DrawWork.csproj">
       <Project>{ab705c54-197d-4c70-a2a9-5525073f7240}</Project>

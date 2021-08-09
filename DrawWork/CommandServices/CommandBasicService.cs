@@ -16,6 +16,8 @@ using DrawWork.DrawAutomationServices;
 
 using AssemblyLib.AssemblyModels;
 using DrawWork.Commons;
+using DrawWork.ValueServices;
+using DrawSettingLib.SettingServices;
 
 namespace DrawWork.CommandServices
 {
@@ -37,6 +39,7 @@ namespace DrawWork.CommandServices
         public DrawScaleModel scaleData;
         public EntityList commandEntities;
 
+        public ValueService valueService;
         //public List<Entity[]> commandDimensionEntities;
         //public List<Entity[]> commandNozzleEntities;
 
@@ -45,6 +48,8 @@ namespace DrawWork.CommandServices
         {
             assemblyData = new AssemblyModel();
             commandData = new BasicCommandModel();
+
+            valueService = new ValueService();
 
             SetCommandData(selCommandList);
             SetAssemblyData(selAssembly);
@@ -66,6 +71,8 @@ namespace DrawWork.CommandServices
         {
             assemblyData = new AssemblyModel();
             commandData = new BasicCommandModel();
+
+            valueService = new ValueService();
 
             //SetCommandData(selCommandList);
             SetAssemblyData(selAssembly);
@@ -135,15 +142,10 @@ namespace DrawWork.CommandServices
         }
         #endregion
 
-        #region Scale
-        public void SetScaleData(double selScaleValue)
-        {
-            scaleData.Value = selScaleValue;
-        }
-        #endregion
+
 
         #region Execute : Create Entity
-        public void ExecuteCommand()
+        public void ExecuteCommand(string selType)
         {
             // Draw Entity Clear
             drawEntity = new DrawEntityModel();
@@ -165,8 +167,12 @@ namespace DrawWork.CommandServices
 
             SetDrawPoint(drawPoint);
 
-            // Create Boundary
+            // Create Boundary : Pending
             boundaryService.CreateBoundary(drawPoint);
+
+            // Create Scale Value
+            SetScaleData(selType, ref refPoint, ref curPoint);
+           
 
             // Create Entity
             foreach (string[] eachCmd in commandData.commandListTransFunciton)
@@ -184,6 +190,7 @@ namespace DrawWork.CommandServices
                 {
                     if (eachCmd != null)
                     {
+                        Console.WriteLine("CMD : " + string.Join("|",eachCmd));
                         CommandFunctionModel eachFunction = null;
                         DrawObjectLogic(eachCmd,ref refPoint, ref curPoint,out eachFunction);
                         if(eachFunction!=null)
@@ -198,7 +205,8 @@ namespace DrawWork.CommandServices
             AutomationDimensionService autoDimService = new AutomationDimensionService();
 
             List<Entity> tempRegenList = new List<Entity>();
-            tempRegenList.AddRange(autoDimService.SetLineBreak(singleModel as Model, drawEntity));
+            tempRegenList.AddRange(autoDimService.SetLineBreakFree(drawEntity));
+            //tempRegenList.AddRange(autoDimService.SetLineBreak(singleModel as Model, drawEntity));
             tempRegenList.AddRange(drawEntity.blockList);
 
             commandEntities.AddRange(tempRegenList);
@@ -208,6 +216,36 @@ namespace DrawWork.CommandServices
         }
         #endregion
 
+
+        #region Scale Size
+        public void SetScaleData(string selType,ref CDPoint refPoint, ref CDPoint curPoint)
+        {
+
+            // Real Size : Default
+            double tankID = 1000;
+            double tankHeight = 1000;
+            
+            CDPoint UppderPoint= drawObject.workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref curPoint);
+            tankHeight = UppderPoint.Y - refPoint.Y;
+
+            if (assemblyData.GeneralDesignData.Count > 0)
+                tankID= valueService.GetDoubleValue( assemblyData.GeneralDesignData[0].SizeNominalID);
+
+            // GA
+            if(selType.ToLower()=="ga")
+                SingletonData.GAArea.SetMainAssemblySize(refPoint.X, refPoint.Y, tankID, tankHeight);
+
+            // Paper
+
+            // Scale
+            PaperAreaService paperAreaService = new PaperAreaService();
+            scaleData.Value= paperAreaService.UpdateScaleValue(selType,SingletonData.PaperArea, SingletonData.GAArea, tankID,refPoint.X,refPoint.Y);
+
+            // Set Scale Data
+            
+
+        }
+        #endregion
 
         #region Reference Point
         private DrawPointModel GetReferencePoint()

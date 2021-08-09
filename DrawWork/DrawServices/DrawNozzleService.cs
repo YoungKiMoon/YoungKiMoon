@@ -365,10 +365,10 @@ namespace DrawWork.DrawServices
 
             // Shell Spacing
             DrawPositionValueModel shellSpacing = new DrawPositionValueModel();
-            shellSpacing.Left= valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length);
-            shellSpacing.Right= valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length);
-            shellSpacing.Top = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length);
-            shellSpacing.Bottom = valueService.GetDoubleValue(SingletonData.GAArea.Dimension.Length);
+            shellSpacing.Left = SingletonData.GAArea.Dimension.AreaSize.Width * selScaleValue;
+            shellSpacing.Right= SingletonData.GAArea.Dimension.AreaSize.Width * selScaleValue;
+            shellSpacing.Top = SingletonData.GAArea.Dimension.AreaSize.Height * selScaleValue;
+            shellSpacing.Bottom = SingletonData.GAArea.Dimension.AreaSize.Height * selScaleValue;
 
             // Reference Position
             int refFirstIndex = 0;
@@ -464,6 +464,8 @@ namespace DrawWork.DrawServices
                 // Create Model : OutLine
                 customOutlineEntity.AddRange(customEntity);
                 Console.WriteLine(eachNozzle.Description + " " + eachNozzle.Remarks);
+
+
             }
 
             // Layer
@@ -472,16 +474,21 @@ namespace DrawWork.DrawServices
 
             nozzleEntities.outlineList.AddRange(customOutlineEntity);
 
-            // Nozzel Mark Point List : Create Mark Position Arrangement 
-            List<Point3D> leaderMarkPointList = GetArrangeLeaderMarkPosition(  drawArrangeNozzle, selLeaderCircleSize, multiColumnValue, sizeNominalId, centerTopHeight, shellSpacing, refPoint);
 
             // Nozzle : Create Mark
+            DrawDimensionService newDim = new DrawDimensionService();
+            double markDiameter = newDim.GetNozzleCircleDiameter(selScaleValue);
+            double markTextSize = 2.5 * selScaleValue;
+
+            // Nozzel Mark Point List : Create Mark Position Arrangement 
+            List<Point3D> leaderMarkPointList = GetArrangeLeaderMarkPosition(  drawArrangeNozzle, markDiameter, multiColumnValue, sizeNominalId, centerTopHeight, shellSpacing, refPoint,selScaleValue);
+
             int indexArrange = -1;
             foreach (NozzleInputModel eachNozzle in drawArrangeNozzle)
             {
                 indexArrange++;
                 Point3D drawPoint = leaderMarkPointList[indexArrange];
-                Dictionary<string, List<Entity>> customEntity = CreateNozzleLeader(drawPoint, eachNozzle, selNozzleFontSize, selLeaderCircleSize);
+                Dictionary<string, List<Entity>> customEntity = CreateNozzleLeader(drawPoint, eachNozzle, markTextSize, markDiameter);
                 customMarkEntity.AddRange(customEntity[CommonGlobal.NozzleMark]);
                 customTextEntity.AddRange(customEntity[CommonGlobal.NozzleText]);
 
@@ -3565,14 +3572,14 @@ namespace DrawWork.DrawServices
         #region Nozzle : Arrange Leader Mark Position
         // 노즐 지시 겹칩 가능
         // Left 영역만 구현
-        private List<Point3D> GetArrangeLeaderMarkPosition( List<NozzleInputModel> drawArrangeNozzle, string selLeaderCircleSize, bool multiColumnValue, double selSizeNominalID, double selCenterTopHeight, DrawPositionValueModel selShellSpacing, CDPoint refPoint)
+        private List<Point3D> GetArrangeLeaderMarkPosition( List<NozzleInputModel> drawArrangeNozzle, double selLeaderCircleSize, bool multiColumnValue, double selSizeNominalID, double selCenterTopHeight, DrawPositionValueModel selShellSpacing, CDPoint refPoint,double selScaleValue)
         {
-            double arrangeGapHeight = 40;
+            double arrangeGapHeight = 1 * selScaleValue;
             double arrangeMaxHeightValue = 0;
-            double circleSize = valueService.GetDoubleValue(selLeaderCircleSize);
+            double circleSize = selLeaderCircleSize;
 
             // convergence
-            double convergenceHeight = 100;
+            double convergenceHeight = 1 * selScaleValue;
             bool convergenceValue = false;
             double convergenceXY = 0;
 
@@ -3798,7 +3805,7 @@ namespace DrawWork.DrawServices
         #endregion
 
         #region Nozzle : Create Mark
-        private Dictionary<string, List<Entity>> CreateNozzleLeader(Point3D refPoint, NozzleInputModel selNozzle, string fontSize, string circleSize)
+        private Dictionary<string, List<Entity>> CreateNozzleLeader(Point3D refPoint, NozzleInputModel selNozzle, double fontSize, double circleSize)
         {
 
             string selPosition = selNozzle.Position;
@@ -3807,9 +3814,9 @@ namespace DrawWork.DrawServices
             string textLowerStr = selNozzle.Size;
 
             // Current Test
-            double cirDiameter = valueService.GetDoubleValue(circleSize);
+            double cirDiameter = circleSize;
             double cirRadius = cirDiameter / 2;
-            double cirTextSize = valueService.GetDoubleValue(fontSize);
+            double cirTextSize = fontSize;
 
             // Point Adj
             Point3D drawPoint = new Point3D();

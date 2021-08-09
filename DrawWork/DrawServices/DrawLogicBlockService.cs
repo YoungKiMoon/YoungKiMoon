@@ -4252,8 +4252,11 @@ namespace DrawWork.DrawServices
             double currentHeight = 0;
             double currentCourse = 0;
 
-            double shellDistance = 5000;
-            double ShellCourseDistance = 11000;
+            double shellDistance = SingletonData.GAArea.Dimension.AreaSize.Width * scaleValue;
+            double ShellCourseDistance = SingletonData.GAArea.Dimension.AreaSize.Width * scaleValue + SingletonData.GAArea.NozzleLeader.AreaSize.Width*scaleValue;
+
+
+            double lastCourseDimGap = 10 * scaleValue;
             double scaleTextHeight = scaleService.GetOriginValueOfScale(scaleValue, newArrowSize);
             CDPoint shellCoursePoint = workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointRightShellBottom, 0, ref refPoint, ref curPoint);
             foreach(ShellOutputModel eachShell in assemblyData.ShellOutput)
@@ -4263,9 +4266,9 @@ namespace DrawWork.DrawServices
                 currentHeight = beforeHeight + courseHeight;
                 newPoint1 = GetSumCDPoint(shellCoursePoint, shellMaxThickness, beforeHeight);
                 newPoint2 = GetSumCDPoint(shellCoursePoint, shellMaxThickness, currentHeight);
-                newPoint3 = GetSumCDPoint(shellCoursePoint, shellDistance, beforeHeight + currentHeight / 2);
+                newPoint3 = GetSumCDPoint(shellCoursePoint, shellDistance - lastCourseDimGap, beforeHeight + currentHeight / 2);
                 newPosition = "right";
-                newDimHeight = shellDistance;
+                newDimHeight = shellDistance - lastCourseDimGap;
 
 
                 allDimensionList.Add(drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newPosition, newDimHeight, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, newText, 0, scaleValue, layerName));
@@ -4306,7 +4309,7 @@ namespace DrawWork.DrawServices
 
             }
 
-
+            double lastDimGap = 4 * scaleValue;
 
             // ID
             string idString = "TANK I.D " + assemblyData.GeneralDesignData[0].SizeNominalID;
@@ -4319,7 +4322,7 @@ namespace DrawWork.DrawServices
             allDimensionList.Add(drawService.Draw_Dimension(
                 GetSumCDPoint(refPoint, tankID + shellMaxThickness, 0),
                 GetSumCDPoint(refPoint, tankID + shellMaxThickness, tankHeight ),
-                null, "right", shellDistance + 1000, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, heightString, 0, scaleValue, layerName));
+                null, "right", shellDistance - lastDimGap, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, heightString, 0, scaleValue, layerName));
 
             // Winder Girder
             if (assemblyData.WindGirderInput[0].WindGirderRequired.ToLower() == "yes")
@@ -4330,7 +4333,7 @@ namespace DrawWork.DrawServices
                     double eachElevation = valueService.GetDoubleValue(eachWind.Elevation);
                     allDimensionList.Add(drawService.Draw_Dimension(
                         GetSumCDPoint(refPoint, - shellMaxThickness, currentElevation),
-                        GetSumCDPoint(refPoint, - shellMaxThickness, eachElevation), null, "left", shellDistance , newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, "", 0, scaleValue, layerName));
+                        GetSumCDPoint(refPoint, - shellMaxThickness, eachElevation), null, "left", shellDistance - lastDimGap, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, "", 0, scaleValue, layerName));
                     currentElevation = eachElevation;
                 }
             }

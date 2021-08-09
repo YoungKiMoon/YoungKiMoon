@@ -17,6 +17,7 @@ namespace DrawWork.Commons
 
         }
 
+        // Model Area : GA
         private static GAAreaModel _GAArea = new GAAreaModel();
         public static GAAreaModel GAArea
         {
@@ -24,6 +25,13 @@ namespace DrawWork.Commons
             set { _GAArea = value; }
         }
 
+        // Paper Area : List
+        public static List<PaperAreaModel> _PaperArea = new List<PaperAreaModel>();
+        public static List<PaperAreaModel> PaperArea
+        {
+            get { return _PaperArea; }
+            set { _PaperArea = value; }
+        }
 
         public static TANK_TYPE TankType
         {

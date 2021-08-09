@@ -39,6 +39,7 @@ using DrawWork.AssemblyServices;
 using DrawWork.Commons;
 using DrawWork.DrawSacleServices;
 using DrawWork.DWGFileServices;
+using DrawSettingLib.SettingServices;
 
 namespace DrawWork
 {
@@ -128,6 +129,11 @@ namespace DrawWork
 
         private void btnCreateDwg_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            //NewSave();
+            OldSave();
+        }
+        private void OldSave()
+        {
             var exportFileDialog = new SaveFileDialog();
             exportFileDialog.Filter = "CAD drawings(*.dwg)| *.dwg|" + "Drawing Exchange Format (*.dxf)|*.dxf";
             exportFileDialog.AddExtension = true;
@@ -142,6 +148,39 @@ namespace DrawWork
                 testModel.StartWork(wa);
 
 
+            }
+        }
+        private void NewSave()
+        {
+            var saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "CAD drawings (*.dwg)|*.dwg";
+            saveFileDialog.AddExtension = true;
+            saveFileDialog.CheckPathExists = true;
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                WriteFileAsync wfa = null;
+                switch (saveFileDialog.FilterIndex)
+                {
+                    case 1:
+                    case 2:
+#if SETUP
+                        wfa = _helper.GetWriteAutodesk(testModel, null, false, saveFileDialog.FileName);
+#else
+                        wfa = new WriteAutodesk(new WriteAutodeskParams(testModel), saveFileDialog.FileName);
+#endif
+                        break;
+                    case 3:
+#if SETUP
+                        //wfa = _helper.GetWritePDF(model1, saveFileDialog.FileName);
+#else
+                        //var writePdfParams = new WritePdfParams(testModel, new Size(842, 595), new Rect(20, 40, 802, 495)) { ViewBorderWidth = 0, TransparentBackground = true };
+                        //wfa = new MyWritePDF(writePdfParams, saveFileDialog.FileName);
+#endif
+                        break;
+                }
+
+                testModel.StartWork(wfa);
             }
         }
 
@@ -396,6 +435,14 @@ namespace DrawWork
             }
 
 
+            // Scale Setting
+            ModelAreaService areaService = new ModelAreaService();
+            PaperAreaService paperAreaService = new PaperAreaService();
+            SingletonData.GAArea = areaService.GetModelAreaData();
+            SingletonData.PaperArea = paperAreaService.GetPaperAreaData();
+
+
+
             tempImportBlocks = testModel.Blocks;
 
             // Delete
@@ -416,7 +463,10 @@ namespace DrawWork
                 }
             }
 
-            IntergrationService newInterService = new IntergrationService("CRT", newTankData, testModel,null);
+            string testName = "ORIENTATION";
+            //string testName = "GA";
+            IntergrationService newInterService = new IntergrationService(testName, newTankData, testModel);
+            //IntergrationService newInterService = new IntergrationService("GA", newTankData, testModel);
 
             LogicBuilder outBuilder = null;
             if (newInterService.CreateLogic(Convert.ToDouble(autoScale), newComData,out outBuilder))
@@ -433,7 +483,7 @@ namespace DrawWork
 
             // fits the model in the viewport
             testModel.ZoomFit();
-
+            testModel.Refresh();
         }
 
         private void Window_Closed(object sender, EventArgs e)

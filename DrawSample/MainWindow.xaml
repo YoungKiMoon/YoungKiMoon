@@ -27,11 +27,11 @@
                 <Button x:Name="btnDraw" Content="ReDraw"  Click="btnDraw_Click" Background="#FF7DE1FF"/>
                 <Button x:Name="btnDetection" Content="ReDetection" Margin="10,0,0,0" Click="btnDetection_Click" Background="#FF84FFA5" />
                 <Button x:Name="btnMark" Content="Mark" Margin="10,0,0,0" Click="btnMark_Click" Background="#FFF0FFBE"  />
-                <Button x:Name="btnPlate" Content="CreatePlate" Margin="10,0,0,0" Click="btnPlate_Click" />
+                <Button x:Name="btnPlate" Content="CreatePlate" Margin="10,0,0,0" Click="btnPlate_Click"  Visibility="Collapsed"/>
                 <Button x:Name="btnRegen" Content="Regen" Margin="10,0,0,0" Click="btnRegen_Click" />
 
-                <Button x:Name="btn3D" Content="Create3D" Margin="10,0,0,0" Click="btn3D_Click"  />
-                <Button x:Name="btn3DTest" Content="Create3D" Margin="10,0,0,0" Click="btn3DTest_Click" />
+                <Button x:Name="btn3D" Content="Create3D" Margin="10,0,0,0" Click="btn3D_Click" Visibility="Collapsed" />
+                <Button x:Name="btn3DTest" Content="Create3D" Margin="10,0,0,0" Click="btn3DTest_Click" Visibility="Collapsed" />
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1" Margin="0,0,0,0">
@@ -57,7 +57,7 @@
                     <TextBox x:Name="tbShape"/>
                 </StackPanel>
             </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Vertical" >
+            <StackPanel Grid.Column="1" Orientation="Vertical" Visibility="Hidden" >
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Diameter : "/>
                     <TextBox x:Name="tbDiameter" Width="100" Text="90000"/>

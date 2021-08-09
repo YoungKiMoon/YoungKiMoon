@@ -408,17 +408,6 @@
                 <Border Background="#FFE6F8FF" />
 
                 <TextBlock Text="TABAS 데이터 로딩 중입니다." FontSize="26" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF087474"/>
-
-                <ddes:Model x:Name="testModel2" Visibility="Collapsed">
-                    <ddes:Model.ProgressBar>
-                        <ddes:ProgressBar Lighting="False"/>
-                    </ddes:Model.ProgressBar>
-                    <ddes:Model.Viewports>
-                        <ddes:Viewport DisplayMode="Wireframe" InitialView="Other">
-                            
-                        </ddes:Viewport>
-                    </ddes:Model.Viewports>
-                </ddes:Model>
             </Grid>
             <!--#region TANK LOADING-->
             <Grid x:Name="busyAreaSource"  Visibility="Collapsed">

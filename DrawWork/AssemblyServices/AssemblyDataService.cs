@@ -578,15 +578,15 @@ namespace DrawWork.AssemblyServices
                 // Structure : Center Purlin
 
                 string centeringPurlin = "";
-                if (selAssembly.StructureCRTCenterRingInput.Count>0)
-                    centeringPurlin = selAssembly.StructureCRTCenterRingInput[firstIndex].PurlinSize;
+                //if (selAssembly.StructureCRTCenterRingInput.Count>0)
+                //    centeringPurlin = selAssembly.StructureCRTCenterRingInput[firstIndex].PurlinSize;
 
-                selAssembly.StructureCRTCenteringPurlinOutput.Clear();
-                foreach (AngleSizeModel eachAngle in selAssembly.AngleIList)
-                {
-                    if (eachAngle.SIZE == centeringPurlin)
-                        selAssembly.StructureCRTCenteringPurlinOutput.Add(eachAngle);
-                }
+                //selAssembly.StructureCRTCenteringPurlinOutput.Clear();
+                //foreach (AngleSizeModel eachAngle in selAssembly.AngleIList)
+                //{
+                //    if (eachAngle.SIZE == centeringPurlin)
+                //        selAssembly.StructureCRTCenteringPurlinOutput.Add(eachAngle);
+                //}
 
                 #endregion
             }

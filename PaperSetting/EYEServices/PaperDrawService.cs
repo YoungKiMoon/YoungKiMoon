@@ -25,6 +25,8 @@ using DrawWork.DrawModels;
 using DrawWork.DrawStyleServices;
 using AssemblyLib.AssemblyModels;
 using DrawWork.Commons;
+using DrawSettingLib.SettingServices;
+using DrawSettingLib.SettingModels;
 
 namespace PaperSetting.EYEServices
 {
@@ -80,7 +82,7 @@ namespace PaperSetting.EYEServices
 
 
         #region Create : Paper : Draw
-        public void CreatePaperDraw(ObservableCollection<PaperDwgModel> selPaperCol, AssemblyModel assemblyData,double scaleValue, bool selOneSheet = true)
+        public void CreatePaperDraw(ObservableCollection<PaperDwgModel> selPaperCol, AssemblyModel assemblyData, bool selOneSheet = true)
         {
 
             singleDraw.Sheets.Clear();
@@ -101,7 +103,10 @@ namespace PaperSetting.EYEServices
             }
 
 
-
+            // Scale
+            double scaleValue = 1;
+            PaperAreaService paperArea = new PaperAreaService();
+            
 
 
             //for(int i = 0; i < selPaperCol.Count;i++)
@@ -158,6 +163,8 @@ namespace PaperSetting.EYEServices
                 //
                 if (eachPaper.Basic.Title == "GENERAL ASSEMBLY(1-2)")
                 {
+                    scaleValue = paperArea.GetPaperScaleValue("GA", SingletonData.PaperArea);
+
                     CreateVectorViewGA(newSheet, eachPaper.ViewPorts[0].ViewPort, scaleValue, assemblyData);
 
                     CreateTableBlockGADesign(eachPaper.Tables[0], newSheet, eachPaper.Tables[0].No, assemblyData);
@@ -173,6 +180,7 @@ namespace PaperSetting.EYEServices
 
                 if (eachPaper.Basic.Title == "NOZZLE ORIENTATION")
                 {
+                    scaleValue = paperArea.GetPaperScaleValue("ORIENTATION", SingletonData.PaperArea);
                     CreateVectorViewOrientation(newSheet, eachPaper.ViewPorts[0].ViewPort, scaleValue, assemblyData);
 
                     CreateTableBlockGA(eachPaper.Tables[0], newSheet, eachPaper.Tables[0].No, assemblyData);
@@ -286,19 +294,33 @@ namespace PaperSetting.EYEServices
 
 
                 Point3D targetPoint = new Point3D();
-                targetPoint.X = SingletonData.GAViewPortCenter.X + SingletonData.GAViewPortSize.X / 2;
-                targetPoint.Y = SingletonData.GAViewPortCenter.Y + SingletonData.GAViewPortSize.Y / 2;
+                //targetPoint.X = SingletonData.GAViewPortCenter.X + SingletonData.GAViewPortSize.X / 2;
+                //targetPoint.Y = SingletonData.GAViewPortCenter.Y + SingletonData.GAViewPortSize.Y / 2;
+
+                targetPoint.X = SingletonData.GAArea.ViewCenterPoint.X;
+                targetPoint.Y = SingletonData.GAArea.ViewCenterPoint.Y;
 
 
                 Camera newnewCamera = new Camera(targetPoint,0,Viewport.GetCameraRotation(viewType.Top),projectionType.Orthographic,0,1);
-                VectorView newnewView = new VectorView(valueService.GetDoubleValue(selViewPort.LocationX),
-                                                    valueService.GetDoubleValue(selViewPort.LocationY),
-                                                    newnewCamera,
-                                                    scaleService.GetViewScale(scaleValue),
-                                                    "newView",
-                                                    valueService.GetDoubleValue(selViewPort.SizeX),
-                                                    valueService.GetDoubleValue(selViewPort.SizeY)
-                                                    );
+                //VectorView newnewView = new VectorView(valueService.GetDoubleValue(selViewPort.LocationX),
+                //                                    valueService.GetDoubleValue(selViewPort.LocationY),
+                //                                    newnewCamera,
+                //                                    scaleService.GetViewScale(scaleValue),
+                //                                    "newView",
+                //                                    valueService.GetDoubleValue(selViewPort.SizeX),
+                //                                    valueService.GetDoubleValue(selViewPort.SizeY)
+                //                                    );
+
+                PaperAreaModel GAPaper= SingletonData.PaperArea[0];
+
+                VectorView newnewView = new VectorView(GAPaper.Location.X,
+                                                       GAPaper.Location.Y,
+                                                        newnewCamera,
+                                    scaleService.GetViewScale(scaleValue),
+                                    "newView",
+                                    GAPaper.Size.X,
+                                    GAPaper.Size.Y
+                                    );
 
                 newnewView.CenterlinesExtensionAmount = extensionAmount;
 
@@ -390,20 +412,24 @@ namespace PaperSetting.EYEServices
                 double extensionAmount = Math.Min(selSheet.Width, selSheet.Height) / 594;
 
 
+                PaperAreaModel orientationPaper = SingletonData.PaperArea[1];
 
                 Point3D targetPoint = new Point3D();
-                targetPoint.X = SingletonData.OrientationGAViewPortCenter.X + SingletonData.OrientationViewPortSize.X / 2;
-                targetPoint.Y = SingletonData.OrientationGAViewPortCenter.Y + SingletonData.OrientationViewPortSize.Y / 2;
+                targetPoint.X = orientationPaper.ModelLocation.X;
+                targetPoint.Y = orientationPaper.ModelLocation.Y;
+
+
+
 
 
                 Camera newnewCamera = new Camera(targetPoint, 0, Viewport.GetCameraRotation(viewType.Top), projectionType.Orthographic, 0, 1);
-                VectorView newnewView = new VectorView(valueService.GetDoubleValue(selViewPort.LocationX),
-                                                    valueService.GetDoubleValue(selViewPort.LocationY),
+                VectorView newnewView = new VectorView(orientationPaper.Location.X,
+                                                    orientationPaper.Location.Y,
                                                     newnewCamera,
                                                     scaleService.GetViewScale(scaleValue),
                                                     "newView2",
-                                                    valueService.GetDoubleValue(selViewPort.SizeX),
-                                                    valueService.GetDoubleValue(selViewPort.SizeY)
+                                                    orientationPaper.Size.X,
+                                                    orientationPaper.Size.Y
                                                     );
 
                 newnewView.CenterlinesExtensionAmount = extensionAmount;
@@ -2488,7 +2514,7 @@ namespace PaperSetting.EYEServices
 
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, leftTextGap + tableOneWidth + 21 + 42.5, currentY + rowHeight / 2), "NOZZLE NECK", fontHeight, 0.95, Text.alignmentType.MiddleLeft));
             newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 21 + 42.5 + 28.2, currentY + rowHeight / 2), ":", fontHeight, 0.95, Text.alignmentType.MiddleCenter));
-            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 21 + 42.5 + 28.2 + 43.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].NozzleNeckPipePlate, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
+            newList.Add(GetNewTextWhite(GetSumPoint(refPoint, tableOneWidth + 21 + 42.5 + 28.2 + 43.5 / 2, currentY + rowHeight / 2), assemblyData.GeneralMaterialSpecifications[0].NozzleNeckPipe, fontHeight, 0.95, Text.alignmentType.MiddleCenter));
 
 
 

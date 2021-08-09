@@ -34,13 +34,25 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="devDept.Eyeshot.Control.Wpf.v2020, Version=2020.3.528.0, Culture=neutral, PublicKeyToken=5385d83d2fb4d7d9, processorArchitecture=MSIL" />
+    <Reference Include="devDept.Eyeshot.Control.Wpf.v2020, Version=2020.3.542.0, Culture=neutral, PublicKeyToken=5385d83d2fb4d7d9, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\devDept.Eyeshot.Control.Wpf.v2020.dll</HintPath>
+    </Reference>
     <Reference Include="devDept.Eyeshot.Control.x64.Wpf.v2020">
       <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\x64\devDept.Eyeshot.Control.x64.Wpf.v2020.dll</HintPath>
     </Reference>
-    <Reference Include="devDept.Geometry.v2020, Version=2020.3.528.0, Culture=neutral, PublicKeyToken=9440825e8b4733bc, processorArchitecture=MSIL" />
-    <Reference Include="devDept.Graphics.Shaders.v2020, Version=2020.3.528.0, Culture=neutral, PublicKeyToken=54ce5f5f803e4b42, processorArchitecture=MSIL" />
-    <Reference Include="devDept.Graphics.Wpf.v2020, Version=2020.3.528.0, Culture=neutral, PublicKeyToken=f3cd437f0d8061b5, processorArchitecture=MSIL" />
+    <Reference Include="devDept.Geometry.v2020, Version=2020.3.542.0, Culture=neutral, PublicKeyToken=9440825e8b4733bc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\devDept.Geometry.v2020.dll</HintPath>
+    </Reference>
+    <Reference Include="devDept.Graphics.Shaders.v2020, Version=2020.3.542.0, Culture=neutral, PublicKeyToken=54ce5f5f803e4b42, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\devDept.Graphics.Shaders.v2020.dll</HintPath>
+    </Reference>
+    <Reference Include="devDept.Graphics.Wpf.v2020, Version=2020.3.542.0, Culture=neutral, PublicKeyToken=f3cd437f0d8061b5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\devDept Software\Eyeshot Ultimate 2020\Bin\devDept.Graphics.Wpf.v2020.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -91,12 +103,18 @@
     <Compile Include="DrawCustomObjectModels\CustomRenderedHatch.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedMesh.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedTriangle.cs" />
+    <Compile Include="DrawModels\DrawBMLeaderModel.cs" />
+    <Compile Include="DrawModels\DrawBMNumberModel.cs" />
     <Compile Include="DrawModels\DrawCenterLineModel.cs" />
+    <Compile Include="DrawModels\DrawDimensionArcModel.cs" />
+    <Compile Include="DrawModels\DrawDimensionModel.cs" />
     <Compile Include="DrawModels\DrawDimStyle.cs" />
     <Compile Include="DrawModels\DrawEntityModel.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
     <Compile Include="DrawModels\DrawPositionValueModel.cs" />
     <Compile Include="DrawModels\DrawScaleModel.cs" />
+    <Compile Include="DrawModels\DrawSlopeLeaderModel.cs" />
+    <Compile Include="DrawModels\DrawWeldingModel.cs" />
     <Compile Include="DrawPaperServices\PaperPreviewService.cs" />
     <Compile Include="DrawPaperServices\ViewPortSettingModel.cs" />
     <Compile Include="DrawSacleServices\DrawScaleService.cs" />
@@ -119,6 +137,9 @@
     <Compile Include="DrawServices\DrawObjectService.cs" />
     <Compile Include="DrawServices\DrawReferenceBlockService.cs" />
     <Compile Include="DrawServices\DrawSettingService.cs" />
+    <Compile Include="DrawShapes\DrawBreakSymbols.cs" />
+    <Compile Include="DrawShapes\DrawShellCourses.cs" />
+    <Compile Include="DrawShapes\DrawSlopeSymbols.cs" />
     <Compile Include="DrawStyleServices\EnvironmentStyleService.cs" />
     <Compile Include="DrawStyleServices\LayerStyleService.cs" />
     <Compile Include="DrawStyleServices\LineStyleService.cs" />

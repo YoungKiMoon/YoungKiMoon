@@ -1293,9 +1293,9 @@ namespace DrawWork.DrawServices
 
 
             // Circle Array algorithm
-            double markStartDistance = 80 * selScaleValue;
-            double markDistancedGap = 30 * selScaleValue;
-            double labelDistance = 40 * selScaleValue;
+            double markStartDistance = 40 * selScaleValue;
+            double markDistancedGap = 15 * selScaleValue;
+            double labelDistance = 20 * selScaleValue;
 
             double bendLineGap = 1 * selScaleValue;
 

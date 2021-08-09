@@ -11,42 +11,30 @@ namespace DrawSettingLib.SettingModels
     {
         public AreaBoxModel()
         {
-			Length = "";
-			Width = "";
-			Height = "";
+			AreaSize = new SizeModel();
+			BoxSize = new SizeModel();
 			Margin = new AreaMarginModel();
         }
 
-		private string _Length;
-		public string Length
+		private SizeModel _AreaSize;
+		public SizeModel AreaSize
 		{
-			get { return _Length; }
+			get { return _AreaSize; }
 			set
 			{
-				_Length = value;
-				OnPropertyChanged(nameof(Length));
+				_AreaSize = value;
+				OnPropertyChanged(nameof(AreaSize));
 			}
 		}
 
-		private string _Width;
-		public string Width
+		private SizeModel _BoxSize;
+		public SizeModel BoxSize
 		{
-			get { return _Width; }
+			get { return _BoxSize; }
 			set
 			{
-				_Width = value;
-				OnPropertyChanged(nameof(Width));
-			}
-		}
-
-		private string _Height;
-		public string Height
-		{
-			get { return _Height; }
-			set
-			{
-				_Height = value;
-				OnPropertyChanged(nameof(Height));
+				_BoxSize = value;
+				OnPropertyChanged(nameof(BoxSize));
 			}
 		}
 

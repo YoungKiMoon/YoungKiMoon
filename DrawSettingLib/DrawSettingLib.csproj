@@ -47,6 +47,12 @@
     <Compile Include="SettingModels\AreaBoxModel.cs" />
     <Compile Include="SettingModels\AreaMarginModel.cs" />
     <Compile Include="SettingModels\GAAreaModel.cs" />
+    <Compile Include="SettingModels\PaperAreaModel.cs" />
+    <Compile Include="SettingModels\PointModel.cs" />
+    <Compile Include="SettingModels\SizeModel.cs" />
+    <Compile Include="SettingServices\ModelAreaService.cs" />
+    <Compile Include="SettingServices\PaperAreaService.cs" />
+    <Compile Include="SettingServices\ScaleCalService.cs" />
     <Compile Include="Utils\Notifier.cs" />
   </ItemGroup>
   <ItemGroup>
