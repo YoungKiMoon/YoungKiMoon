@@ -75,6 +75,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AssemblyServices\AssemblyDataService.cs" />
+    <Compile Include="AssemblyServices\AssemblyModelService.cs" />
     <Compile Include="AssemblyServices\FieldService.cs" />
     <Compile Include="CommandModels\BasicCommandModel.cs" />
     <Compile Include="CommandModels\CommandFunctionModel.cs" />
@@ -103,6 +104,11 @@
     <Compile Include="DrawCustomObjectModels\CustomRenderedHatch.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedMesh.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedTriangle.cs" />
+    <Compile Include="DrawDetailServices\DrawDetailRoofBottomService.cs" />
+    <Compile Include="DrawDetailServices\DrawDetailService.cs" />
+    <Compile Include="DrawDetailServices\DrawDetailShellService.cs" />
+    <Compile Include="DrawDetailServices\DrawDetailTempService.cs" />
+    <Compile Include="DrawModels\DrawAssyModel.cs" />
     <Compile Include="DrawModels\DrawBMLeaderModel.cs" />
     <Compile Include="DrawModels\DrawBMNumberModel.cs" />
     <Compile Include="DrawModels\DrawCenterLineModel.cs" />
@@ -113,6 +119,7 @@
     <Compile Include="DrawModels\DrawPointModel.cs" />
     <Compile Include="DrawModels\DrawPositionValueModel.cs" />
     <Compile Include="DrawModels\DrawScaleModel.cs" />
+    <Compile Include="DrawModels\DrawShellDevModel.cs" />
     <Compile Include="DrawModels\DrawSlopeLeaderModel.cs" />
     <Compile Include="DrawModels\DrawWeldingModel.cs" />
     <Compile Include="DrawPaperServices\PaperPreviewService.cs" />
@@ -260,8 +267,6 @@
   <ItemGroup>
     <Resource Include="Resources\samsungengtitleblock.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DrawLogicFileService\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

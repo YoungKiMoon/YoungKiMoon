@@ -4193,7 +4193,7 @@ namespace DrawWork.DrawServices
 
 
 
-        public Dictionary<string, List<Entity>> DrawBlock_CustomDimension(ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
+        public DrawEntityModel DrawBlock_CustomDimension(ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
         {
 
             int firstIndex = 0;
@@ -4220,7 +4220,7 @@ namespace DrawWork.DrawServices
 
             string layerName = layerService.LayerDimension;
 
-            Dictionary<string, List<Entity>> returnEntity = new Dictionary<string, List<Entity>>();
+            DrawEntityModel returnEntity = new DrawEntityModel();
 
             List<Entity> dimLineList = new List<Entity>();
             List<Entity> dimTextList = new List<Entity>();
@@ -4270,8 +4270,7 @@ namespace DrawWork.DrawServices
                 newPosition = "right";
                 newDimHeight = shellDistance - lastCourseDimGap;
 
-
-                allDimensionList.Add(drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newPosition, newDimHeight, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, newText, 0, scaleValue, layerName));
+                returnEntity.AddDrawEntity(drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newPosition, newDimHeight, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, newText, 0, scaleValue, layerName));
 
                 // text
                 double middleLineWidth = 0;
@@ -4313,13 +4312,13 @@ namespace DrawWork.DrawServices
 
             // ID
             string idString = "TANK I.D " + assemblyData.GeneralDesignData[0].SizeNominalID;
-            allDimensionList.Add( drawService.Draw_Dimension(
+            returnEntity.AddDrawEntity( drawService.Draw_Dimension(
                 GetSumCDPoint(refPoint,0,tankHeight/2), 
                 GetSumCDPoint(refPoint, tankID, tankHeight/2), null, "top", 0, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, idString, 0, scaleValue, layerName));
 
             // Thank Height
             string heightString = "TANK HEIGHT " + assemblyData.GeneralDesignData[0].SizeTankHeight;
-            allDimensionList.Add(drawService.Draw_Dimension(
+            returnEntity.AddDrawEntity( drawService.Draw_Dimension(
                 GetSumCDPoint(refPoint, tankID + shellMaxThickness, 0),
                 GetSumCDPoint(refPoint, tankID + shellMaxThickness, tankHeight ),
                 null, "right", shellDistance - lastDimGap, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, heightString, 0, scaleValue, layerName));
@@ -4331,7 +4330,7 @@ namespace DrawWork.DrawServices
                 foreach (WindGirderOutputModel eachWind in assemblyData.WindGirderOutput)
                 {
                     double eachElevation = valueService.GetDoubleValue(eachWind.Elevation);
-                    allDimensionList.Add(drawService.Draw_Dimension(
+                    returnEntity.AddDrawEntity(drawService.Draw_Dimension(
                         GetSumCDPoint(refPoint, - shellMaxThickness, currentElevation),
                         GetSumCDPoint(refPoint, - shellMaxThickness, eachElevation), null, "left", shellDistance - lastDimGap, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, "", 0, scaleValue, layerName));
                     currentElevation = eachElevation;
@@ -4352,26 +4351,10 @@ namespace DrawWork.DrawServices
             // public Logic
             foreach(DimensionPointModel eachDim in SingletonData.DimPublicList)
             {
-                allDimensionList.Add(drawService.Draw_Dimension(
+                returnEntity.AddDrawEntity(drawService.Draw_Dimension(
                         eachDim.leftPoint,
                         eachDim.rightPoint, null, eachDim.Position, eachDim.dimHeight, newTextHeight, newTextGap, newArrowSize, newPrefix, newSuffix, eachDim.Text, 0, scaleValue, layerName,eachDim.leftArrowVisible,eachDim.rightArrowVisible,eachDim.extVisible, eachDim.middleValue));
             }
-
-
-
-
-            foreach (Dictionary<string, List<Entity>> eachDime in allDimensionList)
-            {
-                dimLineList.AddRange(eachDime[CommonGlobal.DimLine]);
-                dimTextList.AddRange(eachDime[CommonGlobal.DimText]);
-                dimLineExtList.AddRange(eachDime[CommonGlobal.DimLineExt]);
-                dimArrowList.AddRange(eachDime[CommonGlobal.DimArrow]);
-            }
-
-            returnEntity.Add(CommonGlobal.DimLine, dimLineList);
-            returnEntity.Add(CommonGlobal.DimText, dimTextList);
-            returnEntity.Add(CommonGlobal.DimLineExt, dimLineExtList);
-            returnEntity.Add(CommonGlobal.DimArrow, dimArrowList);
 
             return returnEntity;
 

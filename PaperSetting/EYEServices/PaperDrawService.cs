@@ -27,6 +27,7 @@ using AssemblyLib.AssemblyModels;
 using DrawWork.Commons;
 using DrawSettingLib.SettingServices;
 using DrawSettingLib.SettingModels;
+using DrawSettingLib.Commons;
 
 namespace PaperSetting.EYEServices
 {
@@ -163,7 +164,7 @@ namespace PaperSetting.EYEServices
                 //
                 if (eachPaper.Basic.Title == "GENERAL ASSEMBLY(1-2)")
                 {
-                    scaleValue = paperArea.GetPaperScaleValue("GA", SingletonData.PaperArea);
+                    scaleValue = paperArea.GetPaperScaleValue(PAPERMAIN_TYPE.GA,PAPERSUB_TYPE.NotSet, SingletonData.PaperArea);
 
                     CreateVectorViewGA(newSheet, eachPaper.ViewPorts[0].ViewPort, scaleValue, assemblyData);
 
@@ -180,7 +181,7 @@ namespace PaperSetting.EYEServices
 
                 if (eachPaper.Basic.Title == "NOZZLE ORIENTATION")
                 {
-                    scaleValue = paperArea.GetPaperScaleValue("ORIENTATION", SingletonData.PaperArea);
+                    scaleValue = paperArea.GetPaperScaleValue(PAPERMAIN_TYPE.ORIENTATION,PAPERSUB_TYPE.NotSet, SingletonData.PaperArea);
                     CreateVectorViewOrientation(newSheet, eachPaper.ViewPorts[0].ViewPort, scaleValue, assemblyData);
 
                     CreateTableBlockGA(eachPaper.Tables[0], newSheet, eachPaper.Tables[0].No, assemblyData);

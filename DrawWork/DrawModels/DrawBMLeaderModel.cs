@@ -23,6 +23,8 @@ namespace DrawWork.DrawModels
         public string upperText { get; set; }
         public string lowerText { get; set; }
 
+        public POSITION_TYPE textAlign { get; set; }
+
         public double leaderLength { get; set; }
 
         public double textSideGap { get; set; }
@@ -40,6 +42,8 @@ namespace DrawWork.DrawModels
             textHeight = 2.5;
             upperText = "";
             lowerText = "";
+
+            textAlign = POSITION_TYPE.CENTER;
 
             bmNumber = "";
 

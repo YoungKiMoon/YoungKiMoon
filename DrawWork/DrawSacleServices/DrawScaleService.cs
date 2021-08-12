@@ -1,4 +1,6 @@
 ﻿using AssemblyLib.AssemblyModels;
+using DrawSettingLib.SettingModels;
+using DrawWork.DrawDetailServices;
 using DrawWork.ValueServices;
 using System;
 using System.Collections.Generic;
@@ -95,15 +97,90 @@ namespace DrawWork.DrawSacleServices
             return returnValue;
         }
 
+        #region Scale : calculation
+        public double GetScaleCalValue(double viewWidth, double viewHeight, double modelWidth, double modelHeight)
+        {
+            double tempScaleValue = 1;
+            if (modelWidth >= modelHeight)
+            {
+                // Horizontal
+                tempScaleValue = Math.Ceiling(modelWidth / viewWidth);
+            }
+            else
+            {
+                // Vertical
+                tempScaleValue = Math.Ceiling(modelHeight / viewHeight);
+            }
+
+            return tempScaleValue;
+        }
+        #endregion
+
+        #region Scale : GA ( Genernal Assembly )
+
+        // GA Scale
+        public double GetGAScaleValue(PaperAreaModel selPaperArea, GAAreaModel selGAArea)
+        {
+            double viewWidth = selPaperArea.Size.X - selGAArea.Dimension.AreaSize.Width * 2 - selGAArea.NozzleLeader.AreaSize.Width * 2 - selGAArea.ShellCourse.AreaSize.Width;
+            double viewHeight = selPaperArea.Size.Y - selGAArea.Dimension.AreaSize.Height * 2 - selGAArea.NozzleLeader.AreaSize.Height * 2;
+            double modelWidth = selGAArea.MainAssembly.BoxSize.Width;
+            double modelHeight = selGAArea.MainAssembly.BoxSize.Height;
 
 
-        // Plate Arrange
+
+            return GetOrientationScaleValue(viewWidth,viewHeight,modelWidth,modelHeight);
+        }
+
+        // Orientation
+        public double GetOrientationScaleValue(double viewWidth, double viewHeight, double modelWidth, double modelHeight)
+        {
+            double tempScaleValue = GetScaleCalValue(viewWidth, viewHeight, modelWidth, modelHeight);
+
+            // GA 적용
+            double scaleValue = 1;
+            if (tempScaleValue < 22)
+            {
+                if (!IsEvenNumber(tempScaleValue))
+                    tempScaleValue += 1;
+                scaleValue = tempScaleValue;
+            }
+            else if (tempScaleValue == 22)
+            {
+                scaleValue = 22;
+            }
+            else if (tempScaleValue > 22)
+            {
+                if (!IsHalfNumber(tempScaleValue))
+                    while (!IsHalfNumber(tempScaleValue))
+                        tempScaleValue++;
+
+                scaleValue = tempScaleValue;
+            }
+
+            return scaleValue;
+        }
+
+        private bool IsEvenNumber(double selNumber)
+        {
+            return selNumber % 2 == 0;
+        }
+        private bool IsHalfNumber(double selNumber)
+        {
+            return selNumber % 5 == 0;
+        }
+
+        #endregion
+
+
+        #region Scale : Detail
+
+        // Plate Horizontal Joint
         public double GetPlateHorizontalJointScale(double oneCourseThk)
         {
             double scaleValue = 1;
             if (oneCourseThk >= 31)
             {
-                scaleValue=8;
+                scaleValue = 8;
             }
             else if (oneCourseThk >= 21)
             {
@@ -117,6 +194,28 @@ namespace DrawWork.DrawSacleServices
             return scaleValue;
         }
 
+        public double GetOneCourseDevelopmentScale(PaperAreaModel selPaperArea,double tankID, double oneCourseWidth, double plateWidth, double plateMaxLength)
+        {
+            
+            // One Plate : Length
+            DrawDetailShellService dsService = new DrawDetailShellService( null,null);
+
+
+            double oneCoursePlateCount = 0;
+            double onePlateLength = 0;
+            dsService.SetCourseOnePlate(tankID, plateMaxLength, out oneCoursePlateCount, out onePlateLength);
+
+            double maxRow = 3;
+            double viewWidth = selPaperArea.Size.X;
+            double viewHeight = selPaperArea.Size.Y;
+
+            double modelWidth = onePlateLength * maxRow;
+            double modelHeight = plateWidth;
+
+            return GetScaleCalValue(viewWidth,viewHeight,modelWidth,modelHeight);
+        }
+
+        #endregion
 
     }
 

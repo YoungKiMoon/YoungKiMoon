@@ -382,7 +382,7 @@ namespace DrawWork.DrawServices
 
         //    return customEntityList.ToArray();
         //}
-        public Dictionary<string, List<Entity>> Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3,
+        public DrawEntityModel Draw_Dimension(CDPoint selPoint1, CDPoint selPoint2, CDPoint selPoint3,
                                     string selPosition, double selDimHeight, double selTextHeight, double selTextGap, double selArrowSize,
                                     string selTextPrefix, string selTextSuffix, string selTextUserInput,
                                     double selRotate,
@@ -549,9 +549,9 @@ namespace DrawWork.DrawServices
                 dimlineExtList.Add(dimLine1);
             if (extVisible)
                 dimlineExtList.Add(dimLine2);
-            
 
-            Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
+
+            DrawEntityModel customEntityList = new DrawEntityModel();
 
             // Layer
             styleSerivce.SetLayerListEntity(ref dimlineList, selLayerName);
@@ -560,16 +560,16 @@ namespace DrawWork.DrawServices
             styleSerivce.SetLayerListTextEntity(ref dimTextList, selLayerName);
 
 
-            customEntityList.Add(CommonGlobal.DimLine, dimlineList);
-            customEntityList.Add(CommonGlobal.DimText, dimTextList);
-            customEntityList.Add(CommonGlobal.DimLineExt, dimlineExtList);
-            customEntityList.Add(CommonGlobal.DimArrow, dimArrowList);
+            customEntityList.dimlineList.AddRange(dimlineList);
+            customEntityList.dimTextList.AddRange(dimTextList);
+            customEntityList.dimlineExtList.AddRange(dimlineExtList);
+            customEntityList.dimArrowList.AddRange(dimArrowList);
 
 
             return customEntityList;
         }
 
-        public Dictionary<string, List<Entity>> Draw_DimensionDetail(ref Model refSingleModel, Point3D selPoint1, Point3D selPoint2, double selScale, DrawDimensionModel selDimModel)
+        public DrawEntityModel Draw_DimensionDetail(ref Model refSingleModel, Point3D selPoint1, Point3D selPoint2, double selScale, DrawDimensionModel selDimModel)
         {
 
             Point3D textCenter = new Point3D();
@@ -942,7 +942,7 @@ namespace DrawWork.DrawServices
             }
 
 
-            Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
+            DrawEntityModel customEntityList = new DrawEntityModel();
 
             // Layer
             styleSerivce.SetLayerListEntity(ref dimlineList, layerService.LayerDimension);
@@ -951,17 +951,16 @@ namespace DrawWork.DrawServices
             styleSerivce.SetLayerListTextEntity(ref dimTextList, layerService.LayerDimension);
 
 
-            customEntityList.Add(CommonGlobal.DimLine, dimlineList);
-            customEntityList.Add(CommonGlobal.DimText, dimTextList);
-            customEntityList.Add(CommonGlobal.DimLineExt, dimlineExtList);
-            customEntityList.Add(CommonGlobal.DimArrow, dimArrowList);
-
+            customEntityList.dimlineList.AddRange(dimlineList);
+            customEntityList.dimTextList.AddRange(dimTextList);
+            customEntityList.dimlineExtList.AddRange(dimlineExtList);
+            customEntityList.dimArrowList.AddRange(dimArrowList);
 
             return customEntityList;
         }
 
 
-        public Dictionary<string, List<Entity>> Draw_DimensionArc(Point3D selPoint1, Point3D selPoint2, 
+        public DrawEntityModel Draw_DimensionArc(Point3D selPoint1, Point3D selPoint2, 
                                     string selPosition, double selDimHeight, 
                                     string selTextUserInput,
                                     double selDegree,
@@ -1158,8 +1157,6 @@ namespace DrawWork.DrawServices
             if (extVisible)
                 dimlineExtList.Add(dimLine2);
 
-            Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
-
             // Layer
             styleSerivce.SetLayerListEntity(ref dimlineList, selLayerName);
             styleSerivce.SetLayerListEntity(ref dimlineExtList, selLayerName);
@@ -1167,16 +1164,19 @@ namespace DrawWork.DrawServices
             styleSerivce.SetLayerListTextEntity(ref dimTextList, selLayerName);
 
 
-            customEntityList.Add(CommonGlobal.DimLine, dimlineList);
-            customEntityList.Add(CommonGlobal.DimText, dimTextList);
-            customEntityList.Add(CommonGlobal.DimLineExt, dimlineExtList);
-            customEntityList.Add(CommonGlobal.DimArrow, dimArrowList);
+
+            DrawEntityModel customEntityList = new DrawEntityModel();
+
+            customEntityList.dimlineList.AddRange(dimlineList);
+            customEntityList.dimTextList.AddRange(dimTextList);
+            customEntityList.dimlineExtList.AddRange(dimlineExtList);
+            customEntityList.dimArrowList.AddRange(dimArrowList);
 
 
             return customEntityList;
         }
 
-        public Dictionary<string, List<Entity>> Draw_Leader(CDPoint selPoint1, 
+        public DrawEntityModel Draw_Leader(CDPoint selPoint1, 
                                     string selLength, string selPostion,string selTextHeight,string selLayerHeight,
                                     List<string> selText, List<string> selTextSub, 
                                     Model ssModel,
@@ -1401,22 +1401,25 @@ namespace DrawWork.DrawServices
 
 
 
-            Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
+
 
             styleSerivce.SetLayerListEntity(ref leaderLine, selLayerName);
             styleSerivce.SetLayerListEntity(ref leaderArrow, selLayerName);
             //styleSerivce.SetLayerListTextEntity(ref leaderText, selLayerName);
 
-            customEntityList.Add(CommonGlobal.LeaderLine, leaderLine);
-            customEntityList.Add(CommonGlobal.LeaderText, leaderText);
-            customEntityList.Add(CommonGlobal.LeaderArrow, leaderArrow);
+            DrawEntityModel customEntityList = new DrawEntityModel();
+
+            customEntityList.leaderlineList.AddRange(leaderLine);
+            customEntityList.leaderTextList.AddRange(leaderText);
+            customEntityList.leaderArrowList.AddRange(leaderArrow);
+
 
             return customEntityList;
         }
 
 
 
-        public Dictionary<string,List<Entity>> Draw_BMLeader(ref Model refSingleModel,Point3D selPoint,DrawBMLeaderModel selLeaderModel, double selScale)
+        public DrawEntityModel Draw_BMLeader(ref Model refSingleModel,Point3D selPoint,DrawBMLeaderModel selLeaderModel, double selScale)
         {
             List<Entity> leaderLine = new List<Entity>();
             List<Entity> leaderArrow = new List<Entity>();
@@ -1521,6 +1524,10 @@ namespace DrawWork.DrawServices
                     if (dimLowerText != null)
                         dimLowerText.Translate(scaleArrowWidth + leaderLengthMax / 2, 0);
 
+                    // Text Align
+                    if (selLeaderModel.position == POSITION_TYPE.RIGHT)
+                        SetTextAlign(selLeaderModel.textAlign, dimUpperText, dimLowerText);
+
                     leaderLengthMax += scaleArrowWidth;
 
                     // Line
@@ -1580,20 +1587,40 @@ namespace DrawWork.DrawServices
             }
 
 
-
-            Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
-
             styleSerivce.SetLayerListEntity(ref leaderLine,layerService.LayerDimension);
             styleSerivce.SetLayerListEntity(ref leaderArrow, layerService.LayerDimension);
             styleSerivce.SetLayerListTextEntity(ref leaderText, layerService.LayerDimension);
 
-            customEntityList.Add(CommonGlobal.LeaderLine, leaderLine);
-            customEntityList.Add(CommonGlobal.LeaderText, leaderText);
-            customEntityList.Add(CommonGlobal.LeaderArrow, leaderArrow);
+            
+
+            DrawEntityModel customEntityList = new DrawEntityModel();
+
+            customEntityList.leaderlineList.AddRange(leaderLine);
+            customEntityList.leaderTextList.AddRange(leaderText);
+            customEntityList.leaderArrowList.AddRange(leaderArrow);
+
             return customEntityList;
         }
 
-        public Dictionary<string,List<Entity>> Draw_SlopeLeader(ref Model refSingleModel, Point3D selPoint, DrawSlopeLeaderModel selLeaderModel, double selScale)
+        public void SetTextAlign(POSITION_TYPE selPosition,Text t1, Text t2)
+        {
+            double t1X = 0;
+            double t2X = 0;
+            switch (selPosition)
+            {
+                case POSITION_TYPE.LEFT:
+                    t1X = t1.InsertionPoint.X - t1.BoxSize.X / 2;
+                    t2X = t2.InsertionPoint.X - t2.BoxSize.X / 2;
+                    if (t1X > t2X)
+                        t1.InsertionPoint.X -= t1X- t2X;
+                    else
+                        t2.InsertionPoint.X -= t2X - t1X;
+                    break;
+            }
+           
+        }
+
+        public DrawEntityModel Draw_SlopeLeader(ref Model refSingleModel, Point3D selPoint, DrawSlopeLeaderModel selLeaderModel, double selScale)
         {
             List<Entity> leaderLine = new List<Entity>();
             List<Entity> leaderArrow = new List<Entity>();
@@ -1604,7 +1631,7 @@ namespace DrawWork.DrawServices
             //double scaleCircleRadius = scaleService.GetOriginValueOfScale(selScale, selLeaderModel.bmCircle.circleRadius);
             //double scaleCircleNumberHeight = scaleService.GetOriginValueOfScale(selScale, selLeaderModel.bmCircle.textHeight);
 
-            Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
+            //Dictionary<string, List<Entity>> customEntityList = new Dictionary<string, List<Entity>>();
 
             //styleSerivce.SetLayerListEntity(ref leaderLine, layerService.LayerDimension);
             //styleSerivce.SetLayerListEntity(ref leaderArrow, layerService.LayerDimension);
@@ -1613,6 +1640,13 @@ namespace DrawWork.DrawServices
             //customEntityList.Add(CommonGlobal.LeaderLine, leaderLine);
             //customEntityList.Add(CommonGlobal.LeaderText, leaderText);
             //customEntityList.Add(CommonGlobal.LeaderArrow, leaderArrow);
+
+
+            DrawEntityModel customEntityList = new DrawEntityModel();
+
+            customEntityList.leaderlineList.AddRange(leaderLine);
+            customEntityList.leaderTextList.AddRange(leaderText);
+            customEntityList.leaderArrowList.AddRange(leaderArrow);
             return customEntityList;
         }
 

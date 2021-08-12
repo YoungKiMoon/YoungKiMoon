@@ -243,5 +243,42 @@ namespace DrawWork.ValueServices
         {
             return Math.PI * selRadius * 2;
         }
+
+
+        #region Development : 정방향
+        public double GetLengthOfOneDegree(double selCircum)
+        {
+            return selCircum / 360;
+        }
+        public double GetLengthOfDegree(double selDegree, double selCircum)
+        {
+            return selDegree * GetLengthOfOneDegree(selDegree);
+        }
+
+
+
+        public double GetShiftDegree(double startDegree, double selDegree)
+        {
+            return (startDegree + selDegree) % 360;
+        }
+        public double GetLengthOfDegreeByStartDegree(double startDegree, double selDegree, double selCircum)
+        {
+            return GetLengthOfDegree(GetShiftDegree(startDegree,selDegree), selCircum);
+        }
+
+        public double GetShiftReverseDegree(double startDegree, double selDegree)
+        {
+            double realDegree = selDegree % 360;
+            double calDegree = startDegree - realDegree;
+            if (calDegree < 0)
+                calDegree = 360 - calDegree;
+            return calDegree;
+        }
+        public double GetLengthOfReverseDegreeByStartDegree(double startDegree, double selDegree, double selCircum)
+        {
+            return GetShiftReverseDegree(GetShiftDegree(startDegree, selDegree), selCircum);
+        }
+
+        #endregion
     }
 }

@@ -68,48 +68,31 @@ namespace DrawWork.DrawServices
         }
 
 
-        public Dictionary<string, List<Entity>> GetLeaderList(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
+        public DrawEntityModel GetLeaderList(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
         {
 
 
 
-            Dictionary<string, List<Entity>> returnEntity = new Dictionary<string, List<Entity>>();
+            DrawEntityModel returnEntity = new DrawEntityModel();
 
             List<Entity> leaderLine = new List<Entity>();
             List<Entity> leaderText = new List<Entity>();
             List<Entity> leaderArrow = new List<Entity>();
-            
+
 
             // Roof
-            Dictionary<string, List<Entity>> leader_Basic = GetLeader_Basic(ref refPoint, ref curPoint, scaleValue);
-            if (leader_Basic.Count > 0)
-            {
-                leaderLine.AddRange(leader_Basic[CommonGlobal.LeaderLine]);
-                leaderText.AddRange(leader_Basic[CommonGlobal.LeaderText]);
-                leaderArrow.AddRange(leader_Basic[CommonGlobal.LeaderArrow]);
-            }
-            Dictionary<string, List<Entity>> leader_SingletonData = GetLeader_SignletonData(ref refPoint, ref curPoint, scaleValue);
-            if (leader_SingletonData.Count > 0)
-            {
-                leaderLine.AddRange(leader_SingletonData[CommonGlobal.LeaderLine]);
-                leaderText.AddRange(leader_SingletonData[CommonGlobal.LeaderText]);
-                leaderArrow.AddRange(leader_SingletonData[CommonGlobal.LeaderArrow]);
-            }
+            DrawEntityModel leader_Basic = GetLeader_Basic(ref refPoint, ref curPoint, scaleValue);
+            returnEntity.AddDrawEntity(leader_Basic);
 
+            DrawEntityModel leader_SingletonData = GetLeader_SignletonData(ref refPoint, ref curPoint, scaleValue);
+            returnEntity.AddDrawEntity(leader_SingletonData);
 
-            //returnEntity = drawService.Draw_Leader(newPoint1, newLength, newPosition, newFontSize, newLayerHeight, newText, newTextSub, selModel as Model, scaleValue, layerName);
-            if (leaderArrow.Count > 0)
-            {
-                returnEntity.Add(CommonGlobal.LeaderLine, leaderLine);
-                returnEntity.Add(CommonGlobal.LeaderText, leaderText);
-                returnEntity.Add(CommonGlobal.LeaderArrow, leaderArrow);
-            }
 
 
             return returnEntity;
         }
 
-        private Dictionary<string, List<Entity>> GetLeader_Basic( ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
+        private DrawEntityModel GetLeader_Basic( ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
         {
             int refIndex = 1;
 
@@ -126,7 +109,7 @@ namespace DrawWork.DrawServices
 
             string layerName = layerService.LayerDimension;
 
-            Dictionary<string, List<Entity>> returnEntity = new Dictionary<string, List<Entity>>();
+            DrawEntityModel returnEntity = new DrawEntityModel();
 
             double tankHeight= valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight); 
             double tankNominalID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
@@ -148,7 +131,7 @@ namespace DrawWork.DrawServices
                 if (newText.Count == 0)
                     newText = newTextSub;
 
-                Dictionary<string, List<Entity>> eachLeaderList = new Dictionary<string, List<Entity>>();
+                DrawEntityModel eachLeaderList = new DrawEntityModel();
                 if (eachPart == "roof")
                 {
                     newText = new List<string>();
@@ -196,28 +179,18 @@ namespace DrawWork.DrawServices
                     eachLeaderList = drawService.Draw_Leader(currentPoint, newLength, newPosition, "", "", newText, newTextSub, singleModel, scaleValue, layerName);
                 }
 
-                if (eachLeaderList.Count > 0)
-                {
-                    leaderLine.AddRange(eachLeaderList[CommonGlobal.LeaderLine]);
-                    leaderText.AddRange(eachLeaderList[CommonGlobal.LeaderText]);
-                    leaderArrow.AddRange(eachLeaderList[CommonGlobal.LeaderArrow]);
-                }
+                returnEntity.AddDrawEntity(eachLeaderList);
             }
 
 
             //returnEntity = drawService.Draw_Leader(newPoint1, newLength, newPosition, newFontSize, newLayerHeight, newText, newTextSub, selModel as Model, scaleValue, layerName);
-            if (leaderArrow.Count > 0)
-            {
-                returnEntity.Add(CommonGlobal.LeaderLine, leaderLine);
-                returnEntity.Add(CommonGlobal.LeaderText, leaderText);
-                returnEntity.Add(CommonGlobal.LeaderArrow, leaderArrow);
-            }
+            
 
 
             return returnEntity;
         }
 
-        private Dictionary<string, List<Entity>> GetLeader_SignletonData(ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
+        private DrawEntityModel GetLeader_SignletonData(ref CDPoint refPoint, ref CDPoint curPoint, double scaleValue)
         {
             int refIndex = 1;
 
@@ -234,7 +207,7 @@ namespace DrawWork.DrawServices
 
             string layerName = layerService.LayerDimension;
 
-            Dictionary<string, List<Entity>> returnEntity = new Dictionary<string, List<Entity>>();
+            DrawEntityModel returnEntity = new DrawEntityModel();
 
             double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
             double tankNominalID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
@@ -245,14 +218,11 @@ namespace DrawWork.DrawServices
             double scaleLength = scaleFactor * tankNominalID; //32400일때 리더 길이 2000
             newLength = scaleLength.ToString();
 
-            List<Entity> leaderLine = new List<Entity>();
-            List<Entity> leaderText = new List<Entity>();
-            List<Entity> leaderArrow = new List<Entity>();
+
 
             foreach(LeaderPointModel eachPoint in SingletonData.LeaderPublicList)
             {
-                Dictionary<string, List<Entity>> eachLeaderList = new Dictionary<string, List<Entity>>();
-
+                
                 List<string> newText = eachPoint.lineTextList; ;
                 List<string> newTextSub = eachPoint.emptyTextList;
                 if (newText.Count == 0)
@@ -260,23 +230,9 @@ namespace DrawWork.DrawServices
                 CDPoint currentPoint = eachPoint.leaderPoint;
                 newPosition = eachPoint.Position;
                 newLength = (scaleLength + (eachPoint.lineLength / 100 * scaleLength)).ToString();
-                eachLeaderList = drawService.Draw_Leader(currentPoint, newLength, newPosition, "", "", newText, newTextSub, singleModel, scaleValue, layerName);
 
-                if (eachLeaderList.Count > 0)
-                {
-                    leaderLine.AddRange(eachLeaderList[CommonGlobal.LeaderLine]);
-                    leaderText.AddRange(eachLeaderList[CommonGlobal.LeaderText]);
-                    leaderArrow.AddRange(eachLeaderList[CommonGlobal.LeaderArrow]);
-                }
-            }
-
-
-
-            if (leaderArrow.Count > 0)
-            {
-                returnEntity.Add(CommonGlobal.LeaderLine, leaderLine);
-                returnEntity.Add(CommonGlobal.LeaderText, leaderText);
-                returnEntity.Add(CommonGlobal.LeaderArrow, leaderArrow);
+                DrawEntityModel eachLeaderList = drawService.Draw_Leader(currentPoint, newLength, newPosition, "", "", newText, newTextSub, singleModel, scaleValue, layerName);
+                returnEntity.AddDrawEntity(eachLeaderList);
             }
 
 

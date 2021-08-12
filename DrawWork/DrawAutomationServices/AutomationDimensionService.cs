@@ -467,22 +467,8 @@ namespace DrawWork.DrawAutomationServices
 
         public List<Entity> SetLineBreakFree(DrawEntityModel selDrawEntity)
         {
-            List<Entity> returnEntity = new List<Entity>();
 
-            returnEntity.AddRange(selDrawEntity.outlineList);
-            returnEntity.AddRange(selDrawEntity.centerlineList);
-            returnEntity.AddRange(selDrawEntity.dimlineList);
-            returnEntity.AddRange(selDrawEntity.dimTextList);
-            returnEntity.AddRange(selDrawEntity.dimlineExtList);
-            returnEntity.AddRange(selDrawEntity.dimArrowList);
-            returnEntity.AddRange(selDrawEntity.leaderlineList);
-            returnEntity.AddRange(selDrawEntity.leaderTextList);
-            returnEntity.AddRange(selDrawEntity.leaderArrowList);
-            returnEntity.AddRange(selDrawEntity.nozzlelineList);
-            returnEntity.AddRange(selDrawEntity.nozzleMarkList);
-            returnEntity.AddRange(selDrawEntity.nozzleTextList);
-
-            return returnEntity;
+            return selDrawEntity.GetDrawEntity();
         }
 
         public List<Entity> SetLineBreak(Model singleModel, DrawEntityModel selDrawEntity)

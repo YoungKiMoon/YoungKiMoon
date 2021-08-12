@@ -12,17 +12,24 @@ using devDept.Geometry;
 using devDept.Serialization;
 using DrawWork.ValueServices;
 using DrawWork.Commons;
+using DrawWork.DrawShapes;
 
 namespace DrawWork.DrawServices
 {
     public class DrawShapeServices
     {
-        ValueService valueService;
-        DrawEditingService editingService;
+        private ValueService valueService;
+        private DrawEditingService editingService;
+
+        public DrawBreakSymbols breakSymbols { get; set; }
+        public DrawShellCourses shellCourses { get; set; }
         public DrawShapeServices()
         {
             valueService = new ValueService();
             editingService = new DrawEditingService();
+
+            breakSymbols = new DrawBreakSymbols();
+            shellCourses = new DrawShellCourses();
         }
 
         public List<Entity> GetRectangle(out List<Point3D> selOutputPointList,Point3D selPoint, double selWidth,double selHeight,double selRotate, double selRotateCenter, double selTranslateNumber,bool[] selVisibleLine=null)

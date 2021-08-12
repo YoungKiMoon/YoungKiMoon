@@ -18,6 +18,11 @@ using AssemblyLib.AssemblyModels;
 using DrawWork.Commons;
 using DrawWork.ValueServices;
 using DrawSettingLib.SettingServices;
+using DrawWork.DrawSacleServices;
+using DrawSettingLib.SettingModels;
+using DrawSettingLib.Commons;
+using devDept.Geometry;
+using DrawWork.DrawDetailServices;
 
 namespace DrawWork.CommandServices
 {
@@ -27,24 +32,41 @@ namespace DrawWork.CommandServices
         public BasicCommandModel commandData;
 
         public TranslateDataService commandTranslate;
-        
         public DrawObjectService drawObject;
-
         public DrawBoundaryService boundaryService;
 
         public object singleModel;
 
-        public DrawEntityModel drawEntity;
+        public DrawEntityModel drawEntity { get; set; }
 
-        public DrawScaleModel scaleData;
-        public EntityList commandEntities;
+
+        public EntityList commandEntities { get; set; }
 
         public ValueService valueService;
         //public List<Entity[]> commandDimensionEntities;
         //public List<Entity[]> commandNozzleEntities;
 
+
+        public PaperAreaService areaService;
+        public DrawScaleService scaleService { get; set; }
+
+        public DrawScaleModel scaleData { get; set; }
+
+        public DrawAssyModel currentDrawAssy { get; set; }
+        public DrawPointModel currentDrawPoint { get; set; }
+
+        
+
         #region CONSTRUCTOR
         public CommandBasicService(List<CommandLineModel> selCommandList,AssemblyModel selAssembly,Object selModel)
+        {
+            CommandBasicDefault(selCommandList, selAssembly, selModel);
+        }
+        public CommandBasicService(AssemblyModel selAssembly, Object selModel)
+        {
+            CommandBasicDefault(null, selAssembly, selModel);
+        }
+        private void CommandBasicDefault(List<CommandLineModel> selCommandList, AssemblyModel selAssembly, Object selModel)
         {
             assemblyData = new AssemblyModel();
             commandData = new BasicCommandModel();
@@ -56,7 +78,7 @@ namespace DrawWork.CommandServices
             SetModelData(selModel);
 
             commandTranslate = new TranslateDataService(selAssembly);
-            
+
 
             drawObject = new DrawObjectService(selAssembly, singleModel);
             boundaryService = new DrawBoundaryService(selAssembly);
@@ -66,35 +88,21 @@ namespace DrawWork.CommandServices
             commandEntities = new EntityList();
 
             scaleData = new DrawScaleModel();
-        }
-        public CommandBasicService(AssemblyModel selAssembly, Object selModel)
-        {
-            assemblyData = new AssemblyModel();
-            commandData = new BasicCommandModel();
 
-            valueService = new ValueService();
+            currentDrawAssy = new DrawAssyModel();
+            currentDrawPoint = new DrawPointModel();
 
-            //SetCommandData(selCommandList);
-            SetAssemblyData(selAssembly);
-            SetModelData(selModel);
+            scaleService = new DrawScaleService();
 
-            commandTranslate = new TranslateDataService(selAssembly);
-            
-
-            drawObject = new DrawObjectService(selAssembly, singleModel);
-            boundaryService = new DrawBoundaryService(selAssembly);
-
-
-            drawEntity = new DrawEntityModel();
-            commandEntities = new EntityList();
-
-            scaleData = new DrawScaleModel();
+            areaService = new PaperAreaService();
         }
         #endregion
 
         #region CommandData
         public void SetCommandData(List<CommandLineModel> selCommandList)
         {
+            if (selCommandList == null)
+                return;
             commandData.commandList = CommandTextToLower(selCommandList);
 
         }
@@ -134,13 +142,7 @@ namespace DrawWork.CommandServices
 
         #endregion
 
-        #region ReferencePoint
-        public void SetDrawPoint(DrawPointModel selDrawPoint)
-        {
-            commandData.drawPoint.referencePoint = selDrawPoint.referencePoint;
-            commandData.drawPoint.currentPoint = selDrawPoint.currentPoint;
-        }
-        #endregion
+
 
 
 
@@ -157,21 +159,18 @@ namespace DrawWork.CommandServices
 
 
             // Create ReferencePoint
-            DrawPointModel drawPoint= GetReferencePoint();
-            CDPoint refPoint = drawPoint.referencePoint;
-            CDPoint curPoint = drawPoint.currentPoint;
-
-            // ReferencePoint -> SingletonData
-            SingletonData.RefPoint = (CDPoint)refPoint.Clone();
+            //DrawPointModel drawPoint= GetReferencePoint();
+            //CDPoint refPoint = drawPoint.referencePoint;
+            //CDPoint curPoint = drawPoint.currentPoint;
 
 
-            SetDrawPoint(drawPoint);
+
+
 
             // Create Boundary : Pending
-            boundaryService.CreateBoundary(drawPoint);
+            //boundaryService.CreateBoundary(drawPoint);
 
-            // Create Scale Value
-            SetScaleData(selType, ref refPoint, ref curPoint);
+
            
 
             // Create Entity
@@ -192,7 +191,7 @@ namespace DrawWork.CommandServices
                     {
                         Console.WriteLine("CMD : " + string.Join("|",eachCmd));
                         CommandFunctionModel eachFunction = null;
-                        DrawObjectLogic(eachCmd,ref refPoint, ref curPoint,out eachFunction);
+                        DrawObjectLogic(eachCmd,out eachFunction);
                         if(eachFunction!=null)
                             commandData.commandListFunction.Add(eachFunction);
                     }
@@ -218,36 +217,91 @@ namespace DrawWork.CommandServices
 
 
         #region Scale Size
-        public void SetScaleData(string selType,ref CDPoint refPoint, ref CDPoint curPoint)
+        public void SetScaleData(DrawAssyModel selDrawAssy,DrawPointModel selDrawPoint)
         {
+            CDPoint refPoint = selDrawPoint.referencePoint;
+            CDPoint curPoint = selDrawPoint.currentPoint;
 
             // Real Size : Default
             double tankID = 1000;
             double tankHeight = 1000;
-            
-            CDPoint UppderPoint= drawObject.workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref curPoint);
-            tankHeight = UppderPoint.Y - refPoint.Y;
-
             if (assemblyData.GeneralDesignData.Count > 0)
-                tankID= valueService.GetDoubleValue( assemblyData.GeneralDesignData[0].SizeNominalID);
+                tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
 
-            // GA
-            if(selType.ToLower()=="ga")
-                SingletonData.GAArea.SetMainAssemblySize(refPoint.X, refPoint.Y, tankID, tankHeight);
 
+            PaperAreaModel selPaperAreaModel = areaService.GetPaperAreaModel(selDrawAssy.mainName, selDrawAssy.subName, SingletonData.PaperArea);
+            switch (selDrawAssy.mainName)
+            {
+                case PAPERMAIN_TYPE.GA:
+                    // GA : Size
+                    CDPoint UppderPoint = drawObject.workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref curPoint);
+                    tankHeight = UppderPoint.Y - refPoint.Y;
+                    SingletonData.GAArea.SetMainAssemblySize(refPoint.X, refPoint.Y, tankID, tankHeight);
+                    selPaperAreaModel.ScaleValue = scaleService.GetGAScaleValue(selPaperAreaModel, SingletonData.GAArea);
+                    break;
+
+                case PAPERMAIN_TYPE.ORIENTATION:
+                    // 500 * 0.4
+                    double orientationDim = 170;
+                    selPaperAreaModel.ScaleValue = scaleService.GetOrientationScaleValue(selPaperAreaModel.Size.X - orientationDim, selPaperAreaModel.Size.Y - orientationDim, tankID, tankID);
+                    // Center
+                    selPaperAreaModel.ModelLocation.X = refPoint.X;
+                    selPaperAreaModel.ModelLocation.Y = refPoint.Y;
+                    break;
+
+                case PAPERMAIN_TYPE.DETAIL:
+                    switch (selDrawAssy.subName)
+                    {
+                        case PAPERSUB_TYPE.HORIZONTALJOINT:
+                            if (assemblyData.ShellOutput.Count > 0)
+                            {
+                                double plateFirstCourse = valueService.GetDoubleValue(assemblyData.ShellOutput[0].Thickness);
+                                selPaperAreaModel.ScaleValue = scaleService.GetPlateHorizontalJointScale(plateFirstCourse);
+                            }
+                            break;
+
+                        case PAPERSUB_TYPE.ONECOURSESHELLPLATE:
+                            if (assemblyData.ShellOutput.Count > 0)
+                            {
+                                double oneCourseWidth = valueService.GetDoubleValue(assemblyData.ShellOutput[0].PlateWidth);
+                                double plateWidth = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateWidth);
+                                double plateMaxLength = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateMaxLength);
+
+                                selPaperAreaModel.ScaleValue = scaleService.GetOneCourseDevelopmentScale(selPaperAreaModel, tankID, oneCourseWidth, plateWidth, plateMaxLength);
+                            }
+                            break;
+                    }
+                    break;
+            }
+
+
+            scaleData.Value = selPaperAreaModel.ScaleValue;
+            currentDrawAssy.scaleValue = selPaperAreaModel.ScaleValue;
             // Paper
 
+
             // Scale
-            PaperAreaService paperAreaService = new PaperAreaService();
-            scaleData.Value= paperAreaService.UpdateScaleValue(selType,SingletonData.PaperArea, SingletonData.GAArea, tankID,refPoint.X,refPoint.Y);
+            //PaperAreaService paperAreaService = new PaperAreaService();
+            //scaleData.Value= paperAreaService.UpdateScaleValue(selType,SingletonData.PaperArea, SingletonData.GAArea, tankID,refPoint.X,refPoint.Y);
 
             // Set Scale Data
-            
+
 
         }
         #endregion
 
+
         #region Reference Point
+        public void SetDrawPoint(DrawPointModel selDrawPoint)
+        {
+            commandData.drawPoint.referencePoint = selDrawPoint.referencePoint;
+            commandData.drawPoint.currentPoint = selDrawPoint.currentPoint;
+
+            currentDrawPoint = selDrawPoint;
+
+            // ReferencePoint -> SingletonData
+            SingletonData.RefPoint = (CDPoint)selDrawPoint.referencePoint.Clone();
+        }
         private DrawPointModel GetReferencePoint()
         {
             DrawPointModel drawPoint = new DrawPointModel();
@@ -278,9 +332,10 @@ namespace DrawWork.CommandServices
 
 
         #region DrawLogic
-        public void DrawObjectLogic(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, out CommandFunctionModel selCmdFunction)
+        public void DrawObjectLogic(string[] eachCmd,  out CommandFunctionModel selCmdFunction)
         {
-
+            CDPoint refPoint = currentDrawPoint.referencePoint;
+            CDPoint curPoint = currentDrawPoint.currentPoint; 
 
             CommandFunctionModel newCmdFunction = new CommandFunctionModel();
             List<CommandPropertiyModel> newCmdProperty = new List<CommandPropertiyModel>();
@@ -288,9 +343,19 @@ namespace DrawWork.CommandServices
 
             switch (cmdObject)
             {
-                // Point
+                // Draw Assy Model
+                case "draw":
+                case "drawassembly":                    
+                    currentDrawAssy = drawObject.GetDrawAssyModel(eachCmd);
+                    goto case "allways";
+
+                // RefPoint : Very Import
                 case "refpoint":
-                    drawObject.DoRefPoint(eachCmd, ref refPoint, ref curPoint);
+                    DrawPointModel tempDrawPoint = drawObject.GetDrawPoint(eachCmd);
+                    SetDrawPoint(tempDrawPoint);
+                    currentDrawAssy.refPoint = new Point3D(tempDrawPoint.referencePoint.X,tempDrawPoint.referencePoint.Y);
+                    // Create Scale Value
+                    SetScaleData(currentDrawAssy, currentDrawPoint);
                     goto case "allways";
 
                 case "point":
@@ -333,20 +398,16 @@ namespace DrawWork.CommandServices
                 // Dimension : Scale
                 case "dim":
                 case "dimline":
-                    Dictionary<string, List<Entity>> newDim = drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint,out newCmdProperty,scaleData.Value);
-                    drawEntity.dimlineList.AddRange(newDim[CommonGlobal.DimLine]);
-                    drawEntity.dimTextList.AddRange(newDim[CommonGlobal.DimText]);
-                    drawEntity.dimlineExtList.AddRange(newDim[CommonGlobal.DimLineExt]);
-                    drawEntity.dimArrowList.AddRange(newDim[CommonGlobal.DimArrow]);
+                    DrawEntityModel newDim = drawObject.DoDimension(eachCmd, ref refPoint, ref curPoint,out newCmdProperty,scaleData.Value);
+                    drawEntity.AddDrawEntity(newDim);
                     goto case "allways";
 
                 case "customdim":
                 case "customdimline":
-                    Dictionary<string, List<Entity>> newCustomDim = drawObject.DoDimensionCustom(eachCmd, ref refPoint, ref curPoint,  scaleData.Value);
-                    drawEntity.dimlineList.AddRange(newCustomDim[CommonGlobal.DimLine]);
-                    drawEntity.dimTextList.AddRange(newCustomDim[CommonGlobal.DimText]);
-                    drawEntity.dimlineExtList.AddRange(newCustomDim[CommonGlobal.DimLineExt]);
-                    drawEntity.dimArrowList.AddRange(newCustomDim[CommonGlobal.DimArrow]);
+                    DrawEntityModel newCustomDim = drawObject.DoDimensionCustom(eachCmd, ref refPoint, ref curPoint,  scaleData.Value);
+                    drawEntity.AddDrawEntity(newCustomDim);
+
+
                     break;
 
                 case "extradim":
@@ -379,21 +440,14 @@ namespace DrawWork.CommandServices
                 // Nozzle
                 case "nozzle":
                     DrawEntityModel newNozzle = drawObject.DoNozzle(eachCmd, ref refPoint, ref curPoint, scaleData.Value);
-                    drawEntity.outlineList.AddRange(newNozzle.outlineList);
-                    drawEntity.nozzlelineList.AddRange(newNozzle.nozzlelineList);
-                    drawEntity.nozzleMarkList.AddRange(newNozzle.nozzleMarkList);
-                    drawEntity.nozzleTextList.AddRange(newNozzle.nozzleTextList);
-                    drawEntity.blockList.AddRange(newNozzle.blockList);
+                    drawEntity.AddDrawEntity(newNozzle);
+
                     goto case "allways";
 
                 // Nozzle : Orientation
                 case "nozzleorientation":
                     DrawEntityModel newNozzleOrientation = drawObject.DoNozzleOrientation(eachCmd, ref refPoint, ref curPoint, scaleData.Value);
-                    drawEntity.outlineList.AddRange(newNozzleOrientation.outlineList);
-                    drawEntity.nozzlelineList.AddRange(newNozzleOrientation.nozzlelineList);
-                    drawEntity.nozzleMarkList.AddRange(newNozzleOrientation.nozzleMarkList);
-                    drawEntity.nozzleTextList.AddRange(newNozzleOrientation.nozzleTextList);
-                    drawEntity.blockList.AddRange(newNozzleOrientation.blockList);
+                    drawEntity.AddDrawEntity(newNozzleOrientation);
                     goto case "allways";
 
                 case "orientation":
@@ -405,20 +459,22 @@ namespace DrawWork.CommandServices
                 // Leader : Scale
                 case "leader":
                 case "leaderline":
-                    Dictionary<string, List<Entity>> newLeader = drawObject.DoLeader(eachCmd, ref refPoint, ref curPoint, singleModel,scaleData.Value);
-                    drawEntity.leaderlineList.AddRange(newLeader[CommonGlobal.LeaderLine]);
-                    drawEntity.leaderTextList.AddRange(newLeader[CommonGlobal.LeaderText]);
-                    drawEntity.leaderArrowList.AddRange(newLeader[CommonGlobal.LeaderArrow]);
+                    DrawEntityModel newLeader = drawObject.DoLeader(eachCmd, ref refPoint, ref curPoint, singleModel,scaleData.Value);
+                    drawEntity.AddDrawEntity(newLeader);
                     goto case "allways";
 
                 case "leaderlist":
-                    Dictionary<string, List<Entity>> newLeaderList = drawObject.DoLeaderList(eachCmd, ref refPoint, ref curPoint, singleModel, scaleData.Value);
-                    drawEntity.leaderlineList.AddRange(newLeaderList[CommonGlobal.LeaderLine]);
-                    drawEntity.leaderTextList.AddRange(newLeaderList[CommonGlobal.LeaderText]);
-                    drawEntity.leaderArrowList.AddRange(newLeaderList[CommonGlobal.LeaderArrow]);
+                    DrawEntityModel newLeaderList = drawObject.DoLeaderList(eachCmd, ref refPoint, ref curPoint, singleModel, scaleData.Value);
+                    drawEntity.AddDrawEntity(newLeaderList);
+
                     goto case "allways";
 
+                case "drawdetail":
+                    DrawEntityModel newLogicDetail = drawObject.DoBlockDetail(eachCmd, ref refPoint, ref curPoint, singleModel, scaleData.Value);
+                    drawEntity.AddDrawEntity(newLogicDetail);
+                    goto case "allways";
 
+                    
                 // allways
                 case "allways":
                     newCmdFunction.Name = cmdObject;

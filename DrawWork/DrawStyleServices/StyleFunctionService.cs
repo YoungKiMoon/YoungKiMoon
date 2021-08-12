@@ -68,6 +68,15 @@ namespace DrawWork.DrawStyleServices
                 eachEntity.ColorMethod = colorMethodType.byLayer;
             }
         }
+        public void SetLayerListLine(ref List<Line> selEntity, string selLayerName)
+        {
+            foreach (Line eachEntity in selEntity)
+            {
+                eachEntity.LayerName = selLayerName;
+                eachEntity.LineTypeMethod = colorMethodType.byLayer;
+                eachEntity.ColorMethod = colorMethodType.byLayer;
+            }
+        }
 
         public void SetLayerListEntity(ref List<Entity> selEntity, string selLayerName)
         {
@@ -137,5 +146,12 @@ namespace DrawWork.DrawStyleServices
             selEntity.ColorMethod = colorMethodType.byLayer;
         }
         #endregion
+
+        public List<Entity> GetDimList(Dictionary<string,List<Entity>> selList)
+        {
+            List<Entity> newList = new List<Entity>();
+
+            return newList;
+        }
     }
 }

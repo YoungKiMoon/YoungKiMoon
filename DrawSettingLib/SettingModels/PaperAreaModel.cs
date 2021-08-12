@@ -1,4 +1,5 @@
-﻿using DrawSettingLib.Utils;
+﻿using DrawSettingLib.Commons;
+using DrawSettingLib.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,8 @@ namespace DrawSettingLib.SettingModels
     {
         public PaperAreaModel()
         {
-			Name = "";
+			Name = PAPERMAIN_TYPE.NotSet;
+			SubName = PAPERSUB_TYPE.NotSet;
 			Location = new PointModel();
 			Size = new PointModel();
 
@@ -19,8 +21,8 @@ namespace DrawSettingLib.SettingModels
 			ScaleValue = new double();
 		}
 
-		private string _Name;
-		public string Name
+		private PAPERMAIN_TYPE _Name;
+		public PAPERMAIN_TYPE Name
 		{
 			get { return _Name; }
 			set
@@ -29,6 +31,8 @@ namespace DrawSettingLib.SettingModels
 				OnPropertyChanged(nameof(Name));
 			}
 		}
+
+		public PAPERSUB_TYPE SubName { get; set; }
 
 		private PointModel _Location;
 		public PointModel Location

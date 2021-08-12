@@ -15,12 +15,14 @@ using devDept.Serialization;
 using DrawWork.DrawModels;
 using DrawWork.ValueServices;
 using DrawWork.CommandModels;
+using DrawWork.DrawDetailServices;
 
 using AssemblyLib.AssemblyModels;
 using System.Diagnostics;
 using DrawWork.Commons;
 using DrawWork.DrawStyleServices;
 using DrawWork.CutomModels;
+using DrawSettingLib.SettingServices;
 
 namespace DrawWork.DrawServices
 {
@@ -46,6 +48,9 @@ namespace DrawWork.DrawServices
 
         private DrawLeaderService drawLeaderService;
 
+        private PaperAreaService paperAreaService;
+
+        private DrawDetailService detailService;
         public DrawObjectService(AssemblyModel selAssembly,Object selModel)
         {
             singleModel = selModel as Model;
@@ -69,6 +74,82 @@ namespace DrawWork.DrawServices
 
 
             drawLeaderService = new DrawLeaderService(selAssembly, selModel);
+
+            paperAreaService = new PaperAreaService();
+
+
+            detailService = new DrawDetailService(selAssembly,selModel);
+        }
+
+        public DrawAssyModel GetDrawAssyModel(string[] eachCmd)
+        {
+            DrawAssyModel newAssy = new DrawAssyModel();
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j])
+                {
+                    case "name":
+                    case "mainname":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newAssy.mainName = paperAreaService.GetPaperMainType( eachCmd[j + 1].Trim().ToLower());
+                        }
+                        goto case "always";
+
+                    case "subname":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            newAssy.subName = paperAreaService.GetPaperSubType( eachCmd[j + 1].Trim().ToLower());
+                        }
+                        goto case "always";
+
+                    case "always":
+                        break;
+                }
+            }
+
+            return newAssy;
+        }
+
+        public DrawPointModel GetDrawPoint(string[] eachCmd)
+        {
+            DrawPointModel newDrawPoint = new DrawPointModel();
+
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j])
+                {
+                    case "":
+                    case "xy":
+                        if (j + 1 <= eachCmd.Length)
+                        {
+                            CDPoint refPoint = new CDPoint();
+                            CDPoint curPoint = new CDPoint();
+                            CDPoint newPoint = drawService.GetDrawPoint(eachCmd[j + 1], ref refPoint, ref curPoint);
+                            refPoint = newPoint;
+                            curPoint.X = refPoint.X;
+                            curPoint.Y = refPoint.Y;
+
+                            newDrawPoint.referencePoint = refPoint;
+                            newDrawPoint.currentPoint = curPoint;
+                        }
+                        goto case "always";
+
+                    case "always":
+                        break;
+                }
+            }
+            return newDrawPoint;
         }
 
         public void DoRefPoint(string[] eachCmd,ref CDPoint refPoint,ref CDPoint curPoint)
@@ -921,7 +1002,7 @@ namespace DrawWork.DrawServices
         }
 
         // Dimension
-        public Dictionary<string, List<Entity>> DoDimension(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,out List<CommandPropertiyModel> selCmdFunctionList, double scaleValue)
+        public DrawEntityModel DoDimension(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,out List<CommandPropertiyModel> selCmdFunctionList, double scaleValue)
         {
             // 0 : Object
             // 1 : Command
@@ -1027,14 +1108,13 @@ namespace DrawWork.DrawServices
 
             selCmdFunctionList= newCmdFunctionList;
 
-            Dictionary<string,List<Entity>> returnEntity = new Dictionary<string, List<Entity>>();
 
-            returnEntity =drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newPosition,newDimHeight, newTextHeight, newTextGap, newArrowSize,newPrefix,newSuffix,newText, 0, scaleValue, layerName);
+            DrawEntityModel returnEntity = drawService.Draw_Dimension(newPoint1, newPoint2, newPoint3, newPosition,newDimHeight, newTextHeight, newTextGap, newArrowSize,newPrefix,newSuffix,newText, 0, scaleValue, layerName);
 
             return returnEntity;
         }
 
-        public Dictionary<string, List<Entity>> DoDimensionCustom(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,  double scaleValue)
+        public DrawEntityModel DoDimensionCustom(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,  double scaleValue)
         {
 
 
@@ -1052,7 +1132,7 @@ namespace DrawWork.DrawServices
         }
 
         // Leader
-        public Dictionary<string, List<Entity>> DoLeader(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
+        public DrawEntityModel DoLeader(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
         {
             // 0 : Object
             // 1 : Command
@@ -1169,14 +1249,14 @@ namespace DrawWork.DrawServices
                 }
             }
 
-            Dictionary<string, List<Entity>> returnEntity = new Dictionary<string, List<Entity>>(); ;
 
-            returnEntity = drawService.Draw_Leader(newPoint1, newLength,newPosition,newFontSize,newLayerHeight,newText,newTextSub, selModel as Model, scaleValue,layerName);
+
+            DrawEntityModel returnEntity = drawService.Draw_Leader(newPoint1, newLength,newPosition,newFontSize,newLayerHeight,newText,newTextSub, selModel as Model, scaleValue,layerName);
 
             return returnEntity;
         }
 
-        public Dictionary<string, List<Entity>> DoLeaderList(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
+        public DrawEntityModel DoLeaderList(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
         {
             // 0 : Object
             // 1 : Command
@@ -1199,9 +1279,8 @@ namespace DrawWork.DrawServices
 
             
 
-            Dictionary<string, List<Entity>> returnEntity = new Dictionary<string, List<Entity>>(); ;
 
-            returnEntity= drawLeaderService.GetLeaderList(eachCmd, ref refPoint, ref curPoint, selModel, scaleValue);
+            DrawEntityModel returnEntity = drawLeaderService.GetLeaderList(eachCmd, ref refPoint, ref curPoint, selModel, scaleValue);
 
             return returnEntity;
         }
@@ -2834,6 +2913,55 @@ namespace DrawWork.DrawServices
                     }
                 }
             }
+            return returnEntity;
+        }
+
+
+
+
+        public DrawEntityModel DoBlockDetail(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,object selModel, double scaleValue)
+        {
+            // 0 : Object
+            // 1 : Command
+            // 2 : Data
+            int refIndex = 1;
+
+            string drawDetailName = "";
+
+            for (int j = refIndex; j < eachCmd.Length; j += 2)
+            {
+                switch (eachCmd[j])
+                {
+                    case "name":
+                        if (j + 1 <= eachCmd.Length)
+                            drawDetailName = eachCmd[j + 1];
+                        break;
+
+                }
+            }
+
+            DrawEntityModel returnEntity = new DrawEntityModel();
+
+            // Drawing Logic Block
+            switch (drawDetailName)
+            {
+                case "horizontaljoint":
+                    returnEntity = detailService.detailShellService.GetShellHorizontalJoint(ref refPoint, ref curPoint, selModel,scaleValue);
+                    goto case "allways";
+                case "onecourseshellplate":
+                    returnEntity = detailService.detailShellService.GetOneCourseShellPlate(ref refPoint, ref curPoint, selModel, scaleValue);
+                    goto case "allways";
+
+                case "bottomplatejoint":
+                    returnEntity = detailService.detailTempService.DrawBottomPlateJoint_POINT_Case1(ref refPoint, ref curPoint, selModel, scaleValue);
+                    goto case "allways";
+
+                // allways
+                case "allways":
+                    break;
+            }
+
+
             return returnEntity;
         }
     }

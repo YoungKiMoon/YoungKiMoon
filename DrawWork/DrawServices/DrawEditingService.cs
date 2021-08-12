@@ -266,6 +266,8 @@ namespace DrawWork.DrawServices
         #endregion
 
 
+        
+
         private Point3D GetSumPoint(Point3D selPoint1, double X, double Y, double Z = 0)
         {
             return new Point3D(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
