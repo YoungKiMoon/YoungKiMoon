@@ -21,6 +21,7 @@ namespace DrawSettingLib.Commons
         ONECOURSESHELLPLATE,
         BOTTOMPLATEJOINT,
 
+        RoofArrange,
     }
 
 

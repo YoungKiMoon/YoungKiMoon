@@ -36,6 +36,18 @@ namespace DrawSettingLib.SettingServices
             Orientation.Size.Y = 570;
             newAreaList.Add(Orientation);
 
+
+            // Roof Plate
+            PaperAreaModel DetailRoof01 = new PaperAreaModel();
+            DetailRoof01.Name = PAPERMAIN_TYPE.DETAIL;
+            DetailRoof01.SubName = PAPERSUB_TYPE.RoofArrange;
+            DetailRoof01.Location.X = 280;
+            DetailRoof01.Location.Y = 297;
+            DetailRoof01.Size.X = 500;
+            DetailRoof01.Size.Y = 570;
+            newAreaList.Add(DetailRoof01);
+
+
             PaperAreaModel Detail01 = new PaperAreaModel();
             Detail01.Name = PAPERMAIN_TYPE.DETAIL;
             Detail01.SubName = PAPERSUB_TYPE.HORIZONTALJOINT;
@@ -53,6 +65,7 @@ namespace DrawSettingLib.SettingServices
             Detail02.Size.X = 22 + 598 + 22;
             Detail02.Size.Y = 185 + 185 + 185;
             newAreaList.Add(Detail02);
+
 
 
             // Jang : Dev

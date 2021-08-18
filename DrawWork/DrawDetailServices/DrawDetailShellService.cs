@@ -403,20 +403,21 @@ namespace DrawWork.DrawDetailServices
 
             // One Plate : Width
             double onePlateWidth = oneCourseWidth;
-
+            double onePlateDegree = 360 / oneCoursePlateCount;
 
             // Degree
-            double degreePlateStart = 0;
+            double plateStartDegree = 10;
 
 
             // Anchorage
             string anchorType = assemblyData.AnchorageInput[0].AnchorType;
-            double degreeAnchorStartAngle = valueService.GetDoubleValue(assemblyData.AnchorageInput[0].AnchorStartAngle);
+            double anchorStartAngle = valueService.GetDoubleValue(assemblyData.AnchorageInput[0].AnchorStartAngle);
             double anchorQty = valueService.GetDoubleValue(assemblyData.AnchorageInput[0].AnchorQty);
             double anchorHeight = valueService.GetDoubleValue(assemblyData.AnchorageInput[0].AnchorHeight);
             string anchorBoltSize = assemblyData.AnchorageInput[0].AnchorSize;
 
             double anchorOneDegree = 360 / anchorQty;
+            
 
             // AnchorChair Model
             AnchorChairModel anchorChair = modelService.GetAnchorChair(anchorBoltSize);
@@ -442,109 +443,212 @@ namespace DrawWork.DrawDetailServices
 
             areaModel.SetScaleValue(scaleValue);
 
-            double areaHeightAngle = -17;
+            double areaHeightAngle = 17;
             double scaleAreaHeightAngle= scaleService.GetOriginValueOfScale(scaleValue, areaHeightAngle);
-            double areaHeightDimStart = areaHeightAngle-15;
+            double areaHeightDimStart = areaHeightAngle+15;
             double scaleAreaHeightDimStart = scaleService.GetOriginValueOfScale(scaleValue, areaHeightDimStart);
-            double areaHeightDimGap = -7;
+            double areaHeightDimGap = 7;
             double scaleAreaHeightDimGap = scaleService.GetOriginValueOfScale(scaleValue, areaHeightDimGap);
 
 
 
-            // Row, Column
-            double rowCount = 3;
-            double columnCount = 3;
-
+            double textHeight = 2.5;
+            double scaleTextHeight = textHeight * scaleValue;
 
             List<Entity> plateList = new List<Entity>();
             List<Entity> anchorList = new List<Entity>();
+            List<Entity> plateDegreeList = new List<Entity>();
+            List<Entity> anchorDegreeList = new List<Entity>();
 
-            double currentPage = 0;
-            double currentX = 0;
-            double currentY = 0;
-            double currentColumn = 0;
-            double currentRow = 0;
+            List<Point3D> platePointList = new List<Point3D>();
+            List<Point3D> anchorPointList = new List<Point3D>();
 
-            Point3D referencePoint = new Point3D(refPoint.X, refPoint.Y + areaModel.areaScale.oneHeight* rowCount);
+            Point3D referencePoint = new Point3D(refPoint.X, refPoint.Y + areaModel.areaScale.oneHeight* areaModel.rowCount);
             Point3D startPoint = GetSumPoint(referencePoint, 0, 0);
-            Point3D currentPoint = GetSumPoint(startPoint, 0, 0);
 
-            for (int i=1;i<= oneCoursePlateCount; i++)
+            Point3D currentPlatePoint = GetSumPoint(startPoint, 0, 0);
+            double currentPlateLength = 0;
+            double currentPlateDegree = plateStartDegree;
+            for(int i = 1; i <= oneCoursePlateCount; i++)
             {
+                currentPlatePoint = GetPointOfLength(startPoint, areaModel, onePlateLength, currentPlateLength, 20);
                 // Plate
                 List<Point3D> outPlatePointList = new List<Point3D>();
-                plateList.AddRange(shapeService.GetRectangle(out outPlatePointList, GetSumPoint(currentPoint, 0, 0), onePlateLength, onePlateWidth, 0, 0,0));
-                
-                // Anchor
-                anchorList.AddRange(GetAnchorChairFront(GetSumPoint(currentPoint, 0, -oneCourseWidth), anchorChair, scaleValue));
+                plateList.AddRange(shapeService.GetRectangle(out outPlatePointList, GetSumPoint(currentPlatePoint, 0, 0), onePlateLength, onePlateWidth, 0, 0, 0));
 
-                // Next Plate Information Logic
-                currentColumn++;
-                if (i % columnCount == 0)
-                {
-                    currentColumn = 0;
-                    currentRow++;
-                    if(currentRow % rowCount == 0)
-                    {
-                        currentRow = 0;
-                        currentPage++;
-                        currentX = currentPage * (areaModel.areaScale.oneWidth + areaModel.areaScale.onePageGap);
-                        currentY = 0;
-                    }
-                    else
-                    {
-                        currentX= currentPage * (areaModel.areaScale.oneWidth + areaModel.areaScale.onePageGap);
-                        currentY = -currentRow * areaModel.areaScale.oneHeight;
-                    }
+                string plateDegreeStr = Math.Round(currentPlateDegree, 1, MidpointRounding.AwayFromZero) + "˚";
+                plateDegreeList.Add(new Text(GetSumPoint(currentPlatePoint,0,0),plateDegreeStr, scaleTextHeight) { Alignment = Text.alignmentType.BottomCenter});
 
-                }
-                else
+                if (i % 3 == 0)
                 {
-                    currentX = currentPage * (areaModel.areaScale.oneWidth + areaModel.areaScale.onePageGap) + (currentColumn * onePlateLength);
-                    currentY = -currentRow * areaModel.areaScale.oneHeight;
+                    double currentPlateEndDegree = valueService.GetShiftReverseDegree(currentPlateDegree, onePlateDegree);
+                    string plateEndDegreeStr = Math.Round(currentPlateEndDegree, 1, MidpointRounding.AwayFromZero) + "˚";
+                    plateDegreeList.Add(new Text(GetSumPoint(currentPlatePoint, onePlateLength, 0), plateEndDegreeStr, scaleTextHeight) { Alignment = Text.alignmentType.BottomCenter });
                 }
 
-                // Current Point
-                currentPoint = GetSumPoint(startPoint, currentX, currentY);
+                currentPlateLength += onePlateLength;
+                currentPlateDegree = valueService.GetShiftReverseDegree(currentPlateDegree, onePlateDegree);
 
+                // Point
+                platePointList.Add(GetSumPoint(currentPlatePoint, 0, -oneCourseWidth));
+                platePointList.Add(GetSumPoint(currentPlatePoint, onePlateLength, -oneCourseWidth));
+                anchorPointList.Add(GetSumPoint(currentPlatePoint, 0, -oneCourseWidth));
+                anchorPointList.Add(GetSumPoint(currentPlatePoint, onePlateLength, -oneCourseWidth));
             }
-
-
 
 
             // AnchorChair
-            double currentAnchorLength = valueService.GetLengthOfDegree(degreeAnchorStartAngle, tankCircumference);
-            for (int i = 0; i < anchorQty; i++)
+            Point3D currentAnchorPoint = GetSumPoint(startPoint, 0, 0);
+            for (int i = 1; i <= anchorQty; i++)
             {
+                double currentDegreeSize = anchorOneDegree * (i - 1);
+                double currentDegree = valueService.GetShiftReverseDegree(anchorStartAngle, currentDegreeSize);
+                double currentAnchorLength = valueService.GetLengthOfReverseDegreeByStartDegree(plateStartDegree, currentDegree, tankCircumference);
 
+                currentAnchorPoint = GetPointOfLength(startPoint, areaModel, onePlateLength, currentAnchorLength, 20);
+                // Anchor
+                anchorList.AddRange(GetAnchorChairFront(GetSumPoint(currentAnchorPoint, 0, -oneCourseWidth), anchorChair, scaleValue));
                 // Current Anchor Length
-                currentAnchorLength += valueService.GetLengthOfDegree(anchorOneDegree, tankCircumference);
+
+                string anchorDegreeStr = Math.Round(currentDegree, 1, MidpointRounding.AwayFromZero) + "˚";
+                Point3D anchorDegreePoint = GetSumPoint(currentAnchorPoint, 0, -scaleAreaHeightAngle - oneCourseWidth);
+                Text anchorDegreeText = new Text(GetSumPoint(anchorDegreePoint, 0, 0), anchorDegreeStr, scaleTextHeight) { Alignment = Text.alignmentType.BottomLeft };
+                anchorDegreeText.Rotate(Utility.DegToRad(90), Vector3D.AxisZ, GetSumPoint(anchorDegreePoint, 0, 0));
+                anchorDegreeList.Add(anchorDegreeText);
+
+                // Point
+                anchorPointList.Add(GetSumPoint(currentAnchorPoint, 0, -oneCourseWidth));
             }
 
+            // Dimension : Anchor
+            if (anchorPointList.Count > 1)
+            {
+                Dictionary<double, double> xDic = new Dictionary<double, double>();
+                foreach (Point3D eachPoint in anchorPointList)
+                    if (!xDic.ContainsKey(eachPoint.Y))
+                        xDic.Add(eachPoint.Y, eachPoint.Y);
+
+                List<double> xListDic = xDic.Keys.ToList();
+                foreach (double eachY in xListDic)
+                {
+                    List<Point3D> eachYList = new List<Point3D>();
+                    foreach (Point3D eachPoint in anchorPointList)
+                        if (eachPoint.Y == eachY)
+                            eachYList.Add(eachPoint);
+
+                    List<Point3D> eachYSortList = eachYList.OrderBy(x => x.X).ToList();
+
+                    if (eachYSortList.Count > 0)
+                    {
+                        Point3D eachStartPoint = eachYSortList[0];
+                        double startX = eachStartPoint.X;
+                        double currentX = eachStartPoint.X;
+                        for (int i = 1; i < eachYSortList.Count; i++)
+                        {
+                            Point3D eachPoint = eachYSortList[i];
+                            if (eachPoint.X - startX > areaModel.areaScale.oneWidth)
+                            {
+                                startX = eachPoint.X;
+                                currentX = eachPoint.X;
+                            }
+                            else
+                            {
+                                if (eachPoint.X != eachStartPoint.X)
+                                {
+                                    DrawDimensionModel dimEachModel = new DrawDimensionModel() { position = POSITION_TYPE.BOTTOM, textSizeVisible = true, dimHeight = areaHeightDimStart, scaleValue = scaleValue, };
+                                    DrawEntityModel dimList = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(eachStartPoint, 0, 0), GetSumPoint(eachPoint, 0, 0), scaleValue, dimEachModel);
+                                    drawList.AddDrawEntity(dimList);
+                                }
+                            }
+
+                            eachStartPoint = eachYSortList[i];
+                        }
+                    }
+
+
+                }
+            }
+
+            // Dimension : Plate
+            if (platePointList.Count > 1)
+            {
+                Dictionary<double, double> xDic = new Dictionary<double, double>();
+                foreach (Point3D eachPoint in platePointList)
+                    if (!xDic.ContainsKey(eachPoint.Y))
+                        xDic.Add(eachPoint.Y, eachPoint.Y);
+
+                List<double> xListDic = xDic.Keys.ToList();
+                foreach (double eachY in xListDic)
+                {
+                    List<Point3D> eachYList = new List<Point3D>();
+                    foreach (Point3D eachPoint in platePointList)
+                        if (eachPoint.Y == eachY)
+                            eachYList.Add(eachPoint);
+
+                    List<Point3D> eachYSortList = eachYList.OrderBy(x => x.X).ToList();
+
+                    if (eachYSortList.Count > 0)
+                    {
+                        Point3D eachStartPoint = eachYSortList[0];
+                        double startX = eachStartPoint.X;
+                        double currentX = eachStartPoint.X;
+                        for (int i = 1; i < eachYSortList.Count; i++)
+                        {
+                            Point3D eachPoint = eachYSortList[i];
+                            if (eachPoint.X - startX > areaModel.areaScale.oneWidth)
+                            {
+                                startX = eachPoint.X;
+                                currentX = eachPoint.X;
+                            }
+                            else
+                            {
+                                if (eachPoint.X != eachStartPoint.X)
+                                {
+                                    DrawDimensionModel dimEachModel = new DrawDimensionModel() { position = POSITION_TYPE.BOTTOM, textSizeVisible = true, dimHeight = areaHeightDimStart + areaHeightDimGap*3, scaleValue = scaleValue, };
+                                    DrawEntityModel dimList = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(eachStartPoint, 0, 0), GetSumPoint(eachPoint, 0, 0), scaleValue, dimEachModel);
+                                    drawList.AddDrawEntity(dimList);
+                                }
+                            }
+
+                            eachStartPoint = eachYSortList[i];
+                        }
+                    }
+
+
+                }
+            }
 
             // Style
+            styleService.SetLayerListEntity(ref plateDegreeList, layerService.LayerDimension);
+            styleService.SetLayerListEntity(ref anchorDegreeList, layerService.LayerDimension);
+
             styleService.SetLayerListEntityExcludingCenterLine(ref anchorList, layerService.LayerOutLine);
             styleService.SetLayerListEntity(ref plateList, layerService.LayerOutLine);
 
             drawList.outlineList.AddRange(anchorList);
             drawList.outlineList.AddRange(plateList);
+            drawList.dimTextList.AddRange(plateDegreeList);
+            drawList.dimTextList.AddRange(anchorDegreeList);
+
             return drawList;
         }
 
 
-        public Point3D GetPointOfLength(Point3D startPoint,DrawShellDevModel areaModel, double selLength)
+        public Point3D GetPointOfLength(Point3D startPoint,DrawShellDevModel areaModel,double oneLength, double selLength, double selLenghtFactor)
         {
+
+            double oneRowLength = oneLength * 3;
+
+            double remainingLength = selLength + selLenghtFactor;
             
-            double remainingLength = selLength;
-            
-            double onePageLength = areaModel.areaScale.oneWidth * areaModel.rowCount;
+            double onePageLength = oneRowLength * areaModel.rowCount;
             double currentPage = Math.Truncate(remainingLength / onePageLength);
             remainingLength = remainingLength - ( currentPage * onePageLength);
 
-            double currentRow = Math.Truncate(remainingLength / areaModel.area.oneWidth);
-            remainingLength = remainingLength - (currentRow * areaModel.area.oneWidth);
+            double currentRow = Math.Truncate(remainingLength / oneRowLength);
+            remainingLength = remainingLength - (currentRow * oneRowLength);
 
-            double currentX = currentPage * (areaModel.areaScale.pageWidth + areaModel.areaScale.onePageGap) + remainingLength;
+            double currentX = currentPage * (areaModel.areaScale.pageWidth + areaModel.areaScale.onePageGap) + (remainingLength-selLenghtFactor);
             double currentY = -currentRow * areaModel.areaScale.oneHeight; 
             
 

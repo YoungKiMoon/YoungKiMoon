@@ -1,4 +1,5 @@
 ﻿using AssemblyLib.AssemblyModels;
+using DrawWork.DrawGridServices;
 using PaperSetting.Commons;
 using PaperSetting.Models;
 using System;
@@ -301,6 +302,27 @@ namespace PaperSetting.Services
             return newList;
         }
 
+
+        public List<DrawPaperGridModel> CreatePaperGridList(ObservableCollection<PaperDwgModel> selList)
+        {
+            List<DrawPaperGridModel> newList = new List<DrawPaperGridModel>();
+            foreach(PaperDwgModel eachDwg in selList)
+            {
+                DrawPaperGridModel newGrid = new DrawPaperGridModel();
+
+                // Adjust
+                double widthAdj= -(7 * 2) - 2 - 185;  // 7 Frame, 2 left Gap, 185 Right Area
+                double heightAdj = -(7 * 2) - 10;     // 7 Frame, 10 Bottom Gap
+
+                newGrid.Size.Width = eachDwg.SheetSize.Width;
+                newGrid.Size.Height = eachDwg.SheetSize.Height;
+
+
+                newList.Add(newGrid);
+            }
+
+            return newList;
+        }
 
 
         public ObservableCollection<PaperDwgModel> CreateDrawingCRTList()

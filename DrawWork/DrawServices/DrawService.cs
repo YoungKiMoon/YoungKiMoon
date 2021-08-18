@@ -641,7 +641,10 @@ namespace DrawWork.DrawServices
                     dimLine1 = new Line(new Point3D(selPoint1.X, selPoint1.Y + scalePointGapLine1), new Point3D(selPoint1.X, textCenter.Y + scaleExtLine1));
                     dimLine2 = new Line(new Point3D(selPoint2.X, selPoint2.Y + scalePointGapLine2), new Point3D(selPoint2.X, textCenter.Y + scaleExtLine2));
                     if (selDimModel.textSizeVisible)
-                        dimSizeTextUpper = Point3D.Distance(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y)).ToString();
+                    {
+                        double dimDistance = Point3D.Distance(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y));
+                        dimSizeTextUpper = Math.Round(dimDistance, selDimModel.textRoundNumber, MidpointRounding.AwayFromZero).ToString();
+                    }
                     dimTextUpper = new Text(new Point3D(textCenter.X, textCenter.Y + scaleTextGap), dimSizeTextUpper, scaleTextHeight) {Alignment=Text.alignmentType.BaselineCenter };
                     dimTextLower= new Text(new Point3D(textCenter.X, textCenter.Y - scaleTextGap), selDimtextLower, scaleTextHeight) { Alignment = Text.alignmentType.TopCenter };
 
@@ -712,7 +715,10 @@ namespace DrawWork.DrawServices
                     dimLine2 = new Line(new Point3D(selPoint2.X, selPoint2.Y - scalePointGapLine2), new Point3D(selPoint2.X, textCenter.Y - scaleExtLine2));
 
                     if (selDimModel.textSizeVisible)
-                        dimSizeTextUpper = Point3D.Distance(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y)).ToString();
+                    {
+                        double dimDistance = Point3D.Distance(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint2.X, textCenter.Y));
+                        dimSizeTextUpper = Math.Round(dimDistance, selDimModel.textRoundNumber, MidpointRounding.AwayFromZero).ToString();
+                    }
                     dimTextUpper = new Text(new Point3D(textCenter.X, textCenter.Y + scaleTextGap), dimSizeTextUpper, scaleTextHeight) { Alignment = Text.alignmentType.BaselineCenter };
                     dimTextLower = new Text(new Point3D(textCenter.X, textCenter.Y - scaleTextGap), selDimtextLower, scaleTextHeight) { Alignment = Text.alignmentType.TopCenter };
 
@@ -736,7 +742,10 @@ namespace DrawWork.DrawServices
                     dimLine2 = new Line(new Point3D(selPoint2.X - scalePointGapLine2, selPoint2.Y), new Point3D(textCenter.X - scaleExtLine2, selPoint2.Y));
 
                     if (selDimModel.textSizeVisible)
-                        dimSizeTextUpper = Point3D.Distance(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y)).ToString();
+                    {
+                        double dimDistance = Point3D.Distance(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y));
+                        dimSizeTextUpper = Math.Round(dimDistance, selDimModel.textRoundNumber, MidpointRounding.AwayFromZero).ToString();
+                    }
                     Plane planeLeft = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
                     dimTextUpper = new Text(planeLeft, new Point3D(textCenter.X - scaleTextGap, textCenter.Y), dimSizeTextUpper, scaleTextHeight) { Alignment = Text.alignmentType.BaselineCenter };
                     dimTextLower = new Text(planeLeft, new Point3D(textCenter.X + scaleTextGap, textCenter.Y), selDimtextLower, scaleTextHeight) { Alignment = Text.alignmentType.TopCenter };
@@ -760,7 +769,11 @@ namespace DrawWork.DrawServices
                     dimLine2 = new Line(new Point3D(selPoint2.X + scalePointGapLine2, selPoint2.Y), new Point3D(textCenter.X + scaleExtLine2, selPoint2.Y));
 
                     if (selDimModel.textSizeVisible)
-                        dimSizeTextUpper = Point3D.Distance(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y)).ToString();
+                    {
+                        double dimDistance = Point3D.Distance(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y));
+                        dimSizeTextUpper = Math.Round(dimDistance, selDimModel.textRoundNumber, MidpointRounding.AwayFromZero).ToString();
+                    }
+
                     Plane planeLeft2 = new Plane(new Point3D(selPoint1.X, selPoint1.Y), Vector3D.AxisY, -1 * Vector3D.AxisX);
                     dimTextUpper = new Text(planeLeft2, new Point3D(textCenter.X - scaleTextGap, textCenter.Y), dimSizeTextUpper, scaleTextHeight) { Alignment = Text.alignmentType.BaselineCenter };
                     dimTextLower = new Text(planeLeft2, new Point3D(textCenter.X + scaleTextGap, textCenter.Y), selDimtextLower, scaleTextHeight) { Alignment = Text.alignmentType.TopCenter };

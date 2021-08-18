@@ -108,6 +108,8 @@
     <Compile Include="DrawDetailServices\DrawDetailService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailShellService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailTempService.cs" />
+    <Compile Include="DrawGridServices\DrawPaperGridService.cs" />
+    <Compile Include="DrawGridServices\DrawPaperGridModel.cs" />
     <Compile Include="DrawModels\DrawAssyModel.cs" />
     <Compile Include="DrawModels\DrawBMLeaderModel.cs" />
     <Compile Include="DrawModels\DrawBMNumberModel.cs" />
@@ -116,12 +118,14 @@
     <Compile Include="DrawModels\DrawDimensionModel.cs" />
     <Compile Include="DrawModels\DrawDimStyle.cs" />
     <Compile Include="DrawModels\DrawEntityModel.cs" />
+    <Compile Include="DrawModels\DrawPlateModel.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
     <Compile Include="DrawModels\DrawPositionValueModel.cs" />
     <Compile Include="DrawModels\DrawScaleModel.cs" />
     <Compile Include="DrawModels\DrawShellDevModel.cs" />
     <Compile Include="DrawModels\DrawSlopeLeaderModel.cs" />
     <Compile Include="DrawModels\DrawWeldingModel.cs" />
+    <Compile Include="DrawModels\DrawWeldingSymbolModel.cs" />
     <Compile Include="DrawPaperServices\PaperPreviewService.cs" />
     <Compile Include="DrawPaperServices\ViewPortSettingModel.cs" />
     <Compile Include="DrawSacleServices\DrawScaleService.cs" />
@@ -139,6 +143,7 @@
     <Compile Include="DrawServices\DrawPipeService.cs" />
     <Compile Include="DrawServices\DrawPublicFunctionService.cs" />
     <Compile Include="DrawServices\DrawStructureService.cs" />
+    <Compile Include="DrawServices\DrawWeldingService.cs" />
     <Compile Include="DrawServices\DrawWorkingPointService.cs" />
     <Compile Include="DrawServices\DrawNozzleService.cs" />
     <Compile Include="DrawServices\DrawObjectService.cs" />
@@ -262,6 +267,10 @@
     <ProjectReference Include="..\ExcelDataLib\ExcelDataLib.csproj">
       <Project>{135b58cb-c30c-4500-84c4-0a67a68c7812}</Project>
       <Name>ExcelDataLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StrengthCalLib\StrengthCalLib.csproj">
+      <Project>{38f33e73-a1a2-4455-b5a7-1c1366dcc9bf}</Project>
+      <Name>StrengthCalLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

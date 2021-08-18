@@ -246,13 +246,15 @@ namespace DrawWork.ValueServices
 
 
         #region Development : 정방향
-        public double GetLengthOfOneDegree(double selCircum)
+
+        // Length
+        private double GetLengthOfOneDegree(double selCircum)
         {
             return selCircum / 360;
         }
         public double GetLengthOfDegree(double selDegree, double selCircum)
         {
-            return selDegree * GetLengthOfOneDegree(selDegree);
+            return selDegree * GetLengthOfOneDegree(selCircum);
         }
 
 
@@ -271,12 +273,19 @@ namespace DrawWork.ValueServices
             double realDegree = selDegree % 360;
             double calDegree = startDegree - realDegree;
             if (calDegree < 0)
-                calDegree = 360 - calDegree;
+                calDegree = 360 + calDegree;
             return calDegree;
         }
         public double GetLengthOfReverseDegreeByStartDegree(double startDegree, double selDegree, double selCircum)
         {
-            return GetShiftReverseDegree(GetShiftDegree(startDegree, selDegree), selCircum);
+            return GetLengthOfDegree(GetShiftReverseDegree(startDegree, selDegree), selCircum);
+        }
+
+
+        // Degree
+        public double GetDegreeOfLength(double selCount, double selCircum)
+        {
+            return selCircum / selCount / 360;
         }
 
         #endregion

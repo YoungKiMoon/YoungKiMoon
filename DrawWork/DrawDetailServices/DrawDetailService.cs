@@ -23,6 +23,8 @@ namespace DrawWork.DrawDetailServices
         public  DrawDetailShellService detailShellService;
 
         public DrawDetailTempService detailTempService;
+
+        public DrawDetailRoofBottomService detailRoofBottomService;
         public DrawDetailService(AssemblyModel selAssembly,object selModel)
         {
             singleModel = selModel as Model;
@@ -30,9 +32,11 @@ namespace DrawWork.DrawDetailServices
 
 
 
-
+            detailRoofBottomService = new DrawDetailRoofBottomService(selAssembly, selModel);
             detailShellService = new DrawDetailShellService(selAssembly,selModel);
+
             detailTempService = new DrawDetailTempService(selAssembly, selModel);
+
         }
 
 

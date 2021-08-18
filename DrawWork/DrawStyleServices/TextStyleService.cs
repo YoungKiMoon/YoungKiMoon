@@ -26,7 +26,7 @@ namespace DrawWork.DrawStyleServices
         {
            // TextStyle newTextStyle = new TextStyle(styleName, "romans",System.Drawing.FontStyle.Regular, widthFactor);
             TextStyle newTextStyle = new TextStyle(styleName, "", System.Drawing.FontStyle.Regular, widthFactor);
-            //newTextStyle.FileName = fontFamilyName;
+            newTextStyle.FileName = fontFamilyName;
 
             //newTextStyle.Name = styleName;
             //newTextStyle.WidthFactor = widthFactor;

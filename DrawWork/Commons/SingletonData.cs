@@ -14,7 +14,6 @@ namespace DrawWork.Commons
     {
         public SingletonData()
         {
-
         }
 
         // Model Area : GA
@@ -91,6 +90,16 @@ namespace DrawWork.Commons
             set { _OrientationGAViewPortCenter = value; }
         }
         private static CDPoint _OrientationGAViewPortCenter = new CDPoint();
+
+
+
+        // Temp
+        public static List<string> RoofBottomArrange
+        {
+            get { return _RoofBottomArrange; }
+            set { _RoofBottomArrange = value; }
+        }
+        private static List<string> _RoofBottomArrange = new List<string>();
 
     }
 }

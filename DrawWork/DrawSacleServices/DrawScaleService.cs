@@ -206,8 +206,8 @@ namespace DrawWork.DrawSacleServices
             dsService.SetCourseOnePlate(tankID, plateMaxLength, out oneCoursePlateCount, out onePlateLength);
 
             double maxRow = 3;
-            double viewWidth = selPaperArea.Size.X;
-            double viewHeight = selPaperArea.Size.Y;
+            double viewWidth = selPaperArea.Size.X -22 -22; // 매우중요
+            double viewHeight = selPaperArea.Size.Y /3; // 매우중요
 
             double modelWidth = onePlateLength * maxRow;
             double modelHeight = plateWidth;

@@ -14,7 +14,7 @@ namespace DrawWork.DrawServices
         public string topAngleType = "";
         public string centeringInEx = "";
 
-        public TANK_TYPE originTankType = TANK_TYPE.NoSet;
+        public TANK_TYPE originTankType = TANK_TYPE.NotSet;
         public string originStructureType = "";
         public string originTopAngleType = "";
 

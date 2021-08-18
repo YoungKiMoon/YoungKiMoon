@@ -216,6 +216,20 @@ namespace DrawWork.DrawServices
         }
         #endregion
 
+        #region Rotate
+        public List<Entity> GetRotate(List<Entity> selList,Point3D selCenterPoint, double selRadian)
+        {
+            List<Entity> newList = new List<Entity>();
+            foreach(Entity eachEntity in selList)
+            {
+                Entity tempEachEntity = (Entity)eachEntity.Clone();
+                tempEachEntity.Rotate(selRadian, Vector3D.AxisZ, selCenterPoint);
+                newList.Add(tempEachEntity);
+            }
+            return newList;
+        }
+        #endregion
+
 
         //
         public Arc GetArcOfPoint(Point3D centerPoint,double selRadius, Point3D selPoint, double selWidth)

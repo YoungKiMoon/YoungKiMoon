@@ -12,7 +12,7 @@
         x:Class="DrawWork.MainWindow"
     
         mc:Ignorable="d"
-        Title="Draw Logic Preview" Height="450" Width="800" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
+        Title="Draw Logic Preview" Height="450" Width="800" WindowStartupLocation="CenterScreen" Closed="Window_Closed" WindowState="Maximized">
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
@@ -27,6 +27,20 @@
         <Grid Grid.Row="0">
             <StackPanel Orientation="Horizontal">
                 <Button x:Name="btnTitleBlock" Content="TitleBlock" PreviewMouseLeftButtonUp="btnTitleBlock_PreviewMouseLeftButtonUp"/>
+                <StackPanel Orientation="Horizontal" Margin="10,0">
+                    <ComboBox x:Name="cbRoofType" Width="80" VerticalContentAlignment="Center" Text="ROOF">
+                        <ComboBoxItem Content="ROOF"/>
+                        <ComboBoxItem Content="BOTTOM"/>
+                    </ComboBox>
+                    <TextBlock Text="OD" VerticalAlignment="Center" Margin="4,0"/>
+                    <TextBox x:Name="tbOD" Width="100"/>
+                    <TextBlock Text="P Width" VerticalAlignment="Center" Margin="4,0"/>
+                    <TextBox x:Name="tbPWidth" Width="100"/>
+                    <TextBlock Text="P Length" VerticalAlignment="Center" Margin="4,0"/>
+                    <TextBox x:Name="tbPLength" Width="100"/>
+                    <Button x:Name="btnCal" Content="CAL" Click="btnCal_Click"/>
+                </StackPanel>
+
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBox x:Name="inputScale" Width="50"/>

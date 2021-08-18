@@ -270,6 +270,10 @@ namespace DrawWork.CommandServices
                                 selPaperAreaModel.ScaleValue = scaleService.GetOneCourseDevelopmentScale(selPaperAreaModel, tankID, oneCourseWidth, plateWidth, plateMaxLength);
                             }
                             break;
+
+                        case PAPERSUB_TYPE.RoofArrange:
+                            //작업 필요 함
+                            break;
                     }
                     break;
             }

@@ -40,6 +40,7 @@ using DrawWork.Commons;
 using DrawWork.DrawSacleServices;
 using DrawWork.DWGFileServices;
 using DrawSettingLib.SettingServices;
+using StrengthCalLib.CalServices;
 
 namespace DrawWork
 {
@@ -60,13 +61,13 @@ namespace DrawWork
             this.testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
             this.testModel.ActionMode = devDept.Eyeshot.actionType.SelectByPick;
 
-            this.testModel.Renderer = rendererType.OpenGL;
+            //this.testModel.Renderer = rendererType.OpenGL;
 
             BackgroundSettings cc = new BackgroundSettings();
             this.testModel.ActiveViewport.Background.TopColor= new SolidColorBrush(Color.FromRgb(59, 68, 83));
             //this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Rendered;
             this.testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Wireframe;
-            this.testModel.Wireframe.SilhouettesDrawingMode = silhouettesDrawingType.Always;
+            //this.testModel.Wireframe.SilhouettesDrawingMode = silhouettesDrawingType.Always;
             //this.testModel.ActiveViewport.SmallSize
             //this.testModel.ActiveViewport.SmallSizeRatio = 0.001;
 
@@ -382,6 +383,14 @@ namespace DrawWork
         // Test New
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
+            // Sample RoofBottom Arrange
+            SingletonData.RoofBottomArrange.Clear();
+            SingletonData.RoofBottomArrange.Add(cbRoofType.Text);
+            SingletonData.RoofBottomArrange.Add(tbOD.Text);
+            SingletonData.RoofBottomArrange.Add(tbPWidth.Text);
+            SingletonData.RoofBottomArrange.Add(tbPLength.Text);
+
+
 
             DWGFileService dwgService = new DWGFileService();
             string dwgFilePath= dwgService.FileFilecopy();
@@ -499,6 +508,14 @@ namespace DrawWork
 
             this.testModel.Entities.RegenAllCurved(0.005);
             this.testModel.Refresh();
+
+        }
+
+        private void btnCal_Click(object sender, RoutedEventArgs e)
+        {
+            CalImportService calService = new CalImportService();
+            string fileName = @"C:\Users\tree\Desktop\CAD\TABAS\20210719 GA보완\calSample.doc";
+            calService.Read(fileName);
 
         }
     }

@@ -28,6 +28,13 @@ namespace DrawWork.Commons
         RADIAN = 2,
     }
 
+    public enum PERPENDICULAR_TYPE
+    {
+        NotSet,
+        Vertical,
+        Horizontal,
+    }
+
     // Postion
     public enum POSITION_TYPE 
     {
@@ -45,8 +52,10 @@ namespace DrawWork.Commons
         NotSet,
         TOPLEFT,
         TOPRIGHT,
+        TOPCENTER,
         BOTTOMLEFT,
         BOTTOMRIGHT,
+        BOTTOMCENTER,
     }
 
     // Tank Assembly
@@ -196,7 +205,7 @@ namespace DrawWork.Commons
     // Tank Type
     public enum TANK_TYPE
     {
-        NoSet,
+        NotSet,
         CRT,
         DRT,
         IFRT,
@@ -207,17 +216,70 @@ namespace DrawWork.Commons
 
     public enum NozzleBlock_Type
     {
-        NoSet,
+        NotSet,
         OnlyBlock,
         Flange,
         Other,
     }
 
+    // 
+
+
     // Dimension
     public enum DimHead_Type
     {
-        NoSet,
+        NotSet,
         Arrow,
         Circle,
     }
+
+    // Weld Type Symbol
+    public enum WeldSymbolDetail_Type
+    {
+        NotSet,
+        ArrowSide,
+        OtherSide,
+        BothSide,
+    }
+    public enum WeldSymbol_Type
+    {
+        NotSet,
+        Fillet,
+        V,
+        Bevel,
+        FilletBevel,
+        Square,
+        Plug,
+        FlareV,
+        FlareBevel,
+        J,
+        U,
+        FlangeV,
+        FlangeBevel,
+    }
+
+    public enum WeldFace_Type
+    {
+        NotSet,
+        Flat,
+        Convex, //볼록
+        Concave,//오목
+    }
+
+    public enum PlateArrange_Type
+    {
+        NotSet,
+        Roof,
+        Bottom,
+    }
+
+    //
+    public enum Plate_Type
+    {
+        NotSet,
+        Arc,
+        Rectangle,
+        RectangleArc,
+    }
+
 }

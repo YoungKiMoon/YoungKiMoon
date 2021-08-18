@@ -2956,6 +2956,10 @@ namespace DrawWork.DrawServices
                     returnEntity = detailService.detailTempService.DrawBottomPlateJoint_POINT_Case1(ref refPoint, ref curPoint, selModel, scaleValue);
                     goto case "allways";
 
+                case "roofarrange":
+                    returnEntity = detailService.detailRoofBottomService.GetRoofArrange(ref refPoint, ref curPoint,  scaleValue);
+                    goto case "allways";
+
                 // allways
                 case "allways":
                     break;

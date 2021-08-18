@@ -49,6 +49,8 @@ namespace DrawWork.DrawModels
 
         // Text
         public bool textSizeVisible { get; set; }
+
+        public int textRoundNumber { get; set; }
         public double textHeight { get; set; }
         public double textGap { get; set; }
         public double textSideGap { get; set; }
@@ -98,6 +100,8 @@ namespace DrawWork.DrawModels
             rightBMNumber = "";
             
             textSizeVisible = false;
+
+            textRoundNumber = 1;
 
             textHeight = 2.5;
             textGap = 1;
