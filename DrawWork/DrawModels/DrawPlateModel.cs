@@ -24,11 +24,11 @@ namespace DrawWork.DrawModels
         public  ORIENTATION_TYPE ArcDirection { get; set; }
 
         public double RectWidth { get; set; }
-        public double RectHeight { get; set; }
+        public double RectLength { get; set; }
 
         public DrawPlateModel()
         {
-            // 중심 선
+            // 중심 점
             CenterPoint = null;
             Radius = 0;
 
@@ -49,7 +49,7 @@ namespace DrawWork.DrawModels
 
             // Plate Size
             RectWidth = 0;
-            RectHeight = 0;
+            RectLength = 0;
 
 
         }
