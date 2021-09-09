@@ -16,6 +16,32 @@ namespace DrawWork.Commons
         {
         }
 
+
+        // Dimension
+        private static List<DrawDimensionsModel> _DimensionsList = new List<DrawDimensionsModel>();
+        public static List<DrawDimensionsModel> DimensionsList
+        {
+            get { return _DimensionsList; }
+            set { _DimensionsList = value; }
+        }
+
+        // Paper : Grid Visible
+        private static bool _PaperGridVisible = false;
+        public static bool PaperGridVisible
+        {
+            get { return _PaperGridVisible; }
+            set { _PaperGridVisible = value; }
+        }
+
+
+        // BM Model
+        public static List<DrawBMModel> _BMList = new List<DrawBMModel>();
+        public static List<DrawBMModel> BMList
+        {
+            get { return _BMList; }
+            set { _BMList = value; }
+        }
+
         // Model Area : GA
         private static GAAreaModel _GAArea = new GAAreaModel();
         public static GAAreaModel GAArea
@@ -25,8 +51,8 @@ namespace DrawWork.Commons
         }
 
         // Paper Area : List
-        public static List<PaperAreaModel> _PaperArea = new List<PaperAreaModel>();
-        public static List<PaperAreaModel> PaperArea
+        public static PaperAreaListModel _PaperArea = new PaperAreaListModel();
+        public static PaperAreaListModel PaperArea
         {
             get { return _PaperArea; }
             set { _PaperArea = value; }
@@ -100,6 +126,33 @@ namespace DrawWork.Commons
             set { _RoofBottomArrange = value; }
         }
         private static List<string> _RoofBottomArrange = new List<string>();
+
+        // Temp : Arrange
+        public static List<DrawPlateModel> BottomPlateInfo
+        {
+            get { return _BottomPlateInfo; }
+            set { _BottomPlateInfo = value; }
+        }
+        private static List<DrawPlateModel> _BottomPlateInfo = new List<DrawPlateModel>();
+        public static List<DrawPlateModel> RoofPlateInfo
+        {
+            get { return _RoofPlateInfo; }
+            set { _RoofPlateInfo = value; }
+        }
+        private static List<DrawPlateModel> _RoofPlateInfo = new List<DrawPlateModel>();
+
+        public static List<DrawCuttingAreaModel> BottomCuttingList
+        {
+            get { return _BottomCuttingList; }
+            set { _BottomCuttingList = value; }
+        }
+        private static List<DrawCuttingAreaModel> _BottomCuttingList = new List<DrawCuttingAreaModel>();
+        public static List<DrawCuttingAreaModel> RoofCuttingList
+        {
+            get { return _RoofCuttingList; }
+            set { _RoofCuttingList = value; }
+        }
+        private static List<DrawCuttingAreaModel> _RoofCuttingList = new List<DrawCuttingAreaModel>();
 
     }
 }

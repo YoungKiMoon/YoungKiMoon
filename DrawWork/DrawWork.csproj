@@ -104,20 +104,27 @@
     <Compile Include="DrawCustomObjectModels\CustomRenderedHatch.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedMesh.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedTriangle.cs" />
+    <Compile Include="DrawDetailServices\DrawDetailPlateCuttingPlanService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailRoofBottomService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailShellService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailTempService.cs" />
+    <Compile Include="DrawDetailServices\DrawDetailVisibleService.cs" />
     <Compile Include="DrawGridServices\DrawPaperGridService.cs" />
     <Compile Include="DrawGridServices\DrawPaperGridModel.cs" />
     <Compile Include="DrawModels\DrawAssyModel.cs" />
     <Compile Include="DrawModels\DrawBMLeaderModel.cs" />
+    <Compile Include="DrawModels\DrawBMModel.cs" />
     <Compile Include="DrawModels\DrawBMNumberModel.cs" />
     <Compile Include="DrawModels\DrawCenterLineModel.cs" />
+    <Compile Include="DrawModels\DrawCuttingAreaModel.cs" />
     <Compile Include="DrawModels\DrawDimensionArcModel.cs" />
     <Compile Include="DrawModels\DrawDimensionModel.cs" />
+    <Compile Include="DrawModels\DrawDimensionsModel.cs" />
     <Compile Include="DrawModels\DrawDimStyle.cs" />
     <Compile Include="DrawModels\DrawEntityModel.cs" />
+    <Compile Include="DrawModels\DrawOnePlateModel.cs" />
+    <Compile Include="DrawModels\DrawPlateCuttingModel.cs" />
     <Compile Include="DrawModels\DrawPlateModel.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
     <Compile Include="DrawModels\DrawPositionValueModel.cs" />
@@ -125,14 +132,18 @@
     <Compile Include="DrawModels\DrawShellDevModel.cs" />
     <Compile Include="DrawModels\DrawSlopeLeaderModel.cs" />
     <Compile Include="DrawModels\DrawWeldingModel.cs" />
-    <Compile Include="DrawModels\DrawWeldingSymbolModel.cs" />
+    <Compile Include="DrawModels\DrawWeldSymbolModel.cs" />
+    <Compile Include="DrawModels\PlateInfo.cs" />
     <Compile Include="DrawPaperServices\PaperPreviewService.cs" />
     <Compile Include="DrawPaperServices\ViewPortSettingModel.cs" />
     <Compile Include="DrawSacleServices\DrawScaleService.cs" />
+    <Compile Include="DrawServices\DrawBMCalService.cs" />
+    <Compile Include="DrawServices\DrawBMService.cs" />
     <Compile Include="DrawServices\DrawBoundaryService.cs" />
     <Compile Include="DrawServices\DrawDimensionService.cs" />
     <Compile Include="DrawServices\DrawFRTBlockService.cs" />
     <Compile Include="DrawServices\DrawNozzleOrientationService.cs" />
+    <Compile Include="DrawServices\DrawShapeCalculationService.cs" />
     <Compile Include="DrawServices\DrawShapeServices.cs" />
     <Compile Include="DrawServices\DrawEditingService.cs" />
     <Compile Include="DrawServices\DrawImportBlockService.cs" />
@@ -152,6 +163,7 @@
     <Compile Include="DrawShapes\DrawBreakSymbols.cs" />
     <Compile Include="DrawShapes\DrawShellCourses.cs" />
     <Compile Include="DrawShapes\DrawSlopeSymbols.cs" />
+    <Compile Include="DrawShapes\DrawWeldSymbols.cs" />
     <Compile Include="DrawStyleServices\EnvironmentStyleService.cs" />
     <Compile Include="DrawStyleServices\LayerStyleService.cs" />
     <Compile Include="DrawStyleServices\LineStyleService.cs" />
@@ -263,6 +275,10 @@
     <ProjectReference Include="..\DrawSettingLib\DrawSettingLib.csproj">
       <Project>{09af4a28-824a-4ea4-b217-98a964d4b112}</Project>
       <Name>DrawSettingLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EPDataLib\EPDataLib.csproj">
+      <Project>{57C694EC-D561-4BE8-80E6-63FD2CB22EFB}</Project>
+      <Name>EPDataLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\ExcelDataLib\ExcelDataLib.csproj">
       <Project>{135b58cb-c30c-4500-84c4-0a67a68c7812}</Project>

@@ -33,6 +33,7 @@ namespace DrawWork.DrawDetailServices
 
         private DrawEditingService editingService;
         private DrawShapeServices shapeService;
+        private DrawBreakSymbols breakService;
 
         public DrawDetailShellService(AssemblyModel selAssembly, object selModel)
         {
@@ -49,6 +50,7 @@ namespace DrawWork.DrawDetailServices
 
             editingService = new DrawEditingService();
             shapeService = new DrawShapeServices();
+            breakService = new DrawBreakSymbols();
         }
 
         #region Horizontal Joint
@@ -62,10 +64,28 @@ namespace DrawWork.DrawDetailServices
             Point3D referencePoint = new Point3D(refPoint.X, refPoint.Y);
             // Tank ID
             double ID = 24500;
+            if (assemblyData.GeneralDesignData.Count > 0)
+                ID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
 
             // Plate Info
             double plateLength = 8000;
-            double PlateWidth = 3000;
+            double plateWidth = 3000;
+            if (assemblyData.ShellInput.Count > 0)
+            {
+                plateLength = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateMaxLength);
+                plateWidth = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateWidth);
+            }
+
+            
+
+            // Course Height
+            double tankHeight = 0;
+            if (assemblyData.GeneralDesignData.Count > 0)
+                tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
+            double shellCount = assemblyData.ShellOutput.Count;
+            double drawHeight = 500;
+            double scaleDrawHeight = drawHeight * scaleValue;
+            double oneHeight = scaleDrawHeight / shellCount;
 
             // Course Width
             double[] sampleCourseWidth = new double[8] { 480, 480, 480, 480, 480, 480, 480, 480 };
@@ -74,8 +94,10 @@ namespace DrawWork.DrawDetailServices
 
 
             // Sample Data
+            List<double> courseWidthRealList = new List<double>();
             List<double> courseWidthList = new List<double>(sampleCourseWidth);
             List<double> courseThkList = new List<double>(sampleCourseThk);
+
 
             List<ShellOutputModel> shellCourses = new List<ShellOutputModel>();
             for (int i = 0; i < courseWidthList.Count; i++)
@@ -85,6 +107,23 @@ namespace DrawWork.DrawDetailServices
                 newShellCourse.Thickness = courseThkList[i].ToString();
                 shellCourses.Add(newShellCourse);
             }
+
+            if (assemblyData.ShellOutput.Count > 0)
+            {
+                courseWidthList.Clear();
+                courseThkList.Clear();
+                shellCourses.Clear();
+                foreach (ShellOutputModel eachShell in assemblyData.ShellOutput)
+                {
+                    courseWidthRealList.Add(valueService.GetDoubleValue(eachShell.PlateWidth));
+                    courseWidthList.Add(oneHeight);
+                    courseThkList.Add(valueService.GetDoubleValue(eachShell.Thickness));
+                    shellCourses.Add(eachShell);
+                }
+            }
+
+
+
 
 
             // Data
@@ -96,9 +135,9 @@ namespace DrawWork.DrawDetailServices
 
 
             // Dimension Area Size
-            double dimAreaLength = 80;
+            double dimAreaLength = 60;
             double scaleDimAreaLength = scaleService.GetOriginValueOfScale(customScaleValue, dimAreaLength);
-            double dimAreaGapLength = dimAreaLength + 16;
+            double dimAreaGapLength = dimAreaLength + 10;
             //double scaleDimAreaGapLength = scaleService.GetOriginValueOfScale(customScaleValue, dimAreaGapLength);
 
 
@@ -117,8 +156,8 @@ namespace DrawWork.DrawDetailServices
 
 
 
-            // Dim Service
-
+            // Welding Symbols
+            List<Point3D> weldPointList = new List<Point3D>();
 
             // First Dim Point
             Point3D firstDimPoint = null;
@@ -137,7 +176,8 @@ namespace DrawWork.DrawDetailServices
             foreach (ShellOutputModel eachCourse in shellCourses)
             {
                 courseIndex++;
-                double eachCourseWidth = valueService.GetDoubleValue(eachCourse.PlateWidth);
+                double eachCourseWdithReal = courseWidthRealList[courseIndex];
+                double eachCourseWidth = courseWidthList[courseIndex];
                 double eachCourseThk = valueService.GetDoubleValue(eachCourse.Thickness);
                 double eachCourseThkNext = 0;
                 if (courseIndex < shellCourses.Count - 1)
@@ -149,6 +189,8 @@ namespace DrawWork.DrawDetailServices
 
                 if (eachCourseWidth > 0 && eachCourseThk > 0)
                 {
+                    weldPointList.Add((Point3D)exPoint[0].Clone());
+
                     // One Course
                     DrawSlopeLeaderModel slopeModel = new DrawSlopeLeaderModel();
                     DrawWeldingModel eachWeldingModel = GetOnePlateModel(eachCourseWidth, eachCourseThk, eachCourseThkNext, firstPlate, lastPlate);
@@ -185,7 +227,7 @@ namespace DrawWork.DrawDetailServices
 
                         dimPoint1 = GetSumPoint(dimPoint1, 0, eachWeldingModel.OtherDistance);
                     }
-                    DrawDimensionModel dimEachCourseModel = new DrawDimensionModel() { position = POSITION_TYPE.LEFT, textUpper = "AAAA", dimHeight = dimAreaLength, scaleValue = customScaleValue, };
+                    DrawDimensionModel dimEachCourseModel = new DrawDimensionModel() { position = POSITION_TYPE.LEFT, textUpper = eachCourseWdithReal.ToString(), dimHeight = dimAreaLength, scaleValue = customScaleValue, };
                     DrawEntityModel dimList = drawService.Draw_DimensionDetail(ref singleModel, new Point3D(firstDimPoint.X, dimPoint1.Y), new Point3D(firstDimPoint.X, dimPoint2.Y, 0), customScaleValue, dimEachCourseModel);
 
 
@@ -211,7 +253,7 @@ namespace DrawWork.DrawDetailServices
                     string leaderCourseText = valueService.GetOrdinalNumber(courseIndex + 1) + " COURSE";
 
                     DrawBMLeaderModel leaderCourseTextModel = new DrawBMLeaderModel() { position = POSITION_TYPE.RIGHT, upperText = leaderCourseText, lowerText = "", bmNumber = "" };
-                    DrawEntityModel leaderCourseTextList = drawService.Draw_BMLeader(ref singleModel, GetSumPoint(exPoint[2], 0, eachCourseWidth * positionCourseText), leaderCourseTextModel, customScaleValue);
+                    DrawEntityModel leaderCourseTextList = drawService.Draw_OneLineLeader(ref singleModel, GetSumPoint(exPoint[2], 0, eachCourseWidth * positionCourseText), leaderCourseTextModel, customScaleValue);
                     drawList.AddDrawEntity(leaderCourseTextList);
 
                     
@@ -230,30 +272,37 @@ namespace DrawWork.DrawDetailServices
                     string leaderCourseInfoD = "D=" + courseInfoD;
                     string leaderCourseInfoC = "C=" + courseInfoC;
                     DrawBMLeaderModel leaderCourseInfoModel = new DrawBMLeaderModel() { position = POSITION_TYPE.RIGHT, upperText = leaderCourseInfoD, lowerText = leaderCourseInfoC, bmNumber = "", textAlign=POSITION_TYPE.LEFT };
-                    DrawEntityModel leaderCourseInfoList = drawService.Draw_BMLeader(ref singleModel, GetSumPoint(exPoint[2], -eachCourseThk / 2, eachCourseWidth * positionCourseInfo), leaderCourseInfoModel, customScaleValue);
+                    DrawEntityModel leaderCourseInfoList = drawService.Draw_OneLineLeader(ref singleModel, GetSumPoint(exPoint[2], -eachCourseThk / 2, eachCourseWidth * positionCourseInfo), leaderCourseInfoModel, customScaleValue);
                     drawList.AddDrawEntity(leaderCourseInfoList);
 
 
                     // Welding Info
-                    DrawDimensionModel dimCourseWeldingModel = new DrawDimensionModel() { position = POSITION_TYPE.TOP, textUpperPosition = POSITION_TYPE.LEFT, textUpper = eachWeldingModel.LeftDepth.ToString(), dimHeight = 0, scaleValue = customScaleValue, extLineLeftVisible = false, extLineRightVisible = false, arrowLeftHeadOut = true, arrowRightSymbol = DimHead_Type.Circle };
-                    DrawEntityModel dimCourseWeldingList = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(exPoint[3], 0, eachCourseWidth * positionWeldingInfo), GetSumPoint(exPoint[3], eachCourseThk / 2, eachCourseWidth * positionWeldingInfo), customScaleValue, dimCourseWeldingModel);
-                    drawList.AddDrawEntity(dimCourseWeldingList);
+                    if (!firstPlate)
+                    {
+                        if (!eachWeldingModel.BottomWeldingSingle)
+                        {
+                            DrawDimensionModel dimCourseWeldingModel = new DrawDimensionModel() { position = POSITION_TYPE.TOP, textUpperPosition = POSITION_TYPE.LEFT, textUpper = eachWeldingModel.LeftDepth.ToString(), dimHeight = 0, scaleValue = customScaleValue, extLineLeftVisible = false, extLineRightVisible = false, arrowLeftHeadOut = true, arrowRightSymbol = DimHead_Type.Circle };
+                            DrawEntityModel dimCourseWeldingList = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(exPoint[3], 0, eachCourseWidth * positionWeldingInfo), GetSumPoint(exPoint[3], eachCourseThk / 2, eachCourseWidth * positionWeldingInfo), customScaleValue, dimCourseWeldingModel);
+                            drawList.AddDrawEntity(dimCourseWeldingList);
 
 
-                    DrawDimensionModel dimCourseWeldingModel2 = new DrawDimensionModel() { position = POSITION_TYPE.TOP, textUpperPosition = POSITION_TYPE.RIGHT, textUpper = eachWeldingModel.RightDepth.ToString(), dimHeight = 0, scaleValue = customScaleValue, extLineLeftVisible = false, extLineRightVisible = false, arrowRightHeadOut = true, arrowLeftSymbol = DimHead_Type.Circle };
-                    DrawEntityModel dimCourseWeldingList2 = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(exPoint[3], eachCourseThk / 2, eachCourseWidth * positionWeldingInfo), GetSumPoint(exPoint[3], eachCourseThk, eachCourseWidth * positionWeldingInfo), customScaleValue, dimCourseWeldingModel2);
-                    drawList.AddDrawEntity(dimCourseWeldingList2);
+                            DrawDimensionModel dimCourseWeldingModel2 = new DrawDimensionModel() { position = POSITION_TYPE.TOP, textUpperPosition = POSITION_TYPE.RIGHT, textUpper = eachWeldingModel.RightDepth.ToString(), dimHeight = 0, scaleValue = customScaleValue, extLineLeftVisible = false, extLineRightVisible = false, arrowRightHeadOut = true, arrowLeftSymbol = DimHead_Type.Circle };
+                            DrawEntityModel dimCourseWeldingList2 = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(exPoint[3], eachCourseThk / 2, eachCourseWidth * positionWeldingInfo), GetSumPoint(exPoint[3], eachCourseThk, eachCourseWidth * positionWeldingInfo), customScaleValue, dimCourseWeldingModel2);
+                            drawList.AddDrawEntity(dimCourseWeldingList2);
+                        }
 
 
 
-                    // Welding Gap
-                    double midGapLength = 0;
-                    if (!eachWeldingModel.BottomWeldingSingle)
-                        midGapLength = -eachWeldingModel.RightDepth;
-                    DrawDimensionModel dimCourseWeldingGapModel = new DrawDimensionModel() { position = POSITION_TYPE.TOP, textUpperPosition = POSITION_TYPE.RIGHT, textUpper = eachWeldingModel.MidDepth.ToString(), dimHeight = 10, scaleValue = customScaleValue, arrowLeftHeadOut = true, arrowRightHeadOut = true };
-                    DrawEntityModel dimCourseWeldingGapList = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(exPoint[2], midGapLength - eachWeldingModel.MidDepth, eachWeldingModel.OtherDistance), GetSumPoint(exPoint[2], midGapLength, eachWeldingModel.OtherDistance), customScaleValue, dimCourseWeldingGapModel);
-                    drawList.AddDrawEntity(dimCourseWeldingGapList);
 
+
+                        // Welding Gap
+                        double midGapLength = 0;
+                        if (!eachWeldingModel.BottomWeldingSingle)
+                            midGapLength = -eachWeldingModel.RightDepth;
+                        DrawDimensionModel dimCourseWeldingGapModel = new DrawDimensionModel() { position = POSITION_TYPE.TOP, textUpperPosition = POSITION_TYPE.RIGHT, textUpper = eachWeldingModel.MidDepth.ToString(), dimHeight = 10, scaleValue = customScaleValue, arrowLeftHeadOut = true, arrowRightHeadOut = true };
+                        DrawEntityModel dimCourseWeldingGapList = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(exPoint[2], midGapLength - eachWeldingModel.MidDepth, eachWeldingModel.OtherDistance), GetSumPoint(exPoint[2], midGapLength, eachWeldingModel.OtherDistance), customScaleValue, dimCourseWeldingGapModel);
+                        drawList.AddDrawEntity(dimCourseWeldingGapList);
+                    }
 
 
 
@@ -264,12 +313,12 @@ namespace DrawWork.DrawDetailServices
                     {
                         if (eachWeldingModel.BottomWeldingSingle)
                         {
-                            dimCourseLeftWeldingArcList = drawService.Draw_DimensionArc(GetSumPoint(exPoint[3], 0, 0), GetSumPoint(exPoint[4], 0, 0), "top", scaleDimArcRadius, "45˚", 45, 90, 45, 0, customScaleValue, layerService.LayerDimension);
+                            dimCourseLeftWeldingArcList = drawService.Draw_DimensionArc(GetSumPoint(exPoint[3], 0, 0), GetSumPoint(exPoint[4], 0, 0), "top", dimArcRadius, "45˚", 45, 90, 45, 0, customScaleValue, layerService.LayerDimension);
                         }
                         else
                         {
-                            dimCourseLeftWeldingArcList = drawService.Draw_DimensionArc(GetSumPoint(exPoint[3], 0, 0), GetSumPoint(exPoint[4], 0, 0), "top", scaleDimArcRadius, "45˚", 45, 90, 45, 0, customScaleValue, layerService.LayerDimension);
-                            dimCourseRightWeldingArcList = drawService.Draw_DimensionArc(GetSumPoint(exPoint[5], 0, 0), GetSumPoint(exPoint[2], 0, 0), "top", scaleDimArcRadius, "45˚", 45, -45, -90, 0, customScaleValue, layerService.LayerDimension);
+                            dimCourseLeftWeldingArcList = drawService.Draw_DimensionArc(GetSumPoint(exPoint[3], 0, 0), GetSumPoint(exPoint[4], 0, 0), "top", dimArcRadius, "45˚", 45, 90, 45, 0, customScaleValue, layerService.LayerDimension);
+                            dimCourseRightWeldingArcList = drawService.Draw_DimensionArc(GetSumPoint(exPoint[5], 0, 0), GetSumPoint(exPoint[2], 0, 0), "top",dimArcRadius, "45˚", 45, -45, -90, 0, customScaleValue, layerService.LayerDimension);
                         }
 
                         drawList.AddDrawEntity(dimCourseLeftWeldingArcList);
@@ -285,12 +334,120 @@ namespace DrawWork.DrawDetailServices
 
 
 
+
+
+
+
+            //Bottom
+            // Bottom Thickness
+
+            string anchorTopPlateC = assemblyData.AnchorageInput[0].TopPlateC;
+            string shellThk = assemblyData.ShellOutput[0].Thickness;
+
+            string bottomString = "";
+            double bottomThickness = 0;
+            string annularPlate = assemblyData.BottomInput[0].AnnularPlate;
+            if (annularPlate.Contains("Yes"))
+            {
+                bottomString = "ANNULAR " + "PLATE O.D ";
+                bottomThickness = valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateThickness);
+            }
+            else
+            {
+                bottomString = "BOTTOM " + "PLATE O.D ";
+                bottomThickness = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateThickness);
+            }
+            DrawPublicFunctionService publicFService = new DrawPublicFunctionService();
+            double outsideProjection = 0;
+
+            // 첫번째 두께 더하기
+            outsideProjection += courseThkList[0] + valueService.GetDoubleValue( anchorTopPlateC);
+
+            
+
+            List<Point3D> outPoint = new List<Point3D>();
+            List<Entity> bottomEntityList= shapeService.GetRectangle(out outPoint, GetSumPoint(referencePoint, -outsideProjection, 0), outsideProjection *2, bottomThickness, 0, 0, 0, new bool[] { true, false, true, true });
+            styleService.SetLayerListEntity(ref bottomEntityList, layerService.LayerVirtualLine);
+            drawList.outlineList.AddRange(bottomEntityList);
+
+            List<Entity> bottomBreakList = breakService.GetFlatBreakLine(GetSumPoint(referencePoint, outsideProjection * 2 - outsideProjection, 0),
+                                                                        GetSumPoint(referencePoint, outsideProjection * 2 - outsideProjection, -bottomThickness),
+                                                                        scaleValue);
+            styleService.SetLayerListEntity(ref bottomBreakList, layerService.LayerDimension);
+            drawList.outlineList.AddRange(bottomBreakList);
+
+            // Dimension : Bottom Thickness
+            DrawDimensionModel dimBottomThkModel = new DrawDimensionModel() { position = POSITION_TYPE.LEFT, textUpperPosition = POSITION_TYPE.LEFT, textUpper = "t" + bottomThickness, dimHeight = dimAreaGapLength, scaleValue = customScaleValue };
+            DrawEntityModel dimBottomThk= drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(referencePoint, -outsideProjection, 0), GetSumPoint(referencePoint, -outsideProjection, -bottomThickness), customScaleValue, dimBottomThkModel);
+            drawList.AddDrawEntity(dimBottomThk);
+
+
+
             // Dimension : Vertical
-            DrawDimensionModel dimVerticalModel = new DrawDimensionModel() { position = POSITION_TYPE.LEFT, textUpper = "COMPLECTIOON HEIgHT 26400", textLower = "ERECTION HeIGHT 26432", dimHeight = dimAreaGapLength, scaleValue = customScaleValue };
-            DrawEntityModel dimVertical = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(referencePoint, 0, 0), GetSumPoint(referencePoint, 0, courseWidthSum), customScaleValue, dimVerticalModel);
+            double erectionHeight = tankHeight + (3.2 * shellCount);
+            DrawDimensionModel dimVerticalModel = new DrawDimensionModel() { position = POSITION_TYPE.LEFT, textUpper = "COMPLECTION HEIGHT " + tankHeight, textLower = "ERECTION HEIGHT " + erectionHeight, dimHeight = dimAreaGapLength, scaleValue = customScaleValue };
+            DrawEntityModel dimVertical = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(referencePoint, -outsideProjection, 0), GetSumPoint(referencePoint, 0, courseWidthSum), customScaleValue, dimVerticalModel);
 
             drawList.AddDrawEntity(dimVertical);
-            
+
+
+            // Dimension : Bottom
+            double dimAreaBottom = 10;
+            DrawDimensionModel dimBottomModel = new DrawDimensionModel() { position = POSITION_TYPE.BOTTOM, textUpper = outsideProjection.ToString() , dimHeight = dimAreaBottom, scaleValue = customScaleValue };
+            DrawEntityModel dimBottom = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(referencePoint, -outsideProjection, -bottomThickness), GetSumPoint(referencePoint, 0, -bottomThickness), customScaleValue, dimBottomModel);
+            drawList.AddDrawEntity(dimBottom);
+
+            // Dimension : Bottom : ID
+            DrawDimensionModel dimBottomIDModel = new DrawDimensionModel() { position = POSITION_TYPE.BOTTOM, textUpper = "I.D " + tankID, dimHeight = dimAreaBottom, scaleValue = customScaleValue ,extLineRightVisible=false,arrowRightHeadVisible=false};
+            DrawEntityModel dimBottomID = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(referencePoint, 0, -bottomThickness), GetSumPoint(referencePoint, 350, -bottomThickness), customScaleValue, dimBottomIDModel);
+            drawList.AddDrawEntity(dimBottomID);
+
+            // Dimension : Bottom : ID
+            DrawDimensionModel dimBottomMainModel = new DrawDimensionModel() { position = POSITION_TYPE.BOTTOM, textUpper = bottomString + (tankID + (outsideProjection*2)).ToString(), dimHeight = 20, scaleValue = customScaleValue, extLineRightVisible = false, arrowRightHeadVisible = false };
+            DrawEntityModel dimBottomMain = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(referencePoint, -outsideProjection, -bottomThickness), GetSumPoint(referencePoint, 350 , -bottomThickness), customScaleValue, dimBottomMainModel);
+            drawList.AddDrawEntity(dimBottomMain);
+
+
+            // Welding Point
+            DrawWeldSymbols weldSymbols = new DrawWeldSymbols();
+            List<Entity> newWeldList = new List<Entity>();
+            for (int i = 0; i < weldPointList.Count; i++)
+            {
+                double currentThk = courseThkList[i];
+                if (i == 0)
+                {
+                    DrawWeldSymbolModel wsModel = new DrawWeldSymbolModel();
+                    wsModel.position = ORIENTATION_TYPE.TOPLEFT;
+                    wsModel.weldTypeUp = WeldSymbol_Type.Fillet;
+                    wsModel.weldTypeDown = WeldSymbol_Type.Fillet;
+                    wsModel.weldDetailType = WeldSymbolDetail_Type.BothSide;
+                    wsModel.weldFaceUp = WeldFace_Type.Concave;
+                    wsModel.weldLength1 = bottomThickness.ToString();
+                    wsModel.weldLength2 = bottomThickness.ToString();
+                    wsModel.tailVisible = false;
+                    wsModel.leaderAngle = 45;
+                    wsModel.leaderLineLength = 20;
+
+                    newWeldList.AddRange(weldSymbols.GetWeldSymbol(GetSumPoint(weldPointList[i],-currentThk,0), singleModel,customScaleValue, wsModel));
+                }
+                else
+                {
+                    DrawWeldSymbolModel wsModel = new DrawWeldSymbolModel();
+                    wsModel.position = ORIENTATION_TYPE.TOPLEFT;
+                    wsModel.weldTypeUp = WeldSymbol_Type.Square;
+                    wsModel.weldTypeDown = WeldSymbol_Type.Bevel;
+                    wsModel.weldDetailType = WeldSymbolDetail_Type.BothSide;
+                    wsModel.weldFaceDown = WeldFace_Type.Convex;
+                    wsModel.specification = "B.G";
+                    wsModel.leaderAngle = 45;
+                    wsModel.leaderLineLength = 20;
+
+                    newWeldList.AddRange(weldSymbols.GetWeldSymbol(GetSumPoint(weldPointList[i], 0, 0), singleModel, customScaleValue, wsModel));
+                }
+            }
+            styleService.SetLayerListEntity(ref newWeldList, layerService.LayerDimension);
+
+            drawList.outlineList.AddRange(newWeldList);
 
             return drawList;
         }
@@ -373,11 +530,19 @@ namespace DrawWork.DrawDetailServices
         public DrawEntityModel GetOneCourseShellPlate(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
         {
             // SampleData
-            assemblyData.GeneralDesignData.Add(new GeneralDesignDataModel() { SizeNominalID = "32400" });
-            assemblyData.ShellInput.Add(new ShellInputModel() { PlateWidth = "2720", PlateMaxLength = "10000" });
-            assemblyData.ShellOutput.Add(new ShellOutputModel() { PlateWidth = "2720" });
+            //assemblyData.GeneralDesignData.Clear();
+            //assemblyData.ShellInput.Clear();
+            //assemblyData.ShellOutput.Clear();
+            //assemblyData.AnchorageInput.Clear();
 
-            assemblyData.AnchorageInput.Add(new AnchorageInputModel() { AnchorType = "TYPE II", AnchorQty = "46", AnchorSize = "M30", AnchorStartAngle = "6", AnchorHeight = "350" });
+            //assemblyData.GeneralDesignData.Add(new GeneralDesignDataModel() { SizeNominalID = "32400" });
+            //assemblyData.ShellInput.Add(new ShellInputModel() { PlateWidth = "2720", PlateMaxLength = "10000" });
+            //assemblyData.ShellOutput.Add(new ShellOutputModel() { PlateWidth = "2720" });
+
+            //assemblyData.AnchorageInput.Add(new AnchorageInputModel() { AnchorType = "TYPE II", AnchorQty = "46", AnchorSize = "M30", AnchorStartAngle = "6", AnchorHeight = "350" });
+
+            // 강제적용
+            //caleValue = 60;
 
             // List
             DrawEntityModel drawList = new DrawEntityModel();
@@ -386,20 +551,24 @@ namespace DrawWork.DrawDetailServices
             double plateMaxLength = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateMaxLength);
 
             double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double oneShellThk = valueService.GetDoubleValue(assemblyData.ShellOutput[0].Thickness);
+            double tankOD = tankID + (oneShellThk * 2);
             double oneCourseWidth = valueService.GetDoubleValue(assemblyData.ShellOutput[0].PlateWidth);
+
 
             // Validation
             if (oneCourseWidth > plateWidth)
             {
                 // Plate 크기가 첫번째 Course 보다 작다
-                return drawList;
+                Console.WriteLine("Plate 크기가 첫번째 course 보다 작다");
+                //return drawList;
             }
 
             // One Plate : Length
-            double tankCircumference = Math.PI * tankID;
+            double tankCircumference = Math.PI * tankOD;
             double oneCoursePlateCount = 0;
             double onePlateLength = 0;
-            SetCourseOnePlate(tankID, plateMaxLength, out oneCoursePlateCount, out onePlateLength);
+            SetCourseOnePlate(tankOD, plateMaxLength, out oneCoursePlateCount, out onePlateLength);
 
             // One Plate : Width
             double onePlateWidth = oneCourseWidth;
@@ -421,7 +590,7 @@ namespace DrawWork.DrawDetailServices
 
             // AnchorChair Model
             AnchorChairModel anchorChair = modelService.GetAnchorChair(anchorBoltSize);
-            if (assemblyData.AnchorageInput[0].AnchorChairBlot.ToLower() != "yes")
+            if (assemblyData.AnchorageInput[0].AnchorChairBlot.ToLower() != "Yes")
                 anchorChair = null;
 
 
@@ -665,7 +834,7 @@ namespace DrawWork.DrawDetailServices
         }
 
 
-        public List<Entity> GetAnchorChairFront(Point3D selPoint, AnchorChairModel newAnchor,double scaleValue)
+        public List<Entity> GetAnchorChairFront(Point3D selPoint, AnchorChairModel newAnchor, double scaleValue)
         {
             List<Entity> drawList = new List<Entity>();
 
@@ -703,7 +872,7 @@ namespace DrawWork.DrawDetailServices
                 }
 
                 double anchorHeight = H - bottomThickness;
-                double anchorLegHeight = anchorHeight - B1;
+                double anchorLegHeight = anchorHeight ;
 
                 List<Point3D> extPoint = new List<Point3D>();
 
@@ -723,7 +892,7 @@ namespace DrawWork.DrawDetailServices
 
                 // Pad
                 double padWidth = F + A2 + A2;
-                double padHeight = anchorHeight;
+                double padHeight = anchorHeight ;
                 List<Entity> padList = shapeService.GetRectangle(out extPoint, GetSumPoint(selPoint, -padWidth/2, C1), padWidth, padHeight, 0, 0, 3);
                 Curve.Fillet((ICurve)padList[3], (ICurve)padList[0], F1, false, false, true, true, out Arc padArcFillet1);
                 Curve.Fillet((ICurve)padList[0], (ICurve)padList[1], F1, false, false, true, true, out Arc padArcFillet2);

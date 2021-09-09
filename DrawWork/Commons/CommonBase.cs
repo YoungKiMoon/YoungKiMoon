@@ -56,6 +56,9 @@ namespace DrawWork.Commons
         BOTTOMLEFT,
         BOTTOMRIGHT,
         BOTTOMCENTER,
+        RIGHTCENTER,
+        LEFTCENTER,
+        BOTHCENTER,
     }
 
     // Tank Assembly
@@ -276,10 +279,21 @@ namespace DrawWork.Commons
     //
     public enum Plate_Type
     {
-        NotSet,
-        Arc,
-        Rectangle,
-        RectangleArc,
+        NotSet =0,
+        Rectangle =1,
+        RectangleArc =2,
+        ArcRectangleArc = 3,
+        Arc =4,
+        Segment =5,
     }
+
+
+    public enum GirdScale_Type
+    {
+        NotSet,
+        One,
+        Real,
+    }
+
 
 }

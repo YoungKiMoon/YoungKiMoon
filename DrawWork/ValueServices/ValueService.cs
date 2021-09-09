@@ -206,6 +206,29 @@ namespace DrawWork.ValueServices
 
         #endregion
 
+
+
+        #region Pythagoras Theorem
+        public double GetHypotenisuByPythagoras(double selBase, double selPerpendicular)
+        {
+            double returnValue = Math.Sqrt(selBase*selBase + selPerpendicular*selPerpendicular);
+
+            return returnValue;
+        }
+        #endregion
+
+        #region Arc
+        public double GetLengthBetweenStringAndArc(double selRadius, double selStringLength)
+        {
+            double returnValue = selRadius - Math.Sqrt(selRadius * selRadius - ((selStringLength / 2) * (selStringLength / 2)));
+            return returnValue;
+        }
+
+        #endregion
+
+
+
+
         // 공백 제거
         public string GetAllTrim(string selStr)
         {
@@ -233,6 +256,18 @@ namespace DrawWork.ValueServices
 
             return selNumber + returnValue;
         }
+
+        public string GetOrdinalSheet(double selNumber)
+        {
+            string returnValue = "";
+            if (selNumber == 1)
+                returnValue = selNumber + " SH'T";
+            else
+                returnValue = selNumber + " SH'TS";
+
+            return returnValue;
+        }
+
 
         public double GetRadianByArcLength(double selLength, double selRadius)
         {
@@ -288,6 +323,24 @@ namespace DrawWork.ValueServices
             return selCircum / selCount / 360;
         }
 
+        #endregion
+
+
+        #region Max Min
+        public double GetMinValueOfList(List<double> seList)
+        {
+            double returnValue = 0;
+            if (seList.Count > 0)
+                returnValue = seList.Min();
+            return returnValue;
+        }
+        public double GetMaxValueOfList(List<double> seList)
+        {
+            double returnValue = 0;
+            if (seList.Count > 0)
+                returnValue = seList.Max();
+            return returnValue;
+        }
         #endregion
     }
 }

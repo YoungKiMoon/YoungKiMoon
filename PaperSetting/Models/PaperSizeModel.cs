@@ -7,9 +7,9 @@ using System.Text;
 
 namespace PaperSetting.Models
 {
-    public class SizeModel : Notifier,ICloneable
+    public class PaperSizeModel : Notifier,ICloneable
     {
-        public SizeModel()
+        public PaperSizeModel()
         {
             Name = "";
             PaperType = PAPERFORMAT_TYPE.A1_ISO; // Default
@@ -17,7 +17,7 @@ namespace PaperSetting.Models
             Width = 0;
             Height = 0;
         }
-        public SizeModel(string selName, PAPERFORMAT_TYPE selPaperType, double selWidth, double selHeight)
+        public PaperSizeModel(string selName, PAPERFORMAT_TYPE selPaperType, double selWidth, double selHeight)
         {
             Name = selName;
             PaperType = selPaperType;
@@ -27,7 +27,7 @@ namespace PaperSetting.Models
 
         public object Clone()
         {
-            SizeModel newModel = new SizeModel();
+            PaperSizeModel newModel = new PaperSizeModel();
             newModel.Name = Name;
             newModel.PaperType = PaperType;
             newModel.Width = Width;

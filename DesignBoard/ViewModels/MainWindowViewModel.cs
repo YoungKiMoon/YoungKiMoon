@@ -1,8 +1,11 @@
-﻿using DesignBoard.Models;
+﻿using AssemblyLib.AssemblyModels;
+using DesignBoard.Models;
 using DesignBoard.Utils;
+using DrawWork.AssemblyServices;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -34,7 +37,42 @@ namespace DesignBoard.ViewModels
 
 
 
+        public FileModel engineeringFile
+        {
+            get { return _engineeringFile; }
+            set
+            {
+                _engineeringFile = value;
+                OnPropertyChanged(nameof(engineeringFile));
+            }
+        }
+        private FileModel _engineeringFile;
 
+
+        public string loadingString
+        {
+            get { return _loadingString; }
+            set
+            {
+                _loadingString = value;
+                OnPropertyChanged(nameof(loadingString));
+            }
+        }
+        private string _loadingString;
+
+
+        // Assembly Model
+
+        public AssemblyModel assemblyData
+        {
+            get { return _assemblyData; }
+            set
+            {
+                _assemblyData = value;
+                OnPropertyChanged(nameof(assemblyData));
+            }
+        }
+        private AssemblyModel _assemblyData;
 
         #region DATA
         public ObservableCollection<AMECheckModel> AMEList
@@ -90,9 +128,13 @@ namespace DesignBoard.ViewModels
 
         public MainWindowViewModel()
         {
-            designBoardVersion = "[ Ver 1.16 ]";
+            designBoardVersion = "[ Ver 1.315 ]";
             checkList = new CheckListModel();
 
+            engineeringFile = new FileModel();
+            loadingString = "";
+
+            assemblyData = new AssemblyModel();
 
             SetSampleData();
             SetImageList();
@@ -116,7 +158,7 @@ namespace DesignBoard.ViewModels
         private void SetSampleData()
         {
             AMEList = new ObservableCollection<AMECheckModel>();
-            if (true)
+            if (false)
             {
                 AMEList.Add(new AMECheckModel() { Name = "APPLIED CODE", Value = "API-650 13th Edition, March 2020", Information = "" });
                 AMEList.Add(new AMECheckModel() { Name = "APPENDICES USED", Value = "E, F, V", Information = "" });
@@ -266,6 +308,107 @@ namespace DesignBoard.ViewModels
 
         }
 
+
+
+        // Assembly Data
+        public void SetAssemblyData()
+        {
+            if (engineeringFile.FullPath!="")
+            {
+                if (File.Exists(engineeringFile.FullPath))
+                {
+                    // Assembly
+                    AssemblyDataService assemblyService = new AssemblyDataService();
+                    //AssemblyModel newTankData = assemblyService.CreateMappingData(ExcelFile.Text);
+
+                    // New Excel Read
+                    assemblyData = assemblyService.CreateMappingDataNew(engineeringFile.FullPath);
+
+                    SetAMEList();
+                }
+
+            }
+        }
+
+        public void SetAMEList()
+        {
+            AMEList.Clear();
+
+            if (assemblyData.GeneralDesignData.Count > 0)
+            {
+                AMEList.Add(new AMECheckModel() { Name = "CODE APPLIED", Value = assemblyData.GeneralDesignData[0].CodeApplied, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "APPENDICES USED", Value = assemblyData.GeneralDesignData[0].AppendicesUsed, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "SHELL DESIGN", Value = assemblyData.GeneralDesignData[0].ShellDesign, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "ROOF DESIGN", Value = assemblyData.GeneralDesignData[0].RoofDesign, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "ROOF STRUCTURE DESIGN", Value = assemblyData.GeneralDesignData[0].RoofStructureDesign, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "CONTENTS", Value = assemblyData.GeneralDesignData[0].Contents, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "DESIGN SPECIFIC. GR.", Value = assemblyData.GeneralDesignData[0].DesignSpecGR, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "MEASUREMENT UNIT", Value = assemblyData.GeneralDesignData[0].MeasurementUnit, Information = "" });
+
+                AMEList.Add(new AMECheckModel() { Name = "ROOF TYPE", Value = assemblyData.GeneralDesignData[0].RoofType, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "NOMINAL ID", Value = assemblyData.GeneralDesignData[0].SizeNominalID, Information = "mm" });
+                AMEList.Add(new AMECheckModel() { Name = "TANK HEIGHT", Value = assemblyData.GeneralDesignData[0].SizeTankHeight, Information = "mm" });
+
+                AMEList.Add(new AMECheckModel() { Name = "DESIGN TEMP. MIN.", Value = assemblyData.GeneralDesignData[0].DesignTempMin, Information = "℃" });
+                AMEList.Add(new AMECheckModel() { Name = "DESIGN TEMP. MAX.", Value = assemblyData.GeneralDesignData[0].DesignTempMax, Information = "℃" });
+                AMEList.Add(new AMECheckModel() { Name = "DESIGN PRESS. INT.", Value = assemblyData.GeneralDesignData[0].DesignPressInt, Information = "mmH2O" });
+                AMEList.Add(new AMECheckModel() { Name = "DESIGN PRESS. EXT.", Value = assemblyData.GeneralDesignData[0].DesignPressExt, Information = "mmH2O" });
+                AMEList.Add(new AMECheckModel() { Name = "TEST SPECIFIC. GR.", Value = assemblyData.GeneralDesignData[0].TestSPGR, Information = "" });
+
+
+                AMEList.Add(new AMECheckModel() { Name = "SHELL PLATE", Value = assemblyData.GeneralMaterialSpecifications[0].ShellPlate, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "BOTTOM PLATE", Value = assemblyData.GeneralMaterialSpecifications[0].BottomPlate, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "ANNULAR PLATE", Value = assemblyData.GeneralMaterialSpecifications[0].AnnularPlate, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "ROOF PLATE", Value = assemblyData.GeneralMaterialSpecifications[0].RoofPlate, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "FLOATING ROOF PLATE", Value = assemblyData.GeneralMaterialSpecifications[0].FloatingRoofPlate, Information = "" });
+
+
+                AMEList.Add(new AMECheckModel() { Name = "SHELL PLATE (C.A)", Value = assemblyData.GeneralCorrosionLoading[0].ShellPlate, Information = "mm" });
+                AMEList.Add(new AMECheckModel() { Name = "ROOF PLATE (C.A)", Value = assemblyData.GeneralCorrosionLoading[0].RoofPlate, Information = "mm" });
+                AMEList.Add(new AMECheckModel() { Name = "BOTTOM PLATE (C.A)", Value = assemblyData.GeneralCorrosionLoading[0].BottomPlate, Information = "mm" });
+                AMEList.Add(new AMECheckModel() { Name = "ANNULAR PLATE (C.A)", Value = assemblyData.GeneralCorrosionLoading[0].AnnularPlate, Information = "mm" });
+                AMEList.Add(new AMECheckModel() { Name = "NOZZLE (C.A)", Value = assemblyData.GeneralCorrosionLoading[0].Nozzle, Information = "mm" });
+
+                AMEList.Add(new AMECheckModel() { Name = "STRUCTURE (EACH SIDE) (C.A)", Value = assemblyData.GeneralCorrosionLoading[0].StructureEachSide, Information = "mm" });
+                AMEList.Add(new AMECheckModel() { Name = "COLUMN (EACH SIDE) (C.A)", Value = assemblyData.GeneralCorrosionLoading[0].ColumnEachSide, Information = "mm" });
+                AMEList.Add(new AMECheckModel() { Name = "DECK PLATE UPPER (C.A)", Value = assemblyData.GeneralCorrosionLoading[0].DeskPlateUpper, Information = "mm" });
+                AMEList.Add(new AMECheckModel() { Name = "DESK PLATE LOWER (C.A)", Value = assemblyData.GeneralCorrosionLoading[0].DeskPlateLower, Information = "mm" });
+
+                AMEList.Add(new AMECheckModel() { Name = "HIGH HIGH LIQUID LEVEL (HHLL)", Value = assemblyData.GeneralLiquidCapacityWeight[0].HighHIghLiquidLevel, Information = "mm" });
+                AMEList.Add(new AMECheckModel() { Name = "HIGH LIQUID LEVEL (HLL)", Value = assemblyData.GeneralLiquidCapacityWeight[0].HighLiquidLevel, Information = "mm" });
+                AMEList.Add(new AMECheckModel() { Name = "LOW LIQUID LEVEL (LLL)", Value = assemblyData.GeneralLiquidCapacityWeight[0].LowLiquidLevel, Information = "mm" });
+                AMEList.Add(new AMECheckModel() { Name = "LOW LOW LIQUID LEVEL (LLLL)", Value = assemblyData.GeneralLiquidCapacityWeight[0].LowLowLiquidLevel, Information = "mm" });
+
+
+                AMEList.Add(new AMECheckModel() { Name = "WIND CODE APPLIED", Value = assemblyData.GeneralWind[0].CodeApplied, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "WIND DESIGN WIND SPEED", Value = assemblyData.GeneralWind[0].DesignWindSpeed, Information = "m/s" });
+                AMEList.Add(new AMECheckModel() { Name = "WIND EXPOSURE", Value = assemblyData.GeneralWind[0].Exposure, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "IMPORTANCE FACTOR", Value = assemblyData.GeneralWind[0].ImportanceFactor, Information = "" });
+
+                AMEList.Add(new AMECheckModel() { Name = "SEISMIC CODE APPLIED", Value = assemblyData.GeneralSeismic[0].CodeApplied, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "SEISMIC USE GROUP", Value = assemblyData.GeneralSeismic[0].SeismicUseGroup, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "SEISMIC SITE CLASSIFICATION", Value = assemblyData.GeneralSeismic[0].SiteClassification, Information = "" });
+                AMEList.Add(new AMECheckModel() { Name = "SEISMIC IMPORTANCE FACTOR", Value = assemblyData.GeneralSeismic[0].ImportanceFactor, Information = "" });
+
+
+                AMEList.Add(new AMECheckModel() { Name = "EMPTY WEIGHT", Value = assemblyData.GeneralLiquidCapacityWeight[0].Empty, Information = "ton" });
+                AMEList.Add(new AMECheckModel() { Name = "OPERATING WEIGHT", Value = assemblyData.GeneralLiquidCapacityWeight[0].Operating, Information = "ton" });
+                AMEList.Add(new AMECheckModel() { Name = "TEST WEIGHT", Value = assemblyData.GeneralLiquidCapacityWeight[0].fullOfWater, Information = "ton" });
+
+
+                AMEList.Add(new AMECheckModel() { Name = "WIND SHEAR", Value = assemblyData.GeneralCorrosionLoading[0].WindShear, Information = "N" });
+                AMEList.Add(new AMECheckModel() { Name = "WIND MOMENT", Value = assemblyData.GeneralCorrosionLoading[0].WindMoment, Information = "N-m" });
+                AMEList.Add(new AMECheckModel() { Name = "SEISMIC SHEAR", Value = assemblyData.GeneralCorrosionLoading[0].SeismicShear, Information = "N" });
+                AMEList.Add(new AMECheckModel() { Name = "SEISMIC MOMENT (RINGWALL)", Value = assemblyData.GeneralCorrosionLoading[0].SeismicMomentRingWall, Information = "N-m" });
+                AMEList.Add(new AMECheckModel() { Name = "SEISMIC MOMENT (SLAB)", Value = assemblyData.GeneralCorrosionLoading[0].SeismicMomentSlab, Information = "N-m" });
+
+
+                //AMEList.Add(new AMECheckModel() { Name = "DESK", Value = assemblyData.GeneralDesignData[0].CodeApplied, Information = "" });
+
+
+            }
+
+        }
 
     }
 }

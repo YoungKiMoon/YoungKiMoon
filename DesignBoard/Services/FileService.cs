@@ -1,7 +1,9 @@
 ﻿using DesignBoard.Commons;
+using DesignBoard.Models;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -47,9 +49,11 @@ namespace DesignBoard.Services
 
             return returnValue;
         }
-        public string GetFile(OpenFile_Type selType )
+        public FileModel GetFile(OpenFile_Type selType )
         {
             string returnValue = "";
+            FileModel returnModel = new FileModel();
+
             List<string> openInfo = GetOpenInformation(selType);
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Title = openInfo[0];
@@ -67,6 +71,30 @@ namespace DesignBoard.Services
                     break;
                 }
 
+            }
+            if (returnValue != "")
+            {
+
+                returnModel.FullPath = returnValue;
+                returnModel.Name = Path.GetFileName(returnModel.FullPath);
+            }
+
+
+            return returnModel;
+        }
+
+        public bool CheckFile(FileModel selFile)
+        {
+            bool returnValue = false;   
+            if (File.Exists(selFile.FullPath))
+            {
+                returnValue = true;
+            }
+            else
+            {
+                selFile.FullPath = "";
+                selFile.Name = "";
+                returnValue = false;
             }
 
             return returnValue;

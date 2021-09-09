@@ -14,7 +14,7 @@
         WindowStartupLocation="CenterScreen" 
         WindowStyle="None" 
         Background="{x:Null}" AllowsTransparency="True"
-        Closing="Window_Closing">
+        Closing="Window_Closing" Closed="Window_Closed">
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
@@ -52,7 +52,7 @@
             <!--#endregion-->
 
 
-            <Border Grid.Row="0" Margin="2,2,2,0" BorderThickness="0"  Background="#FF44546A"/>
+            <Border Grid.Row="0" Margin="2,30,2,0" BorderThickness="0"  Background="#FF44546A"/>
             <Border Grid.Row="1" Margin="2,0,2,2" BorderThickness="0"  Background="#FF333F50"/>
 
             <!--#region Main Image-->
@@ -274,7 +274,7 @@
 
                         </Grid>
 
-                        <Border x:Name="btnEngEdit" Grid.Column="1" BorderThickness="1" CornerRadius="10" BorderBrush="#FF2E75B6" Background="#FF203864" Height="60" VerticalAlignment="Center" SnapsToDevicePixels="True" Cursor="Hand" Margin="10,0,14,0" >
+                        <Border x:Name="btnEngEdit" Grid.Column="1" BorderThickness="1" CornerRadius="10" BorderBrush="#FF2E75B6" Background="#FF203864" Height="60" VerticalAlignment="Center" SnapsToDevicePixels="True" Cursor="Hand" Margin="10,0,14,0" PreviewMouseLeftButtonUp="btnEngEdit_PreviewMouseLeftButtonUp" >
                             <Border.Effect>
                                 <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="Black"/>
                             </Border.Effect>
@@ -308,7 +308,7 @@
                 <Border Grid.Row="0" Height="30" CornerRadius="4" BorderThickness="1" BorderBrush="#FF2E75B6" SnapsToDevicePixels="True" Background="Black" Margin="0,0,14,0">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="6,0">
                         <TextBlock Text="ENG FILE : " Foreground="#FFD6DCE5" FontSize="16"/>
-                        <TextBlock Text="Test_CRT.xlsm" Foreground="Cyan" FontSize="16"/>
+                        <TextBlock Text="{Binding engineeringFile.Name}" Foreground="Cyan" FontSize="16"/>
                     </StackPanel>
                 </Border>
                 <Grid Grid.Row="1">
@@ -398,6 +398,21 @@
             </Border>
         </Grid>
         <!--#endregion-->
+        
+        <!--#region Default Loading-->
+        <Grid x:Name="busyAreaSourceDefault" Visibility="Hidden">
+            <Border Background="#7F8DC2F0">
+                <Border.Effect  >
+                    <BlurEffect KernelType="Gaussian" Radius="10" />
+                </Border.Effect>
+            </Border>
+            <Border Background="#FF1C7DDE" CornerRadius="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="{Binding loadingString}" Margin="30,10" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FF010A27"></TextBlock>
+            </Border>
+        </Grid>
+        
+        <!--#endregion-->
+        
     </Grid>
 
 

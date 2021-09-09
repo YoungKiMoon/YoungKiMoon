@@ -28,6 +28,7 @@ using DrawWork.Commons;
 using DrawSettingLib.SettingServices;
 using DrawSettingLib.SettingModels;
 using DrawSettingLib.Commons;
+using DrawWork.DrawGridServices;
 
 namespace PaperSetting.EYEServices
 {
@@ -80,28 +81,107 @@ namespace PaperSetting.EYEServices
         #endregion
 
 
+        public void DrawEntity()
+        {
+            // Sheet 
+            singleDraw.Sheets.Clear();
+
+            // Blcok
+            for (int i = singleDraw.Blocks.Count; i > 0; i--)
+            {
+                bool removeSign = false;
+                Block eachBlock = singleDraw.Blocks[i-1];
+                if (eachBlock.Name.Contains("View"))
+                    removeSign = true;
+                else if (eachBlock.Name.Contains("PAPER_TABLE"))
+                    removeSign = true;
+                else if (eachBlock.Name.Contains("PAPER_NOTE"))
+                    removeSign = true;
+                // Delete
+                if (removeSign)
+                    singleDraw.Blocks.Remove(eachBlock);
+
+            }
+            singleDraw.Invalidate();
+            singleDraw.Entities.Regen();
+            singleDraw.Rebuild(singleModel);
+        }
+
+
+        public Sheet GetDWGSheet(string sheetName)
+        {
+            foreach(Sheet eachSheet in singleDraw.Sheets)
+            {
+                if (eachSheet.Name == sheetName)
+                {
+                    return eachSheet;
+                }
+            }
+
+            return null;
+        }
+
+        #region Create : Paper : Grid : Draw
+        public void CreatePaperGridDraw(ObservableCollection<DrawPaperGridModel> selGridList, ObservableCollection<PaperDwgModel> selPaperList)
+        {
+
+            bool gridOutlineVisible = true;
+            DrawPaperGridService paperGridService = new DrawPaperGridService();
+
+            // Scale
+            double scaleValue = 1;
+
+            foreach (PaperDwgModel eachPaper in selPaperList)
+            {
+                PAPERMAIN_TYPE eachDwgName = eachPaper.Name;
+                double eachDwgPage = eachPaper.Page;
+
+                DrawPaperGridModel eachPaperGrid = paperGridService.GetPaperGrid(selGridList, eachDwgName,eachDwgPage);
+
+                if (eachPaperGrid != null)
+                {
+                    
+                    // Grid Block
+                    List<Entity> gridEntity = paperGridService.CreateGridEntity(eachPaperGrid, eachDwgName, eachDwgPage, singleDraw);
+                    styleService.SetLayerListEntity(ref gridEntity, layerService.LayerDimension);
+
+                    Sheet eachDWGSheet = GetDWGSheet(eachPaper.Basic.Title + eachPaper.Page);
+                    eachDWGSheet.Entities.AddRange(gridEntity);
+
+                    // ViewPort
+                    foreach (PaperAreaModel eachArea in SingletonData.PaperArea.AreaList)
+                    {
+                        // 같은 DWG
+                        if (eachArea.DWGName == eachDwgName)
+                        {
+                            if (eachArea.Page == eachDwgPage)
+                            {
+
+                                if (eachArea.visible)
+                                {
+                                    Console.WriteLine(eachArea.TitleName + eachArea.viewID );
+                                    CreateVectorViewDetail(ref eachDWGSheet, eachArea, eachArea.ScaleValue);
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+            }
+
+
+            singleDraw.Entities.Regen();
+            singleDraw.Rebuild(singleModel);
+        }
+        #endregion
+
+
 
 
         #region Create : Paper : Draw
         public void CreatePaperDraw(ObservableCollection<PaperDwgModel> selPaperCol, AssemblyModel assemblyData, bool selOneSheet = true)
         {
-
-            singleDraw.Sheets.Clear();
-            singleDraw.Blocks.Remove("newView");
-            singleDraw.Blocks.Remove("newView2");
-
-            for (int i = singleDraw.Blocks.Count - 1; i > -1; i--)
-            {
-                Block eachBlock = singleDraw.Blocks[i];
-                if (eachBlock.Name.Contains("PAPER_TABLE"))
-                {
-                    singleDraw.Blocks.Remove(eachBlock);
-                }
-                if (eachBlock.Name.Contains("PAPER_NOTE"))
-                {
-                    singleDraw.Blocks.Remove(eachBlock);
-                }
-            }
 
 
             // Scale
@@ -125,11 +205,14 @@ namespace PaperSetting.EYEServices
                 oneSheetBlock = new Dictionary<string, DockModel>();
 
                 //string sheetName = "GENERAL A" + sheetIndex.ToString();
-                string sheetName = eachPaper.Basic.Title;
+                string sheetName = eachPaper.Basic.Title+ eachPaper.Page;
                 //newSheet.Name = eachPaper.Basic.Title;
                 //newSheet = CreateSheet(eachPaper);
                 Sheet newSheet = new Sheet(linearUnitsType.Millimeters, eachPaper.SheetSize.Width, eachPaper.SheetSize.Height, sheetName);
                 //newSheet = new Sheet(linearUnitsType.Millimeters, 200, 200, "GENERAL ASSEMBLY(1/2)");
+
+                //eachPaper.PaperSheet = newSheet;
+
                 singleDraw.Sheets.Add(newSheet);
 
 
@@ -164,8 +247,9 @@ namespace PaperSetting.EYEServices
                 //
                 if (eachPaper.Basic.Title == "GENERAL ASSEMBLY(1-2)")
                 {
-                    scaleValue = paperArea.GetPaperScaleValue(PAPERMAIN_TYPE.GA,PAPERSUB_TYPE.NotSet, SingletonData.PaperArea);
+                    scaleValue = paperArea.GetPaperScaleValue(PAPERMAIN_TYPE.GA1,PAPERSUB_TYPE.NotSet, SingletonData.PaperArea.AreaList);
 
+                    // ViewPort 임시 컨트롤 
                     CreateVectorViewGA(newSheet, eachPaper.ViewPorts[0].ViewPort, scaleValue, assemblyData);
 
                     CreateTableBlockGADesign(eachPaper.Tables[0], newSheet, eachPaper.Tables[0].No, assemblyData);
@@ -181,7 +265,8 @@ namespace PaperSetting.EYEServices
 
                 if (eachPaper.Basic.Title == "NOZZLE ORIENTATION")
                 {
-                    scaleValue = paperArea.GetPaperScaleValue(PAPERMAIN_TYPE.ORIENTATION,PAPERSUB_TYPE.NotSet, SingletonData.PaperArea);
+                    scaleValue = paperArea.GetPaperScaleValue(PAPERMAIN_TYPE.ORIENTATION,PAPERSUB_TYPE.NotSet, SingletonData.PaperArea.AreaList);
+                    // ViewPort 임시 컨트롤 
                     CreateVectorViewOrientation(newSheet, eachPaper.ViewPorts[0].ViewPort, scaleValue, assemblyData);
 
                     CreateTableBlockGA(eachPaper.Tables[0], newSheet, eachPaper.Tables[0].No, assemblyData);
@@ -194,6 +279,14 @@ namespace PaperSetting.EYEServices
 
                 }
 
+                if(eachPaper.Basic.Title=="SHELL PLATE ARRANGEMENT")
+                {
+                    //CreateVectorViewDetail01(newSheet, eachPaper.ViewPorts[0].ViewPort, scaleValue, assemblyData);
+                    if(eachPaper.Tables.Count>0)
+                        CreateTableBlockShellPlate(eachPaper.Tables[0], newSheet, eachPaper.Tables[0].No, assemblyData);
+                }
+
+
                 //singleModel.UpdateBoundingBox();
                 //singleDraw.Invalidate();
                 // 중요한지 테스트 필요함
@@ -202,7 +295,7 @@ namespace PaperSetting.EYEServices
                 singleDraw.Invalidate();
                 sheetIndex++;
 
-
+                Console.WriteLine(eachPaper.Name.ToString() + ":" + eachPaper.Page);
             }
 
 
@@ -220,10 +313,57 @@ namespace PaperSetting.EYEServices
             //SolidColorBrush newColor = Brushes.Red;
             //singleDraw.Background.IntermediateColor = newColor;
             //singleDraw.Invalidate();
+            singleDraw.Entities.Regen();
             singleDraw.Rebuild(singleModel);
 
 
         }
+
+
+        // Detail View
+        public void CreateVectorViewDetail(ref Sheet selSheet, PaperAreaModel selPaper, double scaleValue)
+        {
+
+            double extensionAmount = Math.Min(selSheet.Width, selSheet.Height) / 594;
+
+            Point3D targetPoint = new Point3D();
+            targetPoint.X = selPaper.ModelCenterLocation.X;
+            targetPoint.Y = selPaper.ModelCenterLocation.Y;
+
+
+            scaleValue = selPaper.ScaleValue;
+
+            string nickName01 = "newViewDetail" + selPaper.viewID;
+            string nickName02 = "DetailPlaceHolder" + selPaper.viewID;
+
+
+            if (selPaper.visible)
+            {
+                Camera newnewCamera = new Camera(targetPoint, 0, Viewport.GetCameraRotation(viewType.Top), projectionType.Orthographic, 0, 1);
+                VectorView newnewView = new VectorView(selPaper.Location.X + selPaper.Size.X / 2,
+                                                    selPaper.Location.Y - selPaper.Size.Y / 2,
+                                                    newnewCamera,
+                                                    scaleService.GetViewScale(scaleValue),
+                                                    nickName01,
+                                                    selPaper.Size.X,
+                                                    selPaper.Size.Y
+                                                    );
+
+                newnewView.CenterlinesExtensionAmount = extensionAmount;
+                newnewView.KeepEntityColor = true;
+                newnewView.LayerName = layerService.LayerViewport;
+
+                selSheet.AddViewPlaceHolder(newnewView, singleModel, singleDraw, nickName02);
+            }
+            else
+            {
+                Console.WriteLine("ViewPort : Visible : False : " + selPaper.SubName.ToString());
+            }
+
+
+        }
+
+
 
         public void CreateVectorViewGA(Sheet selSheet, ViewPortModel selViewPort,double scaleValue,AssemblyModel assemData)
         {
@@ -312,7 +452,7 @@ namespace PaperSetting.EYEServices
                 //                                    valueService.GetDoubleValue(selViewPort.SizeY)
                 //                                    );
 
-                PaperAreaModel GAPaper= SingletonData.PaperArea[0];
+                PaperAreaModel GAPaper= SingletonData.PaperArea.AreaList[0];
 
                 VectorView newnewView = new VectorView(GAPaper.Location.X,
                                                        GAPaper.Location.Y,
@@ -413,11 +553,11 @@ namespace PaperSetting.EYEServices
                 double extensionAmount = Math.Min(selSheet.Width, selSheet.Height) / 594;
 
 
-                PaperAreaModel orientationPaper = SingletonData.PaperArea[1];
+                PaperAreaModel orientationPaper = SingletonData.PaperArea.AreaList[1];
 
                 Point3D targetPoint = new Point3D();
-                targetPoint.X = orientationPaper.ModelLocation.X;
-                targetPoint.Y = orientationPaper.ModelLocation.Y;
+                targetPoint.X = orientationPaper.ModelCenterLocation.X;
+                targetPoint.Y = orientationPaper.ModelCenterLocation.Y;
 
 
 
@@ -652,6 +792,37 @@ namespace PaperSetting.EYEServices
             selSheet.Entities.Add(newBr);
             oneSheetBlock.Add(newBr.BlockName, selTable.Dock);
         }
+
+
+        private void CreateTableBlockShellPlate(PaperTableModel selTable, Sheet selSheet, string bName, AssemblyModel assemblyData)
+        {
+            BlockReference newBr = BuildPaperTableShellPlateBM(selTable, assemblyData, out Block tableBlock);
+            newBr.LayerName = layerService.LayerBlock;
+
+            tableBlock.Name += bName + "_" + singleDraw.Blocks.Count;
+            newBr.BlockName = tableBlock.Name;
+
+            singleDraw.Blocks.Add(tableBlock);
+            selSheet.Entities.Add(newBr);
+            oneSheetBlock.Add(newBr.BlockName, selTable.Dock);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         private void CreateVectorView(Sheet selSheet, PaperViewportModel selView, string viewName)
@@ -1478,6 +1649,168 @@ namespace PaperSetting.EYEServices
             BlockReference newBr = new BlockReference(selTable.Location.X, selTable.Location.Y, 0, "PAPER_TABLE" + selTable.No, 1, 1, 1, 0);
 
             Block newBl = new Block("PAPER_TABLE_" + selTable.No);
+            newBl.Entities.AddRange(newList);
+            selBlock = newBl;
+            return newBr;
+
+        }
+
+
+        private BlockReference BuildPaperTableShellPlateBM(PaperTableModel selTable, AssemblyModel assemblyData, out Block selBlock)
+        {
+            //int rowCount = selTable.TableList.Count;
+            //int columnCount = selTable.TableList[0].Length;
+
+            double fontHeight = 2.5;
+            double fontHeight2 = 2;
+            double fontHeightTitle = 4;
+
+
+            List<Entity> newList = new List<Entity>();
+            // Default
+
+            Point3D refPoint = new Point3D(0, 0);
+            double tableWidth = 180;
+            double titleRowHeight = 10;
+            double rowHeight = 7;
+
+            List<double> widthList = new List<double>();
+            widthList.AddRange(new double[] { 10, 45, 25, 53, 12, 15, 20 });
+
+            double beforeX = 0;
+            double beforeY = 0;
+            double currentY = 0;
+            double currentX = 0;
+
+            double defaultCount = SingletonData.BMList.Count;
+
+            double tableHeight = titleRowHeight + (rowHeight * defaultCount)+rowHeight;
+
+            // 행
+            currentY = tableHeight;
+            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) );
+            currentY -= titleRowHeight;
+            newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)));
+
+            for (int i = 0; i < defaultCount ; i++)
+            {
+                currentY -= rowHeight;
+                // 마지막 행
+                newList.Add(new Line(GetSumPoint(refPoint, 0, currentY), GetSumPoint(refPoint, tableWidth, currentY)) );
+            }
+            currentY -= rowHeight;
+            // 마지막
+            newList.Add(new Line(GetSumPoint(refPoint, 80, currentY), GetSumPoint(refPoint, 80, currentY+rowHeight)));
+            newList.Add(new Line(GetSumPoint(refPoint, 80, currentY), GetSumPoint(refPoint, tableWidth, currentY)));
+
+            // 열
+            double colCount = 0;
+            currentX = 0;
+            foreach (double eachCol in widthList)
+            {
+                colCount++;
+                newList.Add(new Line(GetSumPoint(refPoint, currentX, rowHeight), GetSumPoint(refPoint, currentX, tableHeight)));
+                currentX += eachCol;
+
+            }
+
+            // 마지막 텍스트
+            Text newTitle01 = new Text(GetSumPoint(refPoint, 80 + 53/2, currentY + rowHeight / 2), "TOTAL WEIGHT", fontHeight);
+            newTitle01.Alignment = Text.alignmentType.MiddleCenter;
+            newTitle01.StyleName = textService.TextROMANS;
+
+            Text newTitle02 = new Text(GetSumPoint(refPoint, tableWidth-20, currentY + rowHeight / 2), "0.0", fontHeight);
+            newTitle02.Alignment = Text.alignmentType.MiddleRight;
+            newTitle02.StyleName = textService.TextROMANS;
+
+            Text newTitle03 = new Text(GetSumPoint(refPoint, tableWidth - 20 / 2, currentY + rowHeight / 2), "kg", fontHeight);
+            newTitle03.Alignment = Text.alignmentType.MiddleCenter;
+            newTitle03.StyleName = textService.TextROMANS;
+
+
+            newList.Add(newTitle01);
+            newList.Add(newTitle02);
+            newList.Add(newTitle03);
+
+
+
+            double realCount = 0;
+
+            if (true)
+            {
+                realCount++;
+                int colNumber = 0;
+                double colWidth = 0;
+
+                // Start firts column
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, tableHeight- titleRowHeight / 2), "NO.", fontHeight, 1, Text.alignmentType.MiddleCenter));
+
+                colWidth += widthList[colNumber];
+                colNumber++;
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, tableHeight - titleRowHeight / 2), "NAME", fontHeight, 1, Text.alignmentType.MiddleCenter));
+                colWidth += widthList[colNumber];
+                colNumber++;
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, tableHeight - titleRowHeight / 2), "MAT'L", fontHeight, 1, Text.alignmentType.MiddleCenter));
+                colWidth += widthList[colNumber];
+                colNumber++;
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, tableHeight - titleRowHeight / 2), "DIMENSION", fontHeight, 1, Text.alignmentType.MiddleCenter));
+                colWidth += widthList[colNumber];
+                colNumber++;
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, tableHeight - titleRowHeight / 2 +0.5), "NO. OF", fontHeight2, 1, Text.alignmentType.BaselineCenter));
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, tableHeight - titleRowHeight / 2 -0.5), "1 SET", fontHeight2, 1, Text.alignmentType.TopCenter));
+                colWidth += widthList[colNumber];
+                colNumber++;
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, tableHeight - titleRowHeight / 2 +0.5), "WEIGHT", fontHeight2, 1, Text.alignmentType.BaselineCenter));
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, tableHeight - titleRowHeight / 2 -0.5), "(Kg)", fontHeight2, 1, Text.alignmentType.TopCenter));
+                colWidth += widthList[colNumber];
+                colNumber++;
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, tableHeight - titleRowHeight / 2), "REMARK", fontHeight,1, Text.alignmentType.MiddleCenter));
+
+            }
+
+            currentY = tableHeight-titleRowHeight;
+            foreach (DrawBMModel eachBM in SingletonData.BMList)
+            {
+                realCount++;
+                int colNumber = 0;
+                double colWidth = 0;      
+
+                // Start firts column
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.No, fontHeight, 1, Text.alignmentType.MiddleCenter));
+
+                colWidth += widthList[colNumber];
+                colNumber++;
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Name, fontHeight, 1, Text.alignmentType.MiddleCenter));
+
+                colWidth += widthList[colNumber];
+                colNumber++;
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Material, fontHeight, 1, Text.alignmentType.MiddleCenter));
+
+                colWidth += widthList[colNumber];
+                colNumber++;
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Dimension, fontHeight, 1, Text.alignmentType.MiddleCenter));
+
+                colWidth += widthList[colNumber];
+                colNumber++;
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Set, fontHeight, 1, Text.alignmentType.MiddleCenter));
+
+                colWidth += widthList[colNumber];
+                colNumber++;
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Weight, fontHeight, 1, Text.alignmentType.MiddleCenter));
+
+                colWidth += widthList[colNumber];
+                colNumber++;
+                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Remark, fontHeight, 1, Text.alignmentType.MiddleCenter));
+
+
+                currentY -= rowHeight;
+            }
+
+            BlockReference newBr = new BlockReference(selTable.Location.X, selTable.Location.Y, 0, "PAPER_TABLE" + selTable.No, 1, 1, 1, 0);
+
+            Block newBl = new Block("PAPER_TABLE_" + selTable.No);
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerDimension);
             newBl.Entities.AddRange(newList);
             selBlock = newBl;
             return newBr;

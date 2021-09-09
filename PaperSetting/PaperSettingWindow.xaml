@@ -53,6 +53,13 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Border CornerRadius="4" Margin="2" Padding="0,4,0,0" BorderBrush="#FF63ADBD" BorderThickness="0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <TextBox x:Name="tbEngFile" Width="100" Height="20" Margin="5,0"/>
+                            <Button x:Name="btnEngLoad" Content="ENG LOAD" Style="{StaticResource customButton}" PreviewMouseLeftButtonUp="btnEngLoad_PreviewMouseLeftButtonUp"/>
+                            <Button x:Name="btnEngSave" Content="ENG SAVE" Style="{StaticResource customButton}" PreviewMouseLeftButtonUp="btnEngSave_PreviewMouseLeftButtonUp" />
+                            <Button x:Name="btnEngCheck" Content="ENG CHECK" Style="{StaticResource customButton}" PreviewMouseLeftButtonUp="btnEngCheck_PreviewMouseLeftButtonUp" />
+                            <CheckBox x:Name="cbGridVisible" IsChecked="{Binding DWGGridVisible}" VerticalAlignment="Center">
+                                <TextBlock Text="Grid Visible" Foreground="#FF626576" />
+                            </CheckBox>
                             <Button x:Name="btnRebuild" Content="REBUILD" Style="{StaticResource customButton}" Margin="10,2,2,0" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Padding="10,0" Background="#FFF0BBBB"/>
                             <Button x:Name="btnRegen" Content="REGEN" Style="{StaticResource customButton}" Margin="10,2,2,0" Padding="10,0" Background="#FF6FBBCB" PreviewMouseLeftButtonUp="btnRegen_PreviewMouseLeftButtonUp"/>
                             <Button x:Name="btnOrientationAdj" Content="ORIENTATION ADJ" Style="{StaticResource customButton}" Margin="10,2,2,0"  Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnOrientationAdj_PreviewMouseLeftButtonUp" />

@@ -64,12 +64,15 @@ namespace DrawWork.DrawModels
         public POSITION_TYPE textLowerPosition { get; set; }
 
 
+        // Rotate
+        public bool rightPointRotate { get; set; }
+        public bool leftPointRotate { get; set; }
+
 
         // Scale
         public double scaleValue { get; set; }
 
 
-        
         public DrawDimensionModel()
         {
             SetDefaultValue();
@@ -123,6 +126,8 @@ namespace DrawWork.DrawModels
             textLower= "";
             textLowerPosition = POSITION_TYPE.CENTER;
 
+            rightPointRotate = false;
+            leftPointRotate = true;
             scaleValue = 1;
         }
     }

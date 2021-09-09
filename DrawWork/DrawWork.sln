@@ -23,6 +23,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ExcelAddinSetup", "..\Excel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrengthCalLib", "..\StrengthCalLib\StrengthCalLib.csproj", "{38F33E73-A1A2-4455-B5A7-1C1366DCC9BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPDataLib", "..\EPDataLib\EPDataLib.csproj", "{57C694EC-D561-4BE8-80E6-63FD2CB22EFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{38F33E73-A1A2-4455-B5A7-1C1366DCC9BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38F33E73-A1A2-4455-B5A7-1C1366DCC9BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38F33E73-A1A2-4455-B5A7-1C1366DCC9BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57C694EC-D561-4BE8-80E6-63FD2CB22EFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57C694EC-D561-4BE8-80E6-63FD2CB22EFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57C694EC-D561-4BE8-80E6-63FD2CB22EFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57C694EC-D561-4BE8-80E6-63FD2CB22EFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -23,6 +23,10 @@ namespace DrawWork.DrawModels
         public string upperText { get; set; }
         public string lowerText { get; set; }
 
+        public double multiLineHeight { get; set; }
+
+        public string upperSecondText { get; set; }
+
         public POSITION_TYPE textAlign { get; set; }
 
         public double leaderLength { get; set; }
@@ -31,6 +35,10 @@ namespace DrawWork.DrawModels
 
         public double textGap { get; set; }
 
+        public double leaderPointLength { get; set; }
+        public double leaderPointRadian { get; set; }
+
+        public bool arrowHeadVisible { get; set; }
         public DrawBMLeaderModel()
         {
 
@@ -39,9 +47,14 @@ namespace DrawWork.DrawModels
             bmCircle = new DrawBMNumberModel();
             arrowHeadWidth = 2.5;
             arrowHeadHeight = 0.8;
+            arrowHeadVisible = true;
+
             textHeight = 2.5;
             upperText = "";
             lowerText = "";
+
+            multiLineHeight = 7;
+            upperSecondText = "";
 
             textAlign = POSITION_TYPE.CENTER;
 
@@ -51,6 +64,9 @@ namespace DrawWork.DrawModels
 
             textGap = 1;
             textSideGap = 1;
+
+            leaderPointLength = 0;
+            leaderPointRadian = 0;
         }
     }
 }

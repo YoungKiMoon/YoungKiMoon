@@ -40,6 +40,10 @@
     <ApplicationIcon>TABAS_ICOn.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AssemblyLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\AssemblyLib\bin\Debug\AssemblyLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -68,6 +72,7 @@
     <Compile Include="Models\DataCheckSummaryModel.cs" />
     <Compile Include="Models\DataListModel.cs" />
     <Compile Include="Models\DataModel.cs" />
+    <Compile Include="Models\FileModel.cs" />
     <Compile Include="Models\ImageModel.cs" />
     <Compile Include="Models\ListBoxItemModel.cs" />
     <Compile Include="Models\NozzleModel.cs" />
@@ -162,6 +167,14 @@
     <Resource Include="AssemblyImage\compressionRing_detail_k.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DrawWork\DrawWork.csproj">
+      <Project>{AB705C54-197D-4C70-A2A9-5525073F7240}</Project>
+      <Name>DrawWork</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ExcelDataLib\ExcelDataLib.csproj">
+      <Project>{135b58cb-c30c-4500-84c4-0a67a68c7812}</Project>
+      <Name>ExcelDataLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PaperSetting\PaperSetting.csproj">
       <Project>{54646763-9077-4586-b318-6a50f28cda15}</Project>
       <Name>PaperSetting</Name>

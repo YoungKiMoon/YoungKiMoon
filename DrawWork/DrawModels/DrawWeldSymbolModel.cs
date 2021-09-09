@@ -7,8 +7,15 @@ using System.Threading.Tasks;
 
 namespace DrawWork.DrawModels
 {
-    public class DrawWeldingSymbolModel
+    public class DrawWeldSymbolModel
     {
+        // Position
+        public ORIENTATION_TYPE position { get; set; }
+
+        // Angle
+        public double leaderAngle { get; set; }
+
+
         // Arrow
         public bool arrowHeadVisible { get; set; }
         public double arrowHeadWidth { get; set; }
@@ -46,16 +53,19 @@ namespace DrawWork.DrawModels
 
         // Weld Tail
         public bool tailVisible { get; set; }
+        public string specification { get; set; }
         public string specification1 { get; set; }
         public string specification2 { get; set; }
         public string specification3 { get; set; }
 
         // Weld Type
-        public WeldSymbol_Type weldType { get; set; }
+        public WeldSymbol_Type weldTypeUp { get; set; }
+        public WeldSymbol_Type weldTypeDown { get; set; }
         public WeldSymbolDetail_Type weldDetailType { get; set; }
 
         // Weld Face
-        public WeldFace_Type weldFace { get; set; }
+        public WeldFace_Type weldFaceUp { get; set; }
+        public WeldFace_Type weldFaceDown { get; set; }
 
         // Weld Angle
         public string weldAngle1 { get; set; }
@@ -69,8 +79,13 @@ namespace DrawWork.DrawModels
         public bool machiningVisible { get; set; }
         public string machiningStr { get; set; }
 
-        public DrawWeldingSymbolModel()
+       public DrawWeldSymbolModel()
         {
+
+            position = ORIENTATION_TYPE.TOPLEFT;
+
+            leaderAngle = 60;
+
             // Arrow Head
             arrowHeadVisible = true;
             arrowHeadWidth = 2.5;
@@ -107,16 +122,19 @@ namespace DrawWork.DrawModels
 
             // Weld Tail
             tailVisible = true;
+            specification = "";
             specification1 = "";
             specification2 = "";
             specification3 = "";
 
             // Weld Type
-            weldType = WeldSymbol_Type.NotSet;
+            weldTypeUp = WeldSymbol_Type.NotSet;
+            weldTypeDown = WeldSymbol_Type.NotSet;
             weldDetailType = WeldSymbolDetail_Type.NotSet;
 
             // Weld Face
-            weldFace = WeldFace_Type.NotSet;
+            weldFaceUp = WeldFace_Type.NotSet;
+            weldFaceDown = WeldFace_Type.NotSet;
 
             // Weld Angle
             weldAngle1 = "";
@@ -125,6 +143,7 @@ namespace DrawWork.DrawModels
             // Weld Root
             weldRoot1 = "";
             weldRoot2 = "";
+
             // Machining
             machiningVisible = false;
             machiningStr = "G";

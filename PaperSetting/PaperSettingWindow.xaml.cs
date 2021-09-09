@@ -42,6 +42,11 @@ using devDept.Eyeshot;
 using System.Diagnostics;
 using PaperSetting.Windows;
 using DrawSettingLib.SettingServices;
+using System.Collections.ObjectModel;
+using DrawWork.DrawGridServices;
+using System.IO;
+using DrawWork.DrawDetailServices;
+using EPDataLib.ExcelServices;
 
 namespace PaperSetting
 {
@@ -119,18 +124,28 @@ namespace PaperSetting
             testDraw.PaperColor = new SolidColorBrush(Color.FromRgb(59,68,83));
 
 
-            workbookName = "TankDesign_0527_1.xlsm";
-            workbookName = "TEST 2019-3.xlsm";
-            workbookName = "TEST-002.xlsm";
-            workbookName = "TEST 2019-1.xlsm";
-            workbookName = "TankDesign_0527-2.xlsm";
-            workbookName = "TankDesign_0528.xlsm";
-            workbookName = "TankDesign_0528-1.xlsm";
-            workbookName = "DRT TEST-1.xlsm";
-            workbookName = "DRT TEST_20210610.xlsm";
-            workbookName = "1.CRT.xlsm";
-            workbookName = "TABAS_20210614+1.xlsm";
-            
+            //workbookName = "TankDesign_0527_1.xlsm";
+            //workbookName = "TEST 2019-3.xlsm";
+            //workbookName = "TEST-002.xlsm";
+            //workbookName = "TEST 2019-1.xlsm";
+            //workbookName = "TankDesign_0527-2.xlsm";
+            //workbookName = "TankDesign_0528.xlsm";
+            //workbookName = "TankDesign_0528-1.xlsm";
+            //workbookName = "DRT TEST-1.xlsm";
+            //workbookName = "DRT TEST_20210610.xlsm";
+            //workbookName = "1.CRT.xlsm";
+            //workbookName = "TABAS_20210614+1.xlsm";
+
+
+
+
+            if(workbookName=="")
+                workbookName = @"C:\Users\tree\Desktop\CAD\TABAS\20210831 제출\TABAS_20210827-CRT.xlsm";
+
+
+
+
+
             //workbookName = "1.CRT_Test.xlsm";
             //workbookName = "TABAS_20210614_blank_CRT.xlsm";
             //workbookName = "TABAS_20210614_data_CRT.xlsm";
@@ -167,7 +182,7 @@ namespace PaperSetting
                 {
                     // 자동 실행
                     //testBackStart();
-                    SetAssemblyData();
+                    //SetAssemblyData();
                 }
                 else
                 {
@@ -179,7 +194,7 @@ namespace PaperSetting
             {
                 // 자동 실행
                 //testBackStart();
-                SetAssemblyData();
+                //SetAssemblyData();
             }
 
             gridLoading.Visibility = Visibility.Collapsed;
@@ -187,6 +202,8 @@ namespace PaperSetting
 
         }
 
+
+        // 실행 버튼
         private void Button_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             //SampleDraw();
@@ -194,8 +211,15 @@ namespace PaperSetting
             //CreateDrawSample();
             if (One_Click())
             {
+                PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+                SingletonData.PaperGridVisible = selView.DWGGridVisible;
                 //tabDetail.SelectedItem = viewview;
                 tabDetail.SelectedItem = previewpreview;
+
+
+                testDraw.ActiveSheet = null;
+                testDraw.Refresh();
+                DoEvents();
                 //BusyStartSource(true);
                 //CreateDraw1st
                 testBack();
@@ -206,67 +230,67 @@ namespace PaperSetting
         }
 
 
-        public void testBackStart()
-        {
-            PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
-            selView.BContents = "TANK DATA 준비 중입니다.";
-            customBusyIndicator.IsBusy = true;
+        //public void testBackStart()
+        //{
+        //    PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+        //    selView.BContents = "TANK DATA 준비 중입니다.";
+        //    customBusyIndicator.IsBusy = true;
 
 
-            BackgroundWorker bgWorker = new BackgroundWorker();
+        //    BackgroundWorker bgWorker = new BackgroundWorker();
 
-            bgWorker.WorkerReportsProgress = true;
-            bgWorker.ProgressChanged += (ssender, ee) =>
-            {
-                if (ee.ProgressPercentage == 99999)
-                {
-                    customBusyIndicator.IsBusy = false;
-                    IsBusy = false;
-                }
-                else
-                {
+        //    bgWorker.WorkerReportsProgress = true;
+        //    bgWorker.ProgressChanged += (ssender, ee) =>
+        //    {
+        //        if (ee.ProgressPercentage == 99999)
+        //        {
+        //            customBusyIndicator.IsBusy = false;
+        //            IsBusy = false;
+        //        }
+        //        else
+        //        {
 
-                }
+        //        }
 
-            };
-            bgWorker.RunWorkerCompleted += (ssender, ee) =>
-            {
-                //PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
-                DrawScaleService scaleService = new DrawScaleService();
-                double autoScale = scaleService.GetAIScale(selView.newTankData);
-                SampleDraw(selView.newTankData);
+        //    };
+        //    bgWorker.RunWorkerCompleted += (ssender, ee) =>
+        //    {
+        //        //PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+        //        DrawScaleService scaleService = new DrawScaleService();
+        //        double autoScale = scaleService.GetAIScale(selView.newTankData);
+        //        SampleDraw(selView.newTankData);
 
-                customBusyIndicator.IsBusy = false;
-                IsBusy = false;
-
-
-
-                gridLoading.Visibility = Visibility.Collapsed;
-            };
-            bgWorker.DoWork += (ssender, ee) =>
-            {
+        //        customBusyIndicator.IsBusy = false;
+        //        IsBusy = false;
 
 
 
-                try
-                {
-                    //DoEvents();
-                    //Thread.Sleep(1000);
-                    Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-                    {
-                        //your code
-                        //DoEvents();
-                        SetAssemblyData();
-                    }));
+        //        gridLoading.Visibility = Visibility.Collapsed;
+        //    };
+        //    bgWorker.DoWork += (ssender, ee) =>
+        //    {
 
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            };
-            bgWorker.RunWorkerAsync();
-        }
+
+
+        //        try
+        //        {
+        //            //DoEvents();
+        //            //Thread.Sleep(1000);
+        //            Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+        //            {
+        //                //your code
+        //                //DoEvents();
+        //                SetAssemblyData();
+        //            }));
+
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show(ex.Message);
+        //        }
+        //    };
+        //    bgWorker.RunWorkerAsync();
+        //}
 
 
         public void testBack()
@@ -294,7 +318,7 @@ namespace PaperSetting
             };
             bgWorker.RunWorkerCompleted += (ssender, ee) =>
             {
-
+                SampleDraw();
                 customBusyIndicator.IsBusy = false;
                 IsBusy = false;
             };
@@ -314,7 +338,8 @@ namespace PaperSetting
                         CreateDraw1st();
 
 
-                        SampleDraw(selView.newTankData);
+                        //SetAssemblyDataSub();
+                        Console.WriteLine("완료");
                     }));
 
                 }
@@ -324,6 +349,7 @@ namespace PaperSetting
                 }
             };
             bgWorker.RunWorkerAsync();
+
         }
 
         public void SetAssemblyData()
@@ -332,14 +358,22 @@ namespace PaperSetting
             // Assembly
             
             AssemblyDataService assemblyService = new AssemblyDataService();
-            AssemblyModel newTankData = assemblyService.CreateMappingData(workbookName,activeCustomWorkbook);
+            AssemblyModel newTankData = assemblyService.CreateMappingDataNew(workbookName,activeCustomWorkbook);
             //selView.newTankData = newTankData;
 
             selView.newTankData = newTankData;
+
+            SetAssemblyDataSub();
+        }
+
+        public void SetAssemblyDataSub()
+        {
+            PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
             PaperSettingService newSetting = new PaperSettingService();
-            selView.PaperList = newSetting.CreateDrawingCRTList(newTankData);
-            //selView.PaperList = newSetting.CreateDrawingCRTList();
-            //selView.CreateDrawingList(newTankData);
+            selView.PaperListSelection = new PaperDwgModel();
+            selView.PaperList=newSetting.CreateDrawingCRTList(selView.newTankData,testModel);
+            selView.PaperGridList= newSetting.CreatePaperGridList(selView.PaperList);
+            
         }
 
 
@@ -354,14 +388,28 @@ namespace PaperSetting
 
             // Assembly
             AssemblyDataService assemblyService = new AssemblyDataService();
-            AssemblyModel newTankData = assemblyService.CreateMappingData(workbookName, activeCustomWorkbook);
+            AssemblyModel newTankData = assemblyService.CreateMappingDataNew(workbookName, activeCustomWorkbook);
 
+            PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+            selView.newTankData=newTankData;
 
-            // Scale Setting
+            // Scale Setting : Area
             ModelAreaService areaService = new ModelAreaService();
             PaperAreaService paperAreaService = new PaperAreaService();
+            DrawDetailRoofBottomService roofBottomService = new DrawDetailRoofBottomService(newTankData, testModel);
+
             SingletonData.GAArea = areaService.GetModelAreaData();
-            SingletonData.PaperArea = paperAreaService.GetPaperAreaData();
+            double bottomRoofOD = roofBottomService.GetBottomRoofOD();
+            string annularStr = newTankData.BottomInput[0].AnnularPlate;
+            string topAngelType = newTankData.RoofCompressionRing[0].CompressionRingType;
+            SingletonData.PaperArea.AreaList = paperAreaService.GetPaperAreaData(bottomRoofOD, annularStr, topAngelType);
+            // Virtual Design
+            DrawDetailVisibleService detailService = new DrawDetailVisibleService(newTankData,testModel);
+            detailService.SetDetailVisible(SingletonData.PaperArea.AreaList);
+
+            // BM List
+            DrawBMService bmService = new DrawBMService(newTankData);
+            SingletonData.BMList = bmService.CreateBMModel();
 
 
             if (visibleValue)
@@ -448,7 +496,7 @@ namespace PaperSetting
             {
                 // Logic
                 DrawLogicDBService newLogic = new DrawLogicDBService();
-                DrawLogicModel newLogicData = newLogic.GetLogicCommand(DrawLogicLib.Commons.LogicFile_Type.GA);
+                DrawLogicModel newLogicData = newLogic.GetLogicCommand(DrawLogicLib.Commons.LogicFile_Type.Detail);
                 // 형상 그리는 것은 완료
                 List<string> newAll = new List<string>();
                 newAll.AddRange(newLogicData.UsingList);
@@ -460,8 +508,8 @@ namespace PaperSetting
                 DrawScaleService scaleService = new DrawScaleService();
                 double autoScale = scaleService.GetAIScale(newTankData);
 
-
-                IntergrationService newInterService = new IntergrationService("GA", newTankData, testModel);
+                string testName = "ORIENTATION";
+                IntergrationService newInterService = new IntergrationService(testName, newTankData, testModel);
                 if (newInterService.CreateLogic(autoScale, newAll.ToArray(), out outBuilder))
                 {
 
@@ -479,7 +527,7 @@ namespace PaperSetting
             }
 
 
-            if (true)
+            if (false)
             {
                 // Logic
                 DrawLogicDBService newLogic = new DrawLogicDBService();
@@ -604,14 +652,45 @@ namespace PaperSetting
 
 
         #region Sample Draw
-        public void SampleDraw(AssemblyModel assemblyData)
+        public void SampleDraw()
         {
+
+
             PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
             PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
+
             //paperService.assemblyData = assemblyData;
-            paperService.CreatePaperDraw(selView.PaperList,assemblyData);
-            //paperService.CreatePaperDraw(selView.PaperListSelectionColl);
+            // Clear
+            paperService.DrawEntity();
+
+            // Grid 생성
+            
+
+            if (selView.newTankData != null)
+            {
+                PaperSettingService newSetting = new PaperSettingService();
+
+                newSetting.SetCuttingModel();
+
+                // Paper List & Paper Grid List  재 
+                selView.PaperList = newSetting.CreateDrawingCRTList(selView.newTankData, testModel);
+                selView.PaperGridList = newSetting.CreatePaperGridList(selView.PaperList);
+
+                // Sheet, Frame, TitleBlock, Table,
+                paperService.CreatePaperDraw(selView.PaperList, selView.newTankData);
+
+                // Grid
+                paperService.CreatePaperGridDraw(selView.PaperGridList, selView.PaperList);
+
+
+                //paperService.CreatePaperDraw(selView.PaperListSelectionColl);
+            }
+
+
         }
+
+
+
         #endregion
 
         #region Tab Control
@@ -1071,6 +1150,80 @@ namespace PaperSetting
         {
             OrientationAdjWindow newWindow = new OrientationAdjWindow();
             newWindow.ShowDialog();
+        }
+
+
+        // Text Temp
+        private void btnEngLoad_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            List<string> openInfo = new List<string>();
+            openInfo.Add("EXISTING DATA LOAD : Engineering Data");
+            openInfo.Add("TABAS File Type (*.*)|*.*;");
+            openInfo.Add("TABAS File Type (*.xlsm)|*.xlsm;");
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Title = openInfo[0];
+            ofd.Filter = openInfo[1];
+            ofd.CheckFileExists = true;
+            ofd.CheckPathExists = true;
+            ofd.Multiselect = false;
+
+            string tempEngFile = "";
+            if (ofd.ShowDialog() == true)
+            {
+                foreach (string eachFile in ofd.FileNames)
+                {
+                    //selView.currentNoticeList.ImagePath.Name = System.IO.Path.GetFileName(eachFile);
+                    //selView.currentNoticeList.ImagePath.Path = eachFile;
+                    tempEngFile = eachFile;
+                    break;
+                }
+
+            }
+
+            if (File.Exists(tempEngFile))
+            {
+                workbookName = tempEngFile;
+                tbEngFile.Text = tempEngFile;
+                SetAssemblyData();
+
+                MessageBox.Show("파일 LOAD 완료");
+            }
+            else
+            {
+                MessageBox.Show("파일 경로가 올바르지 않습니다.");
+            }
+        }
+
+        private void btnEngSave_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            string tempEngFile = tbEngFile.Text;
+            if (File.Exists(tempEngFile))
+            {
+                EPService excelService = new EPService();
+                if (excelService.SetSaveData(tempEngFile))
+                {
+                    MessageBox.Show("파일 저장 완료");
+                }
+            }
+            else
+            {
+                MessageBox.Show("파일 경로가 올바르지 않습니다.");
+            }
+        }
+
+        private void btnEngCheck_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            string tempEngFile = tbEngFile.Text;
+            if (File.Exists(tempEngFile))
+            {
+                EPService excelService = new EPService();
+                string tempData=excelService.GetLoadData(tempEngFile);
+                    MessageBox.Show("파일 저장 시간" + " : " + tempData);
+            }
+            else
+            {
+                MessageBox.Show("파일 경로가 올바르지 않습니다.");
+            }
         }
     }
 }

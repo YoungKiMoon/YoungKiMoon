@@ -11,7 +11,7 @@ namespace PaperSetting.Models
         public ViewPortModel()
         {
             Location = new PointModel();
-            Size = new SizeModel();
+            Size = new PaperSizeModel();
             Scale = new ScaleModel();
 
             ScaleStr = "";
@@ -52,8 +52,8 @@ namespace PaperSetting.Models
             }
         }
 
-        private SizeModel _Size;
-        public SizeModel Size
+        private PaperSizeModel _Size;
+        public PaperSizeModel Size
         {
             get { return _Size; }
             set

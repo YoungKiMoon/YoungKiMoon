@@ -23,6 +23,8 @@ using DrawWork.Commons;
 using DrawWork.DrawStyleServices;
 using DrawWork.CutomModels;
 using DrawSettingLib.SettingServices;
+using DrawSettingLib.Commons;
+using DrawSettingLib.SettingModels;
 
 namespace DrawWork.DrawServices
 {
@@ -2919,8 +2921,14 @@ namespace DrawWork.DrawServices
 
 
 
-        public DrawEntityModel DoBlockDetail(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,object selModel, double scaleValue)
+        public DrawEntityModel DoBlockDetail(string[] eachCmd, ref CDPoint refPoint, ref CDPoint curPoint,object selModel, double scaleValue, PaperAreaModel selPaperAreaModel)
         {
+
+
+            // ScaleValue : 강제적용
+            //scaleValue = 10;
+
+
             // 0 : Object
             // 1 : Command
             // 2 : Data
@@ -2940,24 +2948,193 @@ namespace DrawWork.DrawServices
                 }
             }
 
+
             DrawEntityModel returnEntity = new DrawEntityModel();
 
             // Drawing Logic Block
             switch (drawDetailName)
             {
-                case "horizontaljoint":
+                case "horizontaljoint": // 2021-09-01
                     returnEntity = detailService.detailShellService.GetShellHorizontalJoint(ref refPoint, ref curPoint, selModel,scaleValue);
                     goto case "allways";
+
                 case "onecourseshellplate":
                     returnEntity = detailService.detailShellService.GetOneCourseShellPlate(ref refPoint, ref curPoint, selModel, scaleValue);
                     goto case "allways";
 
-                case "bottomplatejoint":
-                    returnEntity = detailService.detailTempService.DrawBottomPlateJoint_POINT_Case1(ref refPoint, ref curPoint, selModel, scaleValue);
+
+                case "comring":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawCompressorRing(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+                case "topringcuttingplan":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawCuttingPlan_TOP_Ring(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+                case "comringcuttingplan":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawCuttingPlan_COMP_Ring(ref refPoint, ref curPoint, selModel, scaleValue));
                     goto case "allways";
 
+
+                case "anchorchair":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawAnchorChair(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+                case "anchordetail":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawAnchorB2N2W_Detail_Type1A_Type3(ref refPoint, ref curPoint, selModel, scaleValue,2));
+                    goto case "allways";
+
+
+                case "topanglejoint": // 2021-09-01
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawTopAngleJointDetail_View_B(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+                case "windgirderjoint":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawTopAngleJointDetail_View_C(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+
+
+                case "sectiondd":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawSection_D_D(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+
+
+                case "vertjointdetail":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawVertJointDetail_Set(ref refPoint, ref curPoint, selModel, scaleValue,1,2,1,0));
+                    goto case "allways";
+
+
+
+                case "dimensionsforcutting":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawPlanTable(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+                case "tolerancelimit":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawToleranceLimit(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+                case "shellplatechordlength":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawShellPlateChordLength_SectionA(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+
+
+                case "nameplatebracket":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawNamePlateBracket(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+                case "earthlug":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawEarthLug(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+                case "settlementcheckpiece":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawSettlementCheckPiece(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+
+
+
+                case "shellplatearrangement":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.ArrangeShellPlate(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+
+
+
+                // Bottom
+                case "bottomplatearrangement":
+                    returnEntity = detailService.detailRoofBottomService.GetBottomArrangement(ref refPoint, ref curPoint,  scaleValue);
+                    goto case "allways";
+
+
+                case "bottomplatejointdetail":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateJointDetail(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+
+                case "bottomplatejointannulardetail":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateAnnularJointDetail(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+
+                case "bottomplateweldingdetailc":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateWeldingDetailC(ref refPoint, ref curPoint, selModel, scaleValue,selPaperAreaModel));
+                    goto case "allways";
+                case "bottomplateweldingdetaild":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateWeldingDetailD(ref refPoint, ref curPoint, selModel, scaleValue, selPaperAreaModel));
+                    goto case "allways";
+                case "bottomplateweldingdetailbb":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateWeldingDetailBB(ref refPoint, ref curPoint, selModel, scaleValue, selPaperAreaModel));
+                    goto case "allways";
+                case "backingstripweldingdetail":
+                    //returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateJoint_Detail_D_Case5(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+                case "bottomplateshelljointdetail":
+                    // 2.5D
+                    //returnEntity.AddDrawEntity(detailService.detailTempService.ArrangeShellPlate(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+
+
+                case "bottomplatecuttingplan":
+                    // 저녁에 장차장님
+                    //returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomCuttingPlan(ref refPoint, ref curPoint, selModel, scaleValue));
+                    returnEntity.AddDrawEntity(detailService.detailCuttingPlanService.DrawBottomCuttingPlan(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+
+                case "annularplatecuttingplan":
+                    //returnEntity.AddDrawEntity(detailService.detailTempService.ArrangeShellPlate(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+
+                case "backingstrip":
+                    //returnEntity.AddDrawEntity(detailService.detailTempService.ArrangeShellPlate(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+
+
+
+
+                // Roof
+                case "roofplatearrangement":
+                    returnEntity = detailService.detailRoofBottomService.GetRoofArrangement(ref refPoint, ref curPoint, scaleValue);
+                    goto case "allways";
+
+
+
+
+                case "roofcompressionringjointdetail":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawTopAngle_Detail_ALL(ref refPoint, ref curPoint, selModel, scaleValue, selPaperAreaModel));
+                    goto case "allways";
+
+                case "roofplateweldingdetailc":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateWeldingDetailC(ref refPoint, ref curPoint, selModel, scaleValue, selPaperAreaModel));
+                    goto case "allways";
+
+                case "roofplateweldingdetaild":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateWeldingDetailD(ref refPoint, ref curPoint, selModel, scaleValue, selPaperAreaModel));
+                    goto case "allways";
+                case "roofplateweldingdetaildd":
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateWeldingDetailBB(ref refPoint, ref curPoint, selModel, scaleValue, selPaperAreaModel));
+                    goto case "allways";
+                case "roofcompressionweldingdetail":
+                    // 보류 
+                    //returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateWeldingDetailBB(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+                case "roofplatecuttingplan":
+                    // 장차장님
+                    // 보류
+                    //returnEntity.AddDrawEntity(detailService.detailTempService.DrawRoofCuttingPlan(ref refPoint, ref curPoint, selModel, scaleValue));
+                    returnEntity.AddDrawEntity(detailService.detailCuttingPlanService.DrawRoofCuttingPlan(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+                case "roofcompressionringcuttingplan":
+                    // 그려야함
+                    // returnEntity.AddDrawEntity(detailService.detailTempService.ArrangeShellPlate(ref refPoint, ref curPoint, selModel, scaleValue));
+                    goto case "allways";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 case "roofarrange":
-                    returnEntity = detailService.detailRoofBottomService.GetRoofArrange(ref refPoint, ref curPoint,  scaleValue);
+                    // 차장님 새
+                    returnEntity = detailService.detailRoofBottomService.GetRoofSampleArrange(ref refPoint, ref curPoint,  scaleValue);
                     goto case "allways";
 
                 // allways
@@ -2967,6 +3144,11 @@ namespace DrawWork.DrawServices
 
 
             return returnEntity;
+        }
+
+        private CDPoint GetSumCDPoint(CDPoint selPoint1, double X, double Y, double Z = 0)
+        {
+            return new CDPoint(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
         }
     }
 }

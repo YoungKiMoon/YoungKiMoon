@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesignBoard", "DesignBoard.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaperSetting", "..\PaperSetting\PaperSetting.csproj", "{54646763-9077-4586-B318-6A50F28CDA15}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDataLib", "..\ExcelDataLib\ExcelDataLib.csproj", "{135B58CB-C30C-4500-84C4-0A67A68C7812}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawWork", "..\DrawWork\DrawWork.csproj", "{AB705C54-197D-4C70-A2A9-5525073F7240}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{54646763-9077-4586-B318-6A50F28CDA15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54646763-9077-4586-B318-6A50F28CDA15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54646763-9077-4586-B318-6A50F28CDA15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{135B58CB-C30C-4500-84C4-0A67A68C7812}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{135B58CB-C30C-4500-84C4-0A67A68C7812}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{135B58CB-C30C-4500-84C4-0A67A68C7812}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{135B58CB-C30C-4500-84C4-0A67A68C7812}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB705C54-197D-4C70-A2A9-5525073F7240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB705C54-197D-4C70-A2A9-5525073F7240}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB705C54-197D-4C70-A2A9-5525073F7240}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB705C54-197D-4C70-A2A9-5525073F7240}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

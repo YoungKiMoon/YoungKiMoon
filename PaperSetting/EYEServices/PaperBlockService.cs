@@ -47,7 +47,7 @@ namespace PaperSetting.EYEServices
         private Block BuildPaperFRAME_A1(string selName)
         {
 
-            SizeModel selSize = new SizeModel("", Commons.PAPERFORMAT_TYPE.A1_ISO,841,594);
+            PaperSizeModel selSize = new PaperSizeModel("", Commons.PAPERFORMAT_TYPE.A1_ISO,841,594);
 
             double paperWidth = selSize.Width;
             double paperHeight = selSize.Height;
@@ -123,7 +123,7 @@ namespace PaperSetting.EYEServices
         private Block BuildPaperFRAME_A2(string selName)
         {
 
-            SizeModel selSize = new SizeModel("", Commons.PAPERFORMAT_TYPE.A2_ISO, 594, 420);
+            PaperSizeModel selSize = new PaperSizeModel("", Commons.PAPERFORMAT_TYPE.A2_ISO, 594, 420);
 
             double paperWidth = selSize.Width;
             double paperHeight = selSize.Height;

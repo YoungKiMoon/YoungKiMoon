@@ -15,7 +15,7 @@ namespace PaperSetting.Models
             TableSelection = "";
             TableList = new List<string[]>();
             Location = new PointModel();
-            Size = new SizeModel();
+            Size = new PaperSizeModel();
             Dock = new DockModel();
         }
 
@@ -89,8 +89,8 @@ namespace PaperSetting.Models
             }
         }
 
-        private SizeModel _Size;
-        public SizeModel Size
+        private PaperSizeModel _Size;
+        public PaperSizeModel Size
         {
             get { return _Size; }
             set

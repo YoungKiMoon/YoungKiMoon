@@ -3614,21 +3614,21 @@ namespace DrawWork.DrawServices
 
 
                     DrawBMLeaderModel dimLeadder1 = new DrawBMLeaderModel() { position = POSITION_TYPE.LEFT, upperText = "EEEEEE", lowerText = "bbbb", bmNumber = "4" };
-                    DrawEntityModel testDimTest05 = dService.Draw_BMLeader(ref singleModel, GetSumPoint(refPoint, -350, 0), dimLeadder1, customScaleValue);
+                    DrawEntityModel testDimTest05 = dService.Draw_OneLineLeader(ref singleModel, GetSumPoint(refPoint, -350, 0), dimLeadder1, customScaleValue);
                     dimList.AddDrawEntity(testDimTest05);
 
 
                     DrawBMLeaderModel dimLeadder2 = new DrawBMLeaderModel() { position = POSITION_TYPE.BOTTOM, upperText = "aaa", lowerText = "bbbb", bmNumber = "4" };
-                    DrawEntityModel testDimTest06 = dService.Draw_BMLeader(ref singleModel, GetSumPoint(refPoint, -350, 0), dimLeadder2, customScaleValue);
+                    DrawEntityModel testDimTest06 = dService.Draw_OneLineLeader(ref singleModel, GetSumPoint(refPoint, -350, 0), dimLeadder2, customScaleValue);
                     dimList.AddDrawEntity(testDimTest06);
 
 
                     DrawBMLeaderModel dimLeadder3 = new DrawBMLeaderModel() { position = POSITION_TYPE.RIGHT, upperText = "aaa", lowerText = "bbbb", bmNumber = "4" };
-                    DrawEntityModel testDimTest07 = dService.Draw_BMLeader(ref singleModel, GetSumPoint(refPoint, -350, 0), dimLeadder3, customScaleValue);
+                    DrawEntityModel testDimTest07 = dService.Draw_OneLineLeader(ref singleModel, GetSumPoint(refPoint, -350, 0), dimLeadder3, customScaleValue);
                     dimList.AddDrawEntity(testDimTest07);
 
                     DrawBMLeaderModel dimLeadder4 = new DrawBMLeaderModel() { position = POSITION_TYPE.TOP, upperText = "EEEEEEE", lowerText = "", bmNumber = "4" };
-                    DrawEntityModel testDimTest08 = dService.Draw_BMLeader(ref singleModel, GetSumPoint(refPoint, -350, 0), dimLeadder4, customScaleValue);
+                    DrawEntityModel testDimTest08 = dService.Draw_OneLineLeader(ref singleModel, GetSumPoint(refPoint, -350, 0), dimLeadder4, customScaleValue);
                     dimList.AddDrawEntity(testDimTest08);
 
 
@@ -3950,13 +3950,382 @@ namespace DrawWork.DrawServices
                 singleModel.Entities.AddRange(drawEntity.GetDrawEntity());
             }
 
-            
+            if (visibleFalse)
+            {
+                Point3D a = new Point3D(200, 200);
+                Point3D b = new Point3D(220, 220);
+                Point3D c = new Point3D(240, 200);
+
+                //Arc newArc = new Arc(a, b, c,false);
+                Arc newArc = new Arc(a, b, c);
+
+                Arc newArc1 = (Arc)newArc.Clone();
+                List<Entity> newList = new List<Entity>();
+                newList.Add(newArc1);
+
+                editingService.SetTranslate(ref newList, new Point3D(200, 200), new Point3D(200, 220));
+
+                singleModel.Entities.AddRange(newList);
+                styleService.SetLayer(ref newArc, layerService.LayerOutLine);
+                singleModel.Entities.Add(newArc);
+            }
+
+            if (visibleFalse)
+            {
+                Point3D referencePoint = new Point3D(10000, 10000);
+                DrawWeldSymbols weldSymbols = new DrawWeldSymbols();
+                double scaleValue = 10;
+
+                List<Entity> newList = new List<Entity>();
+
+                DrawWeldSymbolModel wsModel = new DrawWeldSymbolModel();
+                wsModel.position = ORIENTATION_TYPE.TOPRIGHT;
+                wsModel.weldTypeUp = WeldSymbol_Type.U;
+                wsModel.weldDetailType = WeldSymbolDetail_Type.BothSide;
+                wsModel.weldFaceUp = WeldFace_Type.Convex;
+                wsModel.weldSize1 = "12";
+                wsModel.weldSize2 = "24";
+                //wsModel.weldAngle1 = "90";
+                //wsModel.weldAngle2 = "45";
+                //wsModel.weldRoot1 = "11";
+                //wsModel.weldRoot2 = "22";
+
+                wsModel.weldLength1 = "12";
+                wsModel.weldQuantity1 = "3";
+                wsModel.weldPitch1 = "123";
+
+                wsModel.specification = "TTXT\r\nCCT\r\nSXST";
+
+                wsModel.machiningVisible = true;
+
+                newList.AddRange(weldSymbols.GetWeldSymbol(referencePoint, singleModel, 10, wsModel));
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerDimension);
+                singleModel.Entities.AddRange(newList);
+
+            }
+
+            // Welding Dime
+            if (visibleFalse)
+            {
+                Point3D referencePoint = new Point3D(10000, 10000);
+                DrawWeldSymbols weldSymbols = new DrawWeldSymbols();
+                double scaleValue = 10;
+
+                List<Entity> newList = new List<Entity>();
+
+                DrawWeldSymbolModel wsModel = new DrawWeldSymbolModel();
+                wsModel.position = ORIENTATION_TYPE.TOPLEFT;
+                wsModel.weldTypeUp = WeldSymbol_Type.Square;
+                wsModel.weldTypeDown = WeldSymbol_Type.Bevel;
+                wsModel.weldDetailType = WeldSymbolDetail_Type.BothSide;
+                wsModel.weldFaceDown = WeldFace_Type.Convex;
+                wsModel.specification = "B.G";
+                wsModel.leaderAngle = 45;
+                wsModel.leaderLineLength = 20;
+
+                newList.AddRange(weldSymbols.GetWeldSymbol(referencePoint, singleModel, 10, wsModel));
+
+
+
+                DrawWeldSymbolModel wsModel01 = new DrawWeldSymbolModel();
+                wsModel01.position = ORIENTATION_TYPE.TOPRIGHT;
+                wsModel01.weldTypeUp = WeldSymbol_Type.V;
+                wsModel01.weldTypeDown = WeldSymbol_Type.Square;
+                wsModel01.weldDetailType = WeldSymbolDetail_Type.BothSide;
+                wsModel01.weldFaceUp = WeldFace_Type.Convex;
+                wsModel01.weldFaceDown = WeldFace_Type.Flat;
+                wsModel01.machiningStr = "G";
+                wsModel01.machiningVisible = true;
+                wsModel01.tailVisible = false;
+                wsModel01.leaderAngle = 60;
+                wsModel01.leaderLineLength = 15;
+
+                newList.AddRange(weldSymbols.GetWeldSymbol(GetSumPoint(referencePoint,0,100), singleModel, 10, wsModel01));
+
+
+                DrawWeldSymbolModel wsModel02 = new DrawWeldSymbolModel();
+                wsModel02.position = ORIENTATION_TYPE.TOPLEFT;
+                wsModel02.weldTypeUp = WeldSymbol_Type.Fillet;
+                wsModel02.weldTypeDown = WeldSymbol_Type.Fillet;
+                wsModel02.weldDetailType = WeldSymbolDetail_Type.BothSide;
+                wsModel02.weldLength1 = "5";
+                wsModel02.tailVisible = false;
+                wsModel02.leaderAngle = 60;
+                wsModel02.leaderLineLength = 15;
+
+                newList.AddRange(weldSymbols.GetWeldSymbol(GetSumPoint(referencePoint, 0, 200), singleModel, 10, wsModel02));
+
+
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerDimension);
+                singleModel.Entities.AddRange(newList);
+
+            }
+
+
+            if (visibleFalse)
+            {
+                double customScaleValue = 3;
+
+                DrawBreakSymbols breakService = new DrawBreakSymbols();
+
+                Point3D refPoint = new Point3D(1000, 1000);
+                double selWidth = 50;
+                double selLength = 1000;
+
+                Point3D sLinePoint = GetSumPoint(refPoint, 0, 0);
+
+
+                List<Entity> lineList = new List<Entity>();
+                Line line01 = new Line(GetSumPoint(refPoint, 0, 0), GetSumPoint(refPoint, 0, -selLength));
+                //Line line02 = new Line(GetSumPoint(refPoint, selWidth, 0), GetSumPoint(refPoint, selWidth, -selLength));
+                Line line02 = new Line(GetSumPoint(refPoint, selWidth, -selLength), GetSumPoint(refPoint, selWidth, 0));
+                lineList.Add(line01);
+                lineList.Add(line02);
+
+
+
+                List<Entity> newSLineList = breakService.GetSLine(GetSumPoint(sLinePoint, 0, -50), selWidth, true);
+                breakService.SetTrimSLine(ref lineList, ref newSLineList, GetSumPoint(sLinePoint, 0, -2000));
+                List<Entity> newSLineList2 = breakService.GetSLine(GetSumPoint(sLinePoint, 0, -650), selWidth);
+                breakService.SetTrimSLine(ref lineList, ref newSLineList2, GetSumPoint(sLinePoint, 0, 0000));
+
+
+                List<Entity> newSDoubleLineList = breakService.GetSDoubleLine(GetSumPoint(sLinePoint, selWidth / 2, -300), selWidth, 10);
+
+                List<Entity> newListList = breakService.GetTrimSDoubleLine(lineList, newSDoubleLineList);
+
+
+
+
+
+                // Chamfer
+
+                double oneCourseHeight = 200;
+
+
+                if (visibleFalse)
+                {
+
+
+
+                    DrawEntityModel dimList = new DrawEntityModel();
+
+
+                    // Dimension : Long
+                    DrawService dService = new DrawService(null);
+                    DrawEntityModel testDim01 = dService.Draw_Dimension(GetSumCDPoint(refPoint, 0, -oneCourseHeight), GetSumCDPoint(refPoint, 0, 0), null, "left", 200, 2.5, 2.5, 2.5, "", "", "D", 0, customScaleValue, layerService.LayerDimension);
+                    dimList.AddDrawEntity(testDim01);
+
+
+
+                    // Dimension : Arc
+                    DrawEntityModel testDimArc01 = dService.Draw_DimensionArc(GetSumPoint(refPoint, 0, -30), GetSumPoint(refPoint, 0, 0), "bottom", 50, "D", 45, 120, 100, 0, customScaleValue, layerService.LayerDimension);
+                    dimList.AddDrawEntity(testDimArc01);
+
+                    DrawEntityModel testDimArc02 = dService.Draw_DimensionArc(GetSumPoint(refPoint, 0, 0), GetSumPoint(refPoint, 0, 30), "top", 50, "D", 45, 120, 100, 0, customScaleValue, layerService.LayerDimension);
+                    dimList.AddDrawEntity(testDimArc02);
+
+
+
+                    DrawDimensionModel dimModel = new DrawDimensionModel() { position = POSITION_TYPE.LEFT, textUpper = "ABaEEEEEEE", textLower = "EbbEEEEEEE", dimHeight = 40, scaleValue = customScaleValue };
+                    DrawEntityModel testDimTest01 = dService.Draw_DimensionDetail(ref singleModel, GetSumPoint(refPoint, 0, -30), GetSumPoint(refPoint, 0, 0), customScaleValue, dimModel);
+                    dimList.AddDrawEntity(testDimTest01);
+
+
+                    DrawDimensionModel dimModel2 = new DrawDimensionModel() { position = POSITION_TYPE.RIGHT, textUpper = "ABaEEEEEEE", textLower = "EbbEEEEEEE", dimHeight = 40, scaleValue = customScaleValue };
+                    DrawEntityModel testDimTest02 = dService.Draw_DimensionDetail(ref singleModel, GetSumPoint(refPoint, 0, -30), GetSumPoint(refPoint, 0, 0), customScaleValue, dimModel2);
+                    dimList.AddDrawEntity(testDimTest02);
+
+
+                    DrawDimensionModel dimModel3 = new DrawDimensionModel()
+                    {
+                        position = POSITION_TYPE.TOP,
+                        textUpper = "ABaEEEEEEE",
+                        textLower = "EEEEE",
+                        arrowLeftHeadOut = true,
+                        arrowRightHeadOut = true,
+                        textUpperPosition = POSITION_TYPE.RIGHT,
+                        arrowRightSymbol = DimHead_Type.Circle,
+                        leftBMNumber = "4",
+                        textSizeVisible = false,
+                        dimHeight = 40,
+                        scaleValue = customScaleValue
+                    };
+                    DrawEntityModel testDimTest03 = dService.Draw_DimensionDetail(ref singleModel, GetSumPoint(refPoint, 0, 0), GetSumPoint(refPoint, 30, 0), customScaleValue, dimModel3);
+                    dimList.AddDrawEntity(testDimTest03);
+
+
+                    DrawDimensionModel dimModel4 = new DrawDimensionModel() { position = POSITION_TYPE.BOTTOM, textUpper = "ABaEEEEEEE", textLower = "EbbEEEEEEE", dimHeight = 40, scaleValue = customScaleValue };
+                    DrawEntityModel testDimTest04 = dService.Draw_DimensionDetail(ref singleModel, GetSumPoint(refPoint, 0, 0), GetSumPoint(refPoint, 30, 0), customScaleValue, dimModel4);
+                    dimList.AddDrawEntity(testDimTest04);
+
+
+
+
+                    DrawDimensionModel dimModel31 = new DrawDimensionModel()
+                    {
+                        position = POSITION_TYPE.BOTTOM,
+                        textUpper = "ABaEEEEEEE",
+                        textLower = "EEEEE",
+                        arrowLeftHeadOut = true,
+                        arrowRightHeadOut = true,
+                        textUpperPosition = POSITION_TYPE.RIGHT,
+                        rightBMNumber = "4",
+                        textSizeVisible = false,
+                        dimHeight = 40,
+                        scaleValue = customScaleValue
+                    };
+                    DrawEntityModel testDimTest031 = dService.Draw_DimensionDetail(ref singleModel, GetSumPoint(refPoint, 500, 0), GetSumPoint(refPoint, 530, 0), customScaleValue, dimModel31,Utility.DegToRad(45));
+                    dimList.AddDrawEntity(testDimTest031);
+                    
+                    DrawDimensionModel dimModel32 = new DrawDimensionModel()
+                    {
+                        position = POSITION_TYPE.RIGHT,
+                        textUpper = "ABaEEEEEEE",
+                        textLower = "EEEEE",
+                        arrowLeftHeadOut = true,
+                        arrowRightHeadOut = true,
+                        textUpperPosition = POSITION_TYPE.RIGHT,
+                        rightBMNumber = "4",
+                        textSizeVisible = false,
+                        dimHeight = 40,
+                        scaleValue = customScaleValue
+                    };
+                    DrawEntityModel testDimTest032 = dService.Draw_DimensionDetail(ref singleModel, GetSumPoint(refPoint, 500, -30), GetSumPoint(refPoint, 500, 0), customScaleValue, dimModel32, Utility.DegToRad(30));
+                    dimList.AddDrawEntity(testDimTest032);
+                    
+                    DrawDimensionModel dimModel33 = new DrawDimensionModel()
+                    {
+                        position = POSITION_TYPE.LEFT,
+                        textUpper = "ABaEEEEEEE",
+                        textLower = "EEEEE",
+                        arrowLeftHeadOut = true,
+                        arrowRightHeadOut = true,
+                        textUpperPosition = POSITION_TYPE.RIGHT,
+                        rightBMNumber = "4",
+                        textSizeVisible = false,
+                        dimHeight = 40,
+                        scaleValue = customScaleValue
+                    };
+                    DrawEntityModel testDimTest033 = dService.Draw_DimensionDetail(ref singleModel, GetSumPoint(refPoint, 500, -30), GetSumPoint(refPoint, 500, 0), customScaleValue, dimModel33, 0);
+                    dimList.AddDrawEntity(testDimTest033);
+
+
+
+
+
+                    // Leader : Left
+                    DrawBMLeaderModel dimLeadder1 = new DrawBMLeaderModel() { position = POSITION_TYPE.LEFT, upperText = "EEEEEE", lowerText = "bbbb", bmNumber = "4" };
+                    DrawEntityModel testDimTest05 = dService.Draw_OneLineLeader(ref singleModel, GetSumPoint(refPoint, -350, 0), dimLeadder1, customScaleValue);
+                    dimList.AddDrawEntity(testDimTest05);
+
+                    // Leader : Bottom
+                    DrawBMLeaderModel dimLeadder2 = new DrawBMLeaderModel() { position = POSITION_TYPE.BOTTOM, upperText = "aaa", lowerText = "bbbb", bmNumber = "4" };
+                    DrawEntityModel testDimTest06 = dService.Draw_OneLineLeader(ref singleModel, GetSumPoint(refPoint, -350, 0), dimLeadder2, customScaleValue);
+                    dimList.AddDrawEntity(testDimTest06);
+
+                    // Leader : Right
+                    DrawBMLeaderModel dimLeadder3 = new DrawBMLeaderModel() { position = POSITION_TYPE.RIGHT, upperText = "aaa", lowerText = "bbbb", bmNumber = "4" };
+                    DrawEntityModel testDimTest07 = dService.Draw_OneLineLeader(ref singleModel, GetSumPoint(refPoint, -350, 0), dimLeadder3, customScaleValue);
+                    dimList.AddDrawEntity(testDimTest07);
+
+                    // Leader : Top
+                    DrawBMLeaderModel dimLeadder4 = new DrawBMLeaderModel() { position = POSITION_TYPE.TOP, upperText = "EEEEEEE", lowerText = "", bmNumber = "4" };
+                    DrawEntityModel testDimTest08 = dService.Draw_OneLineLeader(ref singleModel, GetSumPoint(refPoint, -350, 0), dimLeadder4, customScaleValue);
+                    dimList.AddDrawEntity(testDimTest08);
+
+
+                    List<Point3D> extPointList = new List<Point3D>();
+                    List<Entity> square01 = shapeService.GetRectangle(out extPointList, GetSumPoint(refPoint,0,500), 100, 100, 0, 0, 0);
+                    singleModel.Entities.AddRange(square01);
+
+                    // Break
+                    List<Entity> breakLineHorizontal =breakService.GetFlatBreakLine(GetSumPoint(refPoint, 110, 500),GetSumPoint(refPoint, 110,400), customScaleValue);
+
+                    DrawEntityModel testDimArc03 = dService.Draw_DimensionArc(GetSumPoint(refPoint, 0, 500), GetSumPoint(refPoint, 100, 500), "top", -20, "D", 45, 184, -184, 0, customScaleValue, layerService.LayerDimension);
+                    dimList.AddDrawEntity(testDimArc03);
+
+                    singleModel.Entities.AddRange(breakLineHorizontal);
+                    singleModel.Entities.AddRange(dimList.GetDrawEntity());
+                }
+
+
+
+
+            }
+
+            // 원의 호 길이
+            if (true)
+            {
+                List<Entity> newList = new List<Entity>();
+                Point3D refPoint = new Point3D(1000, 1000);
+                double circleRadus = 100;
+                Circle newCircle = new Circle(Plane.XY, refPoint, circleRadus);
+
+
+                Line line01 = new Line(GetSumPoint(refPoint, 0, 0), GetSumPoint(refPoint, 0, 110));
+                line01.Rotate(Utility.DegToRad(-100), Vector3D.AxisZ,GetSumPoint(refPoint,0,0));
+                Line line02 = new Line(GetSumPoint(refPoint, 0, 0), GetSumPoint(refPoint, 0, 110));
+                line02.Rotate(Utility.DegToRad(-150), Vector3D.AxisZ, GetSumPoint(refPoint, 0, 0));
+
+                Point3D[] line01Inter = newCircle.IntersectWith(line01);
+                Point3D[] line02Inter = newCircle.IntersectWith(line02);
+
+                
+                Line stringLine = new Line(GetSumPoint(line01Inter[0], 0, 0), GetSumPoint(line02Inter[0], 0, 0));
+
+                double offsetValue = valueService.GetLengthBetweenStringAndArc(circleRadus,stringLine.Length());
+
+                Line stringLineOffset = (Line)stringLine.Offset(-offsetValue,Vector3D.AxisZ);
+
+                Line stringLineOffsetLong= editingService.GetExtendLine(stringLineOffset, 30);
+
+                Line stringHorizontal = new Line(GetSumPoint(stringLine.EndPoint, 0, 0), GetSumPoint(stringLine.EndPoint, 30, 0));
+
+                double vHeight = stringLineOffset.StartPoint.Y - stringLineOffset.EndPoint.Y;
+                double vWidth = stringLineOffset.EndPoint.X-stringLineOffset.StartPoint.X ;
+
+                double vSloep = valueService.GetDegreeOfSlope(1, 0) - valueService.GetDegreeOfSlope( vHeight , vWidth);
+                double resultHx = valueService.GetHypotenuseByWidth(vSloep, offsetValue);
+
+                Point3D[] stringInter = stringHorizontal.IntersectWith(stringLineOffsetLong);
+
+                Line newVer = new Line(GetSumPoint(stringLine.EndPoint, resultHx, 10), GetSumPoint(stringLine.EndPoint, resultHx, -10));
+                Console.WriteLine(stringInter[0].X + "\r" + GetSumPoint(stringLine.EndPoint, resultHx, 0).X);
+
+                newList.Add(stringLine);
+                newList.Add(stringLineOffsetLong);
+                newList.Add(stringHorizontal);
+                newList.Add(newVer);
+
+                newList.Add(line01);
+                newList.Add(line02);
+                newList.Add(newCircle);
+
+                styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+                singleModel.Entities.AddRange(newList);
+
+                List<Point3D> outPoint = new List<Point3D>();
+                List<Entity> refccc = shapeService.GetRectangle(out outPoint, GetSumPoint(refPoint, 0, 0), 100, 100, 0, 0, 3);
+                styleService.SetLayerListEntity(ref refccc, layerService.LayerOutLine);
+
+                List<Entity> refcc = shapeService.GetRectangle(out outPoint, GetSumPoint(refPoint, 0, 0), 100, 100, 0, 0,3);
+                styleService.SetLayerListEntity(ref refcc, layerService.LayerVirtualLine);
+
+                singleModel.Entities.AddRange(refccc);
+                singleModel.Entities.AddRange(refcc);
+
+            }
 
             singleModel.Entities.Regen();
             singleModel.ZoomFit();
             singleModel.SetView(viewType.Top);
             singleModel.Refresh();
 
+
+            
 
         }
 

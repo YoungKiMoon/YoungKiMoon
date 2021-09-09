@@ -35,6 +35,7 @@ namespace DrawWork.DrawStyleServices
             selEntity.LineTypeMethod = colorMethodType.byLayer;
             selEntity.ColorMethod = colorMethodType.byLayer;
         }
+
         public void SetLayer(ref Line[] selEntity, string selLayerName)
         {
             foreach (Line eachEntity in selEntity)

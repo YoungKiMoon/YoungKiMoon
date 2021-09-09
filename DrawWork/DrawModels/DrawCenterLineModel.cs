@@ -13,6 +13,7 @@ namespace DrawWork.DrawModels
             centerLine = true;
             exLength = 0.5;
             centerLength = 4;
+            detailCenterLength = 2;
             zeroEx = false;
             oneEx = false;
             twoEx = false;
@@ -41,6 +42,8 @@ namespace DrawWork.DrawModels
             set { _centerLength = value; }
         }
         private double _centerLength;
+
+        public double detailCenterLength { get; set; }
 
         public bool zeroEx
         {

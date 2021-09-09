@@ -150,6 +150,30 @@ namespace DrawWork.DrawServices
             Mirror customMirror = new Mirror(pl1);
             selEntity.TransformBy(customMirror);
         }
+        public void SetMirrorLine(Plane selPlane, ref Line selEntity, Point3D selPoint)
+        {
+            Plane pl1 = selPlane;
+            pl1.Origin.X = selPoint.X;
+            pl1.Origin.Y = selPoint.Y;
+            Mirror customMirror = new Mirror(pl1);
+            selEntity.TransformBy(customMirror);
+        }
+        public void SetMirrorArc(Plane selPlane, ref Arc selEntity, Point3D selPoint)
+        {
+            Plane pl1 = selPlane;
+            pl1.Origin.X = selPoint.X;
+            pl1.Origin.Y = selPoint.Y;
+            Mirror customMirror = new Mirror(pl1);
+            selEntity.TransformBy(customMirror);
+        }
+        public void SetMirrorPoint(Plane selPlane, ref Point3D selEntity, Point3D selPoint)
+        {
+            Plane pl1 = selPlane;
+            pl1.Origin.X = selPoint.X;
+            pl1.Origin.Y = selPoint.Y;
+            Mirror customMirror = new Mirror(pl1);
+            selEntity.TransformBy(customMirror);
+        }
         public void SetMirrorEntity(Plane selPlane, ref Triangle selEntity, Point3D selPoint)
         {
             Plane pl1 = selPlane;

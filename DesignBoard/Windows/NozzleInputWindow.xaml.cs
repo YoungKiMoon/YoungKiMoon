@@ -94,7 +94,7 @@ namespace DesignBoard.Windows
             if (One_Click())
             {
                 FileService newFileService = new FileService();
-                string selFile = newFileService.GetFile(OpenFile_Type.NozzleData);
+                FileModel selFile = newFileService.GetFile(OpenFile_Type.NozzleData);
                 NozzleInputWindowViewModel selView = this.DataContext as NozzleInputWindowViewModel;
                 selView.CreateData();
             }

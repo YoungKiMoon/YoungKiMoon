@@ -3,6 +3,8 @@ using DrawWork.CommandServices;
 using DrawWork.Commons;
 using DrawWork.DrawServices;
 using DrawWork.ValueServices;
+using EPDataLib.ExcelModels;
+using EPDataLib.ExcelServices;
 using ExcelDataLib.ExcelModels;
 using ExcelDataLib.ExcelServices;
 using System;
@@ -22,6 +24,7 @@ namespace DrawWork.AssemblyServices
             valueService = new ValueService();
         }
 
+        // 사용 안함
         public AssemblyModel CreateMappingData(string selFileName,object activeWork=null)
         {
 
@@ -38,6 +41,42 @@ namespace DrawWork.AssemblyServices
             {
                 newSheetList = eDataService.GetSheetList(activeWork);
             }
+
+            eDataService.GetSheetData(selAssembly, newSheetList);
+
+
+            // Tank Type
+            SetTankType(selAssembly);
+
+            // Roof Top Angle
+            SetRoofTopAngeCompressionRing(selAssembly);
+
+            // SetRoofInsulation
+            SetRoofInsulation(selAssembly);
+
+            // Adjust List Data
+            AdjustmentListData(selAssembly);
+
+            // Create OutputData
+            CreateOutputData(selAssembly);
+
+
+
+
+            return selAssembly;
+        }
+
+        public AssemblyModel CreateMappingDataNew(string selFileName, object activeWork = null)
+        {
+
+            AssemblyModel selAssembly = new AssemblyModel();
+            selAssembly.CreateMappingAssembly();
+
+            ObservableCollection<EPWorkSheetModel> newSheetList = new ObservableCollection<EPWorkSheetModel>();
+            EPService eDataService = new EPService();
+            
+           newSheetList = eDataService.GetSheetList(selFileName);
+
 
             eDataService.GetSheetData(selAssembly, newSheetList);
 
@@ -99,6 +138,8 @@ namespace DrawWork.AssemblyServices
                 case TANK_TYPE.CRT:
                     newModel.RoofSlope = selAssembly.RoofCRTInput[firstIndex].RoofSlope;
                     newModel.RoofPlateThickness = selAssembly.RoofCRTInput[firstIndex].RoofPlateThickness;
+                    newModel.PlateLength = selAssembly.RoofCRTInput[firstIndex].PlateLength;
+                    newModel.PlateWidth = selAssembly.RoofCRTInput[firstIndex].PlateWidth;
                     newModel.CompressionRingType = selAssembly.RoofCRTInput[firstIndex].CompressionRingType;
                     switch (newModel.CompressionRingType)
                     {
@@ -129,6 +170,8 @@ namespace DrawWork.AssemblyServices
                 case TANK_TYPE.DRT:
                     newModel.DomeRadiusRatio = selAssembly.RoofDRTInput[firstIndex].DomeRadiusRatio;
                     newModel.RoofPlateThickness = selAssembly.RoofDRTInput[firstIndex].RoofPlateThickness;
+                    newModel.PlateLength = selAssembly.RoofDRTInput[firstIndex].PlateLength;
+                    newModel.PlateWidth = selAssembly.RoofDRTInput[firstIndex].PlateWidth;
                     newModel.CompressionRingType = selAssembly.RoofDRTInput[firstIndex].CompressionRingType;
                     switch (newModel.CompressionRingType)
                     {
@@ -159,6 +202,8 @@ namespace DrawWork.AssemblyServices
                 case TANK_TYPE.IFRT:
                     newModel.RoofSlope = selAssembly.RoofIFRTInput[firstIndex].RoofSlope;
                     newModel.RoofPlateThickness = selAssembly.RoofIFRTInput[firstIndex].RoofPlateThickness;
+                    newModel.PlateLength = selAssembly.RoofIFRTInput[firstIndex].PlateLength;
+                    newModel.PlateWidth = selAssembly.RoofIFRTInput[firstIndex].PlateWidth;
                     newModel.CompressionRingType = selAssembly.RoofIFRTInput[firstIndex].CompressionRingType;
                     switch (newModel.CompressionRingType)
                     {
@@ -188,6 +233,8 @@ namespace DrawWork.AssemblyServices
                     break;
                 case TANK_TYPE.EFRTSingle:
                     newModel.RoofPlateThickness = "";
+                    newModel.PlateLength = selAssembly.RoofEFRTSingleInput[firstIndex].PlateLength;
+                    newModel.PlateWidth = selAssembly.RoofEFRTSingleInput[firstIndex].PlateWidth;
                     newModel.CompressionRingType = selAssembly.RoofEFRTSingleInput[firstIndex].CompressionRingType;
                     switch (newModel.CompressionRingType)
                     {
@@ -201,6 +248,8 @@ namespace DrawWork.AssemblyServices
                     break;
                 case TANK_TYPE.EFRTDouble:
                     newModel.RoofPlateThickness = "";
+                    newModel.PlateLength = selAssembly.RoofEFRTDoubleInput[firstIndex].PlateLength;
+                    newModel.PlateWidth = selAssembly.RoofEFRTDoubleInput[firstIndex].PlateWidth;
                     newModel.CompressionRingType = selAssembly.RoofEFRTDoubleInput[firstIndex].CompressionRingType;
                     switch (newModel.CompressionRingType)
                     {

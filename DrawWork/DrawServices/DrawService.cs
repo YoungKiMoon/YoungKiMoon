@@ -569,7 +569,7 @@ namespace DrawWork.DrawServices
             return customEntityList;
         }
 
-        public DrawEntityModel Draw_DimensionDetail(ref Model refSingleModel, Point3D selPoint1, Point3D selPoint2, double selScale, DrawDimensionModel selDimModel)
+        public DrawEntityModel Draw_DimensionDetail(ref Model refSingleModel, Point3D selPoint1, Point3D selPoint2, double selScale, DrawDimensionModel selDimModel, double rotateValue = 0)
         {
 
             Point3D textCenter = new Point3D();
@@ -585,6 +585,7 @@ namespace DrawWork.DrawServices
             double scalePointGapLine1 = scaleService.GetOriginValueOfScale(selScale, selDimModel.extLinePointGap1);
             double scalePointGapLine2 = scaleService.GetOriginValueOfScale(selScale, selDimModel.extLinePointGap2);
 
+            double scaleTextGapOrigin = scaleService.GetOriginValueOfScale(selScale, selDimModel.textGap);
             double scaleTextGap = scaleService.GetOriginValueOfScale(selScale, selDimModel.textGap);
             double scaleTextSideGap = scaleService.GetOriginValueOfScale(selScale, selDimModel.textSideGap);
             double scaleTextHeight = scaleService.GetOriginValueOfScale(selScale, selDimModel.textHeight);
@@ -627,16 +628,26 @@ namespace DrawWork.DrawServices
             double arrowLineLeftExtendLength = 0;
             double arrowLineRightExtendLength = 0;
 
+            // TestPosion
+            bool isCenterText = true;
+            switch (selDimModel.textUpperPosition)
+            {
+                case POSITION_TYPE.LEFT:
+                case POSITION_TYPE.RIGHT:
+                    isCenterText = false;
+                    break;
+            }
             // Top
             switch (selDimModel.position)
             {
                 case POSITION_TYPE.TOP:
                     // Text Gap
-                    if (Math.Abs(selPoint1.X - selPoint2.X) <= minWidth)
-                        scaleTextGap = scaleTextGap * 2;
+                    if(isCenterText)
+                        if (Math.Abs(selPoint1.X - selPoint2.X) <= minWidth)
+                            scaleTextGap = scaleTextGap * 2;
 
                     textCenter.X = selPoint1.X + middleDistanceH + (middleDistanceH * middleValue / 100);
-                    textCenter.Y = Math.Min(selPoint1.Y, selPoint2.Y) + dimHeight;
+                    textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) + dimHeight;
                     arrowLine = new Line(new Point3D(selPoint1.X + arrowDetail, textCenter.Y), new Point3D(selPoint2.X - arrowDetail, textCenter.Y));
                     dimLine1 = new Line(new Point3D(selPoint1.X, selPoint1.Y + scalePointGapLine1), new Point3D(selPoint1.X, textCenter.Y + scaleExtLine1));
                     dimLine2 = new Line(new Point3D(selPoint2.X, selPoint2.Y + scalePointGapLine2), new Point3D(selPoint2.X, textCenter.Y + scaleExtLine2));
@@ -704,11 +715,12 @@ namespace DrawWork.DrawServices
 
                 case POSITION_TYPE.BOTTOM:
                     // Text Gap
-                    if (Math.Abs(selPoint1.X - selPoint2.X) <= minWidth)
-                        scaleTextGap = scaleTextGap * 2;
+                    if (isCenterText)
+                        if (Math.Abs(selPoint1.X - selPoint2.X) <= minWidth)
+                            scaleTextGap = scaleTextGap * 2;
 
                     textCenter.X = selPoint1.X + middleDistanceH + (middleDistanceH * middleValue / 100);
-                    textCenter.Y = Math.Max(selPoint1.Y, selPoint2.Y) - dimHeight;
+                    textCenter.Y = Math.Min(selPoint1.Y, selPoint2.Y) - dimHeight;
 
                     arrowLine = new Line(new Point3D(selPoint1.X + arrowDetail, textCenter.Y), new Point3D(selPoint2.X - arrowDetail, textCenter.Y));
                     dimLine1 = new Line(new Point3D(selPoint1.X, selPoint1.Y - scalePointGapLine1), new Point3D(selPoint1.X, textCenter.Y - scaleExtLine1));
@@ -723,18 +735,72 @@ namespace DrawWork.DrawServices
                     dimTextLower = new Text(new Point3D(textCenter.X, textCenter.Y - scaleTextGap), selDimtextLower, scaleTextHeight) { Alignment = Text.alignmentType.TopCenter };
 
 
-                    tri1 = new Triangle(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint1.X + scaleArrowWidth, textCenter.Y + scaleArrowHeight / 2), new Point3D(selPoint1.X + scaleArrowWidth, textCenter.Y - scaleArrowHeight / 2));
-                    tri2 = new Triangle(new Point3D(selPoint2.X, textCenter.Y), new Point3D(selPoint2.X - scaleArrowWidth, textCenter.Y + scaleArrowHeight / 2), new Point3D(selPoint2.X - scaleArrowWidth, textCenter.Y - scaleArrowHeight / 2));
+                    //tri1 = new Triangle(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint1.X + scaleArrowWidth, textCenter.Y + scaleArrowHeight / 2), new Point3D(selPoint1.X + scaleArrowWidth, textCenter.Y - scaleArrowHeight / 2));
+                    //tri2 = new Triangle(new Point3D(selPoint2.X, textCenter.Y), new Point3D(selPoint2.X - scaleArrowWidth, textCenter.Y + scaleArrowHeight / 2), new Point3D(selPoint2.X - scaleArrowWidth, textCenter.Y - scaleArrowHeight / 2));
+
+                    if (selDimModel.arrowLeftSymbol == DimHead_Type.Arrow)
+                    {
+                        tri1 = new Triangle(new Point3D(selPoint1.X, textCenter.Y), new Point3D(selPoint1.X + scaleArrowWidth, textCenter.Y + scaleArrowHeight / 2), new Point3D(selPoint1.X + scaleArrowWidth, textCenter.Y - scaleArrowHeight / 2));
+                        if (selDimModel.arrowLeftHeadOut)
+                        {
+                            editingService.SetMirrorEntity(Plane.YZ, ref tri1, selPoint1);
+                            arrowLineLeftExtendLength = scaleArrowWidth + scaleArrowExtLength;
+                        }
+                    }
+                    else if (selDimModel.arrowLeftSymbol == DimHead_Type.Circle)
+                    {
+                        cir1 = new Circle(new Point3D(selPoint1.X, textCenter.Y), scaleCircleRadius);
+                    }
+
+                    if (selDimModel.arrowRightSymbol == DimHead_Type.Arrow)
+                    {
+                        tri2 = new Triangle(new Point3D(selPoint2.X, textCenter.Y), new Point3D(selPoint2.X - scaleArrowWidth, textCenter.Y + scaleArrowHeight / 2), new Point3D(selPoint2.X - scaleArrowWidth, textCenter.Y - scaleArrowHeight / 2));
+                        if (selDimModel.arrowRightHeadOut)
+                        {
+                            editingService.SetMirrorEntity(Plane.YZ, ref tri2, selPoint2);
+                            arrowLineRightExtendLength = scaleArrowWidth + scaleArrowExtLength;
+                        }
+                    }
+                    else if (selDimModel.arrowRightSymbol == DimHead_Type.Circle)
+                    {
+                        cir2 = new Circle(new Point3D(selPoint2.X, textCenter.Y), scaleCircleRadius);
+                    }
+
+                    // Text Position
+                    switch (selDimModel.textUpperPosition)
+                    {
+                        case POSITION_TYPE.LEFT:
+                            dimTextUpper.Regen(new RegenParams(0, refSingleModel));
+                            arrowLineLeftExtendLength = scaleTextSideGap + dimTextUpper.BoxSize.X + scaleTextSideGap;
+                            dimTextUpper.InsertionPoint.X = selPoint1.X - arrowLineLeftExtendLength / 2;
+                            if (selDimModel.arrowLeftSymbol == DimHead_Type.Arrow)
+                            {
+                                dimTextUpper.InsertionPoint.X -= scaleArrowWidth;
+                                arrowLineLeftExtendLength += scaleArrowWidth;
+                            }
+                            break;
+                        case POSITION_TYPE.RIGHT:
+                            dimTextUpper.Regen(new RegenParams(0, refSingleModel));
+                            arrowLineRightExtendLength = scaleTextSideGap + dimTextUpper.BoxSize.X + scaleTextSideGap;
+                            dimTextUpper.InsertionPoint.X = selPoint2.X + arrowLineRightExtendLength / 2;
+                            if (selDimModel.arrowRightSymbol == DimHead_Type.Arrow)
+                            {
+                                dimTextUpper.InsertionPoint.X += scaleArrowWidth;
+                                arrowLineRightExtendLength += scaleArrowWidth;
+                            }
+                            break;
+                    }
 
                     break;
 
 
                 case POSITION_TYPE.LEFT:
                     // Text Gap
-                    if (Math.Abs(selPoint1.Y - selPoint2.Y) <= minWidth)
-                        scaleTextGap = scaleTextGap * 2;
+                    if (isCenterText)
+                        if (Math.Abs(selPoint1.Y - selPoint2.Y) <= minWidth)
+                            scaleTextGap = scaleTextGap * 2;
 
-                    textCenter.X = Math.Max(selPoint1.X, selPoint2.X) - dimHeight;
+                    textCenter.X = Math.Min(selPoint1.X, selPoint2.X) - dimHeight;
                     textCenter.Y = selPoint1.Y + middleDistanceV + (middleDistanceV * middleValue / 100);
 
                     arrowLine = new Line(new Point3D(textCenter.X, selPoint1.Y + arrowDetail), new Point3D(textCenter.X, selPoint2.Y - arrowDetail));
@@ -751,17 +817,70 @@ namespace DrawWork.DrawServices
                     dimTextLower = new Text(planeLeft, new Point3D(textCenter.X + scaleTextGap, textCenter.Y), selDimtextLower, scaleTextHeight) { Alignment = Text.alignmentType.TopCenter };
 
                     //dimText.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
-                    tri1 = new Triangle(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X - scaleArrowHeight / 2, selPoint1.Y + scaleArrowWidth), new Point3D(textCenter.X + scaleArrowHeight / 2, selPoint1.Y + scaleArrowWidth));
-                    tri2 = new Triangle(new Point3D(textCenter.X, selPoint2.Y), new Point3D(textCenter.X - scaleArrowHeight / 2, selPoint2.Y - scaleArrowWidth), new Point3D(textCenter.X + scaleArrowHeight / 2, selPoint2.Y - scaleArrowWidth));
+                    //tri1 = new Triangle(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X - scaleArrowHeight / 2, selPoint1.Y + scaleArrowWidth), new Point3D(textCenter.X + scaleArrowHeight / 2, selPoint1.Y + scaleArrowWidth));
+                    //tri2 = new Triangle(new Point3D(textCenter.X, selPoint2.Y), new Point3D(textCenter.X - scaleArrowHeight / 2, selPoint2.Y - scaleArrowWidth), new Point3D(textCenter.X + scaleArrowHeight / 2, selPoint2.Y - scaleArrowWidth));
 
+                    if (selDimModel.arrowLeftSymbol == DimHead_Type.Arrow)
+                    {
+                        tri1 = new Triangle(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X - scaleArrowHeight / 2, selPoint1.Y + scaleArrowWidth), new Point3D(textCenter.X + scaleArrowHeight / 2, selPoint1.Y + scaleArrowWidth));
+                        if (selDimModel.arrowLeftHeadOut)
+                        {
+                            editingService.SetMirrorEntity(Plane.XZ, ref tri1, selPoint1);
+                            arrowLineLeftExtendLength = scaleArrowWidth + scaleArrowExtLength;
+                        }
+                    }
+                    else if (selDimModel.arrowLeftSymbol == DimHead_Type.Circle)
+                    {
+                        cir1 = new Circle(new Point3D(textCenter.X, selPoint1.Y), scaleCircleRadius);
+                    }
+
+                    if (selDimModel.arrowRightSymbol == DimHead_Type.Arrow)
+                    {
+                        tri2 = new Triangle(new Point3D(textCenter.X, selPoint2.Y), new Point3D(textCenter.X - scaleArrowHeight / 2, selPoint2.Y - scaleArrowWidth), new Point3D(textCenter.X + scaleArrowHeight / 2, selPoint2.Y - scaleArrowWidth));
+                        if (selDimModel.arrowRightHeadOut)
+                        {
+                            editingService.SetMirrorEntity(Plane.XZ, ref tri2, selPoint2);
+                            arrowLineRightExtendLength = scaleArrowWidth + scaleArrowExtLength;
+                        }
+                    }
+                    else if (selDimModel.arrowRightSymbol == DimHead_Type.Circle)
+                    {
+                        cir2 = new Circle(new Point3D(textCenter.X, selPoint2.Y), scaleCircleRadius);
+                    }
+
+                    // Text Position
+                    switch (selDimModel.textUpperPosition)
+                    {
+                        case POSITION_TYPE.LEFT:
+                            dimTextUpper.Regen(new RegenParams(0, refSingleModel));
+                            arrowLineLeftExtendLength = scaleTextSideGap + dimTextUpper.BoxSize.Y + scaleTextSideGap;
+                            dimTextUpper.InsertionPoint.Y = selPoint1.Y - arrowLineLeftExtendLength / 2;
+                            if (selDimModel.arrowLeftSymbol == DimHead_Type.Arrow)
+                            {
+                                dimTextUpper.InsertionPoint.Y -= scaleArrowWidth;
+                                arrowLineLeftExtendLength += scaleArrowWidth;
+                            }
+                            break;
+                        case POSITION_TYPE.RIGHT:
+                            dimTextUpper.Regen(new RegenParams(0, refSingleModel));
+                            arrowLineRightExtendLength = scaleTextSideGap + dimTextUpper.BoxSize.Y + scaleTextSideGap;
+                            dimTextUpper.InsertionPoint.Y = selPoint2.Y + arrowLineRightExtendLength / 2;
+                            if (selDimModel.arrowRightSymbol == DimHead_Type.Arrow)
+                            {
+                                dimTextUpper.InsertionPoint.Y += scaleArrowWidth;
+                                arrowLineRightExtendLength += scaleArrowWidth;
+                            }
+                            break;
+                    }
                     break;
 
                 case POSITION_TYPE.RIGHT:
                     // Text Gap
-                    if (Math.Abs(selPoint1.Y - selPoint2.Y) <= minWidth)
-                        scaleTextGap = scaleTextGap * 2;
+                    if (isCenterText)
+                        if (Math.Abs(selPoint1.Y - selPoint2.Y) <= minWidth)
+                            scaleTextGap = scaleTextGap * 2;
 
-                    textCenter.X = Math.Min(selPoint1.X, selPoint2.X) + dimHeight;
+                    textCenter.X = Math.Max(selPoint1.X, selPoint2.X) + dimHeight;
                     textCenter.Y = selPoint1.Y + middleDistanceV + (middleDistanceV * middleValue / 100);
 
                     arrowLine = new Line(new Point3D(textCenter.X, selPoint1.Y + arrowDetail), new Point3D(textCenter.X, selPoint2.Y - arrowDetail));
@@ -779,8 +898,62 @@ namespace DrawWork.DrawServices
                     dimTextLower = new Text(planeLeft2, new Point3D(textCenter.X + scaleTextGap, textCenter.Y), selDimtextLower, scaleTextHeight) { Alignment = Text.alignmentType.TopCenter };
 
                     //dimText.Rotate(Utility.DegToRad(90), Vector3D.AxisZ);
-                    tri1 = new Triangle(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X - scaleArrowHeight / 2, selPoint1.Y + scaleArrowWidth), new Point3D(textCenter.X + scaleArrowHeight / 2, selPoint1.Y + scaleArrowWidth));
-                    tri2 = new Triangle(new Point3D(textCenter.X, selPoint2.Y), new Point3D(textCenter.X - scaleArrowHeight / 2, selPoint2.Y - scaleArrowWidth), new Point3D(textCenter.X + scaleArrowHeight / 2, selPoint2.Y - scaleArrowWidth));
+                    //tri1 = new Triangle(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X - scaleArrowHeight / 2, selPoint1.Y + scaleArrowWidth), new Point3D(textCenter.X + scaleArrowHeight / 2, selPoint1.Y + scaleArrowWidth));
+                    //tri2 = new Triangle(new Point3D(textCenter.X, selPoint2.Y), new Point3D(textCenter.X - scaleArrowHeight / 2, selPoint2.Y - scaleArrowWidth), new Point3D(textCenter.X + scaleArrowHeight / 2, selPoint2.Y - scaleArrowWidth));
+
+                    if (selDimModel.arrowLeftSymbol == DimHead_Type.Arrow)
+                    {
+                        tri1 = new Triangle(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X - scaleArrowHeight / 2, selPoint1.Y + scaleArrowWidth), new Point3D(textCenter.X + scaleArrowHeight / 2, selPoint1.Y + scaleArrowWidth));
+                        if (selDimModel.arrowLeftHeadOut)
+                        {
+                            editingService.SetMirrorEntity(Plane.XZ, ref tri1, selPoint1);
+                            arrowLineLeftExtendLength = scaleArrowWidth + scaleArrowExtLength;
+                        }
+                    }
+                    else if (selDimModel.arrowLeftSymbol == DimHead_Type.Circle)
+                    {
+                        cir1 = new Circle(new Point3D(selPoint1.X, textCenter.Y), scaleCircleRadius);
+                    }
+
+                    if (selDimModel.arrowRightSymbol == DimHead_Type.Arrow)
+                    {
+                        tri2 = new Triangle(new Point3D(textCenter.X, selPoint2.Y), new Point3D(textCenter.X - scaleArrowHeight / 2, selPoint2.Y - scaleArrowWidth), new Point3D(textCenter.X + scaleArrowHeight / 2, selPoint2.Y - scaleArrowWidth));
+                        if (selDimModel.arrowRightHeadOut)
+                        {
+                            editingService.SetMirrorEntity(Plane.XZ, ref tri2, selPoint2);
+                            arrowLineRightExtendLength = scaleArrowWidth + scaleArrowExtLength;
+                        }
+                    }
+                    else if (selDimModel.arrowRightSymbol == DimHead_Type.Circle)
+                    {
+                        cir2 = new Circle(new Point3D(selPoint2.X, textCenter.Y), scaleCircleRadius);
+                    }
+
+                    // Text Position
+                    switch (selDimModel.textUpperPosition)
+                    {
+                        case POSITION_TYPE.LEFT:
+                            dimTextUpper.Regen(new RegenParams(0, refSingleModel));
+                            arrowLineLeftExtendLength = scaleTextSideGap + dimTextUpper.BoxSize.Y + scaleTextSideGap;
+                            dimTextUpper.InsertionPoint.Y = selPoint1.Y - arrowLineLeftExtendLength / 2;
+                            if (selDimModel.arrowLeftSymbol == DimHead_Type.Arrow)
+                            {
+                                dimTextUpper.InsertionPoint.Y -= scaleArrowWidth;
+                                arrowLineLeftExtendLength += scaleArrowWidth;
+                            }
+                            break;
+                        case POSITION_TYPE.RIGHT:
+                            dimTextUpper.Regen(new RegenParams(0, refSingleModel));
+                            arrowLineRightExtendLength = scaleTextSideGap + dimTextUpper.BoxSize.Y + scaleTextSideGap;
+                            dimTextUpper.InsertionPoint.Y = selPoint2.Y + arrowLineRightExtendLength / 2;
+                            if (selDimModel.arrowRightSymbol == DimHead_Type.Arrow)
+                            {
+                                dimTextUpper.InsertionPoint.Y += scaleArrowWidth;
+                                arrowLineRightExtendLength += scaleArrowWidth;
+                            }
+                            break;
+                    }
+
 
                     break;
 
@@ -937,6 +1110,7 @@ namespace DrawWork.DrawServices
             {
                 double scaleBMCircleRadius= scaleService.GetOriginValueOfScale(selScale, dbNumberModel.circleRadius);
                 double scaleBMTextHeight = scaleService.GetOriginValueOfScale(selScale, dbNumberModel.textHeight);
+                editingService.SetExtendLine(ref arrowLine, scaleBMCircleRadius, false);
                 Line tempBMLine = editingService.GetExtendLine(arrowLine, scaleBMCircleRadius, false);
                 leftBMCircle = new Circle(tempBMLine.StartPoint, scaleBMCircleRadius);
                 leftBMText = new Text(tempBMLine.StartPoint, selDimModel.leftBMNumber, scaleBMTextHeight) {Alignment=Text.alignmentType.MiddleCenter };
@@ -947,6 +1121,7 @@ namespace DrawWork.DrawServices
             {
                 double scaleBMCircleRadius = scaleService.GetOriginValueOfScale(selScale, dbNumberModel.circleRadius);
                 double scaleBMTextHeight = scaleService.GetOriginValueOfScale(selScale, dbNumberModel.textHeight);
+                editingService.SetExtendLine(ref arrowLine, scaleBMCircleRadius, true);
                 Line tempBMLine = editingService.GetExtendLine(arrowLine, scaleBMCircleRadius, true);
                 rightBMCircle = new Circle(tempBMLine.EndPoint, scaleBMCircleRadius);
                 rightBMText = new Text(tempBMLine.EndPoint, selDimModel.rightBMNumber, scaleBMTextHeight) { Alignment = Text.alignmentType.MiddleCenter };
@@ -963,11 +1138,32 @@ namespace DrawWork.DrawServices
             styleSerivce.SetLayerListEntity(ref dimArrowList, layerService.LayerDimension);
             styleSerivce.SetLayerListTextEntity(ref dimTextList, layerService.LayerDimension);
 
+            if (rotateValue != 0)
+            {
+                Point3D rotatePoint = new Point3D();
+                if (selDimModel.leftPointRotate)
+                    rotatePoint = GetSumPoint(selPoint1,0,0);
+                else
+                    rotatePoint = GetSumPoint(selPoint2,0,0);
+                List<Entity> roList01 = editingService.GetRotate(dimlineList, GetSumPoint(rotatePoint, 0, 0), rotateValue);
+                List<Entity> roList02 = editingService.GetRotate(dimTextList, GetSumPoint(rotatePoint, 0, 0), rotateValue);
+                List<Entity> roList03 = editingService.GetRotate(dimlineExtList, GetSumPoint(rotatePoint, 0, 0), rotateValue);
+                List<Entity> roList04 = editingService.GetRotate(dimArrowList, GetSumPoint(rotatePoint, 0, 0), rotateValue);
 
-            customEntityList.dimlineList.AddRange(dimlineList);
-            customEntityList.dimTextList.AddRange(dimTextList);
-            customEntityList.dimlineExtList.AddRange(dimlineExtList);
-            customEntityList.dimArrowList.AddRange(dimArrowList);
+                customEntityList.dimlineList.AddRange(roList01);
+                customEntityList.dimTextList.AddRange(roList02);
+                customEntityList.dimlineExtList.AddRange(roList03);
+                customEntityList.dimArrowList.AddRange(roList04);
+            }
+            else
+            {
+                customEntityList.dimlineList.AddRange(dimlineList);
+                customEntityList.dimTextList.AddRange(dimTextList);
+                customEntityList.dimlineExtList.AddRange(dimlineExtList);
+                customEntityList.dimArrowList.AddRange(dimArrowList);
+            }
+
+
 
             return customEntityList;
         }
@@ -1011,6 +1207,7 @@ namespace DrawWork.DrawServices
 
 
             // Scale
+            double scaleDimHeight= scaleService.GetOriginValueOfScale(selScale, selDimHeight);
             double scaleArrowHeight = scaleService.GetOriginValueOfScale(selScale, selArrowHeight);
             double scaleArrowWidth = scaleService.GetOriginValueOfScale(selScale, selArrowWidth);
 
@@ -1023,6 +1220,7 @@ namespace DrawWork.DrawServices
 
             double scaleTextHeight = scaleService.GetOriginValueOfScale(selScale, selTextHeight);
 
+            
 
             string selDimtext = "";
 
@@ -1068,8 +1266,12 @@ namespace DrawWork.DrawServices
                     break;
             }
 
+            // 좁은 각도
+            if (scaleDimHeight < 0)
+                scaleExtLine1 = -scaleExtLine1;
+
             // Draw
-            textCenter.X = Math.Max(selPoint1.X, selPoint2.X) - selDimHeight;
+            textCenter.X = Math.Max(selPoint1.X, selPoint2.X) - scaleDimHeight;
             textCenter.Y = selPoint1.Y + middleDistanceV + (middleDistanceV * middleValue / 100);
             selDimtext = Point3D.Distance(new Point3D(textCenter.X, selPoint1.Y), new Point3D(textCenter.X, selPoint2.Y)).ToString();
 
@@ -1089,7 +1291,7 @@ namespace DrawWork.DrawServices
                 double arcRadiusMin = dimCenterPoint.DistanceTo(selPoint1);
                 if (arcRadiusMin > dimCenterPoint.DistanceTo(selPoint2))
                     arcRadiusMin = dimCenterPoint.DistanceTo(selPoint2);
-                double arcRadiusMax = arcRadiusMin + selDimHeight;
+                double arcRadiusMax = arcRadiusMin + scaleDimHeight;
                 Circle circleMax = new Circle(GetSumPoint(dimCenterPoint, 0, 0), arcRadiusMax);
                 Point3D dimExt1Point = editingService.GetIntersectWidth(circleMax, vdimLine1Half, 0);
                 Point3D dimExt2Point = editingService.GetIntersectWidth(circleMax, vdimLine2Half, 0);
@@ -1148,7 +1350,8 @@ namespace DrawWork.DrawServices
             if (selTextSuffix != "")
                 selDimtext = selDimtext + selTextSuffix;
 
-            dimText.TextString = selDimtext;
+            if(dimText!=null)
+                dimText.TextString = selDimtext;
 
 
 
@@ -1163,7 +1366,8 @@ namespace DrawWork.DrawServices
             if (rightArrowVisible)
                 dimArrowList.Add(tri2);
 
-            dimTextList.Add(dimText);
+            if(dimText!=null)
+                dimTextList.Add(dimText);
 
             if (extVisible)
                 dimlineExtList.Add(dimLine1);
@@ -1432,7 +1636,7 @@ namespace DrawWork.DrawServices
 
 
 
-        public DrawEntityModel Draw_BMLeader(ref Model refSingleModel,Point3D selPoint,DrawBMLeaderModel selLeaderModel, double selScale)
+        public DrawEntityModel Draw_OneLineLeader(ref Model refSingleModel,Point3D selPoint,DrawBMLeaderModel selLeaderModel, double selScale,double rotateValue=0)
         {
             List<Entity> leaderLine = new List<Entity>();
             List<Entity> leaderArrow = new List<Entity>();
@@ -1448,12 +1652,17 @@ namespace DrawWork.DrawServices
             double scaleTextGap = scaleService.GetOriginValueOfScale(selScale, selLeaderModel.textGap);
 
             double scaleLeaderLength= scaleService.GetOriginValueOfScale(selScale, selLeaderModel.leaderLength);
+            double scaleLeaderPointLength = scaleService.GetOriginValueOfScale(selScale, selLeaderModel.leaderPointLength);
+
+            double scaleMultiLineHeight= scaleService.GetOriginValueOfScale(selScale, selLeaderModel.multiLineHeight);
 
             string upperText = selLeaderModel.upperText;
             string lowerText = selLeaderModel.lowerText;
+            string upperSecondText = selLeaderModel.upperSecondText;
             string bmNumberText = selLeaderModel.bmNumber;
 
             double leaderLengthMax = scaleLeaderLength;
+            double leaderSecondLengthMax = scaleLeaderLength;
 
             // Text Regen에 따른 Box Size 정확하지 않음
             scaleTextSideGap = scaleTextSideGap * 2;
@@ -1462,8 +1671,36 @@ namespace DrawWork.DrawServices
             Circle cir = null;
             Text cirText = null;
             Line arrowLine = null;
+            Line arrowSecondLine = null;
+            Line arrowSecondVLine = null;
             Text dimUpperText = null;
             Text dimLowerText = null;
+            Text dimUpperSecondText = null;
+
+            // Leader Point Line
+            bool drawArrow = selLeaderModel.arrowHeadVisible;
+            Point3D newSelPoint = GetSumPoint(selPoint, 0, 0);
+            Line leaderPointLine = null;
+            if (scaleLeaderPointLength > 0)
+            {
+                leaderPointLine = new Line(GetSumPoint(selPoint, 0, 0), GetSumPoint(selPoint, scaleLeaderPointLength, 0));
+                if (selLeaderModel.leaderPointRadian != 0)
+                    leaderPointLine.Rotate(selLeaderModel.leaderPointRadian, Vector3D.AxisZ, GetSumPoint(selPoint, 0, 0));
+                if (drawArrow)
+                {
+                    tri = new Triangle(GetSumPoint(selPoint, 0, 0), GetSumPoint(selPoint, scaleArrowWidth, scaleArrowHeight / 2), GetSumPoint(selPoint, scaleArrowWidth, -scaleArrowHeight / 2));
+                    if (selLeaderModel.leaderPointRadian != 0)
+                        tri.Rotate(selLeaderModel.leaderPointRadian, Vector3D.AxisZ, GetSumPoint(selPoint, 0, 0));
+                }
+
+
+
+                drawArrow = false;
+                newSelPoint = GetSumPoint(leaderPointLine.EndPoint, 0, 0);
+
+            }
+
+            
 
             switch (selLeaderModel.position)
             {
@@ -1474,7 +1711,7 @@ namespace DrawWork.DrawServices
                     // Text
                     if (upperText != "")
                     {
-                        dimUpperText = new Text(GetSumPoint(selPoint, 0, scaleTextGap), upperText, scaleTextHeight) { Alignment = Text.alignmentType.BaselineCenter };
+                        dimUpperText = new Text(GetSumPoint(newSelPoint, 0, scaleTextGap), upperText, scaleTextHeight) { Alignment = Text.alignmentType.BaselineCenter };
                         dimUpperText.Regen(new RegenParams(0, refSingleModel));
                         double tempTextWidth = scaleTextSideGap + dimUpperText.BoxSize.X + scaleTextSideGap;
                         if (leaderLengthMax < tempTextWidth)
@@ -1482,7 +1719,7 @@ namespace DrawWork.DrawServices
                     }
                     if (lowerText != "")
                     {
-                        dimLowerText = new Text(GetSumPoint(selPoint, 0, -scaleTextGap), lowerText, scaleTextHeight) { Alignment = Text.alignmentType.TopCenter };
+                        dimLowerText = new Text(GetSumPoint(newSelPoint, 0, -scaleTextGap), lowerText, scaleTextHeight) { Alignment = Text.alignmentType.TopCenter };
                         dimLowerText.Regen(new RegenParams(0, refSingleModel));
                         double tempTextWidth = scaleTextSideGap + dimLowerText.BoxSize.X + scaleTextSideGap;
                         if (leaderLengthMax < tempTextWidth)
@@ -1498,15 +1735,33 @@ namespace DrawWork.DrawServices
                     leaderLengthMax += scaleArrowWidth;
 
                     // Line
-                    arrowLine = new Line(GetSumPoint(selPoint, 0, 0), GetSumPoint(selPoint, -leaderLengthMax, 0));
+                    arrowLine = new Line(GetSumPoint(newSelPoint, 0, 0), GetSumPoint(newSelPoint, -leaderLengthMax, 0));
 
                     // Arrow
-                    tri = new Triangle(GetSumPoint(selPoint,0,0), GetSumPoint(selPoint,-scaleArrowWidth, scaleArrowHeight / 2), GetSumPoint(selPoint, -scaleArrowWidth, -scaleArrowHeight / 2));
+                    if(drawArrow)
+                        tri = new Triangle(GetSumPoint(newSelPoint, 0,0), GetSumPoint(newSelPoint, -scaleArrowWidth, scaleArrowHeight / 2), GetSumPoint(selPoint, -scaleArrowWidth, -scaleArrowHeight / 2));
+
+                    // Mutil Line
+                    if (upperSecondText != "")
+                    {
+                        dimUpperSecondText = new Text(GetSumPoint(newSelPoint, 0, -scaleMultiLineHeight + scaleTextGap), upperSecondText, scaleTextHeight) { Alignment = Text.alignmentType.BaselineCenter };
+                        dimUpperSecondText.Regen(new RegenParams(0, refSingleModel));
+                        double tempSecondTextWidth = scaleTextSideGap + dimUpperSecondText.BoxSize.X + scaleTextSideGap;
+                        if (leaderSecondLengthMax < tempSecondTextWidth)
+                            leaderSecondLengthMax = tempSecondTextWidth;
+                        dimUpperSecondText.Translate(-scaleArrowWidth - leaderSecondLengthMax / 2, 0);
+                        leaderSecondLengthMax += scaleArrowWidth;
+                        // Line
+                        arrowSecondVLine = new Line(GetSumPoint(newSelPoint, 0, -scaleMultiLineHeight), GetSumPoint(newSelPoint, 0, 0));
+                        arrowSecondLine = new Line(GetSumPoint(newSelPoint, 0, -scaleMultiLineHeight), GetSumPoint(newSelPoint, -leaderSecondLengthMax, -scaleMultiLineHeight));
+                    }
 
                     // circle
-                    if(bmNumberText != "")
+                    if (bmNumberText != "")
                     {
                         Point3D cirCenterPoint = GetSumPoint(arrowLine.EndPoint, -scaleCircleRadius,0);
+                        if (arrowSecondLine != null)
+                            cirCenterPoint = GetSumPoint(arrowSecondLine.EndPoint, -scaleCircleRadius, 0);
                         cir = new Circle(GetSumPoint(cirCenterPoint, 0, 0), scaleCircleRadius);
                         cirText = new Text(GetSumPoint(cirCenterPoint, 0, 0), bmNumberText, scaleCircleNumberHeight) {Alignment=Text.alignmentType.MiddleCenter };
                     }
@@ -1516,7 +1771,7 @@ namespace DrawWork.DrawServices
                     // Text
                     if (upperText != "")
                     {
-                        dimUpperText = new Text(GetSumPoint(selPoint, 0, scaleTextGap), upperText, scaleTextHeight) { Alignment = Text.alignmentType.BaselineCenter };
+                        dimUpperText = new Text(GetSumPoint(newSelPoint, 0, scaleTextGap), upperText, scaleTextHeight) { Alignment = Text.alignmentType.BaselineCenter };
                         dimUpperText.Regen(new RegenParams(0, refSingleModel));
                         double tempTextWidth = scaleTextSideGap + dimUpperText.BoxSize.X + scaleTextSideGap;
                         if (leaderLengthMax < tempTextWidth)
@@ -1524,7 +1779,7 @@ namespace DrawWork.DrawServices
                     }
                     if (lowerText != "")
                     {
-                        dimLowerText = new Text(GetSumPoint(selPoint, 0, -scaleTextGap), lowerText, scaleTextHeight) { Alignment = Text.alignmentType.TopCenter };
+                        dimLowerText = new Text(GetSumPoint(newSelPoint, 0, -scaleTextGap), lowerText, scaleTextHeight) { Alignment = Text.alignmentType.TopCenter };
                         dimLowerText.Regen(new RegenParams(0, refSingleModel));
                         double tempTextWidth = scaleTextSideGap + dimLowerText.BoxSize.X + scaleTextSideGap;
                         if (leaderLengthMax < tempTextWidth)
@@ -1544,15 +1799,34 @@ namespace DrawWork.DrawServices
                     leaderLengthMax += scaleArrowWidth;
 
                     // Line
-                    arrowLine = new Line(GetSumPoint(selPoint, 0, 0), GetSumPoint(selPoint, leaderLengthMax, 0));
+                    arrowLine = new Line(GetSumPoint(newSelPoint, 0, 0), GetSumPoint(newSelPoint, leaderLengthMax, 0));
 
                     // Arrow
-                    tri = new Triangle(GetSumPoint(selPoint, 0, 0), GetSumPoint(selPoint, scaleArrowWidth, scaleArrowHeight / 2), GetSumPoint(selPoint, scaleArrowWidth, -scaleArrowHeight / 2));
+                    if (drawArrow)
+                        tri = new Triangle(GetSumPoint(newSelPoint, 0, 0), GetSumPoint(newSelPoint, scaleArrowWidth, scaleArrowHeight / 2), GetSumPoint(selPoint, scaleArrowWidth, -scaleArrowHeight / 2));
+
+                    // Mutil Line
+                    if (upperSecondText != "")
+                    {
+                        dimUpperSecondText = new Text(GetSumPoint(newSelPoint, 0, -scaleMultiLineHeight + scaleTextGap), upperSecondText, scaleTextHeight) { Alignment = Text.alignmentType.BaselineCenter };
+                        dimUpperSecondText.Regen(new RegenParams(0, refSingleModel));
+                        double tempSecondTextWidth = scaleTextSideGap + dimUpperSecondText.BoxSize.X + scaleTextSideGap;
+                        if (leaderSecondLengthMax < tempSecondTextWidth)
+                            leaderSecondLengthMax = tempSecondTextWidth;
+                        dimUpperSecondText.Translate(scaleArrowWidth + leaderSecondLengthMax / 2, 0);
+                        leaderSecondLengthMax += scaleArrowWidth;
+                        // Line
+                        arrowSecondVLine = new Line(GetSumPoint(newSelPoint, 0, -scaleMultiLineHeight), GetSumPoint(newSelPoint, 0, 0));
+                        arrowSecondLine = new Line(GetSumPoint(newSelPoint, 0, -scaleMultiLineHeight), GetSumPoint(newSelPoint, leaderSecondLengthMax, -scaleMultiLineHeight));
+                    }
+
 
                     // circle
                     if (bmNumberText != "")
                     {
                         Point3D cirCenterPoint = GetSumPoint(arrowLine.EndPoint, scaleCircleRadius, 0);
+                        if(arrowSecondLine!=null)
+                            cirCenterPoint = GetSumPoint(arrowSecondLine.EndPoint, scaleCircleRadius, 0);
                         cir = new Circle(GetSumPoint(cirCenterPoint, 0, 0), scaleCircleRadius);
                         cirText = new Text(GetSumPoint(cirCenterPoint, 0, 0), bmNumberText, scaleCircleNumberHeight) { Alignment = Text.alignmentType.MiddleCenter };
                     }
@@ -1566,12 +1840,15 @@ namespace DrawWork.DrawServices
                 case POSITION_TYPE.TOP:
                 case POSITION_TYPE.BOTTOM:
                     rotateRadian = Utility.DegToRad(90);
-                    arrowLine.Rotate(rotateRadian, Vector3D.AxisZ, selPoint);
-                    tri.Rotate(rotateRadian, Vector3D.AxisZ, selPoint);
-                    if (cir != null) cir.Rotate(rotateRadian, Vector3D.AxisZ, selPoint);
+                    if (arrowLine != null) arrowLine.Rotate(rotateRadian, Vector3D.AxisZ, selPoint);
+                    if (arrowSecondLine != null) arrowSecondLine.Rotate(rotateRadian, Vector3D.AxisZ, selPoint);
+                    if (arrowSecondVLine != null) arrowSecondVLine.Rotate(rotateRadian, Vector3D.AxisZ, selPoint);
+                    if (tri != null) tri.Rotate(rotateRadian, Vector3D.AxisZ, newSelPoint);
+                    if (cir != null) cir.Rotate(rotateRadian, Vector3D.AxisZ, newSelPoint);
                     if (cirText != null) cirText.InsertionPoint = GetSumPoint(cir.Center, 0, 0);
-                    if (dimUpperText != null) dimUpperText.Rotate(rotateRadian, Vector3D.AxisZ, selPoint);
-                    if (dimLowerText != null) dimLowerText.Rotate(rotateRadian, Vector3D.AxisZ, selPoint);
+                    if (dimUpperText != null) dimUpperText.Rotate(rotateRadian, Vector3D.AxisZ, newSelPoint);
+                    if (dimLowerText != null) dimLowerText.Rotate(rotateRadian, Vector3D.AxisZ, newSelPoint);
+                    if (dimUpperSecondText != null) dimUpperSecondText.Rotate(rotateRadian, Vector3D.AxisZ, newSelPoint);
 
                     break;
 
@@ -1580,6 +1857,11 @@ namespace DrawWork.DrawServices
 
             if (arrowLine != null)
                 leaderArrow.Add(arrowLine);
+            if (arrowSecondLine != null)
+                leaderArrow.Add(arrowSecondLine);
+            if (arrowSecondVLine != null)
+                leaderArrow.Add(arrowSecondVLine);
+
             if (tri != null)
                 leaderArrow.Add(tri);
 
@@ -1591,6 +1873,10 @@ namespace DrawWork.DrawServices
                 if (dimLowerText != null)
                     leaderText.Add(dimLowerText);
 
+            if (upperSecondText != "")
+                if (dimUpperSecondText != null)
+                    leaderText.Add(dimUpperSecondText);
+
             if (bmNumberText != "")
             {
                 if (cir != null)
@@ -1600,6 +1886,9 @@ namespace DrawWork.DrawServices
             }
 
 
+            if (leaderPointLine != null)
+                leaderLine.Add(leaderPointLine);
+
             styleSerivce.SetLayerListEntity(ref leaderLine,layerService.LayerDimension);
             styleSerivce.SetLayerListEntity(ref leaderArrow, layerService.LayerDimension);
             styleSerivce.SetLayerListTextEntity(ref leaderText, layerService.LayerDimension);
@@ -1608,9 +1897,30 @@ namespace DrawWork.DrawServices
 
             DrawEntityModel customEntityList = new DrawEntityModel();
 
-            customEntityList.leaderlineList.AddRange(leaderLine);
-            customEntityList.leaderTextList.AddRange(leaderText);
-            customEntityList.leaderArrowList.AddRange(leaderArrow);
+            if (rotateValue != 0)
+            {
+
+                List<Entity> roList01 = editingService.GetRotate(leaderLine, GetSumPoint(selPoint, 0, 0), rotateValue);
+                List<Entity> roList02 = editingService.GetRotate(leaderText, GetSumPoint(selPoint, 0, 0), rotateValue);
+                List<Entity> roList03 = editingService.GetRotate(leaderArrow, GetSumPoint(selPoint, 0, 0), rotateValue);
+
+                customEntityList.leaderlineList.AddRange(roList01);
+                customEntityList.leaderTextList.AddRange(roList02);
+                customEntityList.leaderArrowList.AddRange(roList03);
+
+            }
+            else
+            {
+                customEntityList.leaderlineList.AddRange(leaderLine);
+                customEntityList.leaderTextList.AddRange(leaderText);
+                customEntityList.leaderArrowList.AddRange(leaderArrow);
+
+            }
+
+
+
+
+
 
             return customEntityList;
         }

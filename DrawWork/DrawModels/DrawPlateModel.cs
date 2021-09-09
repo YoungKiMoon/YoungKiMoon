@@ -16,8 +16,15 @@ namespace DrawWork.DrawModels
 
         public double Number { get; set; }
 
+        public double NumberCount { get; set; }
+        public string DisplayName { get; set; }
 
         public List<Point3D> Points { get; set; }
+        public List<double> VLength { get; set; }
+        public List<double> HLength { get; set; }
+
+       
+
         public Plate_Type ShapeType { get; set; }
         public bool IsAdjustment { get; set; }
         public PERPENDICULAR_TYPE PlateDirection { get; set; }
@@ -25,6 +32,11 @@ namespace DrawWork.DrawModels
 
         public double RectWidth { get; set; }
         public double RectLength { get; set; }
+
+        public Point3D NumberPoint { get; set; }
+
+
+        public DrawPlateCuttingModel CuttingPlan { get; set; }
 
         public DrawPlateModel()
         {
@@ -34,10 +46,16 @@ namespace DrawWork.DrawModels
 
             // Default
             Number = 0;
-
+            NumberCount = 0;
+            NumberPoint = null;
+            DisplayName = "";
 
             // 0 : 직선, 1 : 직선/Arc, 2 : 직선/ARC, 3 : 직선
             Points = new List<Point3D>();
+
+            VLength = new List<double>();
+            HLength = new List<double>();
+
             // 사각형, 사각형 호, 호 
             ShapeType = Plate_Type.Rectangle;
             // 사각형 변형 유무
@@ -51,7 +69,7 @@ namespace DrawWork.DrawModels
             RectWidth = 0;
             RectLength = 0;
 
-
+            CuttingPlan = new DrawPlateCuttingModel();
         }
     }
 }

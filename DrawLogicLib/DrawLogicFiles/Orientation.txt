@@ -15,4 +15,9 @@ refpoint xy 300000,100000
 	nozzleorientation	
 #endregion
 
+#region Detail
+	drawassembly name detail subname bottomplatejoint
+	refpoint xy 1400000,200000
+	drawdetail name bottomplatejoint
+#endregion
 

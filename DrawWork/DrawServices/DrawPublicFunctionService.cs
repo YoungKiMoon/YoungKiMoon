@@ -25,5 +25,10 @@ namespace DrawWork.DrawServices
             return outsideProjection;
         }
 
+
+        public double GetDetailAnnularOverlap()
+        {
+            return 70;
+        }
     }
 }

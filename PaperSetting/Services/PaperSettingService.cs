@@ -1,5 +1,11 @@
 ﻿using AssemblyLib.AssemblyModels;
+using DrawSettingLib.Commons;
+using DrawSettingLib.SettingModels;
+using DrawWork.Commons;
+using DrawWork.DrawDetailServices;
 using DrawWork.DrawGridServices;
+using DrawWork.DrawModels;
+using DrawWork.DrawSacleServices;
 using PaperSetting.Commons;
 using PaperSetting.Models;
 using System;
@@ -18,15 +24,11 @@ namespace PaperSetting.Services
 
         }
 
-        public ObservableCollection<PaperDwgModel> CreateDrawingCRTList(AssemblyModel assemData)
+        public ObservableCollection<PaperDwgModel> CreateDrawingCRTList(AssemblyModel assemData,object selModel)
         {
             ObservableCollection<PaperDwgModel> newList = new ObservableCollection<PaperDwgModel>();
 
-            #region GA
-
-
-
-            #endregion
+            DrawDetailRoofBottomService roofBottomService = new DrawDetailRoofBottomService(assemData,selModel);
 
             #region ETC
             List<string> etcName = new List<string>();
@@ -69,6 +71,7 @@ namespace PaperSetting.Services
                 if (newDescription == "GENERAL ASSEMBLY(1-2)")
                 {
                     PaperDwgModel newPaper01 = new PaperDwgModel();
+                    newPaper01.Name = PAPERMAIN_TYPE.GA1;
 
                     // Sheet
                     newPaper01.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
@@ -162,6 +165,7 @@ namespace PaperSetting.Services
                 else if (newDescription == "GENERAL ASSEMBLY(2-2)")
                 {
                     PaperDwgModel newPaper = new PaperDwgModel();
+                    newPaper.Name = PAPERMAIN_TYPE.GA2;
 
                     // Sheet
                     newPaper.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
@@ -187,6 +191,7 @@ namespace PaperSetting.Services
                 else if(newDescription=="NOZZLE ORIENTATION")
                 {
                     PaperDwgModel newPaper01 = new PaperDwgModel();
+                    newPaper01.Name = PAPERMAIN_TYPE.ORIENTATION;
 
                     // Sheet
                     newPaper01.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
@@ -294,6 +299,238 @@ namespace PaperSetting.Services
                     newPaper.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
                     newList.Add(newPaper);
                 }
+                else if (newDescription == "SHELL PLATE ARRANGEMENT")
+                {
+                    PaperDwgModel newPaper1 = new PaperDwgModel();
+                    newPaper1.Name = PAPERMAIN_TYPE.ShellPlateArrangement;
+                    newPaper1.Page = 1;
+
+                    newPaper1.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+                    newPaper1.RowDef = 3;
+                    newPaper1.ColumnDef = 4;
+                    // Basic
+                    newPaper1.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                    newList.Add(newPaper1);
+
+
+
+                    PaperTableModel newTable01 = new PaperTableModel();
+                    newTable01.No = "1";
+                    newTable01.Name = "Shell Plate BM";
+                    newTable01.TableSelection = "Shell_PLATE_BM";
+                    newTable01.Dock.DockPosition = DOCKPOSITION_TYPE.RIGHT;
+                    newTable01.Dock.VerticalAlignment = VERTICALALIGNMENT_TYPE.TOP;
+                    newTable01.Dock.DockPriority = 1;
+
+
+                    newPaper1.Tables.Add(newTable01);
+
+
+
+                    PaperDwgModel newPaper2 = new PaperDwgModel();
+                    newPaper2.Name = PAPERMAIN_TYPE.ShellPlateArrangement;
+                    newPaper2.Page = 2;
+
+                    newPaper2.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+                    newPaper2.RowDef = 4;
+                    newPaper2.ColumnDef = 4;
+                    // Basic
+                    newPaper2.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                    newList.Add(newPaper2);
+
+
+
+                }
+                else if (newDescription == "1st COURSE SHELL PLATE")
+                {
+                    // Course 수 만큼
+                    double coursePageCount = 0;
+                    foreach(PaperAreaModel eachArea in SingletonData.PaperArea.AreaList)
+                    {
+                        if (eachArea.DWGName == PAPERMAIN_TYPE.CourseShellPlate)
+                        {
+                            coursePageCount++;
+
+                            PaperDwgModel newPaper3 = new PaperDwgModel();
+                            newPaper3.Name = PAPERMAIN_TYPE.CourseShellPlate;
+                            newPaper3.Page = coursePageCount;
+
+                            newPaper3.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+                            newPaper3.RowDef = 1;
+                            newPaper3.ColumnDef = 1;
+                            // Basic
+                            newPaper3.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                            newList.Add(newPaper3);
+                        }
+                    }
+
+                }
+                else if (newDescription == "BOTTOM PLATE ARRANGEMENT")
+                {
+
+
+                    double selTankOD = roofBottomService.GetBottomRoofOD();
+                    //bool selAnnular = assemData.BottomInput[0].AnnularPlate.Contains("yes");
+
+                    if (selTankOD <= 24800)
+                    {
+                        //Annular Yes, OD <=24800
+                        PaperDwgModel newPaper1 = new PaperDwgModel();
+                        newPaper1.Name = PAPERMAIN_TYPE.BottomPlateArrangement;
+                        newPaper1.Page = 1;
+
+                        newPaper1.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+                        newPaper1.RowDef = 4;
+                        newPaper1.ColumnDef = 4;
+                        // Basic
+                        newPaper1.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                        newList.Add(newPaper1);
+
+                    }
+                    else
+                    {
+                        //Annular Yes, OD < 24800
+
+                        PaperDwgModel newPaper1 = new PaperDwgModel();
+                        newPaper1.Name = PAPERMAIN_TYPE.BottomPlateArrangement;
+                        newPaper1.Page = 1;
+
+                        newPaper1.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+                        newPaper1.RowDef = 4;
+                        newPaper1.ColumnDef = 4;
+                        // Basic
+                        newPaper1.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                        newList.Add(newPaper1);
+
+                        PaperDwgModel newPaper2 = new PaperDwgModel();
+                        newPaper2.Name = PAPERMAIN_TYPE.BottomPlateArrangement;
+                        newPaper2.Page = 2;
+
+                        newPaper2.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+                        newPaper2.RowDef = 4;
+                        newPaper2.ColumnDef = 4;
+                        // Basic
+                        newPaper2.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                        newList.Add(newPaper2);
+
+                    }
+
+
+                }
+
+                else if (newDescription == "BOTTOM PLATE CUTTING PLAN")
+                {
+
+                    if (SingletonData.BottomCuttingList.Count > 0)
+                    {
+                        
+                        double refRow = 4;
+                        double refColumn = 3;
+                        double onePageCount = refRow * refColumn;
+                        double cuttingPageCount = Math.Ceiling(SingletonData.BottomCuttingList.Count /onePageCount);
+                        for (int i = 0; i < cuttingPageCount; i++)
+                        {
+
+                            PaperDwgModel newPaper1 = new PaperDwgModel();
+                            newPaper1.Name = PAPERMAIN_TYPE.BottomPlateCuttingPlan;
+                            newPaper1.Page = i + 1;
+
+                            newPaper1.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+                            newPaper1.RowDef = refRow;
+                            newPaper1.ColumnDef = refColumn;
+                            // Basic
+                            newPaper1.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                            newList.Add(newPaper1);
+                        }
+                    }
+
+                        
+
+
+                }
+
+                // Roof
+                else if (newDescription == "ROOF PLATE ARRANGEMENT")
+                {
+
+
+                    double selTankOD = roofBottomService.GetBottomRoofOD();
+                    //bool selAnnular = assemData.BottomInput[0].AnnularPlate.Contains("yes");
+
+                    if (selTankOD <= 24800)
+                    {
+                        //Annular Yes, OD <=24800
+                        PaperDwgModel newPaper1 = new PaperDwgModel();
+                        newPaper1.Name = PAPERMAIN_TYPE.RoofPlateArrangement;
+                        newPaper1.Page = 1;
+
+                        newPaper1.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+                        newPaper1.RowDef = 4;
+                        newPaper1.ColumnDef = 4;
+                        // Basic
+                        newPaper1.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                        newList.Add(newPaper1);
+
+                    }
+                    else
+                    {
+                        //Annular Yes, OD < 24800
+
+                        PaperDwgModel newPaper1 = new PaperDwgModel();
+                        newPaper1.Name = PAPERMAIN_TYPE.RoofPlateArrangement;
+                        newPaper1.Page = 1;
+
+                        newPaper1.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+                        newPaper1.RowDef = 4;
+                        newPaper1.ColumnDef = 4;
+                        // Basic
+                        newPaper1.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                        newList.Add(newPaper1);
+
+                        PaperDwgModel newPaper2 = new PaperDwgModel();
+                        newPaper2.Name = PAPERMAIN_TYPE.RoofPlateArrangement;
+                        newPaper2.Page = 2;
+
+                        newPaper2.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+                        newPaper2.RowDef = 4;
+                        newPaper2.ColumnDef = 4;
+                        // Basic
+                        newPaper2.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                        newList.Add(newPaper2);
+
+                    }
+
+
+                }
+
+                else if (newDescription == "ROOF PLATE CUTTING PLAN")
+                {
+
+                    if (SingletonData.RoofCuttingList.Count > 0)
+                    {
+                        double refRow = 4;
+                        double refColumn = 3;
+                        double onePageCount = refRow * refColumn;
+                        double cuttingPageCount = Math.Ceiling(SingletonData.RoofCuttingList.Count / onePageCount);
+                        for (int i = 0; i < cuttingPageCount; i++)
+                        {
+
+                            PaperDwgModel newPaper1 = new PaperDwgModel();
+                            newPaper1.Name = PAPERMAIN_TYPE.RoofPlateCuttingPlan;
+                            newPaper1.Page = i + 1;
+
+                            newPaper1.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+                            newPaper1.RowDef = refRow;
+                            newPaper1.ColumnDef = refColumn;
+                            // Basic
+                            newPaper1.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                            newList.Add(newPaper1);
+                        }
+                    }
+
+
+                }
+
 
             }
 
@@ -303,20 +540,30 @@ namespace PaperSetting.Services
         }
 
 
-        public List<DrawPaperGridModel> CreatePaperGridList(ObservableCollection<PaperDwgModel> selList)
+
+        // Grid 
+        public ObservableCollection<DrawPaperGridModel> CreatePaperGridList(ObservableCollection<PaperDwgModel> selList)
         {
-            List<DrawPaperGridModel> newList = new List<DrawPaperGridModel>();
+            ObservableCollection<DrawPaperGridModel> newList = new ObservableCollection<DrawPaperGridModel>();
+            
             foreach(PaperDwgModel eachDwg in selList)
             {
                 DrawPaperGridModel newGrid = new DrawPaperGridModel();
 
+                newGrid.Name = eachDwg.Name;
+                newGrid.Page = eachDwg.Page;
                 // Adjust
                 double widthAdj= -(7 * 2) - 2 - 185;  // 7 Frame, 2 left Gap, 185 Right Area
                 double heightAdj = -(7 * 2) - 10;     // 7 Frame, 10 Bottom Gap
 
-                newGrid.Size.Width = eachDwg.SheetSize.Width;
-                newGrid.Size.Height = eachDwg.SheetSize.Height;
+                newGrid.Size.Width = eachDwg.SheetSize.Width + widthAdj;
+                newGrid.Size.Height = eachDwg.SheetSize.Height + heightAdj;
 
+                newGrid.Location.X = 7 + 2;
+                newGrid.Location.Y = 7 + 10;
+
+                newGrid.ColumnDef = eachDwg.ColumnDef;
+                newGrid.RowDef = eachDwg.RowDef;
 
                 newList.Add(newGrid);
             }
@@ -481,19 +728,98 @@ namespace PaperSetting.Services
         }
 
 
-        private SizeModel GetSizeModel(PAPERFORMAT_TYPE selPaper)
+        public void SetCuttingModel()
         {
-            SizeModel newSize;
+            DrawScaleService scaleService = new DrawScaleService();
+
+            // 이거 매우 중요함 : 페이지에 종속 되어야 하나, 여기서는 강제 적용
+            double refRow = 4;
+            double refColumn = 3;
+            double pageMaxCount = refRow * refColumn;
+
+            double itemCount = 0;
+            double pageCount = 0;
+
+            // Roof
+            itemCount = 0;
+            pageCount = 0;
+            PaperAreaModel roofCuttingPlanModel = SingletonData.PaperArea.GetAreaModel(PAPERMAIN_TYPE.DETAIL, PAPERSUB_TYPE.RoofPlateCuttingPlan);
+            // 삭제 매우 중요함
+            SingletonData.PaperArea.AreaList.Remove(roofCuttingPlanModel);
+
+            foreach(DrawCuttingAreaModel eachCutting in SingletonData.RoofCuttingList)
+            {
+                itemCount++;
+                pageCount = Math.Ceiling(itemCount / pageMaxCount);
+
+                PaperAreaModel newModel = roofCuttingPlanModel.CustomClone();
+
+                // Page Number
+                newModel.Page = pageCount;
+                // Visible
+                newModel.visible = true;
+                // Scale
+                newModel.ScaleValue = scaleService.GetScaleCalValue(135, 50, eachCutting.plateLength, eachCutting.plateWidth);
+                // Model CenterPoint
+                newModel.ModelCenterLocation.X = eachCutting.centerPoint.X;
+                newModel.ModelCenterLocation.Y = eachCutting.centerPoint.Y;
+
+                // Sub Title
+                newModel.TitleName=eachCutting.displayName + "-" + newModel.TitleName;
+
+                // View ID
+                newModel.viewID += itemCount;
+                SingletonData.PaperArea.AreaList.Add(newModel);
+            }
+
+            // Bottom
+            itemCount = 0;
+            pageCount = 0;
+            PaperAreaModel bottomCuttingPlanModel = SingletonData.PaperArea.GetAreaModel(PAPERMAIN_TYPE.DETAIL, PAPERSUB_TYPE.BottomPlateCuttingPlan);
+            // 삭제 매우 중요함
+            SingletonData.PaperArea.AreaList.Remove(bottomCuttingPlanModel);
+
+            foreach (DrawCuttingAreaModel eachCutting in SingletonData.BottomCuttingList)
+            {
+                itemCount++;
+                pageCount = Math.Ceiling(itemCount / pageMaxCount);
+
+                PaperAreaModel newModel = bottomCuttingPlanModel.CustomClone();
+
+                // Page Number
+                newModel.Page = pageCount;
+                // Visible
+                newModel.visible = true;
+                // Scale
+                newModel.ScaleValue = scaleService.GetScaleCalValue(135, 50, eachCutting.plateLength, eachCutting.plateWidth);
+                // Model CenterPoint
+                newModel.ModelCenterLocation.X = eachCutting.centerPoint.X;
+                newModel.ModelCenterLocation.Y = eachCutting.centerPoint.Y;
+
+                // Sub Title
+                newModel.TitleName = eachCutting.displayName + "-" + newModel.TitleName;
+
+                // View ID
+                newModel.viewID += itemCount;
+                SingletonData.PaperArea.AreaList.Add(newModel);
+            }
+
+        }
+
+
+        private PaperSizeModel GetSizeModel(PAPERFORMAT_TYPE selPaper)
+        {
+            PaperSizeModel newSize;
             switch (selPaper)
             {
                 case PAPERFORMAT_TYPE.A1_ISO:
-                    newSize = new SizeModel("", selPaper, 841, 594);
+                    newSize = new PaperSizeModel("", selPaper, 841, 594);
                     break;
                 case PAPERFORMAT_TYPE.A2_ISO:
-                    newSize = new SizeModel("", selPaper, 594, 420);
+                    newSize = new PaperSizeModel("", selPaper, 594, 420);
                     break;
                 case PAPERFORMAT_TYPE.A3_ISO:
-                    newSize = new SizeModel("", selPaper, 420, 297);
+                    newSize = new PaperSizeModel("", selPaper, 420, 297);
                     break;
                 default:
                     goto case PAPERFORMAT_TYPE.A1_ISO;

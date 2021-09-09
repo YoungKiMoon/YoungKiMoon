@@ -74,7 +74,7 @@ namespace DesignBoard.Windows
             if (One_Click())
             {
                 FileService newFileService = new FileService();
-                string selFile = newFileService.GetFile(OpenFile_Type.WaterSpray);
+                FileModel selFile = newFileService.GetFile(OpenFile_Type.WaterSpray);
 
             }
         }
@@ -84,7 +84,7 @@ namespace DesignBoard.Windows
             if (One_Click())
             {
                 FileService newFileService = new FileService();
-                string selFile = newFileService.GetFile(OpenFile_Type.FoamSystem);
+                FileModel selFile = newFileService.GetFile(OpenFile_Type.FoamSystem);
 
             }
         }

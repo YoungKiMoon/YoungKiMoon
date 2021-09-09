@@ -121,7 +121,7 @@
     <Compile Include="Models\PaperTableModel.cs" />
     <Compile Include="Models\PaperViewportModel.cs" />
     <Compile Include="Models\ScaleModel.cs" />
-    <Compile Include="Models\SizeModel.cs" />
+    <Compile Include="Models\PaperSizeModel.cs" />
     <Compile Include="Models\ViewPortModel.cs" />
     <Compile Include="Services\PaperDockService.cs" />
     <Compile Include="Services\PaperSettingService.cs" />
@@ -201,6 +201,10 @@
     <ProjectReference Include="..\DrawWork\DrawWork.csproj">
       <Project>{ab705c54-197d-4c70-a2a9-5525073f7240}</Project>
       <Name>DrawWork</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EPDataLib\EPDataLib.csproj">
+      <Project>{57C694EC-D561-4BE8-80E6-63FD2CB22EFB}</Project>
+      <Name>EPDataLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\ExcelDataLib\ExcelDataLib.csproj">
       <Project>{135b58cb-c30c-4500-84c4-0a67a68c7812}</Project>

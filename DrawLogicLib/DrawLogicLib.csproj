@@ -58,7 +58,7 @@
     <EmbeddedResource Include="DrawLogicFiles\Orientation.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DrawLogicFiles\Detail01.txt" />
+    <EmbeddedResource Include="DrawLogicFiles\Detail01.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

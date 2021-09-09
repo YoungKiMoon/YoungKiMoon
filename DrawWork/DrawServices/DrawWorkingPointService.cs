@@ -503,7 +503,7 @@ namespace DrawWork.DrawServices
 
                 case "Detail i":
                     // Roof Slope
-                    string roofSlopeString = assemblyData.RoofCRTInput[firstIndex].RoofSlope;
+                    string roofSlopeString = assemblyData.RoofCompressionRing[firstIndex].RoofSlope;
                     double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
 
                     double A = valueService.GetDoubleValue(assemblyData.RoofCRTInput[firstIndex].DetailIOutsideProjection);

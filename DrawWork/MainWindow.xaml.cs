@@ -41,6 +41,8 @@ using DrawWork.DrawSacleServices;
 using DrawWork.DWGFileServices;
 using DrawSettingLib.SettingServices;
 using StrengthCalLib.CalServices;
+using EPDataLib.ExcelServices;
+using DrawWork.DrawDetailServices;
 
 namespace DrawWork
 {
@@ -79,7 +81,14 @@ namespace DrawWork
             ExcelFile.Text = Properties.Settings.Default.excelPath;
             dwgFile.Text = @"C:\Users\tree\Desktop\CAD\tabas\Block_Sample.dwg";
 
+
+            // Custom Setting
             inputScale.Text = "90";
+            cbRoofType.Text = "ROOF";
+            tbPWidth.Text = "2048";
+            tbPLength.Text = "9144";
+            tbOD.Text = "32000";
+
         }
 
 
@@ -401,7 +410,11 @@ namespace DrawWork
 
             // Assembly
             AssemblyDataService assemblyService = new AssemblyDataService();
-            AssemblyModel newTankData = assemblyService.CreateMappingData(ExcelFile.Text);
+            //AssemblyModel newTankData = assemblyService.CreateMappingData(ExcelFile.Text);
+
+            // New Excel Read
+            AssemblyModel newTankData = assemblyService.CreateMappingDataNew(ExcelFile.Text);
+
 
             // Logic
             DrawLogicDBService newLogic = new DrawLogicDBService();
@@ -447,9 +460,16 @@ namespace DrawWork
             // Scale Setting
             ModelAreaService areaService = new ModelAreaService();
             PaperAreaService paperAreaService = new PaperAreaService();
-            SingletonData.GAArea = areaService.GetModelAreaData();
-            SingletonData.PaperArea = paperAreaService.GetPaperAreaData();
+            DrawDetailRoofBottomService roofBottomService = new DrawDetailRoofBottomService(newTankData, testModel);
 
+            SingletonData.GAArea = areaService.GetModelAreaData();
+            double bottomRoofOD = roofBottomService.GetBottomRoofOD();
+            string annularStr = newTankData.BottomInput[0].AnnularPlate;
+            string topAngelType = newTankData.RoofCompressionRing[0].CompressionRingType;
+            SingletonData.PaperArea.AreaList = paperAreaService.GetPaperAreaData(bottomRoofOD, annularStr, topAngelType);
+            // Virtual Design
+            DrawDetailVisibleService detailService = new DrawDetailVisibleService(newTankData, testModel);
+            detailService.SetDetailVisibleALL(SingletonData.PaperArea.AreaList);
 
 
             tempImportBlocks = testModel.Blocks;
@@ -513,10 +533,38 @@ namespace DrawWork
 
         private void btnCal_Click(object sender, RoutedEventArgs e)
         {
-            CalImportService calService = new CalImportService();
-            string fileName = @"C:\Users\tree\Desktop\CAD\TABAS\20210719 GA보완\calSample.doc";
-            calService.Read(fileName);
+            
+            bool stopValue = false;
+            if (stopValue)
+            {
+                CalImportService calService = new CalImportService();
+                string fileName = @"C:\Users\tree\Desktop\CAD\TABAS\20210719 GA보완\calSample.doc";
+                //calService.Read(fileName);
 
+                string testName = @"C:\Users\tree\Desktop\CAD\TABAS\20210719 GA보완\TABAS_20210614+1.xlsm";
+                //testName = @"C:\Users\tree\Desktop\CAD\TABAS\20210719 GA보완\test.xlsm";
+                //testName = @"C:\Users\tree\Desktop\CAD\TABAS\20210719 GA보완\test2.xlsm";
+                testName = @"C:\Users\tree\Desktop\CAD\TABAS\20210719 GA보완\newtest.xlsm";
+                testName = @"C:\Users\tree\Desktop\CAD\TABAS\20210719 GA보완\TABAS_20210614+11111.xlsm";
+                EPService excelService = new EPService();
+                if (excelService.SetSaveData(testName))
+                {
+                    MessageBox.Show("성공");
+                }
+                else
+                {
+                    MessageBox.Show("비성공");
+                }
+
+            }
+
+
+            if (true)
+            {
+                string selFile = @"C:\Users\tree\Desktop\CAD\TABAS\20210719 GA보완\calSampleadj.doc";
+                CalImportService calService = new CalImportService();
+                calService.ReadDOC(selFile);
+            }
         }
     }
 }

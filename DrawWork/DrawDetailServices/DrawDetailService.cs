@@ -25,6 +25,8 @@ namespace DrawWork.DrawDetailServices
         public DrawDetailTempService detailTempService;
 
         public DrawDetailRoofBottomService detailRoofBottomService;
+
+        public DrawDetailPlateCuttingPlanService detailCuttingPlanService;
         public DrawDetailService(AssemblyModel selAssembly,object selModel)
         {
             singleModel = selModel as Model;
@@ -36,6 +38,7 @@ namespace DrawWork.DrawDetailServices
             detailShellService = new DrawDetailShellService(selAssembly,selModel);
 
             detailTempService = new DrawDetailTempService(selAssembly, selModel);
+            detailCuttingPlanService = new DrawDetailPlateCuttingPlanService(selAssembly, selModel);
 
         }
 

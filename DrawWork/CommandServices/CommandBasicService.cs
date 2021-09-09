@@ -23,6 +23,7 @@ using DrawSettingLib.SettingModels;
 using DrawSettingLib.Commons;
 using devDept.Geometry;
 using DrawWork.DrawDetailServices;
+using DrawWork.AssemblyServices;
 
 namespace DrawWork.CommandServices
 {
@@ -35,6 +36,8 @@ namespace DrawWork.CommandServices
         public DrawObjectService drawObject;
         public DrawBoundaryService boundaryService;
 
+        private AssemblyModelService modelService;
+        private DrawDetailRoofBottomService roofBottomService;
         public object singleModel;
 
         public DrawEntityModel drawEntity { get; set; }
@@ -47,7 +50,7 @@ namespace DrawWork.CommandServices
         //public List<Entity[]> commandNozzleEntities;
 
 
-        public PaperAreaService areaService;
+        public PaperAreaService areaService { get; set; }
         public DrawScaleService scaleService { get; set; }
 
         public DrawScaleModel scaleData { get; set; }
@@ -83,6 +86,8 @@ namespace DrawWork.CommandServices
             drawObject = new DrawObjectService(selAssembly, singleModel);
             boundaryService = new DrawBoundaryService(selAssembly);
 
+            modelService = new AssemblyModelService(selAssembly);
+            roofBottomService = new DrawDetailRoofBottomService(selAssembly, singleModel);
 
             drawEntity = new DrawEntityModel();
             commandEntities = new EntityList();
@@ -171,16 +176,19 @@ namespace DrawWork.CommandServices
             //boundaryService.CreateBoundary(drawPoint);
 
 
-           
+
 
             // Create Entity
+            double commandCount = 0;
             foreach (string[] eachCmd in commandData.commandListTransFunciton)
             {
+                commandCount++;
+
                 if (eachCmd == null)
                     continue;
 
 
-                Console.WriteLine(string.Join("",eachCmd));
+                Console.WriteLine("Line" + commandCount + ":" + string.Join("",eachCmd));
 
 
                 int dmRepeatCount = commandTranslate.DrawMethod_Repeat(eachCmd);
@@ -189,7 +197,7 @@ namespace DrawWork.CommandServices
                 {
                     if (eachCmd != null)
                     {
-                        Console.WriteLine("CMD : " + string.Join("|",eachCmd));
+                        Console.WriteLine("Line" + commandCount + ":" + "CMD : " + string.Join("|",eachCmd)  );
                         CommandFunctionModel eachFunction = null;
                         DrawObjectLogic(eachCmd,out eachFunction);
                         if(eachFunction!=null)
@@ -217,36 +225,51 @@ namespace DrawWork.CommandServices
 
 
         #region Scale Size
-        public void SetScaleData(DrawAssyModel selDrawAssy,DrawPointModel selDrawPoint)
+        public void SetScaleData(DrawAssyModel selDrawAssy)
         {
-            CDPoint refPoint = selDrawPoint.referencePoint;
-            CDPoint curPoint = selDrawPoint.currentPoint;
-
+            
             // Real Size : Default
             double tankID = 1000;
             double tankHeight = 1000;
             if (assemblyData.GeneralDesignData.Count > 0)
+            {
                 tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+                tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
+            }
+
+            
+            PaperAreaModel selPaperAreaModel = areaService.GetPaperAreaModel(selDrawAssy.mainName, selDrawAssy.subName, SingletonData.PaperArea.AreaList);
+
+            SetDrawPoint(selPaperAreaModel.ReferencePoint.X, selPaperAreaModel.ReferencePoint.Y);
+
+            CDPoint refPoint = currentDrawPoint.referencePoint;
+            CDPoint curPoint = currentDrawPoint.currentPoint;
 
 
-            PaperAreaModel selPaperAreaModel = areaService.GetPaperAreaModel(selDrawAssy.mainName, selDrawAssy.subName, SingletonData.PaperArea);
             switch (selDrawAssy.mainName)
             {
-                case PAPERMAIN_TYPE.GA:
+                case PAPERMAIN_TYPE.GA1:
                     // GA : Size
                     CDPoint UppderPoint = drawObject.workingPointService.WorkingPoint(WORKINGPOINT_TYPE.PointCenterTopUp, ref refPoint, ref curPoint);
                     tankHeight = UppderPoint.Y - refPoint.Y;
+                    // Center Position : Auto Setting
                     SingletonData.GAArea.SetMainAssemblySize(refPoint.X, refPoint.Y, tankID, tankHeight);
+
+                    // Scale
                     selPaperAreaModel.ScaleValue = scaleService.GetGAScaleValue(selPaperAreaModel, SingletonData.GAArea);
+                    // Center
+                    selPaperAreaModel.ModelCenterLocation.X = refPoint.X;
+                    selPaperAreaModel.ModelCenterLocation.Y = refPoint.Y;
                     break;
 
                 case PAPERMAIN_TYPE.ORIENTATION:
                     // 500 * 0.4
                     double orientationDim = 170;
+
                     selPaperAreaModel.ScaleValue = scaleService.GetOrientationScaleValue(selPaperAreaModel.Size.X - orientationDim, selPaperAreaModel.Size.Y - orientationDim, tankID, tankID);
                     // Center
-                    selPaperAreaModel.ModelLocation.X = refPoint.X;
-                    selPaperAreaModel.ModelLocation.Y = refPoint.Y;
+                    selPaperAreaModel.ModelCenterLocation.X = refPoint.X;
+                    selPaperAreaModel.ModelCenterLocation.Y = refPoint.Y;
                     break;
 
                 case PAPERMAIN_TYPE.DETAIL:
@@ -257,6 +280,13 @@ namespace DrawWork.CommandServices
                             {
                                 double plateFirstCourse = valueService.GetDoubleValue(assemblyData.ShellOutput[0].Thickness);
                                 selPaperAreaModel.ScaleValue = scaleService.GetPlateHorizontalJointScale(plateFirstCourse);
+                                // Center
+                                double assyHeight= (selPaperAreaModel.ScaleValue * 500) / 2;
+                                double assyWidth = (selPaperAreaModel.ScaleValue * 40) / 2;
+                                selPaperAreaModel.ModelCenterLocation.X = refPoint.X -assyWidth;
+                                selPaperAreaModel.ModelCenterLocation.Y = refPoint.Y + assyHeight;
+                                // sub Name
+                                selPaperAreaModel.TitleSubName = "SCALE : 1/" + selPaperAreaModel.ScaleValue;
                             }
                             break;
 
@@ -267,12 +297,96 @@ namespace DrawWork.CommandServices
                                 double plateWidth = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateWidth);
                                 double plateMaxLength = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateMaxLength);
 
-                                selPaperAreaModel.ScaleValue = scaleService.GetOneCourseDevelopmentScale(selPaperAreaModel, tankID, oneCourseWidth, plateWidth, plateMaxLength);
+                                // Auto Size
+                                List<double> oneCourseInfoList=scaleService.GetOneCourseDevelopmentScale(selPaperAreaModel, tankID, oneCourseWidth, plateWidth, plateMaxLength);
+                                selPaperAreaModel.ScaleValue = oneCourseInfoList[0];
+
+                                double pageCount = oneCourseInfoList[1];
+                                double oneCourseRealWidth = 598 * selPaperAreaModel.ScaleValue;
+                                double oneCourseRealHeight = 185 * 3 * selPaperAreaModel.ScaleValue;
+                                double oneCourseRealPageGap=200 * selPaperAreaModel.ScaleValue;
+
+                                double oneCourseRealWidthAdj = (598+44) * selPaperAreaModel.ScaleValue;
+                                double yHeightAdj=22 * selPaperAreaModel.ScaleValue;
+                                // Center
+                                Point3D refPointNew = new Point3D(refPoint.X, refPoint.Y);
+                                Point3D pageCurrentPoint = GetSumPoint(refPointNew, 0, oneCourseRealHeight / 2 + yHeightAdj);
+                                selPaperAreaModel.ModelCenterLocation.X = pageCurrentPoint.X + oneCourseRealWidth/2;
+                                selPaperAreaModel.ModelCenterLocation.Y = pageCurrentPoint.Y ;
+
+                                // Page Add
+                                for(int i=2;i<= pageCount; i++)
+                                {
+                                    PaperAreaModel newCourseModel = selPaperAreaModel.CustomClone();
+                                    newCourseModel.Page = i;
+                                    newCourseModel.viewID++;
+
+                                    double pageWidth = ((i - 1) * (oneCourseRealWidthAdj + oneCourseRealPageGap));
+                                    newCourseModel.ModelCenterLocation.X = pageCurrentPoint.X + oneCourseRealWidth/2 + pageWidth;
+                                    newCourseModel.ModelCenterLocation.Y = pageCurrentPoint.Y;
+
+                                    SingletonData.PaperArea.AreaList.Add(newCourseModel);
+                                }
                             }
+                            break;
+
+                        case PAPERSUB_TYPE.ShellPlateArrangement:
+
+                            double firstCourse = valueService.GetDoubleValue(assemblyData.ShellOutput[0].Thickness);
+                            double shellCircum = (tankID +(firstCourse*2)) * Math.PI;
+                            double shellCircumHalf = shellCircum/2;
+                            double shellHalf = tankHeight / 2;
+
+                            // Scale
+                            selPaperAreaModel.ScaleValue = scaleService.GetScaleCalValue(580-40, 200, shellCircum, tankHeight);
+                            // Center
+                            selPaperAreaModel.ModelCenterLocation.X = refPoint.X + shellCircumHalf;
+                            selPaperAreaModel.ModelCenterLocation.Y = refPoint.Y + shellHalf;
+                            break;
+
+                        case PAPERSUB_TYPE.BOTTOMPLATEJOINT:
+                            //lPaperAreaModel.ScaleValue = 1;
+                            // Center
+                            //selPaperAreaModel.ModelCenterLocation.X = refPoint.X + 100;
+                            //selPaperAreaModel.ModelCenterLocation.Y = refPoint.Y + 100;
+                            //작업 필요 함
                             break;
 
                         case PAPERSUB_TYPE.RoofArrange:
                             //작업 필요 함
+                            break;
+
+                        case PAPERSUB_TYPE.AnchorChair:
+
+                            // AnchorChair Model
+                            string anchorBoltSize = assemblyData.AnchorageInput[0].AnchorSize;
+                            AnchorChairModel anchorChair = modelService.GetAnchorChair(anchorBoltSize);
+
+                            if (anchorChair != null)
+                            {
+                                // Scale
+                                selPaperAreaModel.ScaleValue = scaleService.GetAnchorScale(anchorChair); ;
+                                // Center
+                                selPaperAreaModel.ModelCenterLocation.X = refPoint.X;
+                                selPaperAreaModel.ModelCenterLocation.Y = refPoint.Y;
+                            }
+                            else
+                            {
+                                selPaperAreaModel.visible = false;
+                            }
+
+                            break;
+
+                        case PAPERSUB_TYPE.RoofPlateArrangement:
+                        case PAPERSUB_TYPE.BottomPlateArrangement:
+
+                            double roofBottomOD= roofBottomService.GetBottomRoofOD();
+                            // Scale
+                            selPaperAreaModel.ScaleValue = scaleService.GetScaleValueByBottomTable(roofBottomOD);
+                            // Center
+                            selPaperAreaModel.ModelCenterLocation.X = refPoint.X +70 * selPaperAreaModel.ScaleValue;
+                            selPaperAreaModel.ModelCenterLocation.Y = refPoint.Y;
+
                             break;
                     }
                     break;
@@ -306,6 +420,24 @@ namespace DrawWork.CommandServices
             // ReferencePoint -> SingletonData
             SingletonData.RefPoint = (CDPoint)selDrawPoint.referencePoint.Clone();
         }
+        public void SetDrawPoint(double X, double Y)
+        {
+            DrawPointModel newDrawPoint = new DrawPointModel();
+            newDrawPoint.referencePoint.X = X;
+            newDrawPoint.referencePoint.Y = Y;
+            newDrawPoint.currentPoint.X = X;
+            newDrawPoint.currentPoint.Y = Y;
+
+            commandData.drawPoint.referencePoint = newDrawPoint.referencePoint;
+            commandData.drawPoint.currentPoint = newDrawPoint.currentPoint;
+
+            currentDrawPoint = newDrawPoint;
+
+            // ReferencePoint -> SingletonData
+            SingletonData.RefPoint = (CDPoint)newDrawPoint.referencePoint.Clone();
+
+        }
+
         private DrawPointModel GetReferencePoint()
         {
             DrawPointModel drawPoint = new DrawPointModel();
@@ -355,11 +487,13 @@ namespace DrawWork.CommandServices
 
                 // RefPoint : Very Import
                 case "refpoint":
+                    // Set Draw Point : Logic Input
                     DrawPointModel tempDrawPoint = drawObject.GetDrawPoint(eachCmd);
                     SetDrawPoint(tempDrawPoint);
-                    currentDrawAssy.refPoint = new Point3D(tempDrawPoint.referencePoint.X,tempDrawPoint.referencePoint.Y);
+
+                    // Create Draw Point 
                     // Create Scale Value
-                    SetScaleData(currentDrawAssy, currentDrawPoint);
+                    SetScaleData(currentDrawAssy);
                     goto case "allways";
 
                 case "point":
@@ -474,8 +608,13 @@ namespace DrawWork.CommandServices
                     goto case "allways";
 
                 case "drawdetail":
-                    DrawEntityModel newLogicDetail = drawObject.DoBlockDetail(eachCmd, ref refPoint, ref curPoint, singleModel, scaleData.Value);
-                    drawEntity.AddDrawEntity(newLogicDetail);
+
+                    PaperAreaModel selPaperAreaModel = areaService.GetPaperAreaModel(currentDrawAssy.mainName, currentDrawAssy.subName, SingletonData.PaperArea.AreaList);
+                    if (selPaperAreaModel.visible)
+                    {
+                        DrawEntityModel newLogicDetail = drawObject.DoBlockDetail(eachCmd, ref refPoint, ref curPoint, singleModel, scaleData.Value, selPaperAreaModel);
+                        drawEntity.AddDrawEntity(newLogicDetail);
+                    }
                     goto case "allways";
 
                     
@@ -496,5 +635,10 @@ namespace DrawWork.CommandServices
             selCmdFunction = newCmdFunction;
         }
         #endregion
+
+        private Point3D GetSumPoint(Point3D selPoint1, double X, double Y, double Z = 0)
+        {
+            return new Point3D(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
+        }
     }
 }

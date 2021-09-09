@@ -10,5 +10,6 @@ namespace DrawLogicLib.Commons
         NotSet,
         GA,
         NozzleOrientation,
+        Detail,
     }
 }
