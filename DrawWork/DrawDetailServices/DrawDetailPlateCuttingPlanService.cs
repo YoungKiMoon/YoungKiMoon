@@ -75,7 +75,7 @@ namespace DrawWork.DrawDetailServices
             // Scale : 매우 중요 함
             double realScaleValue = scaleService.GetScaleCalValue(135, 50, plateActualLength, plateActualWidth);
 
-            drawList.AddDrawEntity(DrawCuttingPlan(referencePoint, SingletonData.RoofPlateInfo, plateActualWidth, plateActualLength, realScaleValue));
+            drawList.AddDrawEntity(DrawCuttingPlan(PlateArrange_Type.Roof,referencePoint, SingletonData.RoofPlateInfo, plateActualWidth, plateActualLength, realScaleValue));
             return drawList;
         }
 
@@ -90,7 +90,7 @@ namespace DrawWork.DrawDetailServices
             // Scale : 매우 중요 함
             double realScaleValue = scaleService.GetScaleCalValue(135, 50, plateActualLength, plateActualWidth);
 
-            drawList.AddDrawEntity(DrawCuttingPlan(referencePoint, SingletonData.BottomPlateInfo, plateActualWidth, plateActualLength, realScaleValue));
+            drawList.AddDrawEntity(DrawCuttingPlan(PlateArrange_Type.Bottom,referencePoint, SingletonData.BottomPlateInfo, plateActualWidth, plateActualLength, realScaleValue));
             return drawList;
         }
 
@@ -209,7 +209,7 @@ namespace DrawWork.DrawDetailServices
             }
         }
 
-        private DrawEntityModel DrawCuttingPlan(Point3D refPoint,List<DrawPlateModel> selPlateList,  double plateActualWidth, double plateActualLength, double scaleValue)
+        private DrawEntityModel DrawCuttingPlan(PlateArrange_Type arrangeType, Point3D refPoint,List<DrawPlateModel> selPlateList,  double plateActualWidth, double plateActualLength, double scaleValue)
         {
             DrawEntityModel drawList = new DrawEntityModel();
 
@@ -453,6 +453,7 @@ namespace DrawWork.DrawDetailServices
                 drawPlateCount++;
                 Point3D insertPoint= GetPlateNextPoint(refPoint, drawPlateCount, scaleValue);
                 eachOnePlate.InsertPoint = insertPoint;
+                eachOnePlate.CenterPoint = GetSumPoint(insertPoint, eachOnePlate.PlateLength / 2, eachOnePlate.PlateWidth / 2);
                 eachOnePlate.PlateOutlineList.AddRange(DrawPlate(eachOnePlate,out dimOnePlateModel, scaleValue));
                 arrangePlateList.AddRange(eachOnePlate.PlateOutlineList);
                 drawList.AddDrawEntity(dimOnePlateModel);
@@ -481,6 +482,19 @@ namespace DrawWork.DrawDetailServices
             drawList.outlineList.AddRange(arrangeCuttingPlateList);
             drawList.outlineList.AddRange(arrangePlateList);
 
+
+            // Singleton Data
+            if (arrangeType == PlateArrange_Type.Roof)
+            {
+                SingletonData.RoofPlateList.Clear();
+                SingletonData.RoofPlateList.AddRange(onePlateList);
+            }
+            else if (arrangeType == PlateArrange_Type.Bottom)
+            {
+                SingletonData.BottomPlateList.Clear();
+                SingletonData.BottomPlateList.AddRange(onePlateList);
+            }
+
             return drawList;
         }
 
@@ -495,7 +509,7 @@ namespace DrawWork.DrawDetailServices
 
             styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
             // Leader
-            string leaderCourseInfoD = "  REQ'D  : " + valueService.GetOrdinalSheet(selModel.Requirement);
+            string leaderCourseInfoD = "         REQ'D  : " + valueService.GetOrdinalSheet(selModel.Requirement);
             DrawBMLeaderModel leaderInfoModel = new DrawBMLeaderModel() { position = POSITION_TYPE.RIGHT, upperText = leaderCourseInfoD, bmNumber = "", textAlign = POSITION_TYPE.CENTER, arrowHeadVisible = false };
             dimModel=drawService.Draw_OneLineLeader(ref singleModel, GetSumPoint(selModel.InsertPoint, selModel.PlateLength, 0), leaderInfoModel, scaleValue);
 
@@ -829,8 +843,9 @@ namespace DrawWork.DrawDetailServices
 
             // Number
             double textHeight = 2.5;
-            Point3D insertTextPoint = GetNumberPoint(selPoint, selPlate, leftPlate);
+            Point3D insertTextPoint = GetNumberPoint(selPoint, selPlate, leftPlate,plateWidth);
             Text displayNameText = new Text(Plane.XY, insertTextPoint, selPlate.DisplayName, textHeight * scaleValue) { Alignment = Text.alignmentType.MiddleCenter };
+            styleService.SetLayer(ref displayNameText, layerService.LayerDimension);
             newList.Add(displayNameText);
 
             return newList;
@@ -947,7 +962,7 @@ namespace DrawWork.DrawDetailServices
 
 
 
-        public Point3D GetNumberPoint(Point3D selPoint, DrawPlateModel selPlate,bool leftPlate)
+        public Point3D GetNumberPoint(Point3D selPoint, DrawPlateModel selPlate,bool leftPlate,double selPlateWidth)
         {
             double distanceX = 0;
             double distanceY = 0;
@@ -963,17 +978,24 @@ namespace DrawWork.DrawDetailServices
                 case Plate_Type.RectangleArc:
                     distanceX = (selPlate.CuttingPlan.MaxLength + selPlate.CuttingPlan.MinLength) / 4;
                     distanceY = selPlate.CuttingPlan.Width / 2;
-                    //if (!leftPlate)
-                    //    distanceX += selPlate.CuttingPlan.LengthSpacing;
+                    if (!leftPlate)
+                        distanceX = selPlate.CuttingPlan.MaxLength-distanceX;
                     break;
                 case Plate_Type.ArcRectangleArc:
                     distanceX = selPlate.CuttingPlan.MaxLength / 2;
                     distanceY = selPlate.CuttingPlan.Width / 2;
-                    distanceX += selPlate.CuttingPlan.LengthSpacing;
+
                     break;
                 case Plate_Type.Arc:
                     distanceX = selPlate.CuttingPlan.MaxLength / 3;
                     distanceY = selPlate.CuttingPlan.Width / 3;
+                    if (!leftPlate)
+                    {
+                        distanceX = selPlate.CuttingPlan.MaxLength - distanceX;
+                        distanceY = selPlateWidth - distanceY;
+                    }
+
+
                     break;
             }
 

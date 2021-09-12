@@ -421,13 +421,13 @@ namespace PaperSetting.Services
                 else if (newDescription == "BOTTOM PLATE CUTTING PLAN")
                 {
 
-                    if (SingletonData.BottomCuttingList.Count > 0)
+                    if (SingletonData.BottomPlateList.Count > 0)
                     {
                         
                         double refRow = 4;
                         double refColumn = 3;
                         double onePageCount = refRow * refColumn;
-                        double cuttingPageCount = Math.Ceiling(SingletonData.BottomCuttingList.Count /onePageCount);
+                        double cuttingPageCount = Math.Ceiling(SingletonData.BottomPlateList.Count /onePageCount);
                         for (int i = 0; i < cuttingPageCount; i++)
                         {
 
@@ -506,12 +506,12 @@ namespace PaperSetting.Services
                 else if (newDescription == "ROOF PLATE CUTTING PLAN")
                 {
 
-                    if (SingletonData.RoofCuttingList.Count > 0)
+                    if (SingletonData.RoofPlateList.Count > 0)
                     {
                         double refRow = 4;
                         double refColumn = 3;
                         double onePageCount = refRow * refColumn;
-                        double cuttingPageCount = Math.Ceiling(SingletonData.RoofCuttingList.Count / onePageCount);
+                        double cuttingPageCount = Math.Ceiling(SingletonData.RoofPlateList.Count / onePageCount);
                         for (int i = 0; i < cuttingPageCount; i++)
                         {
 
@@ -746,8 +746,8 @@ namespace PaperSetting.Services
             PaperAreaModel roofCuttingPlanModel = SingletonData.PaperArea.GetAreaModel(PAPERMAIN_TYPE.DETAIL, PAPERSUB_TYPE.RoofPlateCuttingPlan);
             // 삭제 매우 중요함
             SingletonData.PaperArea.AreaList.Remove(roofCuttingPlanModel);
-
-            foreach(DrawCuttingAreaModel eachCutting in SingletonData.RoofCuttingList)
+            List<PaperAreaModel> roofAreaModel = new List<PaperAreaModel>();
+            foreach(DrawOnePlateModel eachCutting in SingletonData.RoofPlateList)
             {
                 itemCount++;
                 pageCount = Math.Ceiling(itemCount / pageMaxCount);
@@ -759,18 +759,21 @@ namespace PaperSetting.Services
                 // Visible
                 newModel.visible = true;
                 // Scale
-                newModel.ScaleValue = scaleService.GetScaleCalValue(135, 50, eachCutting.plateLength, eachCutting.plateWidth);
+                newModel.ScaleValue = scaleService.GetScaleCalValue(newModel.otherWidth, newModel.otherHeight, eachCutting.PlateLength, eachCutting.PlateWidth);
                 // Model CenterPoint
-                newModel.ModelCenterLocation.X = eachCutting.centerPoint.X;
-                newModel.ModelCenterLocation.Y = eachCutting.centerPoint.Y;
+                newModel.ModelCenterLocation.X = eachCutting.CenterPoint.X +10* newModel.ScaleValue;
+                newModel.ModelCenterLocation.Y = eachCutting.CenterPoint.Y;
 
                 // Sub Title
-                newModel.TitleName=eachCutting.displayName + "-" + newModel.TitleName;
+                //newModel.TitleName=eachCutting.displayName + "-" + newModel.TitleName;
 
                 // View ID
                 newModel.viewID += itemCount;
-                SingletonData.PaperArea.AreaList.Add(newModel);
+                roofAreaModel.Add(newModel);
             }
+            SingletonData.PaperArea.AreaList.AddRange(roofAreaModel);
+
+
 
             // Bottom
             itemCount = 0;
@@ -778,8 +781,8 @@ namespace PaperSetting.Services
             PaperAreaModel bottomCuttingPlanModel = SingletonData.PaperArea.GetAreaModel(PAPERMAIN_TYPE.DETAIL, PAPERSUB_TYPE.BottomPlateCuttingPlan);
             // 삭제 매우 중요함
             SingletonData.PaperArea.AreaList.Remove(bottomCuttingPlanModel);
-
-            foreach (DrawCuttingAreaModel eachCutting in SingletonData.BottomCuttingList)
+            List<PaperAreaModel> bottomAreaModel = new List<PaperAreaModel>();
+            foreach (DrawOnePlateModel eachCutting in SingletonData.BottomPlateList)
             {
                 itemCount++;
                 pageCount = Math.Ceiling(itemCount / pageMaxCount);
@@ -791,19 +794,24 @@ namespace PaperSetting.Services
                 // Visible
                 newModel.visible = true;
                 // Scale
-                newModel.ScaleValue = scaleService.GetScaleCalValue(135, 50, eachCutting.plateLength, eachCutting.plateWidth);
+                newModel.ScaleValue = scaleService.GetScaleCalValue(newModel.otherWidth, newModel.otherHeight, eachCutting.PlateLength, eachCutting.PlateWidth);
                 // Model CenterPoint
-                newModel.ModelCenterLocation.X = eachCutting.centerPoint.X;
-                newModel.ModelCenterLocation.Y = eachCutting.centerPoint.Y;
+                newModel.ModelCenterLocation.X = eachCutting.CenterPoint.X+ 10 * newModel.ScaleValue;
+                newModel.ModelCenterLocation.Y = eachCutting.CenterPoint.Y;
 
                 // Sub Title
-                newModel.TitleName = eachCutting.displayName + "-" + newModel.TitleName;
+                //newModel.TitleName = eachCutting.displayName + "-" + newModel.TitleName;
 
                 // View ID
                 newModel.viewID += itemCount;
-                SingletonData.PaperArea.AreaList.Add(newModel);
+                bottomAreaModel.Add(newModel);
             }
+            SingletonData.PaperArea.AreaList.AddRange(bottomAreaModel);
 
+
+
+            // Priority
+            SingletonData.PaperArea.AreaList.Sort((x, y) => x.Priority.CompareTo(y.Priority));
         }
 
 

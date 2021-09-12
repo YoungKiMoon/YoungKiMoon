@@ -17,21 +17,22 @@ namespace DrawSettingLib.SettingServices
         }
 
 
-        public List<PaperAreaModel> GetPaperAreaData(double selTankOD,string selAnnularString,string selTopAngleType)
+        public List<PaperAreaModel> GetPaperAreaData(string selTankType, double selTankOD, string selAnnularString, string selTopAngleType)
         {
 
             //double selTankOD = 23000;
             //string selTopAngleType = "Detail i";
             bool selAnnular = false;
             if (selAnnularString.Contains("Yes"))
-                selAnnular=true;
+                selAnnular = true;
 
 
             List<PaperAreaModel> newAreaList = new List<PaperAreaModel>();
 
             newAreaList.AddRange(GetPaperAreaDataEtc());
-            newAreaList.AddRange(GetPaperAreaBottom01(selTankOD,selAnnular));
-            newAreaList.AddRange(GetPaperAreaRoofPlate(selTankOD, selTopAngleType));
+            newAreaList.AddRange(GetPaperAreaBottom01(selTankOD, selAnnular));
+            newAreaList.AddRange(GetPaperAreaRoofPlate(selTankType, selTankOD, selTopAngleType));
+
 
             return newAreaList;
         }
@@ -723,7 +724,7 @@ namespace DrawSettingLib.SettingServices
             Detail16.ScaleValue = 1;
 
             Detail16.ReferencePoint.X = 960000;
-            Detail16.ReferencePoint.Y = 100000;
+            Detail16.ReferencePoint.Y = 80000;
             Detail16.ModelCenterLocation.X = Detail16.ReferencePoint.X;
             Detail16.ModelCenterLocation.Y = Detail16.ReferencePoint.Y;
 
@@ -807,7 +808,7 @@ namespace DrawSettingLib.SettingServices
 
 
 
-            // Bakin Strip
+            // Baking Strip
             PaperAreaModel Detail20 = new PaperAreaModel();
             Detail20.DWGName = PAPERMAIN_TYPE.BottomPlateCuttingPlan;
             Detail20.Page = 1;
@@ -817,15 +818,17 @@ namespace DrawSettingLib.SettingServices
             Detail20.TitleName = "BACKING STRIP";
             Detail20.TitleSubName = "";
             Detail20.IsFix = false;
-            Detail20.Priority = 901;
-            Detail20.ScaleValue = 1;
+            Detail20.Priority = 1001;
+            Detail20.ScaleValue = 0;
+            Detail20.otherWidth = 130;
+            Detail20.otherHeight = 30;
 
             Detail20.ReferencePoint.X = 1000000;
             Detail20.ReferencePoint.Y = 90000;
             Detail20.ModelCenterLocation.X = Detail20.ReferencePoint.X;
             Detail20.ModelCenterLocation.Y = Detail20.ReferencePoint.Y;
 
-            Detail20.viewID = 59000 + viewIDNumber++;
+            Detail20.viewID = 60000 + viewIDNumber++;
             newList.Add(Detail20);
 
 
@@ -1076,15 +1079,17 @@ namespace DrawSettingLib.SettingServices
             Detail30.TitleName = "BACKING STRIP";
             Detail30.TitleSubName = "";
             Detail30.IsFix = false;
-            Detail30.Priority = 901;
-            Detail30.ScaleValue = 1;
+            Detail30.Priority = 1001;
+            Detail30.ScaleValue = 0;
+            Detail30.otherWidth = 130;
+            Detail30.otherHeight = 30;
 
             Detail30.ReferencePoint.X = 1000000;
             Detail30.ReferencePoint.Y = 90000;
             Detail30.ModelCenterLocation.X = Detail30.ReferencePoint.X;
             Detail30.ModelCenterLocation.Y = Detail30.ReferencePoint.Y;
 
-            Detail30.viewID = 59000 + viewIDNumber++;
+            Detail30.viewID = 60000 + viewIDNumber++;
             newList.Add(Detail30);
 
 
@@ -1476,9 +1481,26 @@ namespace DrawSettingLib.SettingServices
         #endregion
 
 
-        #region Roof
+        private List<PaperAreaModel> GetPaperAreaRoofPlate(string selTankType,double selRoofOD, string selTopAngleType)
+        {
+            List<PaperAreaModel> newList = new List<PaperAreaModel>();
+            switch(selTankType.ToLower())
+            {
+                case "crt":
+                    newList.AddRange(GetPaperAreaCRTRoofPlate(selRoofOD, selTopAngleType));
+                    break;
+                case "drt":
+                    newList.AddRange(GetPaperAreaDRTRoofPlate(selRoofOD, selTopAngleType));
+                    break;
+
+            }       
+            return newList;
+        }
+
+
+        #region CRT Roof
         // ROOF PLATE ARRANGEMENT, CUTTING PLAN
-        private List<PaperAreaModel> GetPaperAreaRoofPlate(double selRoofOD, string selTopAngleType)
+        private List<PaperAreaModel> GetPaperAreaCRTRoofPlate(double selRoofOD, string selTopAngleType)
         {
             List<PaperAreaModel> newList = new List<PaperAreaModel>();
 
@@ -1586,49 +1608,52 @@ namespace DrawSettingLib.SettingServices
 
 
 
-            // Roof Plate Wellding Detail : D
+            // Roof Plate Wellding Detail : C
             PaperAreaModel Detail52 = new PaperAreaModel();
             Detail52.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
             Detail52.Page = 1;
 
             Detail52.Name = PAPERMAIN_TYPE.DETAIL;
-            Detail52.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailD;
+            Detail52.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailC;
             Detail52.TitleName = "ROOF PLATE WELDING DETAIL";
-            Detail52.TitleSubName = "DETAIL \"D\"";
+            Detail52.TitleSubName = "DETAIL \"C\"";
             Detail52.IsFix = false;
             Detail52.Priority = 500;
             Detail52.ScaleValue = 1;
 
-            Detail52.ReferencePoint.X = 940000; 
+            Detail52.ReferencePoint.X = 930000;
             Detail52.ReferencePoint.Y = 110000;
             Detail52.ModelCenterLocation.X = Detail52.ReferencePoint.X;
             Detail52.ModelCenterLocation.Y = Detail52.ReferencePoint.Y;
 
-            Detail52.viewID = 52000 + viewIDNumber++;
+            Detail52.viewID = 62000 + viewIDNumber++;
             newList.Add(Detail52);
 
 
 
-            // Roof Plate Wellding Detail : C
+
+            // Roof Plate Wellding Detail : D
             PaperAreaModel Detail53 = new PaperAreaModel();
             Detail53.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
             Detail53.Page = 1;
 
             Detail53.Name = PAPERMAIN_TYPE.DETAIL;
-            Detail53.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailC;
+            Detail53.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailD;
             Detail53.TitleName = "ROOF PLATE WELDING DETAIL";
-            Detail53.TitleSubName = "DETAIL \"C\"";
+            Detail53.TitleSubName = "DETAIL \"D\"";
             Detail53.IsFix = false;
             Detail53.Priority = 500;
             Detail53.ScaleValue = 1;
 
-            Detail53.ReferencePoint.X = 930000;
-            Detail53.ReferencePoint.Y = 120000;
+            Detail53.ReferencePoint.X = 940000;
+            Detail53.ReferencePoint.Y = 110000;
             Detail53.ModelCenterLocation.X = Detail53.ReferencePoint.X;
             Detail53.ModelCenterLocation.Y = Detail53.ReferencePoint.Y;
 
-            Detail53.viewID = 52000 + viewIDNumber++;
+            Detail53.viewID = 63000 + viewIDNumber++;
             newList.Add(Detail53);
+
+
 
 
             // Roof Compression Wellding Detail
@@ -1639,17 +1664,17 @@ namespace DrawSettingLib.SettingServices
             Detail54.Name = PAPERMAIN_TYPE.DETAIL;
             Detail54.SubName = PAPERSUB_TYPE.RoofCompressionWeldingDetail;
             Detail54.TitleName = "ROOF COMPRESSION RING WELDING DETAIL";
-            Detail54.TitleSubName = "DETAIL \"E\"-\"E\"";
+            Detail54.TitleSubName = "SECTION \"E\"-\"E\"";
             Detail54.IsFix = false;
             Detail54.Priority = 500;
             Detail54.ScaleValue = 1;
 
-            Detail54.ReferencePoint.X = 930000;
+            Detail54.ReferencePoint.X = 950000;
             Detail54.ReferencePoint.Y = 110000;
             Detail54.ModelCenterLocation.X = Detail54.ReferencePoint.X;
             Detail54.ModelCenterLocation.Y = Detail54.ReferencePoint.Y;
 
-            Detail54.viewID = 52000 + viewIDNumber++;
+            Detail54.viewID = 64000 + viewIDNumber++;
             newList.Add(Detail54);
 
 
@@ -1662,17 +1687,17 @@ namespace DrawSettingLib.SettingServices
             Detail55.Name = PAPERMAIN_TYPE.DETAIL;
             Detail55.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailDD;
             Detail55.TitleName = "ROOF PLATE WELDING DETAIL";
-            Detail55.TitleSubName = "DETAIL \"D\"-\"D\"";
+            Detail55.TitleSubName = "SECTION \"D\"-\"D\"";
             Detail55.IsFix = false;
             Detail55.Priority = 500;
             Detail55.ScaleValue = 1;
 
-            Detail55.ReferencePoint.X = 950000;
+            Detail55.ReferencePoint.X = 960000;
             Detail55.ReferencePoint.Y = 110000;
             Detail55.ModelCenterLocation.X = Detail55.ReferencePoint.X;
             Detail55.ModelCenterLocation.Y = Detail55.ReferencePoint.Y;
 
-            Detail55.viewID = 52000 + viewIDNumber++;
+            Detail55.viewID = 65000 + viewIDNumber++;
             newList.Add(Detail55);
 
 
@@ -1692,16 +1717,16 @@ namespace DrawSettingLib.SettingServices
             Detail56.Priority = 500;
             Detail56.ScaleValue = 0; //Auto Scale
             Detail56.IsRepeat = true;
-            Detail56.otherWidth = 135;
+            Detail56.otherWidth = 135 - 15; // 135 -> dimension position   
             Detail56.otherHeight = 50;
 
 
-            Detail56.ReferencePoint.X = 1000000;
-            Detail56.ReferencePoint.Y = 100000;
+            Detail56.ReferencePoint.X = 970000;
+            Detail56.ReferencePoint.Y = 110000;
             Detail56.ModelCenterLocation.X = Detail56.ReferencePoint.X;
             Detail56.ModelCenterLocation.Y = Detail56.ReferencePoint.Y;
 
-            Detail56.viewID = 59000 + viewIDNumber++;
+            Detail56.viewID = 66000 + viewIDNumber++;
             newList.Add(Detail56);
 
 
@@ -1713,21 +1738,21 @@ namespace DrawSettingLib.SettingServices
             Detail57.Name = PAPERMAIN_TYPE.DETAIL;
             Detail57.SubName = PAPERSUB_TYPE.RoofCompressionRingCuttingPlan;
             Detail57.TitleName = "COMMPRESSION RING CUTTING PLAN";
-            Detail57.TitleSubName = "SALE 1/80";
+            Detail57.TitleSubName = "SALE 1/80";//차후 계산값 적용
             Detail57.IsFix = false;
             Detail57.Priority = 900;
             Detail57.ScaleValue = 0; //Auto Scale
             Detail57.IsRepeat = true;
-            Detail57.otherWidth = 135;
+            Detail57.otherWidth = 135 - 15; // 135 -> dimension position   
             Detail57.otherHeight = 50;
 
 
-            Detail57.ReferencePoint.X = 970000;
+            Detail57.ReferencePoint.X = 980000;
             Detail57.ReferencePoint.Y = 110000;
             Detail57.ModelCenterLocation.X = Detail57.ReferencePoint.X;
             Detail57.ModelCenterLocation.Y = Detail57.ReferencePoint.Y;
 
-            Detail57.viewID = 59000 + viewIDNumber++;
+            Detail57.viewID = 67000 + viewIDNumber++;
             newList.Add(Detail57);
 
 
@@ -1794,49 +1819,49 @@ namespace DrawSettingLib.SettingServices
 
 
 
-            // Roof Plate Wellding Detail : D
+            // Roof Plate Wellding Detail : C
             PaperAreaModel Detail62 = new PaperAreaModel();
             Detail62.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
             Detail62.Page = 2;
 
             Detail62.Name = PAPERMAIN_TYPE.DETAIL;
-            Detail62.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailD;
+            Detail62.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailC;
             Detail62.TitleName = "ROOF PLATE WELDING DETAIL";
-            Detail62.TitleSubName = "DETAIL \"D\"";
+            Detail62.TitleSubName = "DETAIL \"C\"";
             Detail62.IsFix = false;
             Detail62.Priority = 500;
             Detail62.ScaleValue = 1;
 
             Detail62.ReferencePoint.X = 930000;
-            Detail62.ReferencePoint.Y = 110000;
+            Detail62.ReferencePoint.Y = 120000;
             Detail62.ModelCenterLocation.X = Detail62.ReferencePoint.X;
             Detail62.ModelCenterLocation.Y = Detail62.ReferencePoint.Y;
 
-            Detail62.viewID = 52000 + viewIDNumber++;
+            Detail62.viewID = 62000 + viewIDNumber++;
             newList.Add(Detail62);
 
 
-
-            // Roof Plate Wellding Detail : C
+            // Roof Plate Wellding Detail : D
             PaperAreaModel Detail63 = new PaperAreaModel();
             Detail63.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
             Detail63.Page = 2;
 
             Detail63.Name = PAPERMAIN_TYPE.DETAIL;
-            Detail63.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailC;
+            Detail63.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailD;
             Detail63.TitleName = "ROOF PLATE WELDING DETAIL";
-            Detail63.TitleSubName = "DETAIL \"C\"";
+            Detail63.TitleSubName = "DETAIL \"D\"";
             Detail63.IsFix = false;
             Detail63.Priority = 500;
             Detail63.ScaleValue = 1;
 
-            Detail63.ReferencePoint.X = 930000;
-            Detail63.ReferencePoint.Y = 120000;
+            Detail63.ReferencePoint.X = 940000;
+            Detail63.ReferencePoint.Y = 110000;
             Detail63.ModelCenterLocation.X = Detail63.ReferencePoint.X;
             Detail63.ModelCenterLocation.Y = Detail63.ReferencePoint.Y;
 
-            Detail63.viewID = 52000 + viewIDNumber++;
+            Detail63.viewID = 63000 + viewIDNumber++;
             newList.Add(Detail63);
+
 
 
             // Roof Compression Wellding Detail
@@ -1847,17 +1872,17 @@ namespace DrawSettingLib.SettingServices
             Detail64.Name = PAPERMAIN_TYPE.DETAIL;
             Detail64.SubName = PAPERSUB_TYPE.RoofCompressionWeldingDetail;
             Detail64.TitleName = "ROOF COMPRESSION RING WELDING DETAIL";
-            Detail64.TitleSubName = "DETAIL \"E\"-\"E\"";
+            Detail64.TitleSubName = "SECTION \"E\"-\"E\"";
             Detail64.IsFix = false;
             Detail64.Priority = 500;
             Detail64.ScaleValue = 1;
 
-            Detail64.ReferencePoint.X = 940000;
+            Detail64.ReferencePoint.X = 950000;
             Detail64.ReferencePoint.Y = 110000;
             Detail64.ModelCenterLocation.X = Detail64.ReferencePoint.X;
             Detail64.ModelCenterLocation.Y = Detail64.ReferencePoint.Y;
 
-            Detail64.viewID = 52000 + viewIDNumber++;
+            Detail64.viewID = 64000 + viewIDNumber++;
             newList.Add(Detail64);
 
 
@@ -1870,17 +1895,17 @@ namespace DrawSettingLib.SettingServices
             Detail65.Name = PAPERMAIN_TYPE.DETAIL;
             Detail65.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailDD;
             Detail65.TitleName = "ROOF PLATE WELDING DETAIL";
-            Detail65.TitleSubName = "DETAIL \"D\"-\"D\"";
+            Detail65.TitleSubName = "SECTION \"D\"-\"D\"";
             Detail65.IsFix = false;
             Detail65.Priority = 500;
             Detail65.ScaleValue = 1;
 
-            Detail65.ReferencePoint.X = 950000;
+            Detail65.ReferencePoint.X = 960000;
             Detail65.ReferencePoint.Y = 110000;
             Detail65.ModelCenterLocation.X = Detail65.ReferencePoint.X;
             Detail65.ModelCenterLocation.Y = Detail65.ReferencePoint.Y;
 
-            Detail65.viewID = 52000 + viewIDNumber++;
+            Detail65.viewID = 65000 + viewIDNumber++;
             newList.Add(Detail65);
 
 
@@ -1900,16 +1925,16 @@ namespace DrawSettingLib.SettingServices
             Detail66.Priority = 500;
             Detail66.ScaleValue = 0; //Auto Scale
             Detail66.IsRepeat = true;
-            Detail66.otherWidth = 135;
+            Detail66.otherWidth = 135 - 15; // 135 -> dimension position 
             Detail66.otherHeight = 50;
 
 
-            Detail66.ReferencePoint.X = 1000000;
+            Detail66.ReferencePoint.X = 970000;
             Detail66.ReferencePoint.Y = 100000;
             Detail66.ModelCenterLocation.X = Detail66.ReferencePoint.X;
             Detail66.ModelCenterLocation.Y = Detail66.ReferencePoint.Y;
 
-            Detail66.viewID = 59000 + viewIDNumber++;
+            Detail66.viewID = 66000 + viewIDNumber++;
             newList.Add(Detail66);
 
 
@@ -1921,21 +1946,21 @@ namespace DrawSettingLib.SettingServices
             Detail67.Name = PAPERMAIN_TYPE.DETAIL;
             Detail67.SubName = PAPERSUB_TYPE.RoofCompressionRingCuttingPlan;
             Detail67.TitleName = "COMMPRESSION RING CUTTING PLAN";
-            Detail67.TitleSubName = "SALE 1/80";
+            Detail67.TitleSubName = "SALE 1/80";//차후 계산값 적용
             Detail67.IsFix = false;
             Detail67.Priority = 900;
             Detail67.ScaleValue = 0; //Auto Scale
             Detail67.IsRepeat = true;
-            Detail67.otherWidth = 135;
+            Detail67.otherWidth = 135 - 15; // 135 -> dimension position  
             Detail67.otherHeight = 50;
 
 
-            Detail67.ReferencePoint.X = 970000;
+            Detail67.ReferencePoint.X = 980000;
             Detail67.ReferencePoint.Y = 110000;
             Detail67.ModelCenterLocation.X = Detail67.ReferencePoint.X;
             Detail67.ModelCenterLocation.Y = Detail67.ReferencePoint.Y;
 
-            Detail67.viewID = 59000 + viewIDNumber++;
+            Detail67.viewID = 67000 + viewIDNumber++;
             newList.Add(Detail67);
 
 
@@ -1944,8 +1969,6 @@ namespace DrawSettingLib.SettingServices
             return newList;
 
         }
-
-
 
         public List<PaperAreaModel> GetPaperAreaDataRoofPlate03()  //String Etc Type, OD <=24800
         {
@@ -2004,48 +2027,48 @@ namespace DrawSettingLib.SettingServices
 
 
 
-            // Roof Plate Wellding Detail : D
+            // Roof Plate Wellding Detail : C
             PaperAreaModel Detail72 = new PaperAreaModel();
             Detail72.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
             Detail72.Page = 1;
 
             Detail72.Name = PAPERMAIN_TYPE.DETAIL;
-            Detail72.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailD;
+            Detail72.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailC;
             Detail72.TitleName = "ROOF PLATE WELDING DETAIL";
-            Detail72.TitleSubName = "DETAIL \"D\"";
+            Detail72.TitleSubName = "DETAIL \"C\"";
             Detail72.IsFix = false;
             Detail72.Priority = 500;
             Detail72.ScaleValue = 1;
 
             Detail72.ReferencePoint.X = 930000;
-            Detail72.ReferencePoint.Y = 110000;
+            Detail72.ReferencePoint.Y = 120000;
             Detail72.ModelCenterLocation.X = Detail72.ReferencePoint.X;
             Detail72.ModelCenterLocation.Y = Detail72.ReferencePoint.Y;
 
-            Detail72.viewID = 52000 + viewIDNumber++;
+            Detail72.viewID = 62000 + viewIDNumber++;
             newList.Add(Detail72);
 
 
 
-            // Roof Plate Wellding Detail : C
+            // Roof Plate Wellding Detail : D
             PaperAreaModel Detail73 = new PaperAreaModel();
             Detail73.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
             Detail73.Page = 1;
 
             Detail73.Name = PAPERMAIN_TYPE.DETAIL;
-            Detail73.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailC;
+            Detail73.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailD;
             Detail73.TitleName = "ROOF PLATE WELDING DETAIL";
-            Detail73.TitleSubName = "DETAIL \"C\"";
+            Detail73.TitleSubName = "DETAIL \"D\"";
             Detail73.IsFix = false;
             Detail73.Priority = 500;
             Detail73.ScaleValue = 1;
 
-            Detail73.ReferencePoint.X = 930000;
-            Detail73.ReferencePoint.Y = 120000;
+            Detail73.ReferencePoint.X = 940000;
+            Detail73.ReferencePoint.Y = 110000;
             Detail73.ModelCenterLocation.X = Detail73.ReferencePoint.X;
             Detail73.ModelCenterLocation.Y = Detail73.ReferencePoint.Y;
 
-            Detail73.viewID = 52000 + viewIDNumber++;
+            Detail73.viewID = 63000 + viewIDNumber++;
             newList.Add(Detail73);
 
 
@@ -2058,7 +2081,7 @@ namespace DrawSettingLib.SettingServices
             Detail74.Name = PAPERMAIN_TYPE.DETAIL;
             Detail74.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailDD;
             Detail74.TitleName = "ROOF PLATE WELDING DETAIL";
-            Detail74.TitleSubName = "DETAIL \"D\"-\"D\"";
+            Detail74.TitleSubName = "SECTION \"D\"-\"D\"";
             Detail74.IsFix = false;
             Detail74.Priority = 500;
             Detail74.ScaleValue = 1;
@@ -2068,10 +2091,8 @@ namespace DrawSettingLib.SettingServices
             Detail74.ModelCenterLocation.X = Detail74.ReferencePoint.X;
             Detail74.ModelCenterLocation.Y = Detail74.ReferencePoint.Y;
 
-            Detail74.viewID = 52000 + viewIDNumber++;
+            Detail74.viewID = 64000 + viewIDNumber++;
             newList.Add(Detail74);
-
-
 
 
 
@@ -2088,16 +2109,16 @@ namespace DrawSettingLib.SettingServices
             Detail75.Priority = 500;
             Detail75.ScaleValue = 0; //Auto Scale
             Detail75.IsRepeat = true;
-            Detail75.otherWidth = 135;
+            Detail75.otherWidth = 135 - 15; // 135 -> dimension  position 
             Detail75.otherHeight = 50;
 
 
-            Detail75.ReferencePoint.X = 1000000;
+            Detail75.ReferencePoint.X = 960000;
             Detail75.ReferencePoint.Y = 100000;
             Detail75.ModelCenterLocation.X = Detail75.ReferencePoint.X;
             Detail75.ModelCenterLocation.Y = Detail75.ReferencePoint.Y;
 
-            Detail75.viewID = 59000 + viewIDNumber++;
+            Detail75.viewID = 65000 + viewIDNumber++;
             newList.Add(Detail75);
 
 
@@ -2163,48 +2184,48 @@ namespace DrawSettingLib.SettingServices
 
 
 
-            // Roof Plate Wellding Detail : D
+            // Roof Plate Wellding Detail : C
             PaperAreaModel Detail82 = new PaperAreaModel();
             Detail82.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
             Detail82.Page = 2;
 
             Detail82.Name = PAPERMAIN_TYPE.DETAIL;
-            Detail82.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailD;
+            Detail82.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailC;
             Detail82.TitleName = "ROOF PLATE WELDING DETAIL";
-            Detail82.TitleSubName = "DETAIL \"D\"";
+            Detail82.TitleSubName = "DETAIL \"C\"";
             Detail82.IsFix = false;
             Detail82.Priority = 500;
             Detail82.ScaleValue = 1;
 
             Detail82.ReferencePoint.X = 930000;
-            Detail82.ReferencePoint.Y = 110000;
+            Detail82.ReferencePoint.Y = 120000;
             Detail82.ModelCenterLocation.X = Detail82.ReferencePoint.X;
             Detail82.ModelCenterLocation.Y = Detail82.ReferencePoint.Y;
 
-            Detail82.viewID = 52000 + viewIDNumber++;
+            Detail82.viewID = 62000 + viewIDNumber++;
             newList.Add(Detail82);
 
 
 
-            // Roof Plate Wellding Detail : C
+            // Roof Plate Wellding Detail : D
             PaperAreaModel Detail83 = new PaperAreaModel();
             Detail83.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
             Detail83.Page = 2;
 
             Detail83.Name = PAPERMAIN_TYPE.DETAIL;
-            Detail83.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailC;
+            Detail83.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailD;
             Detail83.TitleName = "ROOF PLATE WELDING DETAIL";
-            Detail83.TitleSubName = "DETAIL \"C\"";
+            Detail83.TitleSubName = "DETAIL \"D\"";
             Detail83.IsFix = false;
             Detail83.Priority = 500;
             Detail83.ScaleValue = 1;
 
-            Detail83.ReferencePoint.X = 930000;
-            Detail83.ReferencePoint.Y = 120000;
+            Detail83.ReferencePoint.X = 940000;
+            Detail83.ReferencePoint.Y = 110000;
             Detail83.ModelCenterLocation.X = Detail83.ReferencePoint.X;
             Detail83.ModelCenterLocation.Y = Detail83.ReferencePoint.Y;
 
-            Detail83.viewID = 52000 + viewIDNumber++;
+            Detail83.viewID = 63000 + viewIDNumber++;
             newList.Add(Detail83);
 
 
@@ -2217,7 +2238,7 @@ namespace DrawSettingLib.SettingServices
             Detail84.Name = PAPERMAIN_TYPE.DETAIL;
             Detail84.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailDD;
             Detail84.TitleName = "ROOF PLATE WELDING DETAIL";
-            Detail84.TitleSubName = "DETAIL \"D\"-\"D\"";
+            Detail84.TitleSubName = "SECTION \"D\"-\"D\"";
             Detail84.IsFix = false;
             Detail84.Priority = 500;
             Detail84.ScaleValue = 1;
@@ -2227,7 +2248,7 @@ namespace DrawSettingLib.SettingServices
             Detail84.ModelCenterLocation.X = Detail84.ReferencePoint.X;
             Detail84.ModelCenterLocation.Y = Detail84.ReferencePoint.Y;
 
-            Detail84.viewID = 52000 + viewIDNumber++;
+            Detail84.viewID = 64000 + viewIDNumber++;
             newList.Add(Detail84);
 
 
@@ -2247,16 +2268,16 @@ namespace DrawSettingLib.SettingServices
             Detail85.Priority = 500;
             Detail85.ScaleValue = 0; //Auto Scale
             Detail85.IsRepeat = true;
-            Detail85.otherWidth = 135;
+            Detail85.otherWidth = 135 - 15; // 135 -> dimension position 
             Detail85.otherHeight = 50;
 
 
-            Detail85.ReferencePoint.X = 1000000;
+            Detail85.ReferencePoint.X = 960000;
             Detail85.ReferencePoint.Y = 100000;
             Detail85.ModelCenterLocation.X = Detail85.ReferencePoint.X;
             Detail85.ModelCenterLocation.Y = Detail85.ReferencePoint.Y;
 
-            Detail85.viewID = 59000 + viewIDNumber++;
+            Detail85.viewID = 65000 + viewIDNumber++;
             newList.Add(Detail85);
 
 
@@ -2271,6 +2292,804 @@ namespace DrawSettingLib.SettingServices
         #endregion
 
 
+
+        #region DRT Roof
+
+        // ROOF PLATE ARRANGEMENT, CUTTING PLAN
+        private List<PaperAreaModel> GetPaperAreaDRTRoofPlate(double selRoofOD, string selTopAngleType)
+        {
+            List<PaperAreaModel> newList = new List<PaperAreaModel>();
+
+            switch (selTopAngleType)
+            {
+                case "Detail i":
+                    if (selRoofOD <= 24800)
+                    {
+                        //String I Type, OD <=24800
+                        newList.AddRange(GetPaperAreaDataDRTRoofPlate01());
+
+                    }
+                    else
+                    {
+                        //String I Type, OD > 24800
+
+                        newList.AddRange(GetPaperAreaDataDRTRoofPlate02());
+
+                    }
+                    break;
+
+                case "Detail b":
+                case "Detail d":
+                case "Detail e":
+                case "Detail k":
+                    if (selRoofOD <= 24800)
+                    {
+                        //String Etc Type, OD <=24800
+                        newList.AddRange(GetPaperAreaDataDRTRoofPlate03());
+
+                    }
+                    else
+                    {
+                        //String Etc Type, OD > 24800
+                        newList.AddRange(GetPaperAreaDataDRTRoofPlate04());
+
+                    }
+
+                    break;
+            }
+
+
+
+
+            return newList;
+        }
+
+
+        // ROOF PLATE 
+        public List<PaperAreaModel> GetPaperAreaDataDRTRoofPlate01()  //String I Type, OD <=24800
+        {
+
+            double viewIDNumber = 13000;
+
+            //Roof Plate Arrangement
+
+            List<PaperAreaModel> newList = new List<PaperAreaModel>();
+            PaperAreaModel Detail100 = new PaperAreaModel();
+            Detail100.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail100.Page = 1;
+
+            Detail100.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail100.SubName = PAPERSUB_TYPE.RoofPlateArrangement;
+            Detail100.TitleName = "ROOF PLATE ARRANGEMENT";
+            Detail100.TitleSubName = "";
+            Detail100.IsFix = true;
+            Detail100.Row = 1;
+            Detail100.Column = 1;
+            Detail100.RowSpan = 3;
+            Detail100.ColumnSpan = 3;
+            Detail100.ScaleValue = 0; // Auto Scale
+            Detail100.otherWidth = 420;
+            Detail100.otherHeight = 290;
+
+            Detail100.ReferencePoint.X = 400000;
+            Detail100.ReferencePoint.Y = 800000;
+            Detail100.ModelCenterLocation.X = Detail100.ReferencePoint.X;
+            Detail100.ModelCenterLocation.Y = Detail100.ReferencePoint.Y;
+
+            Detail100.viewID = 70000 + viewIDNumber++;
+            newList.Add(Detail100);
+
+
+
+            // Roof Compression Ring JointDetail
+            PaperAreaModel Detail101 = new PaperAreaModel();
+            Detail101.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail101.Page = 1;
+
+            Detail101.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail101.SubName = PAPERSUB_TYPE.RoofCompressionRingJointDetail;
+            Detail101.TitleName = "ROOF COMPRESSION RING JOINT DETAIL";
+            Detail101.TitleSubName = "DETAIL \"A\"";
+            Detail101.IsFix = false;
+            Detail101.Priority = 500;
+            Detail101.ScaleValue = 1;
+
+            Detail101.ReferencePoint.X = 920000;
+            Detail101.ReferencePoint.Y = 130000;
+            Detail101.ModelCenterLocation.X = Detail101.ReferencePoint.X;
+            Detail101.ModelCenterLocation.Y = Detail101.ReferencePoint.Y;
+
+            Detail101.viewID = 71000 + viewIDNumber++;
+            newList.Add(Detail101);
+
+
+
+            // Roof Plate Wellding Detail : C
+            PaperAreaModel Detail102 = new PaperAreaModel();
+            Detail102.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail102.Page = 1;
+
+            Detail102.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail102.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailC;
+            Detail102.TitleName = "ROOF PLATE WELDING DETAIL";
+            Detail102.TitleSubName = "DETAIL \"C\"";
+            Detail102.IsFix = false;
+            Detail102.Priority = 500;
+            Detail102.ScaleValue = 1;
+
+            Detail102.ReferencePoint.X = 930000;
+            Detail102.ReferencePoint.Y = 130000;
+            Detail102.ModelCenterLocation.X = Detail102.ReferencePoint.X;
+            Detail102.ModelCenterLocation.Y = Detail102.ReferencePoint.Y;
+
+            Detail102.viewID = 72000 + viewIDNumber++;
+            newList.Add(Detail102);
+
+
+
+            // Roof Plate Wellding Detail : D
+            PaperAreaModel Detail103 = new PaperAreaModel();
+            Detail103.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail103.Page = 1;
+
+            Detail103.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail103.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailD;
+            Detail103.TitleName = "ROOF PLATE WELDING DETAIL";
+            Detail103.TitleSubName = "DETAIL \"D\"";
+            Detail103.IsFix = false;
+            Detail103.Priority = 500;
+            Detail103.ScaleValue = 1;
+
+            Detail103.ReferencePoint.X = 940000;
+            Detail103.ReferencePoint.Y = 130000;
+            Detail103.ModelCenterLocation.X = Detail103.ReferencePoint.X;
+            Detail103.ModelCenterLocation.Y = Detail103.ReferencePoint.Y;
+
+            Detail103.viewID = 73000 + viewIDNumber++;
+            newList.Add(Detail103);
+
+
+
+            // Roof Compression Wellding Detail
+            PaperAreaModel Detail104 = new PaperAreaModel();
+            Detail104.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail104.Page = 1;
+
+            Detail104.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail104.SubName = PAPERSUB_TYPE.RoofCompressionWeldingDetail;
+            Detail104.TitleName = "ROOF COMPRESSION RING WELDING DETAIL";
+            Detail104.TitleSubName = "SECTION \"E\"-\"E\"";
+            Detail104.IsFix = false;
+            Detail104.Priority = 500;
+            Detail104.ScaleValue = 1;
+
+            Detail104.ReferencePoint.X = 950000;
+            Detail104.ReferencePoint.Y = 130000;
+            Detail104.ModelCenterLocation.X = Detail104.ReferencePoint.X;
+            Detail104.ModelCenterLocation.Y = Detail104.ReferencePoint.Y;
+
+            Detail104.viewID = 74000 + viewIDNumber++;
+            newList.Add(Detail104);
+
+
+
+            // Roof Plate Wellding Detail : DD
+            PaperAreaModel Detail105 = new PaperAreaModel();
+            Detail105.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail105.Page = 1;
+
+            Detail105.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail105.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailDD;
+            Detail105.TitleName = "ROOF PLATE WELDING DETAIL";
+            Detail105.TitleSubName = "SECTION \"D\"-\"D\"";
+            Detail105.IsFix = false;
+            Detail105.Priority = 500;
+            Detail105.ScaleValue = 1;
+
+            Detail105.ReferencePoint.X = 960000;
+            Detail105.ReferencePoint.Y = 130000;
+            Detail105.ModelCenterLocation.X = Detail105.ReferencePoint.X;
+            Detail105.ModelCenterLocation.Y = Detail105.ReferencePoint.Y;
+
+            Detail105.viewID = 75000 + viewIDNumber++;
+            newList.Add(Detail105);
+
+
+
+
+
+            // Roof Plate Cutting Plan
+            PaperAreaModel Detail106 = new PaperAreaModel();
+            Detail106.DWGName = PAPERMAIN_TYPE.RoofPlateCuttingPlan;
+            Detail106.Page = 1;
+
+            Detail106.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail106.SubName = PAPERSUB_TYPE.RoofPlateCuttingPlan;
+            Detail106.TitleName = "ROOF PLATE CUTTING PLAN";
+            Detail106.TitleSubName = "";
+            Detail106.IsFix = false;
+            Detail106.Priority = 500;
+            Detail106.ScaleValue = 0; //Auto Scale
+            Detail106.IsRepeat = true;
+            Detail106.otherWidth = 135 - 15; // 135 -> dimension position
+            Detail106.otherHeight = 50;
+
+
+            Detail106.ReferencePoint.X = 970000;
+            Detail106.ReferencePoint.Y = 130000;
+            Detail106.ModelCenterLocation.X = Detail106.ReferencePoint.X;
+            Detail106.ModelCenterLocation.Y = Detail106.ReferencePoint.Y;
+
+            Detail106.viewID = 76000 + viewIDNumber++;
+            newList.Add(Detail106);
+
+
+            // Commpression Ring Cutting Plan
+            PaperAreaModel Detail107 = new PaperAreaModel();
+            Detail107.DWGName = PAPERMAIN_TYPE.RoofPlateCuttingPlan;
+            Detail107.Page = 1;
+
+            Detail107.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail107.SubName = PAPERSUB_TYPE.RoofCompressionRingCuttingPlan;
+            Detail107.TitleName = "COMMPRESSION RING CUTTING PLAN";
+            Detail107.TitleSubName = "SALE 1/80"; //차후 계산값 적용
+            Detail107.IsFix = false;
+            Detail107.Priority = 900;
+            Detail107.ScaleValue = 0; //Auto Scale
+            Detail107.IsRepeat = true;
+            Detail107.otherWidth = 135 - 15; // 135 -> dimension position
+            Detail107.otherHeight = 50;
+
+
+            Detail107.ReferencePoint.X = 980000;
+            Detail107.ReferencePoint.Y = 130000;
+            Detail107.ModelCenterLocation.X = Detail107.ReferencePoint.X;
+            Detail107.ModelCenterLocation.Y = Detail107.ReferencePoint.Y;
+
+            Detail107.viewID = 78000 + viewIDNumber++;
+            newList.Add(Detail107);
+
+
+
+
+            return newList;
+        }
+
+        public List<PaperAreaModel> GetPaperAreaDataDRTRoofPlate02()  //String I Type, OD > 24800
+        {
+
+            double viewIDNumber = 14000;
+
+            //Roof Plate Arrangement
+
+            List<PaperAreaModel> newList = new List<PaperAreaModel>();
+            PaperAreaModel Detail110 = new PaperAreaModel();
+            Detail110.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail110.Page = 1;
+
+            Detail110.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail110.SubName = PAPERSUB_TYPE.RoofPlateArrangement;
+            Detail110.TitleName = "ROOF PLATE ARRANGEMENT";
+            Detail110.TitleSubName = "";
+            Detail110.IsFix = true;
+            Detail110.Row = 1;
+            Detail110.Column = 1;
+            Detail110.RowSpan = 4;
+            Detail110.ColumnSpan = 4;
+            Detail110.ScaleValue = 0; // Auto Scale
+            Detail110.otherWidth = 570;
+            Detail110.otherHeight = 440;
+
+            Detail110.ReferencePoint.X = 400000;
+            Detail110.ReferencePoint.Y = 800000;
+            Detail110.ModelCenterLocation.X = Detail110.ReferencePoint.X;
+            Detail110.ModelCenterLocation.Y = Detail110.ReferencePoint.Y;
+
+            Detail110.viewID = 80000 + viewIDNumber++;
+            newList.Add(Detail110);
+
+
+
+            // Roof Compression Ring JointDetail
+            PaperAreaModel Detail111 = new PaperAreaModel();
+            Detail111.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail111.Page = 2;
+
+            Detail111.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail111.SubName = PAPERSUB_TYPE.RoofCompressionRingJointDetail;
+            Detail111.TitleName = "ROOF COMPRESSION RING JOINT DETAIL";
+            Detail111.TitleSubName = "DETAIL \"A\"";
+            Detail111.IsFix = false;
+            Detail111.Priority = 500;
+            Detail111.ScaleValue = 1;
+
+            Detail111.ReferencePoint.X = 920000;
+            Detail111.ReferencePoint.Y = 130000;
+            Detail111.ModelCenterLocation.X = Detail111.ReferencePoint.X;
+            Detail111.ModelCenterLocation.Y = Detail111.ReferencePoint.Y;
+
+            Detail111.viewID = 81000 + viewIDNumber++;
+            newList.Add(Detail111);
+
+
+
+
+            // Roof Plate Wellding Detail : C
+            PaperAreaModel Detail112 = new PaperAreaModel();
+            Detail112.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail112.Page = 2;
+
+            Detail112.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail112.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailC;
+            Detail112.TitleName = "ROOF PLATE WELDING DETAIL";
+            Detail112.TitleSubName = "DETAIL \"C\"";
+            Detail112.IsFix = false;
+            Detail112.Priority = 500;
+            Detail112.ScaleValue = 1;
+
+            Detail112.ReferencePoint.X = 930000;
+            Detail112.ReferencePoint.Y = 130000;
+            Detail112.ModelCenterLocation.X = Detail112.ReferencePoint.X;
+            Detail112.ModelCenterLocation.Y = Detail112.ReferencePoint.Y;
+
+            Detail112.viewID = 82000 + viewIDNumber++;
+            newList.Add(Detail112);
+
+
+
+
+            // Roof Plate Wellding Detail : D
+            PaperAreaModel Detail113 = new PaperAreaModel();
+            Detail113.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail113.Page = 2;
+
+            Detail113.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail113.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailD;
+            Detail113.TitleName = "ROOF PLATE WELDING DETAIL";
+            Detail113.TitleSubName = "DETAIL \"D\"";
+            Detail113.IsFix = false;
+            Detail113.Priority = 500;
+            Detail113.ScaleValue = 1;
+
+            Detail113.ReferencePoint.X = 940000;
+            Detail113.ReferencePoint.Y = 130000;
+            Detail113.ModelCenterLocation.X = Detail113.ReferencePoint.X;
+            Detail113.ModelCenterLocation.Y = Detail113.ReferencePoint.Y;
+
+            Detail113.viewID = 83000 + viewIDNumber++;
+            newList.Add(Detail113);
+
+
+
+            // Roof Compression Wellding Detail
+            PaperAreaModel Detail114 = new PaperAreaModel();
+            Detail114.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail114.Page = 2;
+
+            Detail114.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail114.SubName = PAPERSUB_TYPE.RoofCompressionWeldingDetail;
+            Detail114.TitleName = "ROOF COMPRESSION RING WELDING DETAIL";
+            Detail114.TitleSubName = "SECTION \"E\"-\"E\"";
+            Detail114.IsFix = false;
+            Detail114.Priority = 500;
+            Detail114.ScaleValue = 1;
+
+            Detail114.ReferencePoint.X = 950000;
+            Detail114.ReferencePoint.Y = 130000;
+            Detail114.ModelCenterLocation.X = Detail114.ReferencePoint.X;
+            Detail114.ModelCenterLocation.Y = Detail114.ReferencePoint.Y;
+
+            Detail114.viewID = 84000 + viewIDNumber++;
+            newList.Add(Detail114);
+
+
+
+            // Roof Plate Wellding Detail : DD
+            PaperAreaModel Detail115 = new PaperAreaModel();
+            Detail115.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail115.Page = 2;
+
+            Detail115.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail115.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailDD;
+            Detail115.TitleName = "ROOF PLATE WELDING DETAIL";
+            Detail115.TitleSubName = "SECTION \"D\"-\"D\"";
+            Detail115.IsFix = false;
+            Detail115.Priority = 500;
+            Detail115.ScaleValue = 1;
+
+            Detail115.ReferencePoint.X = 960000;
+            Detail115.ReferencePoint.Y = 130000;
+            Detail115.ModelCenterLocation.X = Detail115.ReferencePoint.X;
+            Detail115.ModelCenterLocation.Y = Detail115.ReferencePoint.Y;
+
+            Detail115.viewID = 85000 + viewIDNumber++;
+            newList.Add(Detail115);
+
+
+
+
+
+            // Roof Plate Cutting Plan
+            PaperAreaModel Detail116 = new PaperAreaModel();
+            Detail116.DWGName = PAPERMAIN_TYPE.RoofPlateCuttingPlan;
+            Detail116.Page = 1;
+
+            Detail116.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail116.SubName = PAPERSUB_TYPE.RoofPlateCuttingPlan;
+            Detail116.TitleName = "ROOF PLATE CUTTING PLAN";
+            Detail116.TitleSubName = "";
+            Detail116.IsFix = false;
+            Detail116.Priority = 500;
+            Detail116.ScaleValue = 0; //Auto Scale
+            Detail116.IsRepeat = true;
+            Detail116.otherWidth = 135 - 15; // 135 -> dimension position
+            Detail116.otherHeight = 50;
+
+
+            Detail116.ReferencePoint.X = 970000;
+            Detail116.ReferencePoint.Y = 130000;
+            Detail116.ModelCenterLocation.X = Detail116.ReferencePoint.X;
+            Detail116.ModelCenterLocation.Y = Detail116.ReferencePoint.Y;
+
+            Detail116.viewID = 86000 + viewIDNumber++;
+            newList.Add(Detail116);
+
+
+            // Commpression Ring Cutting Plan
+            PaperAreaModel Detail117 = new PaperAreaModel();
+            Detail117.DWGName = PAPERMAIN_TYPE.RoofPlateCuttingPlan;
+            Detail117.Page = 1;
+
+            Detail117.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail117.SubName = PAPERSUB_TYPE.RoofCompressionRingCuttingPlan;
+            Detail117.TitleName = "COMMPRESSION RING CUTTING PLAN";
+            Detail117.TitleSubName = "SALE 1/80";//차후 계산값 적용
+            Detail117.IsFix = false;
+            Detail117.Priority = 900;
+            Detail117.ScaleValue = 0; //Auto Scale
+            Detail117.IsRepeat = true;
+            Detail117.otherWidth = 135 - 15; // 135 -> dimension position
+            Detail117.otherHeight = 50;
+
+
+            Detail117.ReferencePoint.X = 980000;
+            Detail117.ReferencePoint.Y = 130000;
+            Detail117.ModelCenterLocation.X = Detail117.ReferencePoint.X;
+            Detail117.ModelCenterLocation.Y = Detail117.ReferencePoint.Y;
+
+            Detail117.viewID = 87000 + viewIDNumber++;
+            newList.Add(Detail117);
+
+
+
+
+            return newList;
+
+        }
+
+        public List<PaperAreaModel> GetPaperAreaDataDRTRoofPlate03()  //String Etc Type, OD <=24800
+        {
+
+            double viewIDNumber = 15000;
+            //Roof Plate Arrangement
+
+            List<PaperAreaModel> newList = new List<PaperAreaModel>();
+            PaperAreaModel Detail120 = new PaperAreaModel();
+            Detail120.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail120.Page = 1;
+
+            Detail120.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail120.SubName = PAPERSUB_TYPE.RoofPlateArrangement;
+            Detail120.TitleName = "ROOF PLATE ARRANGEMENT";
+            Detail120.TitleSubName = "";
+            Detail120.IsFix = true;
+            Detail120.Row = 1;
+            Detail120.Column = 1;
+            Detail120.RowSpan = 3;
+            Detail120.ColumnSpan = 3;
+            Detail120.ScaleValue = 0; // Auto Scale
+            Detail120.otherWidth = 420;
+            Detail120.otherHeight = 290;
+
+            Detail120.ReferencePoint.X = 400000;
+            Detail120.ReferencePoint.Y = 800000;
+            Detail120.ModelCenterLocation.X = Detail120.ReferencePoint.X;
+            Detail120.ModelCenterLocation.Y = Detail120.ReferencePoint.Y;
+
+            Detail120.viewID = 90000 + viewIDNumber++;
+            newList.Add(Detail120);
+
+
+
+            // Roof Compression Ring JointDetail(타입에 따라 이름 변경!!)
+            PaperAreaModel Detail121 = new PaperAreaModel();
+            Detail121.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail121.Page = 1;
+
+            Detail121.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail121.SubName = PAPERSUB_TYPE.RoofCompressionRingJointDetail;
+            Detail121.TitleName = "ROOF COMPRESSION RING JOINT DETAIL";
+            Detail121.TitleSubName = "DETAIL \"A\"";
+            Detail121.IsFix = false;
+            Detail121.Priority = 500;
+            Detail121.ScaleValue = 1;
+
+            Detail121.ReferencePoint.X = 920000;
+            Detail121.ReferencePoint.Y = 130000;
+            Detail121.ModelCenterLocation.X = Detail121.ReferencePoint.X;
+            Detail121.ModelCenterLocation.Y = Detail121.ReferencePoint.Y;
+
+            Detail121.viewID = 91000 + viewIDNumber++;
+            newList.Add(Detail121);
+
+
+
+            // Roof Plate Wellding Detail : C
+            PaperAreaModel Detail122 = new PaperAreaModel();
+            Detail122.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail122.Page = 1;
+
+            Detail122.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail122.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailC;
+            Detail122.TitleName = "ROOF PLATE WELDING DETAIL";
+            Detail122.TitleSubName = "DETAIL \"C\"";
+            Detail122.IsFix = false;
+            Detail122.Priority = 500;
+            Detail122.ScaleValue = 1;
+
+            Detail122.ReferencePoint.X = 930000;
+            Detail122.ReferencePoint.Y = 130000;
+            Detail122.ModelCenterLocation.X = Detail122.ReferencePoint.X;
+            Detail122.ModelCenterLocation.Y = Detail122.ReferencePoint.Y;
+
+            Detail122.viewID = 92000 + viewIDNumber++;
+            newList.Add(Detail122);
+
+
+
+            // Roof Plate Wellding Detail : D
+            PaperAreaModel Detail123 = new PaperAreaModel();
+            Detail123.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail123.Page = 1;
+
+            Detail123.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail123.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailD;
+            Detail123.TitleName = "ROOF PLATE WELDING DETAIL";
+            Detail123.TitleSubName = "DETAIL \"D\"";
+            Detail123.IsFix = false;
+            Detail123.Priority = 500;
+            Detail123.ScaleValue = 1;
+
+            Detail123.ReferencePoint.X = 940000;
+            Detail123.ReferencePoint.Y = 130000;
+            Detail123.ModelCenterLocation.X = Detail123.ReferencePoint.X;
+            Detail123.ModelCenterLocation.Y = Detail123.ReferencePoint.Y;
+
+            Detail123.viewID = 93000 + viewIDNumber++;
+            newList.Add(Detail123);
+
+
+
+            // Roof Plate Wellding Detail : DD
+            PaperAreaModel Detail124 = new PaperAreaModel();
+            Detail124.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail124.Page = 1;
+
+            Detail124.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail124.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailDD;
+            Detail124.TitleName = "ROOF PLATE WELDING DETAIL";
+            Detail124.TitleSubName = "SECTION \"D\"-\"D\"";
+            Detail124.IsFix = false;
+            Detail124.Priority = 500;
+            Detail124.ScaleValue = 1;
+
+            Detail124.ReferencePoint.X = 950000;
+            Detail124.ReferencePoint.Y = 130000;
+            Detail124.ModelCenterLocation.X = Detail124.ReferencePoint.X;
+            Detail124.ModelCenterLocation.Y = Detail124.ReferencePoint.Y;
+
+            Detail124.viewID = 94000 + viewIDNumber++;
+            newList.Add(Detail124);
+
+
+
+
+
+            // Roof Plate Cutting Plan
+            PaperAreaModel Detail125 = new PaperAreaModel();
+            Detail125.DWGName = PAPERMAIN_TYPE.RoofPlateCuttingPlan;
+            Detail125.Page = 1;
+
+            Detail125.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail125.SubName = PAPERSUB_TYPE.RoofPlateCuttingPlan;
+            Detail125.TitleName = "ROOF PLATE CUTTING PLAN";
+            Detail125.TitleSubName = "";
+            Detail125.IsFix = false;
+            Detail125.Priority = 500;
+            Detail125.ScaleValue = 0; //Auto Scale
+            Detail125.IsRepeat = true;
+            Detail125.otherWidth = 135 - 15; // 135 -> dimension position
+            Detail125.otherHeight = 50;
+
+
+            Detail125.ReferencePoint.X = 960000;
+            Detail125.ReferencePoint.Y = 130000;
+            Detail125.ModelCenterLocation.X = Detail125.ReferencePoint.X;
+            Detail125.ModelCenterLocation.Y = Detail125.ReferencePoint.Y;
+
+            Detail125.viewID = 95000 + viewIDNumber++;
+            newList.Add(Detail125);
+
+
+            return newList;
+
+        }
+
+        public List<PaperAreaModel> GetPaperAreaDataDRTRoofPlate04()  //String Etc Type, OD > 24800
+        {
+
+            double viewIDNumber = 16000;
+
+            //Roof Plate Arrangement
+
+            List<PaperAreaModel> newList = new List<PaperAreaModel>();
+            PaperAreaModel Detail130 = new PaperAreaModel();
+            Detail130.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail130.Page = 1;
+
+            Detail130.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail130.SubName = PAPERSUB_TYPE.RoofPlateArrangement;
+            Detail130.TitleName = "ROOF PLATE ARRANGEMENT";
+            Detail130.TitleSubName = "";
+            Detail130.IsFix = true;
+            Detail130.Row = 1;
+            Detail130.Column = 1;
+            Detail130.RowSpan = 4;
+            Detail130.ColumnSpan = 4;
+            Detail130.ScaleValue = 0; // Auto Scale
+            Detail130.otherWidth = 570;
+            Detail130.otherHeight = 440;
+
+            Detail130.ReferencePoint.X = 400000;
+            Detail130.ReferencePoint.Y = 800000;
+            Detail130.ModelCenterLocation.X = Detail130.ReferencePoint.X;
+            Detail130.ModelCenterLocation.Y = Detail130.ReferencePoint.Y;
+
+            Detail130.viewID = 100000 + viewIDNumber++;
+            newList.Add(Detail130);
+
+
+
+            // Roof Compression Ring JointDetail(타입에 따라 이름 변경!!)
+            PaperAreaModel Detail131 = new PaperAreaModel();
+            Detail131.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail131.Page = 2;
+
+            Detail131.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail131.SubName = PAPERSUB_TYPE.RoofCompressionRingJointDetail;
+            Detail131.TitleName = "ROOF COMPRESSION RING JOINT DETAIL";
+            Detail131.TitleSubName = "DETAIL \"A\"";
+            Detail131.IsFix = false;
+            Detail131.Priority = 500;
+            Detail131.ScaleValue = 1;
+
+            Detail131.ReferencePoint.X = 920000;
+            Detail131.ReferencePoint.Y = 130000;
+            Detail131.ModelCenterLocation.X = Detail131.ReferencePoint.X;
+            Detail131.ModelCenterLocation.Y = Detail131.ReferencePoint.Y;
+
+            Detail131.viewID = 101000 + viewIDNumber++;
+            newList.Add(Detail131);
+
+
+
+
+            // Roof Plate Wellding Detail : C
+            PaperAreaModel Detail132 = new PaperAreaModel();
+            Detail132.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail132.Page = 2;
+
+            Detail132.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail132.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailC;
+            Detail132.TitleName = "ROOF PLATE WELDING DETAIL";
+            Detail132.TitleSubName = "DETAIL \"C\"";
+            Detail132.IsFix = false;
+            Detail132.Priority = 500;
+            Detail132.ScaleValue = 1;
+
+            Detail132.ReferencePoint.X = 930000;
+            Detail132.ReferencePoint.Y = 130000;
+            Detail132.ModelCenterLocation.X = Detail132.ReferencePoint.X;
+            Detail132.ModelCenterLocation.Y = Detail132.ReferencePoint.Y;
+
+            Detail132.viewID = 102000 + viewIDNumber++;
+            newList.Add(Detail132);
+
+
+
+            // Roof Plate Wellding Detail : D
+            PaperAreaModel Detail133 = new PaperAreaModel();
+            Detail133.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail133.Page = 2;
+
+            Detail133.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail133.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailD;
+            Detail133.TitleName = "ROOF PLATE WELDING DETAIL";
+            Detail133.TitleSubName = "DETAIL \"D\"";
+            Detail133.IsFix = false;
+            Detail133.Priority = 500;
+            Detail133.ScaleValue = 1;
+
+            Detail133.ReferencePoint.X = 940000;
+            Detail133.ReferencePoint.Y = 130000;
+            Detail133.ModelCenterLocation.X = Detail133.ReferencePoint.X;
+            Detail133.ModelCenterLocation.Y = Detail133.ReferencePoint.Y;
+
+            Detail133.viewID = 103000 + viewIDNumber++;
+            newList.Add(Detail133);
+
+
+
+            // Roof Plate Wellding Detail : DD
+            PaperAreaModel Detail134 = new PaperAreaModel();
+            Detail134.DWGName = PAPERMAIN_TYPE.RoofPlateArrangement;
+            Detail134.Page = 2;
+
+            Detail134.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail134.SubName = PAPERSUB_TYPE.RoofPlateWeldingDetailDD;
+            Detail134.TitleName = "ROOF PLATE WELDING DETAIL";
+            Detail134.TitleSubName = "SECTION \"D\"-\"D\"";
+            Detail134.IsFix = false;
+            Detail134.Priority = 500;
+            Detail134.ScaleValue = 1;
+
+            Detail134.ReferencePoint.X = 950000;
+            Detail134.ReferencePoint.Y = 130000;
+            Detail134.ModelCenterLocation.X = Detail134.ReferencePoint.X;
+            Detail134.ModelCenterLocation.Y = Detail134.ReferencePoint.Y;
+
+            Detail134.viewID = 104000 + viewIDNumber++;
+            newList.Add(Detail134);
+
+
+
+
+
+            // Roof Plate Cutting Plan
+            PaperAreaModel Detail135 = new PaperAreaModel();
+            Detail135.DWGName = PAPERMAIN_TYPE.RoofPlateCuttingPlan;
+            Detail135.Page = 1;
+
+            Detail135.Name = PAPERMAIN_TYPE.DETAIL;
+            Detail135.SubName = PAPERSUB_TYPE.RoofPlateCuttingPlan;
+            Detail135.TitleName = "ROOF PLATE CUTTING PLAN";
+            Detail135.TitleSubName = "";
+            Detail135.IsFix = false;
+            Detail135.Priority = 500;
+            Detail135.ScaleValue = 0; //Auto Scale
+            Detail135.IsRepeat = true;
+            Detail135.otherWidth = 135 - 15; // 135 -> dimension position
+            Detail135.otherHeight = 50;
+
+
+            Detail135.ReferencePoint.X = 960000;
+            Detail135.ReferencePoint.Y = 130000;
+            Detail135.ModelCenterLocation.X = Detail135.ReferencePoint.X;
+            Detail135.ModelCenterLocation.Y = Detail135.ReferencePoint.Y;
+
+            Detail135.viewID = 105000 + viewIDNumber++;
+            newList.Add(Detail135);
+
+
+
+
+            return newList;
+
+        }
+
+
+
+        #endregion
 
 
 
@@ -2304,7 +3123,7 @@ namespace DrawSettingLib.SettingServices
             foreach (PaperAreaModel eachArea in selList)
             {
                 if (eachArea.Name == mainName)
-                    if(eachArea.SubName== subName)
+                    if (eachArea.SubName == subName)
                     {
                         returnScale = eachArea.ScaleValue;
                         break;
@@ -2316,7 +3135,7 @@ namespace DrawSettingLib.SettingServices
 
 
 
-        
+
 
         // Type Name
         public PAPERMAIN_TYPE GetPaperMainType(string selName)

@@ -3441,7 +3441,16 @@ namespace DrawWork.DrawDetailServices
             //drawList.outlineList.AddRange(weldList);
 
 
-            DrawBMLeaderModel leaderInfoModel = new DrawBMLeaderModel() { position = POSITION_TYPE.LEFT, upperText = "HAMMERING", bmNumber = "", textAlign = POSITION_TYPE.CENTER,leaderPointLength=12,leaderPointRadian=Utility.DegToRad(135) };
+            DrawBMLeaderModel leaderInfoModel = new DrawBMLeaderModel()
+            {
+                position = POSITION_TYPE.LEFT,
+                upperText = "HAMMERING",
+                bmNumber = "",
+                textAlign = POSITION_TYPE.CENTER,
+                leaderPointLength = 12,
+                leaderPointRadian = Utility.DegToRad(135)
+            };
+
             DrawEntityModel leaderInfoList = drawService.Draw_OneLineLeader(ref singleModel, GetSumPoint(lineList[9].MidPoint, 0, 0), leaderInfoModel, scaleValue);
             drawList.AddDrawEntity(leaderInfoList);
 
@@ -7195,12 +7204,491 @@ namespace DrawWork.DrawDetailServices
             SetModelCenterPoint(PAPERSUB_TYPE.ToleranceLimit, modelCenterPoint);
 
 
-            styleService.SetLayerListEntity(ref newList, layerService.LayerHiddenLine);
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
             drawList.outlineList.AddRange(newList);
 
             return drawList;
 
         }
+
+        public DrawEntityModel DrawBackingStrip(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue, PaperAreaModel selPaperAreaModel)
+        {
+            DrawEntityModel drawList = new DrawEntityModel();
+            //Vert. Joint Detail_CRT
+
+            //singleModel.Entities.Clear();
+
+            List<Entity> newList = new List<Entity>();
+
+
+            Point3D referencePoint = new Point3D(refPoint.X, refPoint.Y);
+
+            double tWidth = 1770;
+            double tHeight = 50;
+
+
+            scaleValue = scaleService.GetScaleCalValue(selPaperAreaModel.otherWidth, selPaperAreaModel.otherHeight, tWidth, tHeight);
+            selPaperAreaModel.ScaleValue = scaleValue;
+
+            Line line01 = new Line(GetSumPoint(referencePoint, 0, 0), GetSumPoint(referencePoint, 0, tHeight));
+            Line line02 = new Line(GetSumPoint(referencePoint, 0, tHeight), GetSumPoint(referencePoint, tWidth, tHeight));
+            Line line03 = new Line(GetSumPoint(referencePoint, tWidth, tHeight), GetSumPoint(referencePoint, tWidth, 0));
+            Line line04 = new Line(GetSumPoint(referencePoint, 0, 0), GetSumPoint(referencePoint, tWidth, 0));
+
+            newList.Add(line01);
+            newList.Add(line02);
+            newList.Add(line03);
+            newList.Add(line04);
+
+            string horizontalString = "\"L\"±2.0";
+            string verticalString = "\"W\"±1.0";
+            string crossString = "DIAGONAL TOLERANCE \"X\"±3.0";
+            double dimHeight = 15;
+            DrawDimensionModel dimBottomMainModel = new DrawDimensionModel()
+            {
+                position = POSITION_TYPE.BOTTOM,
+                textUpper = horizontalString,
+                dimHeight = dimHeight,
+                scaleValue = scaleValue
+            };
+            DrawEntityModel dimBottomMain = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(line04.StartPoint, 0, 0), GetSumPoint(line04.EndPoint, 0, 0), scaleValue, dimBottomMainModel);
+            drawList.AddDrawEntity(dimBottomMain);
+
+            DrawDimensionModel dimRightModel = new DrawDimensionModel()
+            {
+                position = POSITION_TYPE.RIGHT,
+                textUpper = verticalString,
+                dimHeight = dimHeight,
+                scaleValue = scaleValue
+            };
+            DrawEntityModel dimRight = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(line03.EndPoint, 0, 0), GetSumPoint(line03.StartPoint, 0, 0), scaleValue, dimRightModel);
+            drawList.AddDrawEntity(dimRight);
+
+
+            // Rotate Angle
+            Line angleLIne = new Line(GetSumPoint(line01.StartPoint, 0, 0), GetSumPoint(line02.EndPoint, 0, 0));
+            double rotateAngle = editingService.GetAngleOfLine(angleLIne);
+
+
+            //DrawDimensionModel dimCrossModel = new DrawDimensionModel()
+            //{
+            //    position = POSITION_TYPE.BOTTOM,
+            //    textUpper = crossString,
+            //    dimHeight = 0,
+            //    scaleValue = scaleValue,
+            //};
+            //DrawEntityModel dimCross = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(line04.StartPoint, 0, 0), GetSumPoint(line04.StartPoint, angleLIne.Length(), 0), scaleValue, dimCrossModel, rotateAngle);
+            //drawList.AddDrawEntity(dimCross);
+            Point3D insertTextPoint = GetSumPoint(referencePoint, tWidth / 2, tHeight / 2);
+            string bsText = "BS";
+            Text middleText = new Text(Plane.XY, insertTextPoint, bsText, 2.5 * scaleValue) { Alignment = Text.alignmentType.MiddleCenter};
+            styleService.SetLayer(ref middleText, layerService.LayerDimension);
+            drawList.dimTextList.Add(middleText);
+
+            // Center Point
+            Point3D modelCenterPoint = GetSumPoint(referencePoint, tWidth / 2, tHeight / 2);
+            SetModelCenterPoint(PAPERSUB_TYPE.BackingStrip, modelCenterPoint);
+
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+            drawList.outlineList.AddRange(newList);
+
+            return drawList;
+
+        }
+
+
+
+
+
+
+
+
+
+
+        // 210909 v1
+
+        public DrawEntityModel DrawBackingStrip_Welding_Detail(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
+        {
+            // 
+            // 
+
+            DrawEntityModel drawList = new DrawEntityModel();
+
+
+            List<Entity> outlinesList = new List<Entity>();
+
+            Point3D referencePoint = GetSumPoint(new Point3D(refPoint.X, refPoint.Y), 0, 0);
+
+            /////////////////////////////
+            // CAD Data
+            /////////////////////////////
+            double angle = 60;
+            double bar_length = 150;
+            double bar_width = 10;
+            double backingStrip_lenth = 50;
+            double backingStrip_width = 6;
+            double backing_size = 4;
+            double arc_width = 2; // 임의 값
+
+            // Info. Data
+            double halfAngle = angle / 2;
+            double backingStrip_startPoint = (bar_length - backingStrip_lenth) / 2;
+
+
+            //for Horizontal, Vertical Line
+            Point3D t_startPoint = GetSumPoint(referencePoint, 0, bar_width + backingStrip_width);
+            Point3D m_startPoint = GetSumPoint(referencePoint, 0, backingStrip_width);
+            Point3D b_startPoint = GetSumPoint(referencePoint, backingStrip_startPoint, 0);
+
+
+            Line topLine = new Line(GetSumPoint(t_startPoint, 0, 0), GetSumPoint(t_startPoint, bar_length, 0));
+            Line midLine = new Line(GetSumPoint(m_startPoint, 0, 0), GetSumPoint(m_startPoint, bar_length, 0));
+            Line bottomLine = new Line(GetSumPoint(b_startPoint, 0, 0), GetSumPoint(b_startPoint, backingStrip_lenth, 0));
+            Line bottomRight = new Line(GetSumPoint(bottomLine.EndPoint, 0, 0), GetSumPoint(bottomLine.EndPoint, 0, backingStrip_width));
+            Line bottomLeft = new Line(GetSumPoint(bottomLine.StartPoint, 0, 0), GetSumPoint(bottomLine.StartPoint, 0, backingStrip_width));
+            Line diagonalLine = new Line(GetSumPoint(bottomLine.StartPoint, 0, 0), GetSumPoint(bottomLeft.EndPoint, -backingStrip_width, 0));
+
+            //for intersectionLine
+            Point3D midSeamLineLeftSP = GetSumPoint(referencePoint, (bar_length - backing_size) / 2, backingStrip_width);
+            Point3D midSeamLineRightSP = GetSumPoint(referencePoint, (bar_length + backing_size) / 2, backingStrip_width);
+
+
+
+            //will rotate
+            Line tm_leftLinkLine = new Line(midSeamLineLeftSP, GetSumPoint(midSeamLineLeftSP, 0, bar_width * 2));
+            Line tm_rightLinkLine = new Line(midSeamLineRightSP, GetSumPoint(midSeamLineRightSP, 0, bar_width * 2));
+
+            tm_leftLinkLine.Rotate(Utility.DegToRad(halfAngle), Vector3D.AxisZ, midSeamLineLeftSP);
+            tm_rightLinkLine.Rotate(-Utility.DegToRad(halfAngle), Vector3D.AxisZ, midSeamLineRightSP);
+
+
+
+            //for Arc
+            Point3D arcCenterPoint = GetSumPoint(topLine.StartPoint, bar_length / 2, arc_width);
+
+            Point3D[] leftIntersectionPoint = topLine.IntersectWith(tm_leftLinkLine);
+            Point3D[] rightIntersectionPoint = topLine.IntersectWith(tm_rightLinkLine);
+
+            // Draw : Arc(For Seam)
+            Arc arcTop = new Arc(leftIntersectionPoint[0], arcCenterPoint, rightIntersectionPoint[0], false);
+
+            // Draw : Diagonal Line
+            Line tmLeftLinkedLine = new Line(leftIntersectionPoint[0], midSeamLineLeftSP);
+            Line tmRightLinkedLine = new Line(rightIntersectionPoint[0], midSeamLineRightSP);
+
+            // Draw : TopLine(Left/RIght)
+            Line t_Line_left = new Line(t_startPoint, leftIntersectionPoint[0]);
+            Line t_Line_right = new Line(rightIntersectionPoint[0], topLine.EndPoint);
+
+
+            // Draw List : AddRange
+            outlinesList.AddRange(new Entity[] {
+        t_Line_left, t_Line_right,arcTop,
+        midLine, bottomLeft, bottomLine, bottomRight, diagonalLine,
+        tmLeftLinkedLine, tmRightLinkedLine
+
+
+    }); ;
+
+
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+            drawList.outlineList.AddRange(outlinesList);
+
+
+
+            // Center Point
+            Point3D modelCenterPoint = GetSumPoint(arcTop.MidPoint, 0, 0);
+            SetModelCenterPoint(PAPERSUB_TYPE.BackingStripWeldingDetail, modelCenterPoint);
+
+
+
+            return drawList;
+
+
+
+            /*
+            Dimension
+
+            // 60 deg
+            arcTop  
+            //Seam bottom(4)
+            midSeamLineLeftSP;
+            midSeamLineRightSP
+
+            // Break Line (Left)
+            topLine.StartPoint;
+            midLine.StartPoint
+
+            // Break Line (Right, 10)
+            topLine.EndPoint;
+            midLine.EndPoint
+
+            // DiagonalLine (6 50 - 200)
+            diagonalLine.MidPoint
+
+            // Bottom Line(50)
+            bottomLine
+
+            // Backing strip width (6)
+            midLine.EndPoint;
+            bottomLine.EndPoint
+
+
+            /**/
+
+        }
+
+        public DrawEntityModel DrawRoofCompressionRing_WeldingDetail(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
+        {
+            // Roof Compression RIng Welding Detail
+            // Section E - E
+
+            DrawEntityModel drawList = new DrawEntityModel();
+
+
+            List<Entity> outlinesList = new List<Entity>();
+
+            Point3D referencePoint = GetSumPoint(new Point3D(refPoint.X, refPoint.Y), 0, 0);
+
+            // Infomation
+            double distanceBottom = 3.2;  // 아래 떨어진 간격
+            double bottomOneLength = 19.2;
+            double totalLength = 40;
+            double heightSize = 8;
+            double distanceHeight = 1;  // 도면상에는 1.6
+            double distanceTopArc = 1.5; // Arc 의 높이 (임의 값)
+            double TopAngle = 60;
+            double halfAngle = TopAngle / 2;
+
+
+            // Draw : Bottom Lines
+            Line bottomLeftLine = new Line(referencePoint, GetSumPoint(referencePoint, bottomOneLength, 0));
+            // hidden? or show : bottomDistanceLine
+            Line bottomDistanceLine = new Line(GetSumPoint(bottomLeftLine.EndPoint, 0, 0), GetSumPoint(bottomLeftLine.EndPoint, distanceBottom / 2, 0));
+            Line bottomRightLine = new Line(GetSumPoint(bottomDistanceLine.EndPoint, 0, 0), GetSumPoint(bottomDistanceLine.EndPoint, bottomOneLength, 0));
+
+            // Draw : Up Lines - two Line
+            Line bottomUpLineLeft = new Line(GetSumPoint(bottomDistanceLine.StartPoint, 0, 0), GetSumPoint(bottomDistanceLine.StartPoint, 0, distanceHeight));
+            Line bottomUpLineRight = new Line(GetSumPoint(bottomDistanceLine.EndPoint, 0, 0), GetSumPoint(bottomDistanceLine.EndPoint, 0, distanceHeight));
+
+
+            // Guide Line : ArcMidPoint / Top,Left,Right Line
+            Point3D arcMidPoint = GetSumPoint(bottomDistanceLine.MidPoint, 0, heightSize + distanceTopArc);
+            Line guideTopLine = new Line(GetSumPoint(bottomLeftLine.StartPoint, 0, heightSize), GetSumPoint(bottomLeftLine.StartPoint, totalLength, heightSize));
+            Line guideLineLeft = new Line(GetSumPoint(bottomUpLineLeft.EndPoint, 0, 0), GetSumPoint(bottomUpLineLeft.EndPoint, 0, totalLength));
+            Line guideLineRight = new Line(GetSumPoint(bottomUpLineRight.EndPoint, 0, 0), GetSumPoint(bottomUpLineRight.EndPoint, 0, totalLength));
+
+            guideLineLeft.Rotate(Utility.DegToRad(halfAngle), Vector3D.AxisZ, bottomUpLineLeft.EndPoint);
+            guideLineRight.Rotate(Utility.DegToRad(-halfAngle), Vector3D.AxisZ, bottomUpLineRight.EndPoint);
+
+            // Intersect : guideLine with (Circle in / out)
+            Point3D[] intersectLeftTop = guideLineLeft.IntersectWith(guideTopLine);
+            Point3D[] intersectRightTop = guideLineRight.IntersectWith(guideTopLine);
+
+            // Draw : Diagonal Line
+            Line leftDiagonalLine = new Line(GetSumPoint(bottomUpLineLeft.EndPoint, 0, 0), GetSumPoint(intersectLeftTop[0], 0, 0));
+            Line rightDiagonalLine = new Line(GetSumPoint(bottomUpLineRight.EndPoint, 0, 0), GetSumPoint(intersectRightTop[0], 0, 0));
+
+
+            Arc arcTop = new Arc(intersectLeftTop[0], arcMidPoint, intersectRightTop[0], false);
+            Line leftTopLine = new Line(GetSumPoint(guideTopLine.StartPoint, 0, 0), GetSumPoint(intersectLeftTop[0], 0, 0));
+            Line rightTopLine = new Line(GetSumPoint(intersectRightTop[0], 0, 0), GetSumPoint(guideTopLine.EndPoint, 0, 0));
+
+            outlinesList.AddRange(new Entity[] {
+                bottomLeftLine, bottomRightLine,
+                bottomUpLineLeft, bottomUpLineRight,
+                arcTop,
+                leftTopLine, rightTopLine,
+                leftDiagonalLine, rightDiagonalLine,
+
+                bottomDistanceLine // (Option : hidden? or show )
+    });
+
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+            drawList.outlineList.AddRange(outlinesList);
+
+
+
+            // Center Point
+            Point3D modelCenterPoint = GetSumPoint(arcTop.MidPoint, 0, 0);
+            SetModelCenterPoint(PAPERSUB_TYPE.RoofCompressionWeldingDetail, modelCenterPoint);
+
+            return drawList;
+
+
+
+            /*
+                *  Dimension
+                * 
+                * arcTop.MidPoint
+                * leftTopLine.StartPoint , bottomLeftLine.StartPoint  //  t@
+                * rightTopLine.EndPoint , bottomRightLine.EndPoint,   //  OutSide, Inside
+                * bottomUpLineRight.StartPoint , bottomUpLineRight.EndPoint   // 1.6
+                * bottomDistanceLine  // 3.2
+                * 
+                */
+        }
+
+
+
+
+
+        // Annular
+        private DrawEntityModel DrawAnnularPlate_CuttingPlan(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
+        {
+            // Annular Plate Cutting Plan
+
+            DrawEntityModel drawList = new DrawEntityModel();
+
+            List<Entity> outlinesList = new List<Entity>();
+            Point3D referencePoint = GetSumPoint(new Point3D(refPoint.X, refPoint.Y), 0, 0);
+
+            ///////////////////////
+            ///  CAD Data Setting
+            ///////////////////////
+            double plateWidth = 2290;
+            double plateLength = 9900;
+
+            double bendingPlateThk = 1750;
+            double distanceEachbendingPlate = 15;
+
+
+            // INFO : after data
+            double radiusInner = 20336.5;
+            double radiusOuter = 22086.5;
+
+            // INFO : After calculate of data
+            double totalPlate = 0;
+            double totalBendingPlate = 0;
+            // double bendingPlateLength = 0;
+            double maxBendPlateOfOnePlate = 0;
+            double averageBendPlateOfOnePlate = 0;
+
+
+            //////////////////////////////////////////////////////////
+            //// Calculate
+            //////////////////////////////////////////////////////////
+
+            totalBendingPlate = GetNeedAnnularCompRingCount(radiusOuter, plateLength, bendingPlateThk);
+
+            double eachPlateDegree = 360 / totalBendingPlate;
+            double eachPlateHalfDeg = eachPlateDegree / 2;
+
+            // testArc : Bending Plate
+            Arc testArc = new Arc(referencePoint, radiusOuter, Utility.DegToRad(90 + eachPlateHalfDeg), Utility.DegToRad(90 - eachPlateHalfDeg));
+            double arcHeight = testArc.MidPoint.Y - testArc.StartPoint.Y;
+            double firstBendPlateHeight = arcHeight + bendingPlateThk;
+            double arcChordLength = testArc.EndPoint.X - testArc.StartPoint.X;
+
+            // Calculate : MaxCreate bendingPlate of OnePlate ,  total Plate No.
+            double emptyWidth = plateWidth - firstBendPlateHeight - distanceEachbendingPlate;
+            double spaceYEachBendPlate = bendingPlateThk + distanceEachbendingPlate;
+            maxBendPlateOfOnePlate = Math.Truncate(emptyWidth / spaceYEachBendPlate) + 1; // +1 : first BendingPlate
+
+            // totalPlate  : CompRIng을 만들기 위해 필요한 Plate 수량
+            totalPlate = Math.Ceiling(totalBendingPlate / maxBendPlateOfOnePlate);
+            averageBendPlateOfOnePlate = Math.Ceiling(totalBendingPlate / totalPlate);
+            if (averageBendPlateOfOnePlate > maxBendPlateOfOnePlate) { averageBendPlateOfOnePlate = maxBendPlateOfOnePlate; }
+
+            /////////////////////////////////////////////////////////////////////////////////////////
+
+            // Reset Arc CenterPoint : + arcHeight
+            double firstArcStartPointY = plateWidth - distanceEachbendingPlate - radiusOuter;
+            Point3D arcCenterPoint = GetSumPoint(referencePoint, plateLength / 2, firstArcStartPointY);
+
+
+            //////////////////////////////////////////////////////////
+            // Draw BendingPlate
+            //////////////////////////////////////////////////////////
+
+            for (int i = 0; i < averageBendPlateOfOnePlate; i++)
+            {
+                Arc outerBendingPlate = new Arc(arcCenterPoint, radiusOuter, Utility.DegToRad(90 + eachPlateHalfDeg), Utility.DegToRad(90 - eachPlateHalfDeg));
+                Arc innerBendingPlate = new Arc(arcCenterPoint, radiusInner, Utility.DegToRad(90 + eachPlateHalfDeg), Utility.DegToRad(90 - eachPlateHalfDeg));
+
+                Line sideLeftLine = GetDiagonalLineOfArc(radiusOuter, arcCenterPoint, eachPlateHalfDeg, innerBendingPlate, outerBendingPlate);
+                Line sideRightLine = GetDiagonalLineOfArc(radiusOuter, arcCenterPoint, -eachPlateHalfDeg, innerBendingPlate, outerBendingPlate);
+
+                outlinesList.AddRange(new Entity[] {
+                                            innerBendingPlate, outerBendingPlate,
+                                            sideLeftLine, sideRightLine,
+                });
+
+                arcCenterPoint.Y -= spaceYEachBendPlate;
+            }
+
+            // Draw : Plate
+            Point3D plateStartPoint = GetSumPoint(referencePoint, 0, 0);
+            outlinesList.AddRange(GetRectangle(plateStartPoint, plateWidth, plateLength));
+
+
+
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+            drawList.outlineList.AddRange(outlinesList);
+
+            return drawList;
+
+
+
+            /*
+             *  Dimension
+             * 
+             * arcTop.MidPoint
+             * leftTopLine.StartPoint , bottomLeftLine.StartPoint  //  t@
+             * rightTopLine.EndPoint , bottomRightLine.EndPoint,   //  OutSide, Inside
+             * bottomUpLineRight.StartPoint , bottomUpLineRight.EndPoint   // 1.6
+             * bottomDistanceLine  // 3.2
+             * 
+             */
+        }
+
+        public double GetNeedAnnularCompRingCount(double radiusouter, double plateLength, double bendingPlateThk)
+        {
+            Point3D referencePoint = new Point3D(0, 0);
+            double totalBendingPlate = 0;
+
+            // Calculate : bendingPlate Length
+            //double minBendPlateCount = Math.Ceiling((2 * radiusouter * Math.PI) / plateLength);
+            double minBendPlateCount = Math.Floor((2 * radiusouter * Math.PI) / plateLength);
+
+            /* // 짝수 무시중..  짝수적용시 사용
+            if (0 != minBendPlateCount % 2) { totalBendingPlate = minBendPlateCount + 1; }  // Plate 장수를 짝수로 맞춤
+            /**/
+            totalBendingPlate = minBendPlateCount;
+
+            double eachPlateDegree = 360 / totalBendingPlate;
+            double eachPlateHalfDeg = eachPlateDegree / 2;
+
+            // testArc : Bending Plate
+            //double arcCenterPointX = pBottomLine.MidPoint.X;
+            //Point3D arcCenterPoint = GetSumPoint(referencePoint, arcCenterPointX, -radiusInner);
+            Arc testArc = new Arc(referencePoint, radiusouter, Utility.DegToRad(90 + eachPlateHalfDeg), Utility.DegToRad(90 - eachPlateHalfDeg));
+            double arcHeight = testArc.MidPoint.Y - testArc.StartPoint.Y;
+            double firstBendPlateHeight = arcHeight + bendingPlateThk;
+            double arcChordLength = testArc.EndPoint.X - testArc.StartPoint.X;
+            // double testArcLength = testArc.Length();
+
+            // plate 길이보다 Bending Plate의 CHD가 길면 BendingPlate 갯수 추가(각도 재계산:각도 작아짐)
+            if (arcChordLength > plateLength)
+            {
+                minBendPlateCount += 1;
+                /* // 짝수 무시중..  짝수적용시 사용
+                if (0 != minBendPlateCount % 2) { totalBendingPlate = minBendPlateCount + 1; }  // Plate 장수를 짝수로 맞춤
+                /**/
+                totalBendingPlate = minBendPlateCount;
+            }
+
+            return totalBendingPlate;
+
+        }
+
+
+        // compression Ring
+
+
+
+
 
 
 
@@ -8725,9 +9213,14 @@ namespace DrawWork.DrawDetailServices
             return new Line(pointA, pointB);
         }
 
-        private Point3D GetSumPoint(Point3D selPoint1, double X, double Y, double Z = 0)
+        private Point3D GetSumPoint(Point3D selPoint1, double X=0, double Y=0, double Z = 0)
         {
             return new Point3D(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
+        }
+
+        private Point3D CopyPoint(Point3D selPoint)
+        {
+            return new Point3D(selPoint.X, selPoint.Y, selPoint.Z);
         }
     }
 

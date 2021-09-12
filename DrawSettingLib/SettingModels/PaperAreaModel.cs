@@ -81,6 +81,8 @@ namespace DrawSettingLib.SettingModels
 			newModel.IsRepeat = IsRepeat;
 			newModel.GroupName = GroupName;
 
+			newModel.Priority = Priority;
+
 			newModel.TitleName = TitleName;
 			newModel.TitleSubName = TitleSubName;
 

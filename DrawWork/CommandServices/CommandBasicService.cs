@@ -388,6 +388,8 @@ namespace DrawWork.CommandServices
                             selPaperAreaModel.ModelCenterLocation.Y = refPoint.Y;
 
                             break;
+
+                        
                     }
                     break;
             }

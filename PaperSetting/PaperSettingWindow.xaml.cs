@@ -140,7 +140,7 @@ namespace PaperSetting
 
 
             if(workbookName=="")
-                workbookName = @"C:\Users\tree\Desktop\CAD\TABAS\20210831 제출\TABAS_20210827-CRT.xlsm";
+                workbookName = @"C:\Users\tree\Desktop\CAD\TABAS\20210903 점검\TABAS_TK-19104.xlsm";
 
 
 
@@ -382,9 +382,8 @@ namespace PaperSetting
 
             bool visibleValue = false;
 
-            // SingletonData Reset
-            SingletonData.LeaderPublicList.Clear();
-            SingletonData.DimPublicList.Clear();
+            // Singleton Data : Reset
+            SingletonData.Clear();
 
             // Assembly
             AssemblyDataService assemblyService = new AssemblyDataService();
@@ -402,7 +401,8 @@ namespace PaperSetting
             double bottomRoofOD = roofBottomService.GetBottomRoofOD();
             string annularStr = newTankData.BottomInput[0].AnnularPlate;
             string topAngelType = newTankData.RoofCompressionRing[0].CompressionRingType;
-            SingletonData.PaperArea.AreaList = paperAreaService.GetPaperAreaData(bottomRoofOD, annularStr, topAngelType);
+            string tankType = newTankData.GeneralDesignData[0].RoofType;
+            SingletonData.PaperArea.AreaList = paperAreaService.GetPaperAreaData(tankType,bottomRoofOD, annularStr, topAngelType);
             // Virtual Design
             DrawDetailVisibleService detailService = new DrawDetailVisibleService(newTankData,testModel);
             detailService.SetDetailVisible(SingletonData.PaperArea.AreaList);
@@ -410,6 +410,8 @@ namespace PaperSetting
             // BM List
             DrawBMService bmService = new DrawBMService(newTankData);
             SingletonData.BMList = bmService.CreateBMModel();
+
+
 
 
             if (visibleValue)
@@ -670,6 +672,8 @@ namespace PaperSetting
             {
                 PaperSettingService newSetting = new PaperSettingService();
 
+
+                // Cutting Plan
                 newSetting.SetCuttingModel();
 
                 // Paper List & Paper Grid List  재 

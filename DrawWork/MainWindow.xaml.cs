@@ -404,9 +404,8 @@ namespace DrawWork
             DWGFileService dwgService = new DWGFileService();
             string dwgFilePath= dwgService.FileFilecopy();
 
-            // SingletonData Reset
-            SingletonData.LeaderPublicList.Clear();
-            SingletonData.DimPublicList.Clear();
+            // Singleton Data : Reset
+            SingletonData.Clear();
 
             // Assembly
             AssemblyDataService assemblyService = new AssemblyDataService();
@@ -466,7 +465,8 @@ namespace DrawWork
             double bottomRoofOD = roofBottomService.GetBottomRoofOD();
             string annularStr = newTankData.BottomInput[0].AnnularPlate;
             string topAngelType = newTankData.RoofCompressionRing[0].CompressionRingType;
-            SingletonData.PaperArea.AreaList = paperAreaService.GetPaperAreaData(bottomRoofOD, annularStr, topAngelType);
+            string tankType = newTankData.GeneralDesignData[0].RoofType;
+            SingletonData.PaperArea.AreaList = paperAreaService.GetPaperAreaData(tankType,bottomRoofOD, annularStr, topAngelType);
             // Virtual Design
             DrawDetailVisibleService detailService = new DrawDetailVisibleService(newTankData, testModel);
             detailService.SetDetailVisibleALL(SingletonData.PaperArea.AreaList);

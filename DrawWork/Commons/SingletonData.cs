@@ -141,18 +141,62 @@ namespace DrawWork.Commons
         }
         private static List<DrawPlateModel> _RoofPlateInfo = new List<DrawPlateModel>();
 
+        // 사용 안함
         public static List<DrawCuttingAreaModel> BottomCuttingList
         {
             get { return _BottomCuttingList; }
             set { _BottomCuttingList = value; }
         }
         private static List<DrawCuttingAreaModel> _BottomCuttingList = new List<DrawCuttingAreaModel>();
+
+        // 사용 안함
         public static List<DrawCuttingAreaModel> RoofCuttingList
         {
             get { return _RoofCuttingList; }
             set { _RoofCuttingList = value; }
         }
         private static List<DrawCuttingAreaModel> _RoofCuttingList = new List<DrawCuttingAreaModel>();
+
+
+        public static List<DrawOnePlateModel> BottomPlateList
+        {
+            get { return _BottomPlateList; }
+            set { _BottomPlateList = value; }
+        }
+        private static List<DrawOnePlateModel> _BottomPlateList = new List<DrawOnePlateModel>();
+
+        public static List<DrawOnePlateModel> RoofPlateList
+        {
+            get { return _RoofPlateList; }
+            set { _RoofPlateList = value; }
+        }
+        private static List<DrawOnePlateModel> _RoofPlateList = new List<DrawOnePlateModel>();
+
+
+
+        // Method
+        public static void Clear()
+        {
+            LeaderPublicList.Clear();
+            DimPublicList.Clear();
+
+
+            BMList.Clear();
+
+
+            BottomPlateInfo.Clear();
+            RoofPlateInfo.Clear();
+            BottomPlateList.Clear();
+            RoofPlateList.Clear();
+
+
+            // 사용 안함
+            BottomCuttingList.Clear();
+            RoofCuttingList.Clear();
+
+
+        }
+
 
     }
 }

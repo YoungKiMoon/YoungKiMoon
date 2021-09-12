@@ -12,6 +12,8 @@ namespace DrawWork.DrawModels
     {
         
         public Point3D InsertPoint { get; set; }
+
+        public Point3D CenterPoint { get; set; }
         public double PlateWidth { get; set; }
         public double PlateLength { get; set; }
         public double RemainingLength { get; set; }
@@ -27,6 +29,8 @@ namespace DrawWork.DrawModels
         public DrawOnePlateModel()
         {
             InsertPoint = null;
+            CenterPoint = null;
+
             PlateWidth = 0;
             PlateLength = 0;
             RemainingLength = 0;

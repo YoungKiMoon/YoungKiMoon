@@ -3054,7 +3054,7 @@ namespace DrawWork.DrawServices
                     returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateWeldingDetailBB(ref refPoint, ref curPoint, selModel, scaleValue, selPaperAreaModel));
                     goto case "allways";
                 case "backingstripweldingdetail":
-                    //returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateJoint_Detail_D_Case5(ref refPoint, ref curPoint, selModel, scaleValue));
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawBackingStrip_Welding_Detail(ref refPoint, ref curPoint, selModel, scaleValue));
                     goto case "allways";
                 case "bottomplateshelljointdetail":
                     // 2.5D
@@ -3063,8 +3063,6 @@ namespace DrawWork.DrawServices
 
 
                 case "bottomplatecuttingplan":
-                    // 저녁에 장차장님
-                    //returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomCuttingPlan(ref refPoint, ref curPoint, selModel, scaleValue));
                     returnEntity.AddDrawEntity(detailService.detailCuttingPlanService.DrawBottomCuttingPlan(ref refPoint, ref curPoint, selModel, scaleValue));
                     goto case "allways";
 
@@ -3073,7 +3071,7 @@ namespace DrawWork.DrawServices
                     goto case "allways";
 
                 case "backingstrip":
-                    //returnEntity.AddDrawEntity(detailService.detailTempService.ArrangeShellPlate(ref refPoint, ref curPoint, selModel, scaleValue));
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawBackingStrip(ref refPoint, ref curPoint, selModel, scaleValue, selPaperAreaModel));
                     goto case "allways";
 
 
@@ -3102,13 +3100,9 @@ namespace DrawWork.DrawServices
                     returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateWeldingDetailBB(ref refPoint, ref curPoint, selModel, scaleValue, selPaperAreaModel));
                     goto case "allways";
                 case "roofcompressionweldingdetail":
-                    // 보류 
-                    //returnEntity.AddDrawEntity(detailService.detailTempService.DrawBottomPlateWeldingDetailBB(ref refPoint, ref curPoint, selModel, scaleValue));
+                    returnEntity.AddDrawEntity(detailService.detailTempService.DrawRoofCompressionRing_WeldingDetail(ref refPoint, ref curPoint, selModel, scaleValue));
                     goto case "allways";
                 case "roofplatecuttingplan":
-                    // 장차장님
-                    // 보류
-                    //returnEntity.AddDrawEntity(detailService.detailTempService.DrawRoofCuttingPlan(ref refPoint, ref curPoint, selModel, scaleValue));
                     returnEntity.AddDrawEntity(detailService.detailCuttingPlanService.DrawRoofCuttingPlan(ref refPoint, ref curPoint, selModel, scaleValue));
                     goto case "allways";
                 case "roofcompressionringcuttingplan":

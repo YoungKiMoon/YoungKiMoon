@@ -126,6 +126,36 @@ namespace DrawWork.DrawDetailServices
                                 eachArea.visible = true;
                             break;
 
+
+                        // Roof
+                        case PAPERSUB_TYPE.RoofCompressionWeldingDetail:
+                            if (compressionRingType.Contains("Detail i"))
+                                eachArea.visible = true;
+                            break;
+
+
+
+                        // Bottom
+                        case PAPERSUB_TYPE.BackingStripWeldingDetail:
+                            if (annularType.Contains("Yes"))
+                                eachArea.visible = true;
+                            break;
+                        case PAPERSUB_TYPE.BackingStrip:
+                            if (annularType.Contains("Yes"))
+                                eachArea.visible = true;
+                            break;
+
+                        case PAPERSUB_TYPE.BottomPlateJointAnnularDetail:
+                            if (annularType.Contains("Yes"))
+                                eachArea.visible = true;
+                            break;
+                        case PAPERSUB_TYPE.BottomPlateJointDetail:
+                            if (annularType.Contains("No"))
+                                eachArea.visible = true;
+                            break;
+
+
+
                     }
                 }
 
@@ -142,12 +172,12 @@ namespace DrawWork.DrawDetailServices
                         case PAPERSUB_TYPE.BottomPlateWeldingDetailD:
                         case PAPERSUB_TYPE.BottomPlateWeldingDetailBB:
 
-                        //case PAPERSUB_TYPE.BackingStripWeldingDetail:             // 형상 안그림
+
                         //case PAPERSUB_TYPE.BottomPlateShellJointDetail:           // 2.5D
 
                         case PAPERSUB_TYPE.BottomPlateCuttingPlan:                 
                         //case PAPERSUB_TYPE.AnnularPlateCuttingPlan:               // 형상 안그림
-                        //case PAPERSUB_TYPE.BackingStrip:                          // 형상 안그림
+                        
 
                         case PAPERSUB_TYPE.RoofPlateArrangement:
                         case PAPERSUB_TYPE.RoofPlateWeldingDetailD:
@@ -160,19 +190,9 @@ namespace DrawWork.DrawDetailServices
 
                             eachArea.visible = true;
                             break;
-                        case PAPERSUB_TYPE.BottomPlateJointAnnularDetail:
-                            if (annularType.Contains("Yes"))
-                                eachArea.visible = true;
-                            break;
-                        case PAPERSUB_TYPE.BottomPlateJointDetail:
-                            if (annularType.Contains("No"))
-                                eachArea.visible =true;
-                            break;
 
-                        case PAPERSUB_TYPE.RoofCompressionWeldingDetail:
-                            if (compressionRingType.Contains("Detail k"))
-                                eachArea.visible = false;//  <======================미작업
-                            break;
+
+
                     }
                 }
             }
@@ -188,25 +208,18 @@ namespace DrawWork.DrawDetailServices
                         case PAPERSUB_TYPE.BottomPlateWeldingDetailD:
                         case PAPERSUB_TYPE.BottomPlateWeldingDetailBB:
 
-                        //case PAPERSUB_TYPE.BackingStripWeldingDetail:             // 형상 안그림
                         //case PAPERSUB_TYPE.BottomPlateShellJointDetail:           // 2.5D
 
                         case PAPERSUB_TYPE.BottomPlateCuttingPlan:
                             //case PAPERSUB_TYPE.AnnularPlateCuttingPlan:               // 형상 안그림
-                            //case PAPERSUB_TYPE.BackingStrip:      
-                            eachArea.visible = true;
+                        
 
 
                             break;
 
-                        case PAPERSUB_TYPE.BottomPlateJointAnnularDetail:
-                            if (annularType.Contains("Yes"))
-                                eachArea.visible = true;
-                            break;
-                        case PAPERSUB_TYPE.BottomPlateJointDetail:
-                            if (annularType.Contains("No"))
-                                eachArea.visible = true;
-                            break;
+
+
+
                     }
                 }
             }
