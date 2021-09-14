@@ -432,5 +432,116 @@ namespace EPDataLib.ExcelServices
             return returnValue;
         }
 
+        public bool CreateBM(string selFilePath, List<List<string>> selList)
+        {
+            bool returnValue = true;
+            try
+            {
+                using (ExcelPackage package = new ExcelPackage())
+                {
+                    string bmSheetName = "BMList";
+                    package.Workbook.Worksheets.Add(bmSheetName);                    
+                    // Target a worksheet
+                    var worksheet = package.Workbook.Worksheets[bmSheetName];
+
+                    worksheet.Cells[1, 1].Value = "Bill Of Material For Purchase";
+                    worksheet.Cells[1, 1].Style.Font.Bold = true;
+                    worksheet.Cells[1, 1].Style.Font.Size = 20;
+                    worksheet.Cells[1, 1, 1, 15].Merge = true;
+
+                    worksheet.Cells[3, 1].Value = "POR No";
+                    worksheet.Cells[3, 1, 4, 1].Merge = true;
+                    worksheet.Cells[3, 2].Value = "Tank No.";
+                    worksheet.Cells[3, 2, 4, 2].Merge = true;
+                    worksheet.Cells[3, 3].Value = "Tank Name";
+                    worksheet.Cells[3, 3, 4, 3].Merge = true;
+                    worksheet.Cells[3, 4].Value = "Description";
+                    worksheet.Cells[3, 4, 4, 4].Merge = true;
+                    worksheet.Cells[3, 5].Value = "Material";
+                    worksheet.Cells[3, 5, 4, 5].Merge = true;
+
+                    worksheet.Cells[3, 6].Value = "Dimension";
+                    worksheet.Cells[3, 6, 3, 10].Merge=true;
+                    worksheet.Cells[4, 6].Value = "Th'k\r\n(mm)";
+                    worksheet.Cells[4, 7].Value = "Width\r\n(mm)";
+                    worksheet.Cells[4, 8].Value = "Length\r\n(mm)";
+                    worksheet.Cells[4, 9].Value = "Q'ty\r\n(sheets)";
+
+                    worksheet.Cells[3, 10].Value = "Unit";
+                    worksheet.Cells[4, 10].Value = "Weight\r\n(kg)";
+
+                    worksheet.Cells[3, 11].Value = "Tank";
+                    worksheet.Cells[4, 11].Value = "Qty";
+
+                    worksheet.Cells[3, 12].Value = "Margin";
+                    worksheet.Cells[4, 12].Value = "";
+
+                    worksheet.Cells[3, 13].Value = "Total";
+                    worksheet.Cells[4, 13].Value = "Plate Q'ty\r\n(sheets)";
+                    worksheet.Cells[3, 13, 3, 14].Merge = true;
+
+                    worksheet.Cells[3, 14].Value = "Margin";
+                    worksheet.Cells[4, 14].Value = "Weight\r\n(kg)";
+
+                    worksheet.Cells[3, 15].Value = "Remarks";
+                    worksheet.Cells[3, 15, 4, 15].Merge = true;
+
+
+
+
+                    worksheet.Cells["A3:O" + 4].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    worksheet.Cells["A3:O" + 4].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                    worksheet.Cells["A3:O" + 4].Style.WrapText = true;
+
+                    int rowIndex = 4;
+                    foreach(List<string> eachRow in selList)
+                    {
+                        rowIndex++;
+                        int columnIndex = 0;
+                        foreach(string eachValue in eachRow)
+                        {
+                            columnIndex++;
+                            worksheet.Cells[rowIndex, columnIndex].Value = eachValue;
+                        }
+                    }
+
+                    // Sub total
+                    int rowCount = 4;
+                    rowCount += selList.Count;
+                    rowCount ++;
+
+                    // Style
+                    worksheet.Cells["A3:O" + rowCount].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    worksheet.Cells["A3:O" + rowCount].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    worksheet.Cells["A3:O" + rowCount].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    worksheet.Cells["A3:O" + rowCount].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    worksheet.Cells["A3:O" + rowCount].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+
+                    worksheet.Cells[rowCount, 1].Value = "SUB TOTAL";
+                    worksheet.Cells[rowCount, 1, rowCount, 5].Merge = true;
+
+                    worksheet.Cells["M5:O" + (rowCount - 1)].Style.Numberformat.Format = "#";
+                    worksheet.Cells["N5:O" + (rowCount - 1)].Style.Numberformat.Format = "#";
+                    worksheet.Cells[rowCount, 13].Formula = "=SUM(" + worksheet.Cells[5, 13].Address + ":" + worksheet.Cells[rowCount-1, 13].Address + ")";
+                    worksheet.Cells[rowCount, 14].Formula = "=SUM(" + worksheet.Cells[5, 14].Address + ":" + worksheet.Cells[rowCount - 1, 14].Address + ")";
+
+                    worksheet.Cells.AutoFitColumns();
+
+                    FileInfo excelFile = new FileInfo(@selFilePath);
+                    package.SaveAs(excelFile);
+                    package.Dispose();
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                returnValue = false;
+            }
+
+
+            return returnValue;
+        }
+
     }
 }

@@ -497,7 +497,19 @@ namespace DrawWork.DrawDetailServices
 
 
 
+        public List<DrawPlateModel> GetPlateModel_New(PlateArrange_Type arrangeType, List<Entity> selEntities, double plateWidth, double selRadius, Point3D selCenterPoint)
+        {
+            List<DrawPlateModel> plateList = new List<DrawPlateModel>();
 
+            Dictionary<double, double> xDic = new Dictionary<double, double>();
+            Dictionary<double, double> yDic = new Dictionary<double, double>();
+            foreach (ICurve eachLine in selEntities)
+            {
+                if()
+            }
+
+            return plateList;
+        }
 
 
 
@@ -512,60 +524,57 @@ namespace DrawWork.DrawDetailServices
 
             string plateNamePre = "";
             if (arrangeType == PlateArrange_Type.Bottom)
-            {
                 plateNamePre = "B"; 
-            }
             else if (arrangeType == PlateArrange_Type.Roof)
-            {
                 plateNamePre = "R";
-            }
 
             double centerY = selCenterPoint.Y;
             double centerX = selCenterPoint.X;
 
-            Dictionary<double, List<double>> HDic = new Dictionary<double, List<double>>();
-            List<ICurve> VEntities = new List<ICurve>();
-            List<ICurve> HEntities = new List<ICurve>();
+            Dictionary<double, List<double>> HLineDic = new Dictionary<double, List<double>>();
+            List<ICurve> VLineEntities = new List<ICurve>();
+            List<ICurve> HLineEntities = new List<ICurve>();
+
             foreach (ICurve eachEntity in selEntities)
             {
                 if (eachEntity.StartPoint.Y == eachEntity.EndPoint.Y)
                 {
-                    HEntities.Add(eachEntity);
-                    if (!HDic.ContainsKey(eachEntity.StartPoint.Y))
+                    HLineEntities.Add(eachEntity);
+                    if (!HLineDic.ContainsKey(eachEntity.StartPoint.Y))
                     {
                         List<double> tempList = new List<double>();
                         tempList.Add(eachEntity.StartPoint.X);
                         tempList.Add(eachEntity.EndPoint.X);
                         tempList.Sort();
-                        HDic.Add(eachEntity.StartPoint.Y, tempList);
+                        HLineDic.Add(eachEntity.StartPoint.Y, tempList);
                     }
                     else
                     {
-                        List<double> tempList = HDic[eachEntity.StartPoint.Y];
+                        List<double> tempList = HLineDic[eachEntity.StartPoint.Y];
                         tempList.Add(eachEntity.StartPoint.X);
                         tempList.Add(eachEntity.EndPoint.X);
                         tempList.Sort();
-                        HDic[eachEntity.StartPoint.Y] = tempList;
+                        HLineDic[eachEntity.StartPoint.Y] = tempList;
                     }
                 }
                 else
                 {
-                    VEntities.Add(eachEntity);
+                    VLineEntities.Add(eachEntity);
                 }
             }
 
 
 
             // 내림 차순 정렬 => 중앙 정렬 : 위가 우선
-            List<double> HList = HDic.Keys.ToList();
-            List<double> HSortList=HList.OrderByDescending(x=>x).ToList();
-            List<double> HSortAscList = HList.OrderBy(x => x).ToList();
-            double hMidCount = HSortList.Count / 2;
+            List<double> HLineYList = HLineDic.Keys.ToList();
+            List<double> HLineYSortDesList = HLineYList.OrderByDescending(x => x).ToList();
+            List<double> HLineYSortAscList = HLineYList.OrderBy(x => x).ToList();
+            double hMidCount = HLineYSortDesList.Count / 2;
             int hMidIndex = int.Parse( Math.Truncate(hMidCount).ToString());
-            double hMidValue = HSortList[hMidIndex];
+            double hMidValue = HLineYSortDesList[hMidIndex];
 
-            List<double> HRealList = new List<double>();
-            HRealList.Add(HSortList[hMidIndex]);
+            List<double> HLineYAlignList = new List<double>();
+            HLineYAlignList.Add(HLineYSortDesList[hMidIndex]);
             int runPlusCount=hMidIndex;
             int runMinusCount = hMidIndex;
             while (runMinusCount >= 0)
@@ -573,9 +582,9 @@ namespace DrawWork.DrawDetailServices
                 runMinusCount--;
                 runPlusCount++;
                 if (runMinusCount > 0)
-                    HRealList.Add(HSortList[runMinusCount]);
-                if(runPlusCount<HSortList.Count)
-                    HRealList.Add(HSortList[runPlusCount]);
+                    HLineYAlignList.Add(HLineYSortDesList[runMinusCount]);
+                if(runPlusCount< HLineYSortDesList.Count)
+                    HLineYAlignList.Add(HLineYSortDesList[runPlusCount]);
 
             }
 
@@ -584,66 +593,76 @@ namespace DrawWork.DrawDetailServices
 
             // Horizontal Line
             double vFactor = 1; 
-            List<ICurve> VEntitiesSort = VEntities.OrderBy(x => x.StartPoint.X).ToList();
+            List<ICurve> VEntitiesSort = VLineEntities.OrderBy(x => x.StartPoint.X).ToList();
             
-            foreach (double eachLH in HRealList)
+            foreach (double eachLY in HLineYAlignList)
             {
                 // Lower, Upper Factor
-                double eachUH = eachLH;
-                foreach(double eachUpperTempH in HSortAscList)
+                double eachUY = eachLY;
+                foreach(double eachUpperTempH in HLineYSortAscList)
                 {
-                    if (eachUpperTempH > eachLH)
+                    if (eachUpperTempH > eachLY)
                     {
-                        eachUH = eachUpperTempH;
+                        eachUY = eachUpperTempH;
                         break;
                     }
                 }
-                double eachLowerH = eachLH - vFactor;
-                double eachUpperH = eachUH + vFactor;
+                double eachLowerHLine = eachLY - vFactor;
+                double eachUpperHLine = eachUY + vFactor;
 
                 // One Line
-                List<ICurve> oneLineList = new List<ICurve>();
+                List<ICurve> oneVLineList = new List<ICurve>();
                 foreach (ICurve eachV in VEntitiesSort)
-                    if (eachV.StartPoint.Y >= eachLowerH && eachV.EndPoint.Y >= eachLowerH &&
-                        eachV.StartPoint.Y <= eachUpperH && eachV.EndPoint.Y < eachUpperH)
-                        oneLineList.Add(eachV);
+                    if (eachV.StartPoint.Y >= eachLowerHLine && eachV.EndPoint.Y >= eachLowerHLine &&
+                        eachV.StartPoint.Y <= eachUpperHLine && eachV.EndPoint.Y < eachUpperHLine)
+                        oneVLineList.Add(eachV);
 
                 // Create Plate
                 List<DrawPlateModel> onePlateList = new List<DrawPlateModel>();
-                List<double> lowerXEndPoint = HDic[eachLH];
-                List<double> upperXEndPoint = HDic[eachUH];
-                double lowerBeforeX = lowerXEndPoint[0];
-                double upperBeforeX = upperXEndPoint[0];
-                if (oneLineList.Count > 0)
+                List<double> lowerXEndPoint = HLineDic[eachLY];
+                List<double> upperXEndPoint = HLineDic[eachUY];
+                double lowerBeforeX = lowerXEndPoint.First();
+                double upperBeforeX = upperXEndPoint.First();
+
+
+                // 세로 라인이 있을 경우
+                if (oneVLineList.Count > 0)
                 {
-                    for (int i = 0; i < oneLineList.Count; i++)
+                    double firstVLineIndex = 0;
+                    double lastVLineIndex = oneVLineList.Count;
+                    for (int i = 0; i < oneVLineList.Count; i++)
                     {
-                        Line eachOneV = (Line)oneLineList[i];
-                        double eachOneVLength = eachOneV.Length();
-                        double eachOneVX = eachOneV.StartPoint.X;
+                        Line eachOneVLine = (Line)oneVLineList[i];
+                        double eachOneVLineLength = eachOneVLine.Length();
+                        double eachOneVLineX = eachOneVLine.StartPoint.X;
                         double maxBeforeX = Math.Max(lowerBeforeX, upperBeforeX);
 
+                        double eachLowerLength = eachOneVLineX - lowerBeforeX;
+                        double eachUpperLength = eachOneVLineX - upperBeforeX;
 
                         DrawPlateModel eachOnePlate = new DrawPlateModel();
                         eachOnePlate.Radius = selRadius;
                         eachOnePlate.PlateDirection = PERPENDICULAR_TYPE.Horizontal;
-                        if (i == 0)
+
+                        // 왼쪽
+                        if (i == firstVLineIndex)
                         {
                             // One Line : Left
                             eachOnePlate.ShapeType = Plate_Type.RectangleArc;
-                            if (eachUH - 1 >= centerY)
+                            if (eachUY - 1 >= centerY)
                             {
                                 // Left : Upper
                                 eachOnePlate.ArcDirection = ORIENTATION_TYPE.TOPLEFT;
-                                if (eachOneVX < upperXEndPoint[0])
+                                if (eachOneVLineX < upperXEndPoint[0])
                                 {
                                     eachOnePlate.ShapeType = Plate_Type.Arc;
-                                    eachOnePlate.HLength.Add(eachOneVX - lowerBeforeX);
+                                    eachOnePlate.HLength.Add(eachLowerLength);
                                 }
                                 else
                                 {
-                                    eachOnePlate.HLength.Add(eachOneVX - upperBeforeX);
-                                    eachOnePlate.HLength.Add(eachOneVX - lowerBeforeX);
+                                    eachOnePlate.HLength.Add(eachUpperLength);
+                                    eachOnePlate.HLength.Add(eachLowerLength);
+                                    // Center
                                     if (lowerXEndPoint[0] == upperXEndPoint[0])
                                         eachOnePlate.ArcDirection = ORIENTATION_TYPE.LEFTCENTER;
                                 }
@@ -652,51 +671,32 @@ namespace DrawWork.DrawDetailServices
                             {
                                 // Left : Lower
                                 eachOnePlate.ArcDirection = ORIENTATION_TYPE.BOTTOMLEFT;
-                                if (eachOneVX < lowerXEndPoint[0])
+                                if (eachOneVLineX < lowerXEndPoint[0])
                                 {
                                     eachOnePlate.ShapeType = Plate_Type.Arc;
-                                    eachOnePlate.HLength.Add(eachOneVX - upperBeforeX);
+                                    eachOnePlate.HLength.Add(eachUpperLength);
                                 }
                                 else
                                 {
-                                    eachOnePlate.HLength.Add(eachOneVX - lowerBeforeX);
-                                    eachOnePlate.HLength.Add(eachOneVX - upperBeforeX);
+                                    eachOnePlate.HLength.Add(eachLowerLength);
+                                    eachOnePlate.HLength.Add(eachUpperLength);
                                 }
 
 
                             }
-                            eachOnePlate.VLength.Add(eachOneVLength);
+                            eachOnePlate.VLength.Add(eachOneVLineLength);
 
                             // Plate Add
-                            eachOnePlate.NumberPoint = GetNumberPoint(eachOneV.MidPoint.Y, maxBeforeX, eachOnePlate.HLength);
+                            eachOnePlate.NumberPoint = GetNumberPoint(eachOneVLine.MidPoint.Y, maxBeforeX, eachOnePlate.HLength);
                             onePlateList.Add(eachOnePlate);
 
-                            lowerBeforeX = eachOneVX;
-                            upperBeforeX = eachOneVX;
-                        }
-                        else
-                        {
-                            // One Line : Mid
-                            eachOnePlate.ShapeType = Plate_Type.Rectangle;
-                            eachOnePlate.VLength.Add(eachOneVLength);
-                            eachOnePlate.VLength.Add(eachOneVLength);
-                            eachOnePlate.HLength.Add(eachOneVX - lowerBeforeX);
-                            eachOnePlate.HLength.Add(eachOneVX - upperBeforeX);
-
-                            // Plate Add
-                            eachOnePlate.NumberPoint = GetNumberPoint(eachOneV.MidPoint.Y, maxBeforeX, eachOnePlate.HLength);
-                            onePlateList.Add(eachOnePlate);
-
-                            lowerBeforeX = eachOneVX;
-                            upperBeforeX = eachOneVX;
-
+                            lowerBeforeX = eachOneVLineX;
+                            upperBeforeX = eachOneVLineX;
                         }
 
 
-
-
-
-                        if (i == oneLineList.Count - 1)
+                        // 오른쪽
+                        else if (i == lastVLineIndex)
                         {
                             double minBeforeX = Math.Min(lowerBeforeX, upperBeforeX);
                             DrawPlateModel eachOnePlateLast = new DrawPlateModel();
@@ -709,11 +709,11 @@ namespace DrawWork.DrawDetailServices
                             double lowerEndX = lowerXEndPoint[lowerEndPointIndex];
                             double upperEndX = upperXEndPoint[upperEndPointIndex];
                             eachOnePlateLast.ShapeType = Plate_Type.RectangleArc;
-                            if (eachUH - 1 >= centerY)
+                            if (eachUY - 1 >= centerY)
                             {
                                 // Right : Upper
                                 eachOnePlateLast.ArcDirection = ORIENTATION_TYPE.TOPRIGHT;
-                                if (eachOneVX > upperXEndPoint[upperEndPointIndex])
+                                if (eachOneVLineX > upperXEndPoint[upperEndPointIndex])
                                 {
                                     eachOnePlateLast.ShapeType = Plate_Type.Arc;
                                 }
@@ -729,7 +729,7 @@ namespace DrawWork.DrawDetailServices
                             {
                                 // Right : Lower
                                 eachOnePlateLast.ArcDirection = ORIENTATION_TYPE.BOTTOMRIGHT;
-                                if (eachOneVX > lowerXEndPoint[lowerEndPointIndex])
+                                if (eachOneVLineX > lowerXEndPoint[lowerEndPointIndex])
                                 {
                                     eachOnePlateLast.ShapeType = Plate_Type.Arc;
                                     eachOnePlateLast.HLength.Add(upperEndX - upperBeforeX);
@@ -742,12 +742,37 @@ namespace DrawWork.DrawDetailServices
 
                             }
 
-                            eachOnePlateLast.VLength.Add(eachOneVLength);
+                            eachOnePlateLast.VLength.Add(eachOneVLineLength);
 
                             // Plate Add
-                            eachOnePlateLast.NumberPoint = GetNumberPoint(eachOneV.MidPoint.Y, minBeforeX, eachOnePlateLast.HLength);
+                            eachOnePlateLast.NumberPoint = GetNumberPoint(eachOneVLine.MidPoint.Y, minBeforeX, eachOnePlateLast.HLength);
                             onePlateList.Add(eachOnePlateLast);
                         }
+
+
+                        // 중간
+                        else
+                        {
+                            // One Line : Mid
+                            eachOnePlate.ShapeType = Plate_Type.Rectangle;
+                            eachOnePlate.VLength.Add(eachOneVLineLength);
+                            eachOnePlate.VLength.Add(eachOneVLineLength);
+                            eachOnePlate.HLength.Add(eachOneVLineX - lowerBeforeX);
+                            eachOnePlate.HLength.Add(eachOneVLineX - upperBeforeX);
+
+                            // Plate Add
+                            eachOnePlate.NumberPoint = GetNumberPoint(eachOneVLine.MidPoint.Y, maxBeforeX, eachOnePlate.HLength);
+                            onePlateList.Add(eachOnePlate);
+
+                            lowerBeforeX = eachOneVLineX;
+                            upperBeforeX = eachOneVLineX;
+
+                        }
+
+
+
+
+                        
 
 
 
@@ -764,13 +789,13 @@ namespace DrawWork.DrawDetailServices
                         eachOnePlate.ArcDirection = ORIENTATION_TYPE.BOTHCENTER;
                         eachOnePlate.ShapeType = Plate_Type.ArcRectangleArc;
 
-                        double vLength = eachUH - eachLH;
+                        double vLength = eachUY - eachLY;
                         eachOnePlate.VLength.Add(vLength);
                         eachOnePlate.HLength.Add(lowerXEndPoint[1] - lowerXEndPoint[0]);
                         eachOnePlate.HLength.Add(upperXEndPoint[1] - upperXEndPoint[0]);
 
                         // Plate Add
-                        eachOnePlate.NumberPoint = new Point3D(lowerXEndPoint[0] + eachOnePlate.HLength[0] / 2, eachLH + vLength / 2);
+                        eachOnePlate.NumberPoint = new Point3D(lowerXEndPoint[0] + eachOnePlate.HLength[0] / 2, eachLY + vLength / 2);
                         onePlateList.Add(eachOnePlate);
                     }
 
@@ -780,28 +805,18 @@ namespace DrawWork.DrawDetailServices
 
 
                 // 재배열
-                List<int> reNumberList = new List<int>();
-                if(onePlateList.Count>0)
-                    reNumberList = GetCenterIndexList(onePlateList.Count);
-                foreach (int eachIndex in reNumberList)
-                {
-                    DrawPlateModel eachPlate = onePlateList[eachIndex];
-                    eachPlate.NumberCount = numberCount++;
-                    newPlateList.Add(eachPlate);
-                }
+                newPlateList.AddRange(GetSortListByCenterIndex(ref numberCount, onePlateList));
 
                 // Delete
-                foreach (ICurve eachV in oneLineList)
-                {
+                foreach (ICurve eachV in oneVLineList)
                     VEntitiesSort.Remove(eachV);
-                }
             }
 
             // Vertical Line
-            double upperHLineY = HSortList[0];
-            double lowerHLineY = HSortList[HSortList.Count-1];
-            List<double> upperXHLineEndPoint = HDic[upperHLineY];
-            List<double> lowerXHLineEndPoint = HDic[lowerHLineY];
+            double upperHLineY = HLineYSortDesList.First();
+            double lowerHLineY = HLineYSortDesList.Last();
+            List<double> upperXHLineEndPoint = HLineDic[upperHLineY];
+            List<double> lowerXHLineEndPoint = HLineDic[lowerHLineY];
             List<ICurve> oneLineVUpperList = new List<ICurve>();
             List<ICurve> oneLineVLowerList = new List<ICurve>();
             Dictionary<double, double> oneLineVUpperDic = new Dictionary<double, double>();
@@ -872,7 +887,7 @@ namespace DrawWork.DrawDetailServices
                 oneUpperPlateList.Add(eachOnePlate);
             }
 
-            if(HEntities.Count>0 && VEntities.Count == 0)
+            if(HLineEntities.Count>0 && VLineEntities.Count == 0)
             {
                 //모두 가로선만 있을 경우
                 // Sagment : Upper, Lower 제외하고 중간 필요함
@@ -996,15 +1011,8 @@ namespace DrawWork.DrawDetailServices
 
             }
             // 재배열
-            List<int> reUpperNumberList = new List<int>();
-            if (oneUpperPlateList.Count > 0)
-                reUpperNumberList = GetCenterIndexList(oneUpperPlateList.Count);
-            foreach (int eachIndex in reUpperNumberList)
-            {
-                DrawPlateModel eachPlate = oneUpperPlateList[eachIndex];
-                eachPlate.NumberCount = numberCount++;
-                newPlateList.Add(eachPlate); 
-            }
+            newPlateList.AddRange(GetSortListByCenterIndex(ref numberCount, oneUpperPlateList));
+
 
             // Vertical : Lower
             for (int i = 0; i < oneLineVLowerList.Count; i++)
@@ -1123,15 +1131,7 @@ namespace DrawWork.DrawDetailServices
 
             }
             // 재배열
-            List<int> reLowerNumberList = new List<int>();
-            if (oneLowerPlateList.Count > 0)
-                reLowerNumberList = GetCenterIndexList(oneLowerPlateList.Count);
-            foreach (int eachIndex in reLowerNumberList)
-            {
-                DrawPlateModel eachPlate = oneLowerPlateList[eachIndex];
-                eachPlate.NumberCount = numberCount++;
-                newPlateList.Add(eachPlate);
-            }
+            newPlateList.AddRange(GetSortListByCenterIndex(ref numberCount, oneLowerPlateList));
 
 
 
@@ -1171,6 +1171,26 @@ namespace DrawWork.DrawDetailServices
             return plateSortList;
         }
 
+
+        private List<DrawPlateModel> GetSortListByCenterIndex(ref double numberCount,List<DrawPlateModel> selList)
+        {
+            List<DrawPlateModel> newList = new List<DrawPlateModel>();
+
+            List<int> reNumberList = new List<int>();
+            if (selList.Count > 0)
+            {
+                reNumberList = GetCenterIndexList(selList.Count);
+            }
+            foreach (int eachIndex in reNumberList)
+            {
+                DrawPlateModel eachPlate = selList[eachIndex];
+                eachPlate.NumberCount = numberCount++;
+                newList.Add(eachPlate);
+            }
+
+            return newList;
+        }
+
         private List<int>GetCenterIndexList(double selNumber)
         {
             List<int> newList = new List<int>();
@@ -1204,7 +1224,7 @@ namespace DrawWork.DrawDetailServices
 
 
 
-        private double GetRoofOuterDiameter()
+        public  double GetRoofOuterDiameter()
         {
             double roofOD = 0;
             if(assemblyData !=null)
@@ -1467,7 +1487,7 @@ namespace DrawWork.DrawDetailServices
             double lowerY = centerPoint.Y;
 
             // Center 
-            if (startX == 0)
+            if (startX == centerPoint.X)
                 centerCopy = false;
 
             Line cLine = new Line(new Point3D(startX,lowerY), new Point3D(startX,upperY));
@@ -1855,30 +1875,65 @@ namespace DrawWork.DrawDetailServices
             double optLength = maxLength;
 
             List<double> optSizeCaseList = new List<double>();
-            if(beforeX== centerPoint.X)
+
+            switch (plateWidth)
             {
-                // 역방향
-                optSizeCaseList.Add(maxLength);                     // Case 5 : Plate Max
-                optSizeCaseList.Add(plateWidth * 3);                // Case 4 : Plate Width * 3
-                //optSizeCaseList.Add(plateWidth + plateWidth / 2);   // Case 3 : plate Width + Plate Width / 2
-                //optSizeCaseList.Add(plateLength / 2);               // Case 3 : plate Length / 2
-                optSizeCaseList.Add(plateWidth * 2 + plateWidth /2);                // Case 2 : Plate Width * 2
-                optSizeCaseList.Add(plateWidth * 2);                // Case 2 : Plate Width * 2
-                optSizeCaseList.Add(plateWidth);                    // Case 1 : Plate Width
+                case 2438 - 30:
+                    goto default;
+                case 1524 - 30:
+                    if (beforeX == centerPoint.X)
+                    {
+                        // 역방향
+                        optSizeCaseList.Add(maxLength);                     // Case 5 : Plate Max
+                        optSizeCaseList.Add(plateWidth * 4);                // Case 4 : Plate Width * 3
+                                                                            //optSizeCaseList.Add(plateWidth + plateWidth / 2);   // Case 3 : plate Width + Plate Width / 2
+                                                                            //optSizeCaseList.Add(plateLength / 2);               // Case 3 : plate Length / 2
+                        optSizeCaseList.Add(plateWidth * 2 + plateWidth / 2);                // Case 2 : Plate Width * 2
+                        optSizeCaseList.Add(plateWidth * 2);                // Case 2 : Plate Width * 2
+                        optSizeCaseList.Add(plateWidth);                    // Case 1 : Plate Width
 
 
+
+                    }
+                    else
+                    {
+                        optSizeCaseList.Add(plateWidth);                    // Case 1 : Plate Width
+                        optSizeCaseList.Add(plateWidth * 2);                // Case 2 : Plate Width * 2
+                        optSizeCaseList.Add(plateWidth * 2 + plateWidth / 2);                // Case 2 : Plate Width * 2
+                                                                                             //optSizeCaseList.Add(plateLength / 2);               // Case 3 : plate Length / 2
+                        optSizeCaseList.Add(plateWidth * 4);                // Case 4 : Plate Width * 3
+                        optSizeCaseList.Add(maxLength);                     // Case 5 : Plate Max
+                    }
+                    break;
+                default:
+                    if (beforeX == centerPoint.X)
+                    {
+                        // 역방향
+                        optSizeCaseList.Add(maxLength);                     // Case 5 : Plate Max
+                        optSizeCaseList.Add(plateWidth * 3);                // Case 4 : Plate Width * 3
+                                                                            //optSizeCaseList.Add(plateWidth + plateWidth / 2);   // Case 3 : plate Width + Plate Width / 2
+                                                                            //optSizeCaseList.Add(plateLength / 2);               // Case 3 : plate Length / 2
+                        optSizeCaseList.Add(plateWidth * 2 + plateWidth / 3);                // Case 2 : Plate Width * 2
+                        optSizeCaseList.Add(plateWidth * 2);                // Case 2 : Plate Width * 2
+                        optSizeCaseList.Add(plateWidth);                    // Case 1 : Plate Width
+
+
+
+                    }
+                    else
+                    {
+                        optSizeCaseList.Add(plateWidth);                    // Case 1 : Plate Width
+                        optSizeCaseList.Add(plateWidth * 2);                // Case 2 : Plate Width * 2
+                        optSizeCaseList.Add(plateWidth * 2 + plateWidth / 3);                // Case 2 : Plate Width * 2
+                                                                                             //optSizeCaseList.Add(plateLength / 2);               // Case 3 : plate Length / 2
+                        optSizeCaseList.Add(plateWidth + plateWidth / 2);   // Case 3 : plate Width + Plate Width / 2
+                        optSizeCaseList.Add(plateWidth * 3);                // Case 4 : Plate Width * 3
+                        optSizeCaseList.Add(maxLength);                     // Case 5 : Plate Max
+                    }
+                    break;
 
             }
-            else
-            {
-                optSizeCaseList.Add(plateWidth);                    // Case 1 : Plate Width
-                optSizeCaseList.Add(plateWidth * 2);                // Case 2 : Plate Width * 2
-                optSizeCaseList.Add(plateWidth * 2 + plateWidth / 2);                // Case 2 : Plate Width * 2
-                //optSizeCaseList.Add(plateLength / 2);               // Case 3 : plate Length / 2
-                optSizeCaseList.Add(plateWidth + plateWidth / 2);   // Case 3 : plate Width + Plate Width / 2
-                optSizeCaseList.Add(plateWidth * 3);                // Case 4 : Plate Width * 3
-                optSizeCaseList.Add(maxLength);                     // Case 5 : Plate Max
-            }
+
 
 
             foreach(double eachLength in optSizeCaseList)
@@ -1998,15 +2053,20 @@ namespace DrawWork.DrawDetailServices
             if (beforeX == 0)
             {
                 // Case : 1
-                returnValue = -plateWidth / 2;
+                //if(plateWidth==2408)
+                    //returnValue = 0;
+                //else
+                    returnValue = -plateWidth / 2;
             }
             else
             {
                 // Case : 1
-                returnValue = -plateWidth / 2;
+                //if(plateWidth==1524)
+                    returnValue = -plateWidth / 2;
+                //else
 
                 // Case : 2
-                returnValue = 0;
+                //returnValue = 0;
             }
 
             return returnValue;
@@ -2021,11 +2081,9 @@ namespace DrawWork.DrawDetailServices
 
             double cirRadius = cirOD / 2;
             double plateMaxCount = Math.Ceiling(cirRadius / plateWidth);
-            
-            double lastPlateLength = 4000;
 
-            if (cirOD <13000)
-                lastPlateLength = 2400;
+            double lastPlateLength = GetLastPlateLength(plateWidth, circleOD);
+
 
             double lastPlateCount =Math.Truncate(lastPlateLength / plateWidth);
 
@@ -2052,6 +2110,20 @@ namespace DrawWork.DrawDetailServices
                 return newLength+ lengthFactor;
         }
 
+        private double GetLastPlateLength(double plateWidth,double circleOD)
+        {
+            double returnValue = 0;
+
+            if (circleOD < 13000)
+            {
+                returnValue = 2400 * plateWidth / 2408;
+            }
+            else
+            {
+                returnValue = 4000 * plateWidth / 2408;
+            }
+            return Math.Ceiling(returnValue);
+        }
 
 
         public List<Entity> GetBottomPlateJoint(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue, out Dictionary<string, List<Entity>> selDim)

@@ -7692,6 +7692,25 @@ namespace DrawWork.DrawDetailServices
 
 
 
+        // 210913 V1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // Roof/Bottom Plate Arrangement
 

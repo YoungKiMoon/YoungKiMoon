@@ -23,6 +23,8 @@ namespace DrawWork.DrawModels
             Set = "";
             Weight = "";
             Remark = "";
+
+            ExportData = new DrawBMExportModel();
         }
 
         public PAPERMAIN_TYPE DWGName { get; set; }
@@ -37,6 +39,9 @@ namespace DrawWork.DrawModels
         public string Set { get; set; }
         public string Weight { get; set; }
         public string Remark { get; set; }
+
+        public DrawBMExportModel ExportData { get; set; }
+
 
     }
 }

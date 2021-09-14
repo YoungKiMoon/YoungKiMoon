@@ -1,4 +1,7 @@
 ﻿using AssemblyLib.AssemblyModels;
+using devDept.Eyeshot;
+using DrawWork.Commons;
+using DrawWork.DrawDetailServices;
 using DrawWork.DrawModels;
 using DrawWork.ValueServices;
 using System;
@@ -14,10 +17,15 @@ namespace DrawWork.DrawServices
 
         private AssemblyModel assemblyData;
         private ValueService valueService;
-        public DrawBMService(AssemblyModel selAssembly)
+
+        private DrawDetailPlateCuttingPlanService detailService;
+        public DrawBMService(AssemblyModel selAssembly,Model selModel)
         {
             assemblyData = selAssembly;
+
+            detailService =  new DrawDetailPlateCuttingPlanService(assemblyData, selModel);
             valueService = new ValueService();
+
         }
 
         public List<DrawBMModel> CreateBMModel()
@@ -25,6 +33,7 @@ namespace DrawWork.DrawServices
             List<DrawBMModel> newList = new List<DrawBMModel>();
 
             double bmCount = 0;
+            // DWG : ShellPlateArrangement
             newList.AddRange(GetShellPlate(bmCount));
             bmCount = newList.Count;
             newList.AddRange(GetTopAngle(bmCount));
@@ -37,29 +46,85 @@ namespace DrawWork.DrawServices
             bmCount = newList.Count;
             newList.AddRange(GetSettlementCheckPiece(bmCount));
 
+
+            bmCount = 0;
+            newList.AddRange(GetBottomPlate(bmCount));
+            bmCount = newList.Count;
+            newList.AddRange(GetBottomAnnularPlate(bmCount));
+
+
+
+            bmCount = 0;
+            newList.AddRange(GetRoofPlate(bmCount));
+            bmCount = newList.Count;
+            newList.AddRange(GetRoofComRingPlate(bmCount));
+
+
+
+
+
             return newList;
         }
 
         public List<DrawBMModel> GetShellPlate(double startNum)
         {
+
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double plateLength = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateMaxLength);
+
+            string tempTankNo = assemblyData.GeneralDesignData[0].RoofType +  " " +
+                                assemblyData.GeneralDesignData[0].SizeNominalID + "*" +
+                                assemblyData.GeneralDesignData[0].SizeTankHeight ;
+
+            double tankCount = 1;
+
             List<DrawBMModel> newList = new List<DrawBMModel>();
 
             double bmCount = startNum;
             foreach (ShellOutputModel eachShell in assemblyData.ShellOutput)
             {
                 bmCount++;
+
+                double eachCourseThk = valueService.GetDoubleValue(eachShell.Thickness);
+                double eachCourseDiameter = tankID + (eachCourseThk * 2);
+                double eachCoursePermiter = Math.PI * eachCourseDiameter;  // 둘레길이
+                double eachPlateCount = Math.Ceiling(eachCoursePermiter / plateLength);
+                double eachPlateLength = eachCoursePermiter / eachPlateCount;
+                string eachPlateLenghtStr = Math.Round(eachPlateLength, 1, MidpointRounding.AwayFromZero).ToString();
+
                 DrawBMModel newModel = new DrawBMModel();
                 newModel.DWGName = DrawSettingLib.Commons.PAPERMAIN_TYPE.ShellPlateArrangement;
                 newModel.Page = 1;
                 newModel.No = bmCount.ToString();
                 newModel.Name = "SHELL PLATE";
                 newModel.Material = eachShell.Material;
-                newModel.Dimension = GetDimension(eachShell.Thickness, eachShell.PlateWidth, "");
-                newModel.Set = "1";
+                newModel.Dimension = GetDimension(eachShell.Thickness, eachShell.PlateWidth, eachPlateLenghtStr);
+                newModel.Set = eachPlateCount.ToString();
                 newModel.Weight = "";// 현재 공백
                 newModel.Remark = "";
 
+                // Export
+                newModel.ExportData.PORNo = "";
+                newModel.ExportData.TankNo = tempTankNo;
+                newModel.ExportData.TankName = "";
+                newModel.ExportData.Description = bmCount + " Shell Platte";
+                newModel.ExportData.Material = eachShell.Material;
+                newModel.ExportData.DimThk = eachShell.Thickness;
+                newModel.ExportData.DimWidth = eachShell.PlateWidth;
+                newModel.ExportData.DimLength = eachPlateLenghtStr;
+                newModel.ExportData.DimQty = eachPlateCount.ToString();
+
+                newModel.ExportData.TankQty = tankCount.ToString();
+                newModel.ExportData.TotalQty = (tankCount * eachPlateCount).ToString();
+                
+
+
                 newList.Add(newModel);
+
+
+                
+
+
             }
 
             return newList;
@@ -344,11 +409,388 @@ namespace DrawWork.DrawServices
         }
 
 
+
+
+
+
+
+        public List<DrawBMModel> GetBottomPlate(double startNum)
+        {
+
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double plateLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateLength);
+            double plateWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateWidth);
+            double plateThk = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateThickness);
+
+            string bottomMaterial = assemblyData.GeneralMaterialSpecifications[0].BottomPlate;
+            string tempTankNo = assemblyData.GeneralDesignData[0].RoofType + " " +
+                                assemblyData.GeneralDesignData[0].SizeNominalID + "*" +
+                                assemblyData.GeneralDesignData[0].SizeTankHeight;
+
+            double tankCount = 1;
+
+            List<DrawBMModel> newList = new List<DrawBMModel>();
+
+            double bmCount = startNum;
+
+            bmCount++;
+
+
+            
+
+            CDPoint refPoint = new CDPoint();
+            CDPoint curPoint = new CDPoint();
+            //detailService.DrawBottomCuttingPlan(ref refPoint, ref curPoint,null,1);
+
+            double bottomPlateCount = 0;
+            foreach (DrawOnePlateModel eachPlate in SingletonData.BottomPlateList)
+            {
+                bottomPlateCount += eachPlate.Requirement;
+            }
+
+
+
+            if (bottomPlateCount > 0)
+            {
+                DrawBMModel newModel = new DrawBMModel();
+                newModel.DWGName = DrawSettingLib.Commons.PAPERMAIN_TYPE.BottomPlateCuttingPlan;
+                newModel.Page = 1;
+                newModel.No = "B" + bmCount.ToString();
+                newModel.Name = "BOTTOM PLATE";
+                newModel.Material = bottomMaterial;
+                newModel.Dimension = GetDimension(plateThk.ToString(), plateWidth.ToString(), plateLength.ToString());
+                newModel.Set = bottomPlateCount.ToString();
+                newModel.Weight = "";// 현재 공백
+                newModel.Remark = "";
+
+                // Export
+                newModel.ExportData.PORNo = "";
+                newModel.ExportData.TankNo = tempTankNo;
+                newModel.ExportData.TankName = "";
+                newModel.ExportData.Description = "Bottom Plate";
+                newModel.ExportData.Material = bottomMaterial;
+                newModel.ExportData.DimThk = plateThk.ToString();
+                newModel.ExportData.DimWidth = plateWidth.ToString();
+                newModel.ExportData.DimLength = plateLength.ToString();
+                newModel.ExportData.DimQty = bottomPlateCount.ToString();
+
+                newModel.ExportData.TankQty = tankCount.ToString();
+                newModel.ExportData.TotalQty = (tankCount * bottomPlateCount).ToString();
+
+
+
+                newList.Add(newModel);
+            }
+
+
+
+
+
+
+            return newList;
+        }
+        public List<DrawBMModel> GetBottomAnnularPlate(double startNum)
+        {
+
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double plateLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateLength);
+            double plateWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateWidth);
+            double plateThk = valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateThickness);
+
+            string bottomAnnularMaterial = assemblyData.GeneralMaterialSpecifications[0].AnnularPlate;
+
+
+
+            string backingStripMaterial = "A283-C";
+            double annularWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateWidth);
+            double backingStripThk = 6;
+            string backingStripThkStr =  backingStripThk.ToString();
+            string backingStripWidth = "50";//고정
+            string backingStripLength = (10 + annularWidth + 10).ToString();
+
+
+
+
+            string tempTankNo = assemblyData.GeneralDesignData[0].RoofType + " " +
+                                assemblyData.GeneralDesignData[0].SizeNominalID + "*" +
+                                assemblyData.GeneralDesignData[0].SizeTankHeight;
+
+            double tankCount = 1;
+
+            List<DrawBMModel> newList = new List<DrawBMModel>();
+
+            double bmCount = startNum;
+
+            bmCount++;
+
+
+
+            double maxPlate = detailService.GetBottomAnnularCutting(out double maxBendPlateofOnePlate, out double totalBendingPlate);
+
+            if (maxPlate > 0)
+            {
+                DrawBMModel newModel = new DrawBMModel();
+                newModel.DWGName = DrawSettingLib.Commons.PAPERMAIN_TYPE.BottomPlateCuttingPlan;
+                newModel.Page = 1;
+                newModel.No = "AP";
+                newModel.Name = "ANNULAR PLATE";
+                newModel.Material = bottomAnnularMaterial;
+                newModel.Dimension = GetDimension(plateThk.ToString(), plateWidth.ToString(), plateLength.ToString());
+                newModel.Set = maxPlate.ToString();
+                newModel.Weight = "";// 현재 공백
+                newModel.Remark = "";
+
+                // Export
+                newModel.ExportData.PORNo = "";
+                newModel.ExportData.TankNo = tempTankNo;
+                newModel.ExportData.TankName = "";
+                newModel.ExportData.Description = "Annular Plate";
+                newModel.ExportData.Material = bottomAnnularMaterial;
+                newModel.ExportData.DimThk = plateThk.ToString();
+                newModel.ExportData.DimWidth = plateWidth.ToString();
+                newModel.ExportData.DimLength = plateLength.ToString();
+                newModel.ExportData.DimQty = maxPlate.ToString();
+
+                newModel.ExportData.TankQty = tankCount.ToString();
+                newModel.ExportData.TotalQty = (tankCount * maxPlate).ToString();
+
+
+                newList.Add(newModel);
+
+                // Backing Strip
+                DrawBMModel newModelBS = new DrawBMModel();
+                newModelBS.DWGName = DrawSettingLib.Commons.PAPERMAIN_TYPE.BottomPlateCuttingPlan;
+                newModelBS.Page = 1;
+                newModelBS.No = "BS";
+                newModelBS.Name = "BACKING STRIP";
+                newModelBS.Material = backingStripMaterial;
+                newModelBS.Dimension = GetDimension(backingStripThkStr, backingStripWidth.ToString(), backingStripLength.ToString());
+                newModelBS.Set = totalBendingPlate.ToString();
+                newModelBS.Weight = "";// 현재 공백
+                newModelBS.Remark = "";
+
+                // Export
+                newModelBS.ExportData.PORNo = "";
+                newModelBS.ExportData.TankNo = tempTankNo;
+                newModelBS.ExportData.TankName = "";
+                newModelBS.ExportData.Description = "Backing Strip Flat Bar";
+                newModelBS.ExportData.Material = backingStripMaterial;
+                newModelBS.ExportData.DimThk = backingStripThk.ToString();
+                newModelBS.ExportData.DimWidth = backingStripWidth.ToString();
+                newModelBS.ExportData.DimLength = backingStripLength.ToString();
+                newModelBS.ExportData.DimQty = totalBendingPlate.ToString();
+
+                newModelBS.ExportData.TankQty = tankCount.ToString();
+                newModelBS.ExportData.TotalQty = (tankCount * totalBendingPlate).ToString();
+
+
+                newList.Add(newModelBS);
+            }
+
+
+
+
+
+
+            return newList;
+        }
+
+
+
+        public List<DrawBMModel> GetRoofPlate(double startNum)
+        {
+
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double plateLength = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateLength);
+            double plateWidth = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateWidth);
+            double plateThk = valueService.GetDoubleValue(assemblyData.GeneralMaterialSpecifications[0].RoofPlateThickness);
+
+            string bottomMaterial = assemblyData.GeneralMaterialSpecifications[0].RoofPlate;
+            string tempTankNo = assemblyData.GeneralDesignData[0].RoofType + " " +
+                                assemblyData.GeneralDesignData[0].SizeNominalID + "*" +
+                                assemblyData.GeneralDesignData[0].SizeTankHeight;
+
+            double tankCount = 1;
+
+            List<DrawBMModel> newList = new List<DrawBMModel>();
+
+            double bmCount = startNum;
+
+            bmCount++;
+
+            CDPoint refPoint = new CDPoint();
+            CDPoint curPoint = new CDPoint();
+            //detailService.DrawRoofCuttingPlan(ref refPoint, ref curPoint, null, 1);
+
+            double roofPlateCount = 0;
+            foreach (DrawOnePlateModel eachPlate in SingletonData.RoofPlateList)
+            {
+                roofPlateCount += eachPlate.Requirement;
+            }
+
+
+
+
+            if (roofPlateCount > 0)
+            {
+                DrawBMModel newModel = new DrawBMModel();
+                newModel.DWGName = DrawSettingLib.Commons.PAPERMAIN_TYPE.RoofPlateCuttingPlan;
+                newModel.Page = 1;
+                newModel.No = bmCount.ToString();
+                newModel.Name = "ROOF PLATE";
+                newModel.Material = bottomMaterial;
+                newModel.Dimension = GetDimension(plateThk.ToString(), plateWidth.ToString(), plateLength.ToString());
+                newModel.Set = roofPlateCount.ToString();
+                newModel.Weight = "";// 현재 공백
+                newModel.Remark = "";
+
+                // Export
+                newModel.ExportData.PORNo = "";
+                newModel.ExportData.TankNo = tempTankNo;
+                newModel.ExportData.TankName = "";
+                newModel.ExportData.Description = "Roof Plate";
+                newModel.ExportData.Material = bottomMaterial;
+                newModel.ExportData.DimThk = plateThk.ToString();
+                newModel.ExportData.DimWidth = plateWidth.ToString();
+                newModel.ExportData.DimLength = plateLength.ToString();
+                newModel.ExportData.DimQty = roofPlateCount.ToString();
+
+                newModel.ExportData.TankQty = tankCount.ToString();
+                newModel.ExportData.TotalQty = (tankCount * roofPlateCount).ToString();
+
+
+
+                newList.Add(newModel);
+            }
+
+
+
+
+
+
+            return newList;
+        }
+
+
+        public List<DrawBMModel> GetRoofComRingPlate(double startNum)
+        {
+
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double plateLength = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateLength);
+            double plateWidth = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateWidth);
+            double plateThk = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].ThicknessT1); // i Type
+
+            string comRingMaterial = "";
+            string tempTankNo = assemblyData.GeneralDesignData[0].RoofType + " " +
+                                assemblyData.GeneralDesignData[0].SizeNominalID + "*" +
+                                assemblyData.GeneralDesignData[0].SizeTankHeight;
+
+            double tankCount = 1;
+
+            List<DrawBMModel> newList = new List<DrawBMModel>();
+
+            double bmCount = startNum;
+
+            bmCount++;
+
+
+            double maxPlate = detailService.GetRoofComRingCutting(out double maxBendPlateofOnePlate, out double totalBendingPlate);
+
+
+            if (maxPlate > 0)
+            {
+                DrawBMModel newModel = new DrawBMModel();
+                newModel.DWGName = DrawSettingLib.Commons.PAPERMAIN_TYPE.RoofPlateCuttingPlan;
+                newModel.Page = 1;
+                newModel.No = "CR";
+                newModel.Name = "COM. RING PLATE";
+                newModel.Material = comRingMaterial;
+                newModel.Dimension = GetDimension(plateThk.ToString(), plateWidth.ToString(), plateLength.ToString());
+                newModel.Set = maxPlate.ToString();
+                newModel.Weight = "";// 현재 공백
+                newModel.Remark = "";
+
+                // Export
+                newModel.ExportData.PORNo = "";
+                newModel.ExportData.TankNo = tempTankNo;
+                newModel.ExportData.TankName = "";
+                newModel.ExportData.Description = "Compression Ring Plate";
+                newModel.ExportData.Material = comRingMaterial;
+                newModel.ExportData.DimThk = plateThk.ToString();
+                newModel.ExportData.DimWidth = plateWidth.ToString();
+                newModel.ExportData.DimLength = plateLength.ToString();
+                newModel.ExportData.DimQty = maxPlate.ToString();
+
+                newModel.ExportData.TankQty = tankCount.ToString();
+                newModel.ExportData.TotalQty = (tankCount * maxPlate).ToString();
+
+
+
+                newList.Add(newModel);
+
+
+
+
+            }
+
+
+
+
+
+
+            return newList;
+        }
+
+
+
         private string GetDimension(string Thk, string W, string L)
         {
             return "t" + Thk + "x" + W + "X" + L;
 
         }
 
+
+
+
+
+
+        public List<List<string>> GetBMListVER01()
+        {
+            List<List<string>> bmList = new List<List<string>>();
+
+            foreach(DrawBMModel eachBM in SingletonData.BMList)
+            {
+                if (eachBM.ExportData.Description != "")
+                {
+                    List<string> newBM = new List<string>();
+                    newBM.Add(eachBM.ExportData.PORNo);
+                    newBM.Add(eachBM.ExportData.TankNo);
+                    newBM.Add(eachBM.ExportData.TankName);
+                    newBM.Add(eachBM.ExportData.Description);
+                    newBM.Add(eachBM.ExportData.Material);
+
+                    newBM.Add(eachBM.ExportData.DimThk);
+                    newBM.Add(eachBM.ExportData.DimWidth);
+                    newBM.Add(eachBM.ExportData.DimLength);
+                    newBM.Add(eachBM.ExportData.DimQty);
+
+                    newBM.Add(eachBM.ExportData.UnitWeight);
+
+                    newBM.Add(eachBM.ExportData.TankQty);
+
+                    newBM.Add(eachBM.ExportData.Margin);
+
+                    newBM.Add(eachBM.ExportData.TotalQty);
+                    newBM.Add(eachBM.ExportData.TotalWeight);
+                    newBM.Add(eachBM.ExportData.Remarks);
+
+                    bmList.Add(newBM);
+                }
+
+
+            }
+
+            return bmList;
+        }
     }
 }

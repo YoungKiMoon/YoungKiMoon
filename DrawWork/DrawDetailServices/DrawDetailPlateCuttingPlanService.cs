@@ -65,7 +65,6 @@ namespace DrawWork.DrawDetailServices
 
 
         public DrawEntityModel DrawRoofCuttingPlan(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
-
         {
             DrawEntityModel drawList = new DrawEntityModel();
             double plateActualWidth = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateWidth);
@@ -75,7 +74,9 @@ namespace DrawWork.DrawDetailServices
             // Scale : 매우 중요 함
             double realScaleValue = scaleService.GetScaleCalValue(135, 50, plateActualLength, plateActualWidth);
 
-            drawList.AddDrawEntity(DrawCuttingPlan(PlateArrange_Type.Roof,referencePoint, SingletonData.RoofPlateInfo, plateActualWidth, plateActualLength, realScaleValue));
+            
+            drawList.AddDrawEntity(DrawCuttingPlan(PlateArrange_Type.Roof, referencePoint, SingletonData.RoofPlateInfo, plateActualWidth, plateActualLength, realScaleValue));
+            
             return drawList;
         }
 
@@ -709,11 +710,23 @@ namespace DrawWork.DrawDetailServices
             switch (selPlate.ShapeType)
             {
                 case Plate_Type.Segment:
-
+                    if (bLine != null)
+                    {
+                        DrawDimensionModel bottomDim = new DrawDimensionModel()
+                        {
+                            position = POSITION_TYPE.BOTTOM,
+                            textUpper = Math.Round(bLine.Length(), 1, MidpointRounding.AwayFromZero).ToString(),
+                            dimHeight = 12,
+                            scaleValue = scaleValue,
+                        };
+                        DrawEntityModel bottomDimEntity = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(bLine.StartPoint, 0, 0), GetSumPoint(bLine.EndPoint, 0, 0), scaleValue, bottomDim, 0);
+                        dimModel.AddDrawEntity(bottomDimEntity);
+                    }
                     break;
 
                 case Plate_Type.Rectangle:
                 case Plate_Type.RectangleArc:
+                case Plate_Type.ArcRectangleArc:
                     if (selPlate.CuttingPlan.Width == plateWidth && selPlate.CuttingPlan.MaxLength==plateLength)
                     {
                         DrawDimensionModel leftDim = new DrawDimensionModel()
@@ -741,21 +754,25 @@ namespace DrawWork.DrawDetailServices
                     {
                         if (cutIndex == 1)
                         {
-                            DrawDimensionModel leftDim = new DrawDimensionModel()
+                            if (lLine != null)
                             {
-                                position = POSITION_TYPE.LEFT,
-                                textUpper = Math.Round(selPlate.CuttingPlan.Width, 1, MidpointRounding.AwayFromZero).ToString(),
-                                dimHeight = 12,
-                                scaleValue = scaleValue,
-                            };
-                            DrawEntityModel leftDimEntity = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(lLine.StartPoint, 0, 0), GetSumPoint(lLine.EndPoint, 0, 0), scaleValue, leftDim, 0);
-                            dimModel.AddDrawEntity(leftDimEntity);
+                                DrawDimensionModel leftDim = new DrawDimensionModel()
+                                {
+                                    position = POSITION_TYPE.LEFT,
+                                    textUpper = Math.Round(selPlate.CuttingPlan.Width, 1, MidpointRounding.AwayFromZero).ToString(),
+                                    dimHeight = 12,
+                                    scaleValue = scaleValue,
+                                };
+                                DrawEntityModel leftDimEntity = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(lLine.StartPoint, 0, 0), GetSumPoint(lLine.EndPoint, 0, 0), scaleValue, leftDim, 0);
+                                dimModel.AddDrawEntity(leftDimEntity);
+                            }
+
                         }
                             
                         DrawDimensionModel topDim = new DrawDimensionModel()
                         {
                             position = POSITION_TYPE.TOP,
-                            textUpper = Math.Round(selPlate.CuttingPlan.MaxLength, 1, MidpointRounding.AwayFromZero).ToString(),
+                            textUpper = Math.Round(tLine.Length(), 1, MidpointRounding.AwayFromZero).ToString(),
                             dimHeight = 12,
                             scaleValue = scaleValue,
                         };
@@ -764,7 +781,7 @@ namespace DrawWork.DrawDetailServices
                         DrawDimensionModel bottomDim = new DrawDimensionModel()
                         {
                             position = POSITION_TYPE.BOTTOM,
-                            textUpper = Math.Round(selPlate.CuttingPlan.MaxLength, 1, MidpointRounding.AwayFromZero).ToString(),
+                            textUpper = Math.Round(bLine.Length(), 1, MidpointRounding.AwayFromZero).ToString(),
                             dimHeight = 12,
                             scaleValue = scaleValue,
                         };
@@ -1002,6 +1019,441 @@ namespace DrawWork.DrawDetailServices
             Point3D nPoint = GetSumPoint(selPoint, distanceX, distanceY);
 
             return nPoint;
+        }
+
+
+
+
+
+        // Compression Ring , Annular Plate
+        public DrawEntityModel DrawRoofComRingCuttingPlan(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
+        {
+
+
+            DrawEntityModel drawList = new DrawEntityModel();
+            double plateActualWidth = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateWidth);
+            double plateActualLength = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateLength);
+
+            Point3D referencePoint = new Point3D(refPoint.X, refPoint.Y);
+            // Scale : 매우 중요 함
+            double realScaleValue = scaleService.GetScaleCalValue(135, 50, plateActualLength, plateActualWidth);
+
+
+            SingletonData.RoofComRingPlateList.Clear();
+
+
+            DrawDetailRoofBottomService roofbottomService = new DrawDetailRoofBottomService(assemblyData, null);
+
+            double cirOD = roofbottomService.GetRoofOuterDiameter();
+            double cirODExtend = 0;
+
+
+            cirODExtend = roofbottomService.GetRoofOD();
+            cirOD = cirODExtend;
+            if (assemblyData.RoofCompressionRing[0].CompressionRingType.Contains("Detail i"))
+                cirOD = roofbottomService.GetRoofODByCompressionRingDetailI();
+
+            double innerWidth = cirODExtend - cirOD;
+
+            if (innerWidth > 0)
+                drawList.AddDrawEntity(DrawPlate_CuttingPlan_Divide_V2(PlateArrange_Type.RoofCompressionRing, referencePoint, plateActualWidth, plateActualLength,cirODExtend,innerWidth, realScaleValue));
+
+
+            return drawList;
+
+
+        }
+
+        public double GetRoofComRingCutting(out double maxBendPlateOfOnePlate, out double totalBendingPlate)
+        {
+            double plateActualWidth = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateWidth);
+            double plateActualLength = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateLength);
+
+            DrawDetailRoofBottomService roofbottomService = new DrawDetailRoofBottomService(assemblyData, null);
+
+            double cirOD = roofbottomService.GetRoofOuterDiameter();
+            double cirODExtend = 0;
+
+
+            cirODExtend = roofbottomService.GetRoofOD();
+            cirOD = cirODExtend;
+            if (assemblyData.RoofCompressionRing[0].CompressionRingType.Contains("Detail i"))
+                cirOD = roofbottomService.GetRoofODByCompressionRingDetailI();
+
+            double innerWidth = cirODExtend - cirOD;
+            double needTotalPlate = 0;
+            maxBendPlateOfOnePlate = 0;
+            totalBendingPlate = 0;
+            if (innerWidth>0)
+                needTotalPlate = GetPlateCoutByCutting(plateActualWidth, plateActualLength, cirODExtend, innerWidth,
+                                            out maxBendPlateOfOnePlate,
+                                            out totalBendingPlate);
+
+            return needTotalPlate;
+        }
+
+        public DrawEntityModel DrawBottomAnnularCuttingPlan(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
+        {
+
+            DrawEntityModel drawList = new DrawEntityModel();
+            double plateActualWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateWidth);
+            double plateActualLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateLength);
+
+            Point3D referencePoint = new Point3D(refPoint.X, refPoint.Y);
+            // Scale : 매우 중요 함
+            double realScaleValue = scaleService.GetScaleCalValue(135, 50, plateActualLength, plateActualWidth);
+
+
+            SingletonData.BottomAnnularPlateList.Clear();
+
+            DrawDetailRoofBottomService roofbottomService = new DrawDetailRoofBottomService(assemblyData, null);
+
+            double cirOD = 0;
+            double cirODExtend = 0;
+
+            cirODExtend = roofbottomService.GetBottomOD();
+            cirOD = cirODExtend;
+            if (assemblyData.BottomInput[0].AnnularPlate.Contains("Yes"))
+                cirOD = roofbottomService.GetAnnularPlateID();
+
+            double innerWidth = (cirODExtend - cirOD)/2;
+
+            if (innerWidth > 0)
+                drawList.AddDrawEntity(DrawPlate_CuttingPlan_Divide_V2(PlateArrange_Type.BottomAnnular, referencePoint, plateActualWidth, plateActualLength, cirODExtend, innerWidth, realScaleValue));
+
+            return drawList;
+
+
+        }
+
+        public double GetBottomAnnularCutting(out double maxBendPlateOfOnePlate, out double totalBendingPlate)
+        {
+            double plateActualWidth = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateWidth);
+            double plateActualLength = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateLength);
+
+            DrawDetailRoofBottomService roofbottomService = new DrawDetailRoofBottomService(assemblyData, null);
+
+            double cirOD = 0;
+            double cirODExtend = 0;
+
+            cirODExtend = roofbottomService.GetBottomOD();
+            cirOD = cirODExtend;
+            if (assemblyData.BottomInput[0].AnnularPlate.Contains("Yes"))
+                cirOD = roofbottomService.GetAnnularPlateID();
+
+            double innerWidth = (cirODExtend - cirOD) / 2;
+            double needTotalPlate = 0;
+            maxBendPlateOfOnePlate = 0;
+            totalBendingPlate = 0;
+            if (innerWidth > 0)
+                needTotalPlate= GetPlateCoutByCutting(plateActualWidth, plateActualLength, cirODExtend, innerWidth,
+                                            out maxBendPlateOfOnePlate,
+                                            out totalBendingPlate);
+
+            return needTotalPlate;
+        }
+
+
+
+
+        private DrawEntityModel DrawPlate_CuttingPlan_Divide_V2(PlateArrange_Type arrangeType, Point3D refPoint,double plateWidth, double plateLength, double radiusOuter,double innerWidth,  double scaleValue)
+        {
+            // Annular Plate Cutting Plan _ Divide (분할)
+            DrawEntityModel drawList = new DrawEntityModel();
+
+
+            List<DrawOnePlateModel> onePlateList = new List<DrawOnePlateModel>();
+            List<Entity> outlinesList = new List<Entity>();
+            List<Entity> plateList= new List<Entity>();
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+
+            ///////////////////////
+            ///  CAD Data Setting
+            ///////////////////////
+            //double plateWidth = 2740;
+            //double plateLength = 9300;
+            //double radiusouter = 16537;
+            //double radiusouter = 24050;
+            //double bendingPlateThk = 320;
+            double radiusInner = radiusOuter - innerWidth;
+
+            double distanceEachbendingPlate = 15;
+
+
+            // INFO : After calculate of data
+            double needTotalPlate = 0;
+            double totalBendingPlate = 0;
+            double maxBendPlateOfOnePlate = 0;
+
+            double gapEachBendingPlate = 0;
+
+
+            bool isRemainderPiece = false;
+            double countRemainderPiece = 0;
+
+
+
+            ////////////////////////////////////////////// ///////////////////////////////////////////
+            needTotalPlate = GetPlateCoutByCutting(plateWidth, plateLength, radiusOuter, innerWidth,
+                                                        out maxBendPlateOfOnePlate,
+                                                        out totalBendingPlate);
+            double eachPlateDegree = 360 / totalBendingPlate;
+            double eachPlateHalfDeg = eachPlateDegree / 2;
+            gapEachBendingPlate = GetArcSpace(innerWidth, distanceEachbendingPlate, eachPlateHalfDeg);
+
+            // Reset Arc CenterPoint : + arcHeight
+            double firstArcStartPointY = plateWidth - distanceEachbendingPlate - radiusOuter;
+            //Point3D arcCenterPoint = GetSumPoint(referencePoint, plateLength / 2, firstArcStartPointY);
+            //Point3D eachArcCenterPoint = GetSumPoint( arcCenterPoint,0,0);
+
+            //////////////////////////////////////////////////////////
+            // Draw BendingPlate
+            //////////////////////////////////////////////////////////
+
+            
+            double countMaxSheet = Math.Truncate(totalBendingPlate / maxBendPlateOfOnePlate);  // 최대조각으로 된 Sheet 장수
+            if ((totalBendingPlate % maxBendPlateOfOnePlate) > 0)
+            {
+                isRemainderPiece = true;
+                countRemainderPiece = totalBendingPlate - (countMaxSheet * maxBendPlateOfOnePlate);  // Sheet 외에 낱개
+            }
+
+
+            int[] countPieceArray = { (int)maxBendPlateOfOnePlate, (int)countRemainderPiece };
+
+            int totalDrawLoop = 1;
+            if (isRemainderPiece) totalDrawLoop = 2;
+
+
+            List<Point3D> outPointList = new List<Point3D>();
+            for (int loopCount = 0; loopCount < totalDrawLoop; loopCount++)
+            {
+                // Draw : Plate
+                Point3D plateStartPoint = GetPlateNextPoint(referencePoint, loopCount+1, scaleValue);
+                plateList.AddRange(shapeService.GetRectangle(out outPointList, plateStartPoint, plateLength, plateWidth, 0, 0, 3));
+
+                DrawOnePlateModel newOnePlate = new DrawOnePlateModel();
+                onePlateList.Add(newOnePlate);
+                newOnePlate.PlateWidth = plateWidth;
+                newOnePlate.PlateLength = plateLength;
+                newOnePlate.InsertPoint = GetSumPoint(plateStartPoint, 0, 0);
+                newOnePlate.CenterPoint = GetSumPoint(plateStartPoint, plateLength / 2, plateWidth / 2);
+
+                newOnePlate.Requirement = 1;
+                if (loopCount == 0)
+                    newOnePlate.Requirement = countMaxSheet;
+
+                Point3D arcCenterPoint = GetSumPoint(plateStartPoint, plateLength / 2, firstArcStartPointY);
+
+                for (int i = 0; i < countPieceArray[loopCount]; i++)
+                {
+                    Point3D eachArcCenterPoint = GetSumPoint(arcCenterPoint,0,-i * gapEachBendingPlate);
+
+                    Arc outerBendingPlate = new Arc(eachArcCenterPoint, radiusOuter, Utility.DegToRad(90 + eachPlateHalfDeg), Utility.DegToRad(90 - eachPlateHalfDeg));
+                    Arc innerBendingPlate = new Arc(eachArcCenterPoint, radiusInner, Utility.DegToRad(90 + eachPlateHalfDeg), Utility.DegToRad(90 - eachPlateHalfDeg));
+
+                    Line sideLeftLine = GetDiagonalLineOfArc(radiusOuter, eachArcCenterPoint, eachPlateHalfDeg, innerBendingPlate, outerBendingPlate);
+                    Line sideRightLine = GetDiagonalLineOfArc(radiusOuter, eachArcCenterPoint, -eachPlateHalfDeg, innerBendingPlate, outerBendingPlate);
+
+                    outlinesList.AddRange(new Entity[] {
+                                            innerBendingPlate, outerBendingPlate,
+                                            sideLeftLine, sideRightLine,
+                    });
+                }
+
+
+            }
+
+            styleService.SetLayerListEntity(ref plateList, layerService.LayerVirtualLine);
+            drawList.outlineList.AddRange(plateList);
+
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+            drawList.outlineList.AddRange(outlinesList);
+
+
+            // Singleton Data
+            if (arrangeType == PlateArrange_Type.RoofCompressionRing)
+            {
+                SingletonData.RoofComRingPlateList.Clear();
+                SingletonData.RoofComRingPlateList.AddRange(onePlateList);
+            }
+            else if (arrangeType == PlateArrange_Type.BottomAnnular)
+            {
+                SingletonData.BottomAnnularPlateList.Clear();
+                SingletonData.BottomAnnularPlateList.AddRange(onePlateList);
+            }
+
+
+            return drawList;
+
+
+
+            /*
+             *  Dimension
+             * 
+             * arcTop.MidPoint
+             * leftTopLine.StartPoint , bottomLeftLine.StartPoint  //  t@
+             * rightTopLine.EndPoint , bottomRightLine.EndPoint,   //  OutSide, Inside
+             * bottomUpLineRight.StartPoint , bottomUpLineRight.EndPoint   // 1.6
+             * bottomDistanceLine  // 3.2
+             * 
+             */
+        }
+
+
+        public Line GetDiagonalLineOfArc(double radius, Point3D centerPoint, double angle, Arc inLine, Arc outLine)
+        {
+            Line diagnalLine = null;
+
+            Line guideLine = new Line(centerPoint, outLine.MidPoint);
+            guideLine.Rotate(Utility.DegToRad(angle), Vector3D.AxisZ, centerPoint);
+
+            Point3D[] intersectInPoint = guideLine.IntersectWith(inLine);
+            Point3D[] intersectOutPoint = guideLine.IntersectWith(outLine);
+
+            return diagnalLine = new Line(intersectInPoint[0], intersectOutPoint[0]);
+        }
+
+        private double GetPlateCoutByCutting(double plateWidth, double plateLength, double radiusOuter, double innerWidth,
+            out double onePlateMaxCount, out double totalBendingPlate)
+        {
+
+
+            ///////////////////////
+            ///  CAD Data Setting
+            ///////////////////////
+
+
+            //double radiusouter = 16537;
+
+            double radiusInner = radiusOuter - innerWidth;
+
+            double distanceEachbendingPlate = 15;
+
+
+            // INFO : After calculate of data
+            double needTotalPlate = 0;
+            double maxBendPlateOfOnePlate = 0;
+
+            double gapEachBendingPlate = 0;
+
+
+            bool isRemainderPiece = false;
+            double countRemainderPiece = 0;
+
+
+            //////////////////////////////////////////////////////////
+            //// Calculate
+            //////////////////////////////////////////////////////////
+
+            totalBendingPlate = GetNeedAnnularCompRingCount(radiusOuter, plateLength, innerWidth);
+
+            double eachPlateDegree = 360 / totalBendingPlate;
+            double eachPlateHalfDeg = eachPlateDegree / 2;
+
+            gapEachBendingPlate = GetArcSpace(innerWidth, distanceEachbendingPlate, eachPlateHalfDeg);
+
+
+            // Clculate : first BendPlate height
+            double arcHeight = radiusInner - (radiusInner * Math.Cos(Utility.DegToRad(eachPlateHalfDeg)));
+            double firstBendPlateHeight = arcHeight + innerWidth;
+
+
+            // Calculate : MaxCreate bendingPlate of OnePlate ,  total Plate No.
+            double emptyWidth = plateWidth - firstBendPlateHeight - distanceEachbendingPlate;
+            maxBendPlateOfOnePlate = Math.Truncate(emptyWidth / gapEachBendingPlate) + 1; // +1 : first BendingPlate
+            /*
+            double spaceYEachBendPlate = bendingPlateThk + gapEachBendingPlate;
+            maxBendPlateOfOnePlate = Math.Truncate(emptyWidth / spaceYEachBendPlate) + 1; // +1 : first BendingPlate
+            /**/
+
+            double countMaxSheet = Math.Truncate(totalBendingPlate / maxBendPlateOfOnePlate);  // 최대조각으로 된 Sheet 장수
+            if ((totalBendingPlate % maxBendPlateOfOnePlate) > 0)
+            {
+                isRemainderPiece = true;
+                needTotalPlate = countMaxSheet + 1;
+                countRemainderPiece = totalBendingPlate - (countMaxSheet * maxBendPlateOfOnePlate);  // Sheet 외에 낱개
+            }
+            else
+            {
+                needTotalPlate = countMaxSheet;
+            }
+
+
+            onePlateMaxCount = maxBendPlateOfOnePlate;
+
+
+
+
+
+            return needTotalPlate;
+
+
+            /*
+             *  Dimension
+             * 
+             * arcTop.MidPoint
+             * leftTopLine.StartPoint , bottomLeftLine.StartPoint  //  t@
+             * rightTopLine.EndPoint , bottomRightLine.EndPoint,   //  OutSide, Inside
+             * bottomUpLineRight.StartPoint , bottomUpLineRight.EndPoint   // 1.6
+             * bottomDistanceLine  // 3.2
+             * 
+             */
+        }
+
+        public double GetArcSpace(double typ, double gap, double halfAngle)
+        {
+            // A function of calculating the distance to the next panel
+            // by receiving the half of the center of arc, the thickness of the panel, and the gap value.
+            // typ : thickness of the panel
+            // gap : The minimum distance between the panels.
+
+
+
+            return typ / Math.Cos(Utility.DegToRad(halfAngle)) + gap;
+
+
+
+        }
+
+        public double GetNeedAnnularCompRingCount(double radiusouter, double plateLength, double bendingPlateThk)
+        {
+            Point3D referencePoint = new Point3D(0, 0);
+            double totalBendingPlate = 0;
+
+            // Calculate : bendingPlate Length
+            //double minBendPlateCount = Math.Ceiling((2 * radiusouter * Math.PI) / plateLength);
+            double minBendPlateCount = Math.Floor((2 * radiusouter * Math.PI) / plateLength);
+
+            /* // 짝수 무시중..  짝수적용시 사용
+            if (0 != minBendPlateCount % 2) { totalBendingPlate = minBendPlateCount + 1; }  // Plate 장수를 짝수로 맞춤
+            /**/
+            totalBendingPlate = minBendPlateCount;
+
+            double eachPlateDegree = 360 / totalBendingPlate;
+            double eachPlateHalfDeg = eachPlateDegree / 2;
+
+            // testArc : Bending Plate
+            //double arcCenterPointX = pBottomLine.MidPoint.X;
+            //Point3D arcCenterPoint = GetSumPoint(referencePoint, arcCenterPointX, -radiusInner);
+            Arc testArc = new Arc(referencePoint, radiusouter, Utility.DegToRad(90 + eachPlateHalfDeg), Utility.DegToRad(90 - eachPlateHalfDeg));
+            double arcHeight = testArc.MidPoint.Y - testArc.StartPoint.Y;
+            double firstBendPlateHeight = arcHeight + bendingPlateThk;
+            double arcChordLength = testArc.EndPoint.X - testArc.StartPoint.X;
+            // double testArcLength = testArc.Length();
+
+            // plate 길이보다 Bending Plate의 CHD가 길면 BendingPlate 갯수 추가(각도 재계산:각도 작아짐)
+            if (arcChordLength > plateLength)
+            {
+                minBendPlateCount += 1;
+                /* // 짝수 무시중..  짝수적용시 사용
+                if (0 != minBendPlateCount % 2) { totalBendingPlate = minBendPlateCount + 1; }  // Plate 장수를 짝수로 맞춤
+                /**/
+                totalBendingPlate = minBendPlateCount;
+            }
+
+            return totalBendingPlate;
+
         }
 
 

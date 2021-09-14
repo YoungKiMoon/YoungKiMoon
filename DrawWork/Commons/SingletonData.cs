@@ -173,6 +173,21 @@ namespace DrawWork.Commons
         private static List<DrawOnePlateModel> _RoofPlateList = new List<DrawOnePlateModel>();
 
 
+        public static List<DrawOnePlateModel> BottomAnnularPlateList
+        {
+            get { return _BottomAnnularPlateList; }
+            set { _BottomAnnularPlateList = value; }
+        }
+        private static List<DrawOnePlateModel> _BottomAnnularPlateList = new List<DrawOnePlateModel>();
+
+        public static List<DrawOnePlateModel> RoofComRingPlateList
+        {
+            get { return _RoofComRingPlateList; }
+            set { _RoofComRingPlateList = value; }
+        }
+        private static List<DrawOnePlateModel> _RoofComRingPlateList = new List<DrawOnePlateModel>();
+
+
 
         // Method
         public static void Clear()
@@ -189,6 +204,9 @@ namespace DrawWork.Commons
             BottomPlateList.Clear();
             RoofPlateList.Clear();
 
+
+            BottomAnnularPlateList.Clear();
+            RoofComRingPlateList.Clear();
 
             // 사용 안함
             BottomCuttingList.Clear();

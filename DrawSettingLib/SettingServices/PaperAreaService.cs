@@ -721,7 +721,7 @@ namespace DrawSettingLib.SettingServices
             Detail16.TitleSubName = "DETAIL\"E\"-\"E\"";
             Detail16.IsFix = false;
             Detail16.Priority = 500;
-            Detail16.ScaleValue = 1;
+            Detail16.ScaleValue = 2;
 
             Detail16.ReferencePoint.X = 960000;
             Detail16.ReferencePoint.Y = 80000;
@@ -769,7 +769,7 @@ namespace DrawSettingLib.SettingServices
             Detail18.Priority = 500;
             Detail18.ScaleValue = 0; //Auto Scale
             Detail18.IsRepeat = true;
-            Detail18.otherWidth = 135;
+            Detail18.otherWidth = 135 - 15; // 135 -> dimension  position 
             Detail18.otherHeight = 50;
 
 
@@ -795,11 +795,13 @@ namespace DrawSettingLib.SettingServices
             Detail19.TitleSubName = "";
             Detail19.IsFix = false;
             Detail19.Priority = 900;
-            Detail19.ScaleValue = 1;
+            Detail19.ScaleValue = 0;
             Detail19.IsRepeat = true;
+            Detail19.otherWidth = 135 - 15; // 135 -> dimension  position 
+            Detail19.otherHeight = 50;
 
-            Detail19.ReferencePoint.X = 990000;
-            Detail19.ReferencePoint.Y = 90000;
+            Detail19.ReferencePoint.X = 980000;
+            Detail19.ReferencePoint.Y = 70000;
             Detail19.ModelCenterLocation.X = Detail19.ReferencePoint.X;
             Detail19.ModelCenterLocation.Y = Detail19.ReferencePoint.Y;
 
@@ -823,7 +825,7 @@ namespace DrawSettingLib.SettingServices
             Detail20.otherWidth = 130;
             Detail20.otherHeight = 30;
 
-            Detail20.ReferencePoint.X = 1000000;
+            Detail20.ReferencePoint.X = 960000;
             Detail20.ReferencePoint.Y = 90000;
             Detail20.ModelCenterLocation.X = Detail20.ReferencePoint.X;
             Detail20.ModelCenterLocation.Y = Detail20.ReferencePoint.Y;
@@ -981,7 +983,7 @@ namespace DrawSettingLib.SettingServices
             Detail26.TitleSubName = "DETAIL\"E\"-\"E\"";
             Detail26.IsFix = false;
             Detail26.Priority = 500;
-            Detail26.ScaleValue = 1;
+            Detail26.ScaleValue = 2;
 
             Detail26.ReferencePoint.X = 960000;
             Detail26.ReferencePoint.Y = 100000;
@@ -1030,7 +1032,7 @@ namespace DrawSettingLib.SettingServices
             Detail28.Priority = 500;
             Detail28.ScaleValue = 0; //Auto Scale
             Detail28.IsRepeat = true;
-            Detail28.otherWidth = 135;
+            Detail28.otherWidth = 135 - 15; // 135 -> dimension  position 
             Detail28.otherHeight = 50;
 
             Detail28.ReferencePoint.X = 980000;
@@ -1055,12 +1057,13 @@ namespace DrawSettingLib.SettingServices
             Detail29.TitleSubName = "";
             Detail29.IsFix = false;
             Detail29.Priority = 900;
-            Detail29.ScaleValue = 1;
+            Detail29.ScaleValue = 0; // Auto Scale
             Detail29.IsRepeat = true;
+            Detail29.otherWidth = 135 - 15; // 135 -> dimension  position 
+            Detail29.otherHeight = 50;
 
-
-            Detail29.ReferencePoint.X = 990000;
-            Detail29.ReferencePoint.Y = 90000;
+            Detail29.ReferencePoint.X = 980000;
+            Detail29.ReferencePoint.Y = 70000;
             Detail29.ModelCenterLocation.X = Detail29.ReferencePoint.X;
             Detail29.ModelCenterLocation.Y = Detail29.ReferencePoint.Y;
 
@@ -1084,7 +1087,7 @@ namespace DrawSettingLib.SettingServices
             Detail30.otherWidth = 130;
             Detail30.otherHeight = 30;
 
-            Detail30.ReferencePoint.X = 1000000;
+            Detail30.ReferencePoint.X = 960000;
             Detail30.ReferencePoint.Y = 90000;
             Detail30.ModelCenterLocation.X = Detail30.ReferencePoint.X;
             Detail30.ModelCenterLocation.Y = Detail30.ReferencePoint.Y;
@@ -1272,7 +1275,7 @@ namespace DrawSettingLib.SettingServices
             Detail37.Priority = 500;
             Detail37.ScaleValue = 0; //Auto Scale
             Detail37.IsRepeat = true;
-            Detail37.otherWidth = 135;
+            Detail37.otherWidth = 135 - 15; // 135 -> dimension  position 
             Detail37.otherHeight = 50;
 
 
@@ -1461,7 +1464,7 @@ namespace DrawSettingLib.SettingServices
             Detail44.Priority = 500;
             Detail44.ScaleValue = 0; //Auto Scale
             Detail44.IsRepeat = true;
-            Detail44.otherWidth = 135;
+            Detail44.otherWidth = 135 - 15; // 135 -> dimension  position 
             Detail44.otherHeight = 50;
 
 
@@ -1692,7 +1695,7 @@ namespace DrawSettingLib.SettingServices
             Detail55.Priority = 500;
             Detail55.ScaleValue = 1;
 
-            Detail55.ReferencePoint.X = 960000;
+            Detail55.ReferencePoint.X = 955000;
             Detail55.ReferencePoint.Y = 110000;
             Detail55.ModelCenterLocation.X = Detail55.ReferencePoint.X;
             Detail55.ModelCenterLocation.Y = Detail55.ReferencePoint.Y;
@@ -1721,8 +1724,8 @@ namespace DrawSettingLib.SettingServices
             Detail56.otherHeight = 50;
 
 
-            Detail56.ReferencePoint.X = 970000;
-            Detail56.ReferencePoint.Y = 110000;
+            Detail56.ReferencePoint.X = 1000000;
+            Detail56.ReferencePoint.Y = 100000;
             Detail56.ModelCenterLocation.X = Detail56.ReferencePoint.X;
             Detail56.ModelCenterLocation.Y = Detail56.ReferencePoint.Y;
 
@@ -1747,8 +1750,8 @@ namespace DrawSettingLib.SettingServices
             Detail57.otherHeight = 50;
 
 
-            Detail57.ReferencePoint.X = 980000;
-            Detail57.ReferencePoint.Y = 110000;
+            Detail57.ReferencePoint.X = 1000000;
+            Detail57.ReferencePoint.Y = 70000;
             Detail57.ModelCenterLocation.X = Detail57.ReferencePoint.X;
             Detail57.ModelCenterLocation.Y = Detail57.ReferencePoint.Y;
 
@@ -1929,7 +1932,7 @@ namespace DrawSettingLib.SettingServices
             Detail66.otherHeight = 50;
 
 
-            Detail66.ReferencePoint.X = 970000;
+            Detail66.ReferencePoint.X = 1000000;
             Detail66.ReferencePoint.Y = 100000;
             Detail66.ModelCenterLocation.X = Detail66.ReferencePoint.X;
             Detail66.ModelCenterLocation.Y = Detail66.ReferencePoint.Y;
@@ -1946,7 +1949,7 @@ namespace DrawSettingLib.SettingServices
             Detail67.Name = PAPERMAIN_TYPE.DETAIL;
             Detail67.SubName = PAPERSUB_TYPE.RoofCompressionRingCuttingPlan;
             Detail67.TitleName = "COMMPRESSION RING CUTTING PLAN";
-            Detail67.TitleSubName = "SALE 1/80";//차후 계산값 적용
+            Detail67.TitleSubName = "SCALE 1/80";//차후 계산값 적용
             Detail67.IsFix = false;
             Detail67.Priority = 900;
             Detail67.ScaleValue = 0; //Auto Scale
@@ -1955,8 +1958,8 @@ namespace DrawSettingLib.SettingServices
             Detail67.otherHeight = 50;
 
 
-            Detail67.ReferencePoint.X = 980000;
-            Detail67.ReferencePoint.Y = 110000;
+            Detail67.ReferencePoint.X = 1000000;
+            Detail67.ReferencePoint.Y = 70000;
             Detail67.ModelCenterLocation.X = Detail67.ReferencePoint.X;
             Detail67.ModelCenterLocation.Y = Detail67.ReferencePoint.Y;
 
@@ -2113,7 +2116,7 @@ namespace DrawSettingLib.SettingServices
             Detail75.otherHeight = 50;
 
 
-            Detail75.ReferencePoint.X = 960000;
+            Detail75.ReferencePoint.X = 1000000;
             Detail75.ReferencePoint.Y = 100000;
             Detail75.ModelCenterLocation.X = Detail75.ReferencePoint.X;
             Detail75.ModelCenterLocation.Y = Detail75.ReferencePoint.Y;
@@ -2272,7 +2275,7 @@ namespace DrawSettingLib.SettingServices
             Detail85.otherHeight = 50;
 
 
-            Detail85.ReferencePoint.X = 960000;
+            Detail85.ReferencePoint.X = 1000000;
             Detail85.ReferencePoint.Y = 100000;
             Detail85.ModelCenterLocation.X = Detail85.ReferencePoint.X;
             Detail85.ModelCenterLocation.Y = Detail85.ReferencePoint.Y;

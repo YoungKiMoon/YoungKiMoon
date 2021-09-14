@@ -427,7 +427,8 @@ namespace PaperSetting.Services
                         double refRow = 4;
                         double refColumn = 3;
                         double onePageCount = refRow * refColumn;
-                        double cuttingPageCount = Math.Ceiling(SingletonData.BottomPlateList.Count /onePageCount);
+                        double cuttingPlanItemCount = SingletonData.BottomPlateList.Count + SingletonData.BottomAnnularPlateList.Count;
+                        double cuttingPageCount = Math.Ceiling(cuttingPlanItemCount / onePageCount);
                         for (int i = 0; i < cuttingPageCount; i++)
                         {
 
@@ -441,6 +442,20 @@ namespace PaperSetting.Services
                             // Basic
                             newPaper1.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
                             newList.Add(newPaper1);
+
+                            if (i == 0)
+                            {
+                                PaperTableModel newTable01 = new PaperTableModel();
+                                newTable01.No = "1";
+                                newTable01.Name = "Bottom Plate BM";
+                                newTable01.TableSelection = "Bottom_PLATE_BM";
+                                newTable01.Dock.DockPosition = DOCKPOSITION_TYPE.RIGHT;
+                                newTable01.Dock.VerticalAlignment = VERTICALALIGNMENT_TYPE.TOP;
+                                newTable01.Dock.DockPriority = 1;
+
+
+                                newPaper1.Tables.Add(newTable01);
+                            }
                         }
                     }
 
@@ -511,7 +526,8 @@ namespace PaperSetting.Services
                         double refRow = 4;
                         double refColumn = 3;
                         double onePageCount = refRow * refColumn;
-                        double cuttingPageCount = Math.Ceiling(SingletonData.RoofPlateList.Count / onePageCount);
+                        double cuttingPlanItemCount = SingletonData.RoofPlateList.Count + SingletonData.RoofComRingPlateList.Count;
+                        double cuttingPageCount = Math.Ceiling(cuttingPlanItemCount / onePageCount);
                         for (int i = 0; i < cuttingPageCount; i++)
                         {
 
@@ -525,6 +541,21 @@ namespace PaperSetting.Services
                             // Basic
                             newPaper1.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
                             newList.Add(newPaper1);
+
+
+                            if (i == 0)
+                            {
+                                PaperTableModel newTable01 = new PaperTableModel();
+                                newTable01.No = "1";
+                                newTable01.Name = "Roof Plate BM";
+                                newTable01.TableSelection = "Roof_PLATE_BM";
+                                newTable01.Dock.DockPosition = DOCKPOSITION_TYPE.RIGHT;
+                                newTable01.Dock.VerticalAlignment = VERTICALALIGNMENT_TYPE.TOP;
+                                newTable01.Dock.DockPriority = 1;
+
+
+                                newPaper1.Tables.Add(newTable01);
+                            }
                         }
                     }
 
@@ -765,13 +796,49 @@ namespace PaperSetting.Services
                 newModel.ModelCenterLocation.Y = eachCutting.CenterPoint.Y;
 
                 // Sub Title
-                //newModel.TitleName=eachCutting.displayName + "-" + newModel.TitleName;
+                //newModel.TitleName="R" + "-" + newModel.TitleName;
 
                 // View ID
                 newModel.viewID += itemCount;
                 roofAreaModel.Add(newModel);
             }
             SingletonData.PaperArea.AreaList.AddRange(roofAreaModel);
+
+
+
+            // Roof : Compression Ring
+            PaperAreaModel roofComRingCuttingPlanModel = SingletonData.PaperArea.GetAreaModel(PAPERMAIN_TYPE.DETAIL, PAPERSUB_TYPE.RoofCompressionRingCuttingPlan);
+            // 삭제 매우 중요함
+            SingletonData.PaperArea.AreaList.Remove(roofComRingCuttingPlanModel);
+            List<PaperAreaModel> roofComRingAreaModel = new List<PaperAreaModel>();
+            foreach (DrawOnePlateModel eachCutting in SingletonData.RoofComRingPlateList)
+            {
+                itemCount++;
+                pageCount = Math.Ceiling(itemCount / pageMaxCount);
+
+                PaperAreaModel newModel = roofComRingCuttingPlanModel.CustomClone();
+
+                // Page Number
+                newModel.Page = pageCount;
+                // Visible
+                newModel.visible = true;
+                // Scale
+                newModel.ScaleValue = scaleService.GetScaleCalValue(newModel.otherWidth, newModel.otherHeight, eachCutting.PlateLength, eachCutting.PlateWidth);
+                // Model CenterPoint
+                newModel.ModelCenterLocation.X = eachCutting.CenterPoint.X + 10 * newModel.ScaleValue;
+                newModel.ModelCenterLocation.Y = eachCutting.CenterPoint.Y;
+
+                // Sub Title
+                //newModel.TitleName=eachCutting.displayName + "-" + newModel.TitleName;
+
+                newModel.TitleSubName = "(SCALE 1/" + newModel.ScaleValue + ")";
+
+                // View ID
+                newModel.viewID += itemCount;
+                roofComRingAreaModel.Add(newModel);
+            }
+            SingletonData.PaperArea.AreaList.AddRange(roofComRingAreaModel);
+
 
 
 
@@ -800,7 +867,7 @@ namespace PaperSetting.Services
                 newModel.ModelCenterLocation.Y = eachCutting.CenterPoint.Y;
 
                 // Sub Title
-                //newModel.TitleName = eachCutting.displayName + "-" + newModel.TitleName;
+                //newModel.TitleName = "B"+ "-" + newModel.TitleName;
 
                 // View ID
                 newModel.viewID += itemCount;
@@ -810,8 +877,42 @@ namespace PaperSetting.Services
 
 
 
+            // Bottom : Annular
+            PaperAreaModel bottomAnnularCuttingPlanModel = SingletonData.PaperArea.GetAreaModel(PAPERMAIN_TYPE.DETAIL, PAPERSUB_TYPE.AnnularPlateCuttingPlan);
+            // 삭제 매우 중요함
+            SingletonData.PaperArea.AreaList.Remove(bottomAnnularCuttingPlanModel);
+            List<PaperAreaModel> bottomAnnularAreaModel = new List<PaperAreaModel>();
+            foreach (DrawOnePlateModel eachCutting in SingletonData.BottomAnnularPlateList)
+            {
+                itemCount++;
+                pageCount = Math.Ceiling(itemCount / pageMaxCount);
+
+                PaperAreaModel newModel = bottomAnnularCuttingPlanModel.CustomClone();
+
+                // Page Number
+                newModel.Page = pageCount;
+                // Visible
+                newModel.visible = true;
+                // Scale
+                newModel.ScaleValue = scaleService.GetScaleCalValue(newModel.otherWidth, newModel.otherHeight, eachCutting.PlateLength, eachCutting.PlateWidth);
+                // Model CenterPoint
+                newModel.ModelCenterLocation.X = eachCutting.CenterPoint.X + 10 * newModel.ScaleValue;
+                newModel.ModelCenterLocation.Y = eachCutting.CenterPoint.Y;
+
+                // Sub Title
+                //newModel.TitleName=eachCutting.displayName + "-" + newModel.TitleName;
+                newModel.TitleSubName="(SCALE 1/" + newModel.ScaleValue +")";
+                // View ID
+                newModel.viewID += itemCount;
+                bottomAnnularAreaModel.Add(newModel);
+            }
+            SingletonData.PaperArea.AreaList.AddRange(bottomAnnularAreaModel);
+
+
+
             // Priority
-            SingletonData.PaperArea.AreaList.Sort((x, y) => x.Priority.CompareTo(y.Priority));
+            SingletonData.PaperArea.AreaList = SingletonData.PaperArea.AreaList.OrderByDescending(x => x.IsFix).ThenBy(x=>x.Priority).ToList();
+            //SingletonData.PaperArea.AreaList.Sort((x, y) => x.Priority.CompareTo(y.Priority));
         }
 
 

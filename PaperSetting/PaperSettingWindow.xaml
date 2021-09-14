@@ -62,10 +62,11 @@
                             </CheckBox>
                             <Button x:Name="btnRebuild" Content="REBUILD" Style="{StaticResource customButton}" Margin="10,2,2,0" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Padding="10,0" Background="#FFF0BBBB"/>
                             <Button x:Name="btnRegen" Content="REGEN" Style="{StaticResource customButton}" Margin="10,2,2,0" Padding="10,0" Background="#FF6FBBCB" PreviewMouseLeftButtonUp="btnRegen_PreviewMouseLeftButtonUp"/>
-                            <Button x:Name="btnOrientationAdj" Content="ORIENTATION ADJ" Style="{StaticResource customButton}" Margin="10,2,2,0"  Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnOrientationAdj_PreviewMouseLeftButtonUp" />
+                            <Button x:Name="btnOrientationAdj" Content="ORIENT ADJ" Style="{StaticResource customButton}" Margin="10,2,2,0"  Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnOrientationAdj_PreviewMouseLeftButtonUp" />
                             <Button x:Name="btnBlock" Content="BLOCK LOAD" Style="{StaticResource customButton}" Margin="2,2,2,0"  Padding="2,0,2,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnBlock_PreviewMouseLeftButtonUp"/>
-                            <Button x:Name="btnEnvironment" Content="ENVIRONMENT" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnEnvironment_PreviewMouseLeftButtonUp"/>
+                            <Button x:Name="btnEnvironment" Visibility="Collapsed" Content="ENVIRONMENT" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnEnvironment_PreviewMouseLeftButtonUp"/>
                             <Button x:Name="btnTitleBlock" Content="TITLE BLOCK" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnTitleBlock_PreviewMouseLeftButtonUp"/>
+                            <Button x:Name="btnBM" Content="CREAT BM" Style="{StaticResource customButton}" BorderThickness="1" Margin="2,2,2,0" Padding="10,0" Background="#FF90E0F1" PreviewMouseLeftButtonUp="btnBM_PreviewMouseLeftButtonUp" />
                         </StackPanel>
                     </Border>
                     <Button x:Name="btnExport" Content="CREATE DWG" Style="{StaticResource customButton}" Padding="10,2" FontWeight="Bold"  Margin="2,8,2,2" Background="#FF09A7C9"  BorderBrush="#FF63ADBD" PreviewMouseLeftButtonUp="btnExport_PreviewMouseLeftButtonUp"/>

@@ -274,6 +274,8 @@ namespace DrawWork.Commons
         NotSet,
         Roof,
         Bottom,
+        RoofCompressionRing,
+        BottomAnnular,
     }
 
     //

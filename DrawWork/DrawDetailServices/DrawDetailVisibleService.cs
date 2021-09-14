@@ -176,7 +176,7 @@ namespace DrawWork.DrawDetailServices
                         //case PAPERSUB_TYPE.BottomPlateShellJointDetail:           // 2.5D
 
                         case PAPERSUB_TYPE.BottomPlateCuttingPlan:                 
-                        //case PAPERSUB_TYPE.AnnularPlateCuttingPlan:               // 형상 안그림
+                        case PAPERSUB_TYPE.AnnularPlateCuttingPlan:           
                         
 
                         case PAPERSUB_TYPE.RoofPlateArrangement:
@@ -186,7 +186,7 @@ namespace DrawWork.DrawDetailServices
                         case PAPERSUB_TYPE.RoofCompressionRingJointDetail:
 
                         case PAPERSUB_TYPE.RoofPlateCuttingPlan:              
-                            //case PAPERSUB_TYPE.RoofCompressionRingCuttingPlan:    // 미작업
+                        case PAPERSUB_TYPE.RoofCompressionRingCuttingPlan:    
 
                             eachArea.visible = true;
                             break;
@@ -208,13 +208,24 @@ namespace DrawWork.DrawDetailServices
                         case PAPERSUB_TYPE.BottomPlateWeldingDetailD:
                         case PAPERSUB_TYPE.BottomPlateWeldingDetailBB:
 
+
                         //case PAPERSUB_TYPE.BottomPlateShellJointDetail:           // 2.5D
 
                         case PAPERSUB_TYPE.BottomPlateCuttingPlan:
-                            //case PAPERSUB_TYPE.AnnularPlateCuttingPlan:               // 형상 안그림
-                        
+                        case PAPERSUB_TYPE.AnnularPlateCuttingPlan:
 
 
+                            //case PAPERSUB_TYPE.RoofPlateArrangement:
+                            //case PAPERSUB_TYPE.RoofPlateWeldingDetailD:
+                            //case PAPERSUB_TYPE.RoofPlateWeldingDetailC:
+                            //case PAPERSUB_TYPE.RoofPlateWeldingDetailDD:
+                            //case PAPERSUB_TYPE.RoofCompressionRingJointDetail:
+
+                            //case PAPERSUB_TYPE.RoofPlateCuttingPlan:
+                            //case PAPERSUB_TYPE.RoofCompressionRingCuttingPlan:
+
+
+                            eachArea.visible = true;
                             break;
 
 

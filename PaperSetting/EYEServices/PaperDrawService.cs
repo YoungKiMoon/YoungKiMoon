@@ -279,11 +279,24 @@ namespace PaperSetting.EYEServices
 
                 }
 
-                if(eachPaper.Basic.Title=="SHELL PLATE ARRANGEMENT")
+                if (eachPaper.Name == PAPERMAIN_TYPE.ShellPlateArrangement)
                 {
-                    //CreateVectorViewDetail01(newSheet, eachPaper.ViewPorts[0].ViewPort, scaleValue, assemblyData);
+
                     if(eachPaper.Tables.Count>0)
-                        CreateTableBlockShellPlate(eachPaper.Tables[0], newSheet, eachPaper.Tables[0].No, assemblyData);
+                        CreateTableBlockShellPlate(eachPaper.Tables[0], newSheet, eachPaper.Tables[0].No,PAPERMAIN_TYPE.ShellPlateArrangement, assemblyData);
+                }
+
+                if (eachPaper.Name == PAPERMAIN_TYPE.BottomPlateCuttingPlan)
+                {
+
+                    if (eachPaper.Tables.Count > 0)
+                        CreateTableBlockShellPlate(eachPaper.Tables[0], newSheet, eachPaper.Tables[0].No, PAPERMAIN_TYPE.BottomPlateCuttingPlan, assemblyData);
+                }
+                if (eachPaper.Name == PAPERMAIN_TYPE.RoofPlateCuttingPlan)
+                {
+
+                    if (eachPaper.Tables.Count > 0)
+                        CreateTableBlockShellPlate(eachPaper.Tables[0], newSheet, eachPaper.Tables[0].No, PAPERMAIN_TYPE.RoofPlateCuttingPlan, assemblyData);
                 }
 
 
@@ -794,9 +807,9 @@ namespace PaperSetting.EYEServices
         }
 
 
-        private void CreateTableBlockShellPlate(PaperTableModel selTable, Sheet selSheet, string bName, AssemblyModel assemblyData)
+        private void CreateTableBlockShellPlate(PaperTableModel selTable, Sheet selSheet, string bName, PAPERMAIN_TYPE selDwgName, AssemblyModel assemblyData)
         {
-            BlockReference newBr = BuildPaperTableShellPlateBM(selTable, assemblyData, out Block tableBlock);
+            BlockReference newBr = BuildPaperTableShellPlateBM(selTable, assemblyData, selDwgName, out Block tableBlock);
             newBr.LayerName = layerService.LayerBlock;
 
             tableBlock.Name += bName + "_" + singleDraw.Blocks.Count;
@@ -1656,7 +1669,7 @@ namespace PaperSetting.EYEServices
         }
 
 
-        private BlockReference BuildPaperTableShellPlateBM(PaperTableModel selTable, AssemblyModel assemblyData, out Block selBlock)
+        private BlockReference BuildPaperTableShellPlateBM(PaperTableModel selTable, AssemblyModel assemblyData, PAPERMAIN_TYPE selDwgName,  out Block selBlock)
         {
             //int rowCount = selTable.TableList.Count;
             //int columnCount = selTable.TableList[0].Length;
@@ -1771,44 +1784,48 @@ namespace PaperSetting.EYEServices
             currentY = tableHeight-titleRowHeight;
             foreach (DrawBMModel eachBM in SingletonData.BMList)
             {
-                realCount++;
-                int colNumber = 0;
-                double colWidth = 0;      
+                if(eachBM.DWGName== selDwgName)
+                {
+                    realCount++;
+                    int colNumber = 0;
+                    double colWidth = 0;
 
-                // Start firts column
-                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.No, fontHeight, 1, Text.alignmentType.MiddleCenter));
+                    // Start firts column
+                    newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.No, fontHeight, 1, Text.alignmentType.MiddleCenter));
 
-                colWidth += widthList[colNumber];
-                colNumber++;
-                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Name, fontHeight, 1, Text.alignmentType.MiddleCenter));
+                    colWidth += widthList[colNumber];
+                    colNumber++;
+                    newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Name, fontHeight, 1, Text.alignmentType.MiddleCenter));
 
-                colWidth += widthList[colNumber];
-                colNumber++;
-                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Material, fontHeight, 1, Text.alignmentType.MiddleCenter));
+                    colWidth += widthList[colNumber];
+                    colNumber++;
+                    newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Material, fontHeight, 1, Text.alignmentType.MiddleCenter));
 
-                colWidth += widthList[colNumber];
-                colNumber++;
-                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Dimension, fontHeight, 1, Text.alignmentType.MiddleCenter));
+                    colWidth += widthList[colNumber];
+                    colNumber++;
+                    newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Dimension, fontHeight, 1, Text.alignmentType.MiddleCenter));
 
-                colWidth += widthList[colNumber];
-                colNumber++;
-                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Set, fontHeight, 1, Text.alignmentType.MiddleCenter));
+                    colWidth += widthList[colNumber];
+                    colNumber++;
+                    newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Set, fontHeight, 1, Text.alignmentType.MiddleCenter));
 
-                colWidth += widthList[colNumber];
-                colNumber++;
-                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Weight, fontHeight, 1, Text.alignmentType.MiddleCenter));
+                    colWidth += widthList[colNumber];
+                    colNumber++;
+                    newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Weight, fontHeight, 1, Text.alignmentType.MiddleCenter));
 
-                colWidth += widthList[colNumber];
-                colNumber++;
-                newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Remark, fontHeight, 1, Text.alignmentType.MiddleCenter));
+                    colWidth += widthList[colNumber];
+                    colNumber++;
+                    newList.Add(GetNewTextWhite(GetSumPoint(refPoint, colWidth + widthList[colNumber] / 2, currentY - rowHeight / 2), eachBM.Remark, fontHeight, 1, Text.alignmentType.MiddleCenter));
 
 
-                currentY -= rowHeight;
+                    currentY -= rowHeight;
+                }
+
             }
 
             BlockReference newBr = new BlockReference(selTable.Location.X, selTable.Location.Y, 0, "PAPER_TABLE" + selTable.No, 1, 1, 1, 0);
 
-            Block newBl = new Block("PAPER_TABLE_" + selTable.No);
+            Block newBl = new Block("PAPER_TABLE_" +selTable.Name + selTable.No);
 
             styleService.SetLayerListEntity(ref newList, layerService.LayerDimension);
             newBl.Entities.AddRange(newList);

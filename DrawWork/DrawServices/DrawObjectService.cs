@@ -3067,7 +3067,7 @@ namespace DrawWork.DrawServices
                     goto case "allways";
 
                 case "annularplatecuttingplan":
-                    //returnEntity.AddDrawEntity(detailService.detailTempService.ArrangeShellPlate(ref refPoint, ref curPoint, selModel, scaleValue));
+                    returnEntity.AddDrawEntity(detailService.detailCuttingPlanService.DrawBottomAnnularCuttingPlan(ref refPoint, ref curPoint, selModel, scaleValue));
                     goto case "allways";
 
                 case "backingstrip":
@@ -3106,8 +3106,7 @@ namespace DrawWork.DrawServices
                     returnEntity.AddDrawEntity(detailService.detailCuttingPlanService.DrawRoofCuttingPlan(ref refPoint, ref curPoint, selModel, scaleValue));
                     goto case "allways";
                 case "roofcompressionringcuttingplan":
-                    // 그려야함
-                    // returnEntity.AddDrawEntity(detailService.detailTempService.ArrangeShellPlate(ref refPoint, ref curPoint, selModel, scaleValue));
+                    returnEntity.AddDrawEntity(detailService.detailCuttingPlanService.DrawRoofComRingCuttingPlan(ref refPoint, ref curPoint, selModel, scaleValue));
                     goto case "allways";
 
 

@@ -113,6 +113,7 @@
     <Compile Include="DrawGridServices\DrawPaperGridService.cs" />
     <Compile Include="DrawGridServices\DrawPaperGridModel.cs" />
     <Compile Include="DrawModels\DrawAssyModel.cs" />
+    <Compile Include="DrawModels\DrawBMExportModel.cs" />
     <Compile Include="DrawModels\DrawBMLeaderModel.cs" />
     <Compile Include="DrawModels\DrawBMModel.cs" />
     <Compile Include="DrawModels\DrawBMNumberModel.cs" />

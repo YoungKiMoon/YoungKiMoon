@@ -128,7 +128,7 @@ namespace DesignBoard.ViewModels
 
         public MainWindowViewModel()
         {
-            designBoardVersion = "[ Ver 1.315 ]";
+            designBoardVersion = "[ Ver 1.319 ]";
             checkList = new CheckListModel();
 
             engineeringFile = new FileModel();

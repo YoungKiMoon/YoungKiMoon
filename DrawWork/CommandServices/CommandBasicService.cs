@@ -333,12 +333,14 @@ namespace DrawWork.CommandServices
                         case PAPERSUB_TYPE.ShellPlateArrangement:
 
                             double firstCourse = valueService.GetDoubleValue(assemblyData.ShellOutput[0].Thickness);
+                            double shellOnePlateLength = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateMaxLength);
                             double shellCircum = (tankID +(firstCourse*2)) * Math.PI;
+                            shellCircum += shellOnePlateLength;
                             double shellCircumHalf = shellCircum/2;
                             double shellHalf = tankHeight / 2;
 
                             // Scale
-                            selPaperAreaModel.ScaleValue = scaleService.GetScaleCalValue(580-40, 200, shellCircum, tankHeight);
+                            selPaperAreaModel.ScaleValue = scaleService.GetScaleCalValue(580, 200, shellCircum, tankHeight);
                             // Center
                             selPaperAreaModel.ModelCenterLocation.X = refPoint.X + shellCircumHalf;
                             selPaperAreaModel.ModelCenterLocation.Y = refPoint.Y + shellHalf;

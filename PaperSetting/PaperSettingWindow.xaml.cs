@@ -407,9 +407,7 @@ namespace PaperSetting
             DrawDetailVisibleService detailService = new DrawDetailVisibleService(newTankData,testModel);
             detailService.SetDetailVisible(SingletonData.PaperArea.AreaList);
 
-            // BM List
-            DrawBMService bmService = new DrawBMService(newTankData);
-            SingletonData.BMList = bmService.CreateBMModel();
+
 
 
 
@@ -670,6 +668,11 @@ namespace PaperSetting
 
             if (selView.newTankData != null)
             {
+                // BM List
+                DrawBMService bmService = new DrawBMService(selView.newTankData,this.testModel);
+                SingletonData.BMList = bmService.CreateBMModel();
+
+
                 PaperSettingService newSetting = new PaperSettingService();
 
 
@@ -1144,6 +1147,7 @@ namespace PaperSetting
             this.testModel.Refresh();
 
             this.testDraw.Entities.RegenAllCurved(0.0005);
+            this.testDraw.Entities.Regen();
             this.testDraw.Refresh();
             this.testDraw.ZoomFit();
         }
@@ -1228,6 +1232,51 @@ namespace PaperSetting
             {
                 MessageBox.Show("파일 경로가 올바르지 않습니다.");
             }
+        }
+
+        private void btnBM_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (One_Click())
+            {
+                StartBMCreate();
+            }
+        }
+
+        private void StartBMCreate()
+        {
+            string selName = DateTime.Now.ToString("yyyyMMdd") + "_BMList.xlsx";
+            //string newPath = System.IO.Path.Combine(selPath, selName);
+
+            string createFilePath = "";
+
+            SaveFileDialog newFiledialog = new SaveFileDialog();
+            newFiledialog.Title = "BM List 파일 저장";
+            //newFiledialog.InitialDirectory = selPath;
+            newFiledialog.FileName = selName;
+            newFiledialog.Filter = "BM List File|*.xlsx";
+
+            if (newFiledialog.ShowDialog(this) == true)
+                createFilePath = newFiledialog.FileName;
+
+            if (createFilePath == "")
+                return;
+
+
+
+
+            PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
+            DrawBMService bmService = new DrawBMService(selView.newTankData, this.testModel);
+            List<List<string>> bmList = bmService.GetBMListVER01();
+
+            EPService excelService = new EPService();
+            if (excelService.CreateBM(createFilePath, bmList))
+            {
+                MessageBox.Show("생성 완료!");
+            }
+            else
+            {
+                MessageBox.Show("생성 실패!");
+            }   
         }
     }
 }
