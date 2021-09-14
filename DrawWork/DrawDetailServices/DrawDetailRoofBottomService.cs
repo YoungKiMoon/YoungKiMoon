@@ -499,17 +499,643 @@ namespace DrawWork.DrawDetailServices
 
         public List<DrawPlateModel> GetPlateModel_New(PlateArrange_Type arrangeType, List<Entity> selEntities, double plateWidth, double selRadius, Point3D selCenterPoint)
         {
+
+            string plateNamePre = "";
+            if (arrangeType == PlateArrange_Type.Bottom)
+                plateNamePre = "B";
+            else if (arrangeType == PlateArrange_Type.Roof)
+                plateNamePre = "R";
+
             List<DrawPlateModel> plateList = new List<DrawPlateModel>();
 
             Dictionary<double, double> xDic = new Dictionary<double, double>();
             Dictionary<double, double> yDic = new Dictionary<double, double>();
             foreach (ICurve eachLine in selEntities)
             {
-                if()
+                double startX = eachLine.StartPoint.X;
+                double startY = eachLine.StartPoint.Y;
+                double endX = eachLine.EndPoint.X;
+                double endY = eachLine.EndPoint.Y;
+                if (!xDic.ContainsKey(startX))
+                    xDic.Add(startX, startX);
+                if (!xDic.ContainsKey(endX))
+                    xDic.Add(endX, endX);
+
+                if (!yDic.ContainsKey(startY))
+                    yDic.Add(startY, startY);
+                if (!yDic.ContainsKey(endY))
+                    yDic.Add(endY, endY);
             }
 
-            return plateList;
+            List<double> xList = xDic.Keys.OrderBy(x=>x).ToList();
+            List<double> yList = yDic.Keys.OrderByDescending(x => x).ToList();
+            Dictionary<double, int> xSortDic = new Dictionary<double, int>();
+            Dictionary<double, int> ySortDic = new Dictionary<double, int>();
+            Dictionary<int, double> xSortNumberDic = new Dictionary<int, double>();
+            Dictionary<int, double> ySortNumberDic = new Dictionary<int, double>();
+            for (int i = 0; i < xList.Count; i++)
+            {
+                xSortDic.Add(xList[i], i + 1);
+                xSortNumberDic.Add(i + 1, xList[i]);
+            }
+            for (int i = 0; i < yList.Count; i++)
+            {
+                ySortDic.Add(yList[i], i + 1);
+                ySortNumberDic.Add(i + 1, xList[i]);
+            }
+
+            // Create Box
+            int xSize = xSortDic.Count+2;
+            int ySize = ySortDic.Count+2;
+            DrawBoxCellModel[,] Box = new DrawBoxCellModel[xSize,ySize];
+            for(int x = 0; x < xSize; x++)
+                for(int y = 0; y < ySize; y++)
+                    Box[x, y] = new DrawBoxCellModel();
+                
+            // Line 정보 입력
+            foreach(ICurve eachLine in selEntities)
+            {
+                GetMinMaxValue(eachLine.StartPoint.X, eachLine.EndPoint.X, out double xMin, out double xMax);
+                GetMinMaxValue(eachLine.StartPoint.Y, eachLine.EndPoint.Y, out double yMin, out double yMax);
+                if (xMin == xMax)
+                {
+                    // Vertical Line : X 기준의 오른쪽
+                    int xLIndex = xSortDic[xMin];
+                    int xRIndex = xLIndex + 1;
+                    int ySIndex = ySortDic[yMin];
+                    int yEIndex = ySortDic[yMax];
+                    for (int y = ySIndex; y <= yEIndex; y++)
+                    {
+                        Box[xLIndex, y].RightLine = true;
+                        Box[xRIndex, y].LeftLine = true;
+                        Box[xRIndex, y].Status = BoxCell_Type.Empty;
+                        Box[xLIndex, y].Status = BoxCell_Type.Empty;
+                    }
+                }
+                else if (yMin == yMax)
+                {
+                    // Horizontal Line : Y 기준의 아래쪽
+                    int yUIndex = ySortDic[yMin];
+                    int yDIndex = yUIndex + 1;
+                    int xSIndex = xSortDic[xMin];
+                    int xEIndex = xSortDic[xMax];
+                    for(int x = xSIndex; x <= xEIndex; x++)
+                    {
+                        Box[x, yUIndex].BottomLine = true;
+                        Box[x, yDIndex].TopLine = true;
+                        Box[x, yUIndex].Status = BoxCell_Type.Empty;
+                        Box[x, yDIndex].Status = BoxCell_Type.Empty;
+                    }
+
+
+                }
+            }
+
+
+            // Create Plate
+            List<int> xIndexList=GetCenterIndexList(xSize);
+            List<int> yIndexList = GetCenterIndexList(ySize);
+            for(int y = 0; y < ySize; y++)
+            {
+                for(int x = 0; x < xSize; x++)
+                {
+                    if (Box[x, y].Status == BoxCell_Type.Empty)
+                    {
+                        // 1. 좌측 하단 찾기
+                        int xLDBox = x;
+                        int yLDBox = y;
+                        for (int xMove = x; xMove >= 0; xMove--)
+                        {
+                            if (Box[xMove, y].Status != BoxCell_Type.Empty)
+                                break;
+                            xLDBox = xMove;
+                            if (Box[xMove, y].LeftLine )
+                                break;
+                        }
+                        for (int yMove = y; yMove < ySize; yMove++)
+                        {
+                            if (Box[xLDBox, yMove].Status != BoxCell_Type.Empty)
+                                break;
+                            yLDBox = yMove;
+                            if (Box[xLDBox, yMove].BottomLine)
+                                break;
+                        }
+
+                        // 2. 우측 상단 찾기
+                        int xRTBox = x;
+                        int yRTBox = y;
+                        for (int xMove = x; xMove < xSize; xMove++)
+                        {
+                            if (Box[xMove, y].Status != BoxCell_Type.Empty)
+                                break;
+                            xLDBox = xMove;
+                            if (Box[xMove, y].RightLine)
+                                break;
+                        }
+                        for (int yMove = y; yMove >= 0; yMove--)
+                        {
+                            if (Box[xLDBox, yMove].Status != BoxCell_Type.Empty)
+                                break;
+                            yLDBox = yMove;
+                            if (Box[xLDBox, yMove].TopLine)
+                                break;
+                        }
+
+                        // 3. 채우기
+                        for (int yMove = yLDBox; yMove >= yRTBox; yMove--)
+                            for (int xMove = xLDBox; xMove <= xRTBox; xMove++)
+                                if (Box[xMove, yMove].Status == BoxCell_Type.Empty)
+                                    Box[xMove, yMove].Status = BoxCell_Type.Use;
+
+                        // 4. 판별하기
+                        // 4.1 길이 구하기
+                        GetCellAreaHorizontalLength(Box, xSortNumberDic, ySortNumberDic,
+                                    xLDBox, yLDBox, xRTBox, yRTBox,
+                                    out double TLength, out double DLength, out double LLength, out double RLength);
+
+                        DrawPlateModel newPlate = GetNewPlateModel(selCenterPoint,xLDBox,yLDBox,
+                                                                TLength, DLength, LLength, RLength, 
+                                                                plateWidth, selRadius);
+
+                        plateList.Add(newPlate);
+                    }
+                }
+            }
+
+            // Number
+            double numberCount = 0;
+            List<DrawPlateModel> plateNumberCountList =GetSortListByCenterIndex(ref numberCount, plateList);
+            List<DrawPlateModel> plateNumberList = GetPlateNumber(plateNamePre, plateNumberCountList);
+
+            return plateNumberList;
         }
+
+
+        private List<DrawPlateModel> GetPlateNumber(string plateNamePre,List<DrawPlateModel> selPlateList )
+        {
+
+
+            // Numbering
+            List<DrawPlateModel> plateSortList = selPlateList.OrderBy(x => x.NumberCount).ToList();
+            Dictionary<string, string[]> plateNameDic = new Dictionary<string, string[]>();
+            double dicCount = 0;
+            foreach (DrawPlateModel eachPlate in plateSortList)
+            {
+                string numberString = "";
+                foreach (double eachVLength in eachPlate.VLength)
+                    numberString += "|" + Math.Round(eachVLength, 1, MidpointRounding.AwayFromZero);
+                foreach (double eachHLength in eachPlate.HLength)
+                    numberString += "|" + Math.Round(eachHLength, 1, MidpointRounding.AwayFromZero);
+                if (!plateNameDic.ContainsKey(numberString))
+                {
+                    // 처음
+                    dicCount++;
+                    string displayName = plateNamePre + dicCount;
+                    eachPlate.DisplayName = displayName;
+                    eachPlate.Number = dicCount;
+                    plateNameDic.Add(numberString, new string[] { displayName, dicCount.ToString() });
+
+                }
+                else
+                {
+                    // 기존
+                    string[] eachString = plateNameDic[numberString];
+                    eachPlate.DisplayName = eachString[0];
+                    eachPlate.Number = valueService.GetDoubleValue(eachString[1]);
+                }
+            }
+
+            return plateSortList;
+        }
+
+        private DrawPlateModel GetNewPlateModel(Point3D centerPoint, double selX, double selY,
+                                                double TLength, double DLength, double LLength, double RLength, 
+                                                double selPlateWidth, double selRadius)
+        {
+
+            double xMaxLength = TLength;
+            if (xMaxLength < DLength) xMaxLength = DLength;
+            double yMaxLength = LLength;
+            if (yMaxLength < RLength) yMaxLength = RLength;
+
+
+            DrawPlateModel newPlate = new DrawPlateModel();
+            newPlate.CenterPoint = GetSumPoint(centerPoint,0,0);
+            newPlate.Radius = selRadius;
+
+            if (xMaxLength > yMaxLength)
+                newPlate.PlateDirection = PERPENDICULAR_TYPE.Horizontal;
+            else
+                newPlate.PlateDirection = PERPENDICULAR_TYPE.Vertical;
+
+
+            if (newPlate.PlateDirection == PERPENDICULAR_TYPE.Horizontal)
+            {
+                if (TLength == 0 && DLength == 0)
+                {
+                    // 원
+                }
+                else if (TLength == 0)
+                {
+                    if (LLength == 0 && RLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.Segment;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.TOPCENTER;
+                    }
+                    else if (LLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.Arc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.TOPLEFT;
+                    }
+                    else if (RLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.Arc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.TOPRIGHT;
+                    }
+                }
+                else if (DLength == 0)
+                {
+                    if (LLength == 0 && RLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.Segment;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.BOTTOMCENTER;
+                    }
+                    else if (LLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.Arc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.BOTTOMLEFT;
+                    }
+                    else if (RLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.Arc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.BOTTOMRIGHT;
+                    }
+                }
+                else if (TLength == DLength)
+                {
+                    newPlate.ShapeType = Plate_Type.Rectangle;
+                    if (LLength == 0 && RLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.ArcRectangleArc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.BOTHCENTER;
+                    }
+                    else if (LLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.RectangleArc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.LEFTCENTER;
+                    }
+                    else if (RLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.RectangleArc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.RIGHTCENTER;
+                    }
+                }
+                else if (TLength != DLength)
+                {
+                    if (TLength < DLength)
+                    {
+                        if (LLength ==0 && RLength == 0)
+                        {
+                            newPlate.ShapeType = Plate_Type.ArcRectangleArc;
+                            newPlate.ArcDirection = ORIENTATION_TYPE.BOTHCENTER;
+                        }
+                        else if (LLength == 0)
+                        {
+                            newPlate.ShapeType = Plate_Type.RectangleArc;
+                            newPlate.ArcDirection = ORIENTATION_TYPE.TOPLEFT;
+                        }
+                        else if (RLength == 0)
+                        {
+                            newPlate.ShapeType = Plate_Type.RectangleArc;
+                            newPlate.ArcDirection = ORIENTATION_TYPE.TOPRIGHT;
+                        }
+                    }
+                    else
+                    {
+                        if (LLength == 0 && RLength == 0)
+                        {
+                            newPlate.ShapeType = Plate_Type.ArcRectangleArc;
+                            newPlate.ArcDirection = ORIENTATION_TYPE.BOTHCENTER;
+                        }
+                        else if (LLength == 0)
+                        {
+                            newPlate.ShapeType = Plate_Type.RectangleArc;
+                            newPlate.ArcDirection = ORIENTATION_TYPE.BOTTOMLEFT;
+                        }
+                        else if (RLength == 0)
+                        {
+                            newPlate.ShapeType = Plate_Type.RectangleArc;
+                            newPlate.ArcDirection = ORIENTATION_TYPE.BOTTOMRIGHT;
+                        }
+                    }
+                }
+            }
+            else if (newPlate.PlateDirection == PERPENDICULAR_TYPE.Vertical)
+            {
+                if (LLength == 0 && RLength == 0)
+                {
+                    // 원
+                }
+                else if (LLength == 0)
+                {
+                    if (TLength == 0 && DLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.Segment;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.LEFTCENTER;
+                    }
+                    else if (TLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.Arc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.TOPLEFT;
+                    }
+                    else if (DLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.Arc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.BOTTOMLEFT;
+                    }
+                }
+                else if (RLength == 0)
+                {
+                    if (TLength == 0 && DLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.Segment;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.RIGHTCENTER;
+                    }
+                    else if (TLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.Arc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.TOPRIGHT;
+                    }
+                    else if (DLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.Arc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.BOTTOMRIGHT;
+                    }
+                }
+                else if (LLength == RLength)
+                {
+                    newPlate.ShapeType = Plate_Type.Rectangle;
+                    if (TLength == 0 && DLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.ArcRectangleArc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.BOTHCENTER;
+                    }
+                    else if (TLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.RectangleArc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.TOPCENTER;
+                    }
+                    else if (DLength == 0)
+                    {
+                        newPlate.ShapeType = Plate_Type.RectangleArc;
+                        newPlate.ArcDirection = ORIENTATION_TYPE.BOTTOMCENTER;
+                    }
+                }
+                else if (LLength != RLength)
+                {
+                    if (LLength < RLength)
+                    {
+                        if (TLength == 0 && DLength == 0)
+                        {
+                            newPlate.ShapeType = Plate_Type.ArcRectangleArc;
+                            newPlate.ArcDirection = ORIENTATION_TYPE.BOTHCENTER;
+                        }
+                        else if (TLength == 0)
+                        {
+                            newPlate.ShapeType = Plate_Type.RectangleArc;
+                            newPlate.ArcDirection = ORIENTATION_TYPE.TOPLEFT;
+                        }
+                        else if (DLength == 0)
+                        {
+                            newPlate.ShapeType = Plate_Type.RectangleArc;
+                            newPlate.ArcDirection = ORIENTATION_TYPE.BOTTOMLEFT;
+                        }
+                    }
+                    else
+                    {
+                        if (TLength == 0 && DLength == 0)
+                        {
+                            newPlate.ShapeType = Plate_Type.ArcRectangleArc;
+                            newPlate.ArcDirection = ORIENTATION_TYPE.BOTHCENTER;
+                        }
+                        else if (TLength == 0)
+                        {
+                            newPlate.ShapeType = Plate_Type.RectangleArc;
+                            newPlate.ArcDirection = ORIENTATION_TYPE.TOPRIGHT;
+                        }
+                        else if (DLength == 0)
+                        {
+                            newPlate.ShapeType = Plate_Type.RectangleArc;
+                            newPlate.ArcDirection = ORIENTATION_TYPE.BOTTOMRIGHT;
+                        }
+                    }
+                }
+            }
+
+            if (TLength > 0)
+                newPlate.HLength.Add(TLength);
+            if (DLength > 0)
+                newPlate.HLength.Add(DLength);
+            if (LLength > 0)
+                newPlate.VLength.Add(LLength);
+            if (RLength > 0)
+                newPlate.VLength.Add(RLength);
+
+            newPlate.VLength.Sort();
+            newPlate.HLength.Sort();
+            newPlate.NumberPoint = GetNumberPoint(new Point3D(selX,selY),newPlate);
+
+
+            return newPlate;
+        }
+
+
+
+        public Point3D GetNumberPoint(Point3D selPoint, DrawPlateModel selPlate)
+        {
+            double distanceX = 0;
+            double distanceY = 0;
+
+            double maxV = selPlate.VLength.Last();
+            double maxH = selPlate.HLength.Last();
+
+            // selPoint : 좌측 하단 기준
+            switch (selPlate.ShapeType)
+            {
+                case Plate_Type.Segment:
+                case Plate_Type.Rectangle:
+                case Plate_Type.ArcRectangleArc:
+                    distanceX = maxH / 2;
+                    distanceY = maxV / 2;
+                    break;
+
+                case Plate_Type.RectangleArc:
+                    if (selPlate.PlateDirection == PERPENDICULAR_TYPE.Horizontal)
+                    {
+                        distanceX = selPlate.HLength.Sum() / 4;
+                        distanceY = maxV / 2;
+                    }
+                    else
+                    {
+                        distanceX = maxH / 2;
+                        distanceY = selPlate.VLength.Sum() / 4;
+                    }
+                    break;
+
+                case Plate_Type.Arc:
+                    if (selPlate.PlateDirection == PERPENDICULAR_TYPE.Horizontal)
+                    {
+                        distanceX = maxH / 3;
+                        distanceY = maxV / 3;
+                    }
+                    else
+                    {
+                        distanceX = maxH / 2;
+                        distanceY = maxV / 3;
+                    }
+                    break;
+            }
+
+            // Arc
+            switch (selPlate.ShapeType)
+            {
+                case Plate_Type.Arc:
+                case Plate_Type.RectangleArc:
+                    switch (selPlate.ArcDirection)
+                    {
+                        case ORIENTATION_TYPE.TOPRIGHT:
+                            break;
+                        case ORIENTATION_TYPE.TOPLEFT:
+                            distanceX = maxH - distanceY;
+                            break;
+                        case ORIENTATION_TYPE.BOTTOMLEFT:
+                            distanceX = maxH - distanceY;
+                            distanceY = maxV - distanceY;
+                            break;
+                        case ORIENTATION_TYPE.BOTTOMRIGHT:
+                            distanceY = maxV - distanceY;
+                            break;
+                    }
+                    break;
+            }
+
+            Point3D nPoint = GetSumPoint(selPoint, distanceX, distanceY);
+
+            return nPoint;
+        }
+
+
+
+        private void GetCellAreaHorizontalLength(DrawBoxCellModel[,] Box, Dictionary<int,double> xDic, Dictionary<int, double> yDic,
+                                                    int xLD, int yLD, int xRT, int yRT,
+                                                    out double TLength, out double DLength, out double LLength, out double RLength)
+        {
+            TLength = 0;
+            for(int x = xRT ; x >= xLD; x--)
+            {
+                if (Box[x, yRT].TopLine)
+                {
+                    double xTopMax = xDic[x + 1];
+                    for(int xx = x; xx > xLD; xx--)
+                    {
+                        if (Box[xx, yRT].TopLine)
+                        {
+                            double xTopMin = xDic[xx];
+                            TLength = xTopMax - xTopMin;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            DLength = 0;
+            for (int x = xRT; x >= xLD; x--)
+            {
+                if (Box[x, yLD].BottomLine)
+                {
+                    double xTopMax = xDic[x + 1];
+                    for (int xx = x; xx > xLD; xx--)
+                    {
+                        if (Box[xx, yLD].BottomLine)
+                        {
+                            double xTopMin = xDic[xx];
+                            DLength = xTopMax - xTopMin;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+
+            LLength = 0;
+            for (int y = yRT; y <= yLD; y++)
+            {
+                if (Box[xLD, y].LeftLine)
+                {
+                    double yTopMax = yDic[y - 1];
+                    for (int yy = y; yy < yLD; yy++)
+                    {
+                        if (Box[xLD, yy].LeftLine)
+                        {
+                            double yTopMin = yDic[yy];
+                            LLength = yTopMax - yTopMin;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            RLength = 0;
+            for (int y = yRT; y <= yLD; y++)
+            {
+                if (Box[xRT, y].RightLine)
+                {
+                    double yTopMax = yDic[y - 1];
+                    for (int yy = y; yy < yLD; yy++)
+                    {
+                        if (Box[xRT, yy].RightLine)
+                        {
+                            double yTopMin = yDic[yy];
+                            RLength = yTopMax - yTopMin;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+
+        }
+
+        private void GetMinMaxValue(double inputMin, double inputMax,out double valueMin, out double valueMax)
+        {
+            valueMin = inputMin;
+            valueMax = inputMax;
+            if (valueMin > valueMax)
+            {
+                double tempValue = valueMax;
+                valueMax = valueMin;
+                valueMin = tempValue;
+            }
+        }
+
+
+
 
 
 

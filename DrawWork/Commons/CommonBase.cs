@@ -298,4 +298,13 @@ namespace DrawWork.Commons
     }
 
 
+    public enum BoxCell_Type 
+    {
+        Empty,
+        Block,
+        Use,
+    }
+
+
+
 }

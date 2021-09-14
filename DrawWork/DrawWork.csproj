@@ -117,6 +117,7 @@
     <Compile Include="DrawModels\DrawBMLeaderModel.cs" />
     <Compile Include="DrawModels\DrawBMModel.cs" />
     <Compile Include="DrawModels\DrawBMNumberModel.cs" />
+    <Compile Include="DrawModels\DrawBoxCellModel.cs" />
     <Compile Include="DrawModels\DrawCenterLineModel.cs" />
     <Compile Include="DrawModels\DrawCuttingAreaModel.cs" />
     <Compile Include="DrawModels\DrawDimensionArcModel.cs" />
