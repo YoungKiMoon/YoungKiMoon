@@ -910,7 +910,14 @@ namespace PaperSetting.Services
 
 
 
-            // Priority
+            // Backing Strip
+            itemCount++;
+            pageCount = Math.Ceiling(itemCount / pageMaxCount);
+            PaperAreaModel backingStripCuttingPlanModel = SingletonData.PaperArea.GetAreaModel(PAPERMAIN_TYPE.DETAIL, PAPERSUB_TYPE.BackingStrip);
+            backingStripCuttingPlanModel.Page = pageCount;
+
+
+            // Priority : 매우 중요
             SingletonData.PaperArea.AreaList = SingletonData.PaperArea.AreaList.OrderByDescending(x => x.IsFix).ThenBy(x=>x.Priority).ToList();
             //SingletonData.PaperArea.AreaList.Sort((x, y) => x.Priority.CompareTo(y.Priority));
         }

@@ -12,19 +12,15 @@ namespace DrawWork.DrawModels
 
         public DrawBoxCellModel()
         {
-
-            Status = BoxCell_Type.Block;
-            LeftLine = false;
-            RightLine = false;
-            BottomLine = false;
-            TopLine = false;
+            Status = BoxCell_Type.Empty;
+            XValue = 0;
+            YValue = 0;
         }
 
         public BoxCell_Type Status { get; set; }
+        
+        public double XValue { get; set; }
+        public double YValue { get; set; }
 
-        public bool LeftLine { get; set; }
-        public bool RightLine { get; set; }
-        public bool BottomLine { get; set; }
-        public bool TopLine { get; set; }
     }
 }

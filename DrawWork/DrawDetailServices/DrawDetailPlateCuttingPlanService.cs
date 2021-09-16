@@ -184,6 +184,7 @@ namespace DrawWork.DrawDetailServices
                         eachPlate.CuttingPlan.XLengthOfArcTangent = valueService.GetHypotenuseByWidth(eachPlate.CuttingPlan.VMinusSlope, eachPlate.CuttingPlan.LengthBetweenStringAndArc);
                         break;
                     case Plate_Type.ArcRectangleArc:
+                        eachPlate.CuttingPlan.Width = plateWidth;
                         eachPlate.CuttingPlan.StringLength = eachPlate.CuttingPlan.Width;
                         eachPlate.CuttingPlan.LengthSpacing = (eachPlate.CuttingPlan.MaxLength - eachPlate.CuttingPlan.MinLength)/2;
                         eachPlate.CuttingPlan.LengthBetweenStringAndArc = valueService.GetLengthBetweenStringAndArc(eachPlate.Radius, eachPlate.CuttingPlan.StringLength);
@@ -251,7 +252,7 @@ namespace DrawWork.DrawDetailServices
 
 
             // Arrange : One Plate
-            double maximumCuttingInPlate = 4; // 매우 중요
+            double maximumCuttingInPlate = 6; // 매우 중요
             double spacingValue = 30;   // 매우 중요
             bool leftDirection = true;
             List<string> divPlateKeyList = divPlateDic.Keys.ToList();
@@ -334,6 +335,9 @@ namespace DrawWork.DrawDetailServices
 
                                     if (CalOptimalSpacing(newOnePlate.RemainingLength, newOnePlate.CuttingPlateList.Last(), rightPlate, spacingValue, out double optimalSpacing))
                                     {
+                                        double adjOptimalSpacing = newOnePlate.RemainingLength - rightPlate.CuttingPlan.MaxLength;
+                                        if (adjOptimalSpacing < optimalSpacing)
+                                            optimalSpacing = adjOptimalSpacing;
                                         rightPlate.CuttingPlan.LeftPlate = leftDirection;
                                         rightPlate.CuttingPlan.InsertPointXLength = plateActualLength - newOnePlate.RemainingLength + optimalSpacing;
                                         newOnePlate.CuttingPlateList.Add(rightPlate);
@@ -677,6 +681,7 @@ namespace DrawWork.DrawDetailServices
             // Translate
             if (!leftPlate)
             {
+                //
                 if (selPlate.ShapeType == Plate_Type.Arc)
                 {
                     double transYValue = plateWidth - selPlate.CuttingPlan.Width;
@@ -903,8 +908,8 @@ namespace DrawWork.DrawDetailServices
                             // 사각형 처럼 처리
                             // Case 1 : 세로로 배열
                             // Case 2 : 가로로 배열
-                            upperR = spacingValue + 0;
-                            lowerR = spacingValue + 0;
+                            upperR = spacingValue + rightPlate.CuttingPlan.MaxLength;
+                            lowerR = spacingValue + rightPlate.CuttingPlan.MaxLength;
 
                             break;
                     }
@@ -923,7 +928,7 @@ namespace DrawWork.DrawDetailServices
                         case Plate_Type.RectangleArc:
                             // Case 1 : 중앙 호의 접선으로 처리 : 반전
                             upperR = spacingValue + rightPlate.CuttingPlan.XLengthOfArcTangent + rightPlate.CuttingPlan.MaxLength;
-                            lowerR = spacingValue + rightPlate.CuttingPlan.XLengthOfArcTangent + +rightPlate.CuttingPlan.MinLength;
+                            lowerR = spacingValue + rightPlate.CuttingPlan.XLengthOfArcTangent + rightPlate.CuttingPlan.MinLength;
                             // Case 2 : 
 
                             break;
@@ -932,8 +937,8 @@ namespace DrawWork.DrawDetailServices
                             // 사각형 처럼 처리
                             // Case 1 : 세로로 배열
                             // Case 2 : 가로로 배열
-                            upperR = spacingValue + 0;
-                            lowerR = spacingValue + 0;
+                            upperR = spacingValue + rightPlate.CuttingPlan.MaxLength;
+                            lowerR = spacingValue + rightPlate.CuttingPlan.MaxLength;
 
                             break;
                     }

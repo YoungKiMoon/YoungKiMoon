@@ -399,24 +399,31 @@ namespace DrawWork.DrawDetailServices
             {
                 // 180 회전
                 double rotateValue = Utility.DegToRad(180);
-                rotateHorizontalLineList = editingService.GetRotate(horizontalLineList, GetSumPoint(referencePoint, 0, 0), rotateValue);
-                rotateHorizontalLineList.RemoveAt(0);
-                rotateHorizontalList = editingService.GetRotate(horizontalList, GetSumPoint(referencePoint, 0, 0), rotateValue);
-                rotateVerticalList = editingService.GetRotate(verticalList, GetSumPoint(referencePoint, 0, 0), rotateValue);
-                plateLineList.AddRange(GetLineByTrimBoth(rotateHorizontalLineList, outCircle));
-                plateLineList.AddRange(rotateHorizontalList);
-                plateLineList.AddRange(rotateVerticalList);
+                if (horizontalLineList.Count > 0)
+                {
+                    rotateHorizontalLineList = editingService.GetRotate(horizontalLineList, GetSumPoint(referencePoint, 0, 0), rotateValue);
+                    rotateHorizontalLineList.RemoveAt(0);
+                    rotateHorizontalList = editingService.GetRotate(horizontalList, GetSumPoint(referencePoint, 0, 0), rotateValue);
+                    rotateVerticalList = editingService.GetRotate(verticalList, GetSumPoint(referencePoint, 0, 0), rotateValue);
+                    plateLineList.AddRange(GetLineByTrimBoth(rotateHorizontalLineList, outCircle));
+                    plateLineList.AddRange(rotateHorizontalList);
+                    plateLineList.AddRange(rotateVerticalList);
+                }
+
             }
             else if (arrangeType == PlateArrange_Type.Bottom)
             {
                 // 180 회전
                 double rotateValue = Utility.DegToRad(180);
-                rotateHorizontalLineList = editingService.GetRotate(horizontalLineList, GetSumPoint(referencePoint, 0, 0), rotateValue);
-                rotateHorizontalList = editingService.GetRotate(horizontalList, GetSumPoint(referencePoint, 0, 0), rotateValue);
-                rotateVerticalList = editingService.GetRotate(verticalList, GetSumPoint(referencePoint, 0, 0), rotateValue);
-                plateLineList.AddRange(GetLineByTrimBoth(rotateHorizontalLineList, outCircle));
-                plateLineList.AddRange(rotateHorizontalList);
-                plateLineList.AddRange(rotateVerticalList);
+                if (horizontalLineList.Count > 0)
+                {
+                    rotateHorizontalLineList = editingService.GetRotate(horizontalLineList, GetSumPoint(referencePoint, 0, 0), rotateValue);
+                    rotateHorizontalList = editingService.GetRotate(horizontalList, GetSumPoint(referencePoint, 0, 0), rotateValue);
+                    rotateVerticalList = editingService.GetRotate(verticalList, GetSumPoint(referencePoint, 0, 0), rotateValue);
+                    plateLineList.AddRange(GetLineByTrimBoth(rotateHorizontalLineList, outCircle));
+                    plateLineList.AddRange(rotateHorizontalList);
+                    plateLineList.AddRange(rotateVerticalList);
+                }
             }
 
 
@@ -449,7 +456,8 @@ namespace DrawWork.DrawDetailServices
 
 
             // Create Plate Model
-            List<DrawPlateModel> plateModelList = GetPlateModel(arrangeType, plateLineList, plateWidth, circleExtendRadius, GetSumPoint(referencePoint, 0, 0) );
+            //List<DrawPlateModel> plateModelList = GetPlateModel(arrangeType, plateLineList, plateWidth, circleExtendRadius, GetSumPoint(referencePoint, 0, 0) );
+            List<DrawPlateModel> plateModelList = GetPlateModel_New(arrangeType, plateLineList, plateWidth, circleExtendRadius, GetSumPoint(referencePoint, 0, 0));
 
             // Calculation : Cutting Plan Value
             DrawDetailPlateCuttingPlanService newCuttingPlanService = new DrawDetailPlateCuttingPlanService(null, null);
@@ -510,6 +518,7 @@ namespace DrawWork.DrawDetailServices
 
             Dictionary<double, double> xDic = new Dictionary<double, double>();
             Dictionary<double, double> yDic = new Dictionary<double, double>();
+            // Box Point By Line
             foreach (ICurve eachLine in selEntities)
             {
                 double startX = eachLine.StartPoint.X;
@@ -526,6 +535,21 @@ namespace DrawWork.DrawDetailServices
                 if (!yDic.ContainsKey(endY))
                     yDic.Add(endY, endY);
             }
+            // Box Point By Circle
+            List<Point3D> circlePointList = new List<Point3D>();
+            circlePointList.Add(GetSumPoint(selCenterPoint, 0, selRadius));
+            circlePointList.Add(GetSumPoint(selCenterPoint, 0, -selRadius));
+            circlePointList.Add(GetSumPoint(selCenterPoint, selRadius, 0));
+            circlePointList.Add(GetSumPoint(selCenterPoint, -selRadius, 0));
+            foreach(Point3D eachPoint in circlePointList)
+            {
+                if (!xDic.ContainsKey(eachPoint.X))
+                    xDic.Add(eachPoint.X, eachPoint.X);
+                if (!yDic.ContainsKey(eachPoint.Y))
+                    yDic.Add(eachPoint.Y, eachPoint.Y);
+            }
+
+
 
             List<double> xList = xDic.Keys.OrderBy(x=>x).ToList();
             List<double> yList = yDic.Keys.OrderByDescending(x => x).ToList();
@@ -535,18 +559,23 @@ namespace DrawWork.DrawDetailServices
             Dictionary<int, double> ySortNumberDic = new Dictionary<int, double>();
             for (int i = 0; i < xList.Count; i++)
             {
-                xSortDic.Add(xList[i], i + 1);
-                xSortNumberDic.Add(i + 1, xList[i]);
+                int ii = i * 3 ;
+                xSortDic.Add(xList[i], ii);
+                xSortNumberDic.Add(ii , xList[i]);
             }
             for (int i = 0; i < yList.Count; i++)
             {
-                ySortDic.Add(yList[i], i + 1);
-                ySortNumberDic.Add(i + 1, xList[i]);
+                int ii = i * 3;
+                ySortDic.Add(yList[i], ii);
+                ySortNumberDic.Add(ii, yList[i]);
             }
 
+            // Default
+            int xSize = ((xSortDic.Count-1) * 3) +1;
+            int ySize = ((ySortDic.Count-1) * 3) +1;
+
+
             // Create Box
-            int xSize = xSortDic.Count+2;
-            int ySize = ySortDic.Count+2;
             DrawBoxCellModel[,] Box = new DrawBoxCellModel[xSize,ySize];
             for(int x = 0; x < xSize; x++)
                 for(int y = 0; y < ySize; y++)
@@ -560,44 +589,43 @@ namespace DrawWork.DrawDetailServices
                 if (xMin == xMax)
                 {
                     // Vertical Line : X 기준의 오른쪽
-                    int xLIndex = xSortDic[xMin];
-                    int xRIndex = xLIndex + 1;
-                    int ySIndex = ySortDic[yMin];
-                    int yEIndex = ySortDic[yMax];
-                    for (int y = ySIndex; y <= yEIndex; y++)
+                    int xIndex = xSortDic[xMin];
+                    int yIndexS = ySortDic[yMin];
+                    int yIndexE = ySortDic[yMax];
+                    for (int y = yIndexS; y >=yIndexE; y--)
                     {
-                        Box[xLIndex, y].RightLine = true;
-                        Box[xRIndex, y].LeftLine = true;
-                        Box[xRIndex, y].Status = BoxCell_Type.Empty;
-                        Box[xLIndex, y].Status = BoxCell_Type.Empty;
+                        Box[xIndex, y].XValue = xMin;
+                        Box[xIndex, y].Status = BoxCell_Type.Block;
                     }
                 }
                 else if (yMin == yMax)
                 {
                     // Horizontal Line : Y 기준의 아래쪽
-                    int yUIndex = ySortDic[yMin];
-                    int yDIndex = yUIndex + 1;
-                    int xSIndex = xSortDic[xMin];
-                    int xEIndex = xSortDic[xMax];
-                    for(int x = xSIndex; x <= xEIndex; x++)
+                    int yIndex = ySortDic[yMin];
+                    int xIndexS = xSortDic[xMin];
+                    int xIndexE = xSortDic[xMax];
+                    for(int x = xIndexS; x <= xIndexE; x++)
                     {
-                        Box[x, yUIndex].BottomLine = true;
-                        Box[x, yDIndex].TopLine = true;
-                        Box[x, yUIndex].Status = BoxCell_Type.Empty;
-                        Box[x, yDIndex].Status = BoxCell_Type.Empty;
+                        Box[x, yIndex].YValue = yMin;
+                        Box[x, yIndex].Status = BoxCell_Type.Block;
                     }
-
 
                 }
             }
+
+            // Fill Box Area Value
+            FillBoxArea(ref Box);
 
 
             // Create Plate
             List<int> xIndexList=GetCenterIndexList(xSize);
             List<int> yIndexList = GetCenterIndexList(ySize);
-            for(int y = 0; y < ySize; y++)
+
+            foreach(int y in yIndexList)
+            //for(int y = 0; y < ySize; y++)
             {
-                for(int x = 0; x < xSize; x++)
+                foreach (int x in xIndexList)
+                //for (int x = 0; x < xSize; x++)
                 {
                     if (Box[x, y].Status == BoxCell_Type.Empty)
                     {
@@ -609,16 +637,12 @@ namespace DrawWork.DrawDetailServices
                             if (Box[xMove, y].Status != BoxCell_Type.Empty)
                                 break;
                             xLDBox = xMove;
-                            if (Box[xMove, y].LeftLine )
-                                break;
                         }
                         for (int yMove = y; yMove < ySize; yMove++)
                         {
                             if (Box[xLDBox, yMove].Status != BoxCell_Type.Empty)
                                 break;
                             yLDBox = yMove;
-                            if (Box[xLDBox, yMove].BottomLine)
-                                break;
                         }
 
                         // 2. 우측 상단 찾기
@@ -628,17 +652,13 @@ namespace DrawWork.DrawDetailServices
                         {
                             if (Box[xMove, y].Status != BoxCell_Type.Empty)
                                 break;
-                            xLDBox = xMove;
-                            if (Box[xMove, y].RightLine)
-                                break;
+                            xRTBox = xMove;
                         }
                         for (int yMove = y; yMove >= 0; yMove--)
                         {
-                            if (Box[xLDBox, yMove].Status != BoxCell_Type.Empty)
+                            if (Box[xRTBox, yMove].Status != BoxCell_Type.Empty)
                                 break;
-                            yLDBox = yMove;
-                            if (Box[xLDBox, yMove].TopLine)
-                                break;
+                            yRTBox = yMove;
                         }
 
                         // 3. 채우기
@@ -649,27 +669,115 @@ namespace DrawWork.DrawDetailServices
 
                         // 4. 판별하기
                         // 4.1 길이 구하기
-                        GetCellAreaHorizontalLength(Box, xSortNumberDic, ySortNumberDic,
+                        GetCellAreaHorizontalLength_New(Box, xSortNumberDic, ySortNumberDic,
                                     xLDBox, yLDBox, xRTBox, yRTBox,
-                                    out double TLength, out double DLength, out double LLength, out double RLength);
+                                    out double TLength, out double DLength, out double LLength, out double RLength,
+                                    out double xLDBoxValue,out double yLDBoxValue);
 
-                        DrawPlateModel newPlate = GetNewPlateModel(selCenterPoint,xLDBox,yLDBox,
+                        DrawPlateModel newPlate = GetNewPlateModel(selCenterPoint, xLDBoxValue, yLDBoxValue,
                                                                 TLength, DLength, LLength, RLength, 
                                                                 plateWidth, selRadius);
 
                         plateList.Add(newPlate);
                     }
+                    Console.WriteLine("x" + x + " y" + y);
                 }
             }
 
             // Number
             double numberCount = 0;
-            List<DrawPlateModel> plateNumberCountList =GetSortListByCenterIndex(ref numberCount, plateList);
+            List<DrawPlateModel> plateNumberCountList =GetSortListByCenterIndex(ref numberCount, plateList,true);
             List<DrawPlateModel> plateNumberList = GetPlateNumber(plateNamePre, plateNumberCountList);
 
             return plateNumberList;
         }
 
+        private void FillBoxArea(ref DrawBoxCellModel[,] Box)
+        {
+            int xSize = Box.GetLength(0);
+            int ySize = Box.GetLength(1);
+
+
+            // X : Left => Right
+            for (int y = 0; y < ySize; y++)
+                for (int x = 0; x < xSize; x++)
+                    if (Box[x, y].Status == BoxCell_Type.Block)
+                    {
+                        if (x + 1 < xSize)
+                            if (Box[x + 1, y].Status == BoxCell_Type.Block)
+                                for (int xx = 0; xx < x; xx++)
+                                    Box[xx, y].Status = BoxCell_Type.Block;
+
+                        break;
+                    }
+
+
+
+            // X : Right => Left
+            for (int y = 0; y < ySize; y++)
+                for (int x = xSize - 1; x >= 0; x--)
+                    if (Box[x, y].Status == BoxCell_Type.Block)
+                    {
+                        if (x - 1 >= 0)
+                            if (Box[x - 1, y].Status == BoxCell_Type.Block)
+                                for (int xx = xSize - 1; xx > x; xx--)
+                                    Box[xx, y].Status = BoxCell_Type.Block;
+                        break;
+
+                    }
+
+
+
+
+            // Y : Up => Down
+            for (int x = 0; x < xSize; x++)
+                for (int y = 0; y < ySize; y++)
+                    if (Box[x, y].Status == BoxCell_Type.Block)
+                    {
+                        // 좌우가 있으면
+                        if (x - 1 >= 0)
+                            if (Box[x - 1, y].Status == BoxCell_Type.Block)
+                                break;
+                        if (x + 1 < xSize)
+                            if (Box[x + 1, y].Status == BoxCell_Type.Block)
+                                break;
+
+                        // 연속
+                        if (y + 1 < ySize)
+                            if (Box[x, y + 1].Status == BoxCell_Type.Block)
+                                for (int yy = 0; yy < y; yy++)
+                                    Box[x, yy].Status = BoxCell_Type.Block;
+                        break;
+                    }
+
+
+            // Y : Down => Up
+            for (int x = 0; x < xSize; x++)
+                for (int y = ySize - 1; y >= 0; y--)
+                    if (Box[x, y].Status == BoxCell_Type.Block)
+                    {
+                        // 좌우가 있으면
+                        if (x - 1 >= 0)
+                            if (Box[x - 1, y].Status == BoxCell_Type.Block)
+                                break;
+                        if (x + 1 < xSize)
+                            if (Box[x + 1, y].Status == BoxCell_Type.Block)
+                                break;
+
+                        // 연속
+                        if (y - 1 >= 0)
+                            if (Box[x, y - 1].Status == BoxCell_Type.Block)
+                                for (int yy = ySize - 1; yy > y; yy--)
+                                    Box[x, yy].Status = BoxCell_Type.Block;
+                        break;
+                    }
+
+
+
+
+
+
+        }
 
         private List<DrawPlateModel> GetPlateNumber(string plateNamePre,List<DrawPlateModel> selPlateList )
         {
@@ -723,7 +831,11 @@ namespace DrawWork.DrawDetailServices
             newPlate.CenterPoint = GetSumPoint(centerPoint,0,0);
             newPlate.Radius = selRadius;
 
-            if (xMaxLength > yMaxLength)
+            if(xMaxLength==selPlateWidth)
+                newPlate.PlateDirection = PERPENDICULAR_TYPE.Vertical;
+            else if(yMaxLength==selPlateWidth)
+                newPlate.PlateDirection = PERPENDICULAR_TYPE.Horizontal;
+            else if (xMaxLength > yMaxLength)
                 newPlate.PlateDirection = PERPENDICULAR_TYPE.Horizontal;
             else
                 newPlate.PlateDirection = PERPENDICULAR_TYPE.Vertical;
@@ -943,6 +1055,26 @@ namespace DrawWork.DrawDetailServices
 
             newPlate.VLength.Sort();
             newPlate.HLength.Sort();
+
+            // Create Rectangle Size
+            switch (newPlate.ShapeType)
+            {
+                case Plate_Type.Segment:
+                    newPlate.RectLength = newPlate.HLength.Max();
+                    newPlate.RectWidth = valueService.GetLengthBetweenStringAndArc(selRadius, newPlate.HLength.Max());
+                    break;
+                case Plate_Type.ArcRectangleArc:
+                    newPlate.RectLength = newPlate.HLength.Max();
+                    newPlate.RectWidth = selPlateWidth;
+                    break;
+                case Plate_Type.Arc:
+                case Plate_Type.Rectangle:
+                case Plate_Type.RectangleArc:
+                    newPlate.RectLength = newPlate.HLength.Max();
+                    newPlate.RectWidth = newPlate.VLength.Max();
+                    break;
+            }
+            
             newPlate.NumberPoint = GetNumberPoint(new Point3D(selX,selY),newPlate);
 
 
@@ -956,8 +1088,9 @@ namespace DrawWork.DrawDetailServices
             double distanceX = 0;
             double distanceY = 0;
 
-            double maxV = selPlate.VLength.Last();
-            double maxH = selPlate.HLength.Last();
+            double maxV = selPlate.RectWidth;
+            double maxH = selPlate.RectLength;
+
 
             // selPoint : 좌측 하단 기준
             switch (selPlate.ShapeType)
@@ -990,7 +1123,7 @@ namespace DrawWork.DrawDetailServices
                     }
                     else
                     {
-                        distanceX = maxH / 2;
+                        distanceX = maxH / 3;
                         distanceY = maxV / 3;
                     }
                     break;
@@ -1006,10 +1139,10 @@ namespace DrawWork.DrawDetailServices
                         case ORIENTATION_TYPE.TOPRIGHT:
                             break;
                         case ORIENTATION_TYPE.TOPLEFT:
-                            distanceX = maxH - distanceY;
+                            distanceX = maxH - distanceX;
                             break;
                         case ORIENTATION_TYPE.BOTTOMLEFT:
-                            distanceX = maxH - distanceY;
+                            distanceX = maxH - distanceX;
                             distanceY = maxV - distanceY;
                             break;
                         case ORIENTATION_TYPE.BOTTOMRIGHT:
@@ -1026,101 +1159,222 @@ namespace DrawWork.DrawDetailServices
 
 
 
-        private void GetCellAreaHorizontalLength(DrawBoxCellModel[,] Box, Dictionary<int,double> xDic, Dictionary<int, double> yDic,
-                                                    int xLD, int yLD, int xRT, int yRT,
-                                                    out double TLength, out double DLength, out double LLength, out double RLength)
+
+
+
+
+
+        private void GetCellAreaHorizontalLength_New(DrawBoxCellModel[,] Box, Dictionary<int, double> xDic, Dictionary<int, double> yDic,
+                                            int xLD, int yLD, int xRT, int yRT,
+                                            out double TLength, out double DLength, out double LLength, out double RLength,
+                                            out double refX, out double refY)
         {
+            double xSize = Box.GetLength(0);
+            double ySize = Box.GetLength(1);
+            int xLDex = xLD;
+            int yLDex = yLD;
+            int xRTex = xRT;
+            int yRTex = yRT;
+            if (xLD - 1 >= 0) xLDex--;
+            if (yLD + 1 < ySize) yLDex++;
+            if (xRT + 1 < xSize) xRTex++;
+            if (yRT - 1 >= 0) yRTex--;
+
             TLength = 0;
-            for(int x = xRT ; x >= xLD; x--)
+            List<double> TLenghtList = new List<double>();
+            for (int x = xRTex; x >= xLDex; x--)
             {
-                if (Box[x, yRT].TopLine)
+                if (Box[x, yRTex].Status==BoxCell_Type.Block)
                 {
-                    double xTopMax = xDic[x + 1];
-                    for(int xx = x; xx > xLD; xx--)
-                    {
-                        if (Box[xx, yRT].TopLine)
-                        {
-                            double xTopMin = xDic[xx];
-                            TLength = xTopMax - xTopMin;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
+                    if(Box[x, yRTex].YValue > 0)
+                        if (xDic.ContainsKey(x))
+                            TLenghtList.Add(xDic[x]);
+                }
+                else
+                {
+                    TLenghtList.Clear();
                     break;
                 }
             }
+            if (TLenghtList.Count > 0)
+                TLength = TLenghtList.Max() - TLenghtList.Min();
+
 
             DLength = 0;
-            for (int x = xRT; x >= xLD; x--)
+            List<double> DLenghtList = new List<double>();
+            for (int x = xRTex; x >= xLDex; x--)
             {
-                if (Box[x, yLD].BottomLine)
+                if (Box[x, yLDex].Status == BoxCell_Type.Block)
                 {
-                    double xTopMax = xDic[x + 1];
-                    for (int xx = x; xx > xLD; xx--)
-                    {
-                        if (Box[xx, yLD].BottomLine)
-                        {
-                            double xTopMin = xDic[xx];
-                            DLength = xTopMax - xTopMin;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
+                    if (Box[x, yLDex].YValue > 0)
+                        if (xDic.ContainsKey(x))
+                            DLenghtList.Add(xDic[x]);
+                }
+                else
+                {
+                    DLenghtList.Clear();
                     break;
                 }
             }
-
+            if (DLenghtList.Count > 0)
+                DLength = DLenghtList.Max() - DLenghtList.Min();
 
             LLength = 0;
-            for (int y = yRT; y <= yLD; y++)
+            List<double> LLenghtList = new List<double>();
+            for (int y = yRTex; y <= yLDex; y++)
             {
-                if (Box[xLD, y].LeftLine)
+                if (Box[xLDex, y].Status==BoxCell_Type.Block)
                 {
-                    double yTopMax = yDic[y - 1];
-                    for (int yy = y; yy < yLD; yy++)
-                    {
-                        if (Box[xLD, yy].LeftLine)
-                        {
-                            double yTopMin = yDic[yy];
-                            LLength = yTopMax - yTopMin;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
+                    if (Box[xLDex, y].XValue > 0)
+                        if (yDic.ContainsKey(y))
+                            LLenghtList.Add(yDic[y]);
+                }
+                else
+                {
+                    LLenghtList.Clear();
                     break;
                 }
             }
+            if (LLenghtList.Count > 0)
+                LLength = LLenghtList.Max() - LLenghtList.Min();
 
             RLength = 0;
-            for (int y = yRT; y <= yLD; y++)
+            List<double> RLenghtList = new List<double>();
+            for (int y = yRTex; y <= yLDex; y++)
             {
-                if (Box[xRT, y].RightLine)
+                if (Box[xRTex, y].Status==BoxCell_Type.Block)
                 {
-                    double yTopMax = yDic[y - 1];
-                    for (int yy = y; yy < yLD; yy++)
-                    {
-                        if (Box[xRT, yy].RightLine)
-                        {
-                            double yTopMin = yDic[yy];
-                            RLength = yTopMax - yTopMin;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
+                    if (Box[xRTex, y].XValue > 0)
+                        if (yDic.ContainsKey(y))
+                            RLenghtList.Add(yDic[y]);
+                }
+                else
+                {
+                    RLenghtList.Clear();
                     break;
                 }
             }
+            if (RLenghtList.Count > 0)
+                RLength = RLenghtList.Max() - RLenghtList.Min();
 
+
+            // Ref Point
+            refX = 0;
+            refY = 0;
+            List<double> refXList = new List<double>();
+            refXList.AddRange(TLenghtList);
+            refXList.AddRange(DLenghtList);
+            if (refXList.Count > 0)
+                refX = refXList.Min();
+            List<double> refYList = new List<double>();
+            refYList.AddRange(LLenghtList);
+            refYList.AddRange(RLenghtList);
+            if (refYList.Count > 0)
+                refY = refYList.Min();
+
+            if (refX == 0)
+                refX = xDic[xLDex];
+            if (refY == 0)
+                refY = yDic[yLDex];
 
         }
+
+
+        //private void GetCellAreaHorizontalLength(DrawBoxCellModel[,] Box, Dictionary<int,double> xDic, Dictionary<int, double> yDic,
+        //                                            int xLD, int yLD, int xRT, int yRT,
+        //                                            out double TLength, out double DLength, out double LLength, out double RLength)
+        //{
+        //    TLength = 0;
+        //    for(int x = xRT ; x >= xLD; x--)
+        //    {
+        //        if (Box[x, yRT].TopLine)
+        //        {
+        //            double xTopMax = xDic[x + 1];
+        //            for(int xx = x; xx > xLD; xx--)
+        //            {
+        //                if (Box[xx, yRT].TopLine)
+        //                {
+        //                    double xTopMin = xDic[xx];
+        //                    TLength = xTopMax - xTopMin;
+        //                }
+        //                else
+        //                {
+        //                    break;
+        //                }
+        //            }
+        //            break;
+        //        }
+        //    }
+
+        //    DLength = 0;
+        //    for (int x = xRT; x >= xLD; x--)
+        //    {
+        //        if (Box[x, yLD].BottomLine)
+        //        {
+        //            double xTopMax = xDic[x + 1];
+        //            for (int xx = x; xx > xLD; xx--)
+        //            {
+        //                if (Box[xx, yLD].BottomLine)
+        //                {
+        //                    double xTopMin = xDic[xx];
+        //                    DLength = xTopMax - xTopMin;
+        //                }
+        //                else
+        //                {
+        //                    break;
+        //                }
+        //            }
+        //            break;
+        //        }
+        //    }
+
+
+        //    LLength = 0;
+        //    for (int y = yRT; y <= yLD; y++)
+        //    {
+        //        if (Box[xLD, y].LeftLine)
+        //        {
+        //            double yTopMax = yDic[y - 1];
+        //            for (int yy = y; yy < yLD; yy++)
+        //            {
+        //                if (Box[xLD, yy].LeftLine)
+        //                {
+        //                    double yTopMin = yDic[yy];
+        //                    LLength = yTopMax - yTopMin;
+        //                }
+        //                else
+        //                {
+        //                    break;
+        //                }
+        //            }
+        //            break;
+        //        }
+        //    }
+
+        //    RLength = 0;
+        //    for (int y = yRT; y <= yLD; y++)
+        //    {
+        //        if (Box[xRT, y].RightLine)
+        //        {
+        //            double yTopMax = yDic[y - 1];
+        //            for (int yy = y; yy < yLD; yy++)
+        //            {
+        //                if (Box[xRT, yy].RightLine)
+        //                {
+        //                    double yTopMin = yDic[yy];
+        //                    RLength = yTopMax - yTopMin;
+        //                }
+        //                else
+        //                {
+        //                    break;
+        //                }
+        //            }
+        //            break;
+        //        }
+        //    }
+
+
+        //}
 
         private void GetMinMaxValue(double inputMin, double inputMax,out double valueMin, out double valueMax)
         {
@@ -1798,14 +2052,14 @@ namespace DrawWork.DrawDetailServices
         }
 
 
-        private List<DrawPlateModel> GetSortListByCenterIndex(ref double numberCount,List<DrawPlateModel> selList)
+        private List<DrawPlateModel> GetSortListByCenterIndex(ref double numberCount, List<DrawPlateModel> selList, bool asc = false)
         {
             List<DrawPlateModel> newList = new List<DrawPlateModel>();
 
             List<int> reNumberList = new List<int>();
             if (selList.Count > 0)
             {
-                reNumberList = GetCenterIndexList(selList.Count);
+                reNumberList = GetCenterIndexList(selList.Count,asc);
             }
             foreach (int eachIndex in reNumberList)
             {
@@ -1817,24 +2071,33 @@ namespace DrawWork.DrawDetailServices
             return newList;
         }
 
-        private List<int>GetCenterIndexList(double selNumber)
+        private List<int>GetCenterIndexList(double selNumber,bool asc=false)
         {
             List<int> newList = new List<int>();
-            double hMidCount = selNumber / 2;
-            int hMidIndex = int.Parse(Math.Truncate(hMidCount).ToString());
-            int runPlusCount = hMidIndex;
-            int runMinusCount = hMidIndex;
-            newList.Add(hMidIndex);
-            while (runMinusCount >= 0)
+            if (!asc)
             {
-                runMinusCount--;
-                runPlusCount++;
-                if (runMinusCount >= 0)
-                    newList.Add(runMinusCount);
-                if (runPlusCount < selNumber)
-                    newList.Add(runPlusCount);
+                double hMidCount = selNumber / 2;
+                int hMidIndex = int.Parse(Math.Truncate(hMidCount).ToString());
+                int runPlusCount = hMidIndex;
+                int runMinusCount = hMidIndex;
+                newList.Add(hMidIndex);
+                while (runMinusCount >= 0)
+                {
+                    runMinusCount--;
+                    runPlusCount++;
+                    if (runMinusCount >= 0)
+                        newList.Add(runMinusCount);
+                    if (runPlusCount < selNumber)
+                        newList.Add(runPlusCount);
 
+                }
             }
+            else
+            {
+                for(int i = 0; i < selNumber; i++)
+                    newList.Add(i);
+            }
+
 
 
             return newList;
@@ -2976,21 +3239,40 @@ namespace DrawWork.DrawDetailServices
             double hLineLengthRadius = hLineLength / 2;
             double plateWidthHalf = plateWidth / 2;
 
+            double overlapFactor = 30;
+            double rangeVCase00 = plateWidth ;
+            double rangeHCase00 = plateLength;
+            double rangeVCase01 = (plateWidth - overlapFactor) * 1;
+            double rangeHCase01 = plateLength;
+            double rangeVCase02 = (plateWidth - overlapFactor) * 2;
+            double rangeHCase02 = plateLength;
+            double rangeVCase03 = (plateWidth - overlapFactor) * 3;
+            double rangeHCase03 = plateLength;
+            double rangeVCase04 = (plateWidth - overlapFactor) * 4;
+            double rangeHCase04 = plateLength;
+
             Circle outCircle = new Circle(Plane.XY,GetSumPoint(centerPoint,0,0) , circleRadius);
 
             if (arrangeType == PlateArrange_Type.Roof)
             {
-                if (circleOD < 5000)
+                if (circleOD <= rangeVCase01)
                 {
                     returnValue = true;//초기화
 
                 }
-                else if (5000 <= circleOD && circleOD <= 7224)
+                else if (rangeVCase01 < circleOD && circleOD <= rangeVCase02 && circleOD < rangeHCase02)
                 {
+                    // 2장
+                    returnValue = true;//초기화
+                    hCenterLineList.Add(new Line(GetSumPoint(centerPoint, -hLineLengthRadius, 0), GetSumPoint(centerPoint, hLineLengthRadius, 0)));
+                }
+                else if (rangeVCase02 < circleOD && circleOD <= rangeVCase03 &&  circleOD < rangeHCase03)
+                {
+                    // 3장
                     returnValue = true;//초기화
                     hLineList.Add(new Line(GetSumPoint(centerPoint, -hLineLengthRadius, plateWidthHalf), GetSumPoint(centerPoint, hLineLengthRadius, plateWidthHalf)));
                 }
-                else if (7225 <= circleOD && circleOD <= 9144)
+                else if (rangeVCase03 < circleOD && circleOD <= rangeVCase04 && circleOD < rangeHCase04)
                 {
                     returnValue = true;//초기화
                     hLineList.Add(new Line(GetSumPoint(centerPoint, -hLineLengthRadius, plateWidth), GetSumPoint(centerPoint, hLineLengthRadius, plateWidth)));
@@ -3011,17 +3293,24 @@ namespace DrawWork.DrawDetailServices
             }
             else if (arrangeType == PlateArrange_Type.Bottom)
             {
-                if (circleOD < 5000)
+                if (circleOD <= rangeVCase01)
                 {
                     returnValue = true;//초기화
 
                 }
-                else if (5000 <= circleOD && circleOD <= 7224)
+                else if (rangeVCase01 < circleOD && circleOD <= rangeVCase02 && circleOD < rangeHCase02)
                 {
+                    // 2장
+                    returnValue = true;//초기화
+                    hCenterLineList.Add(new Line(GetSumPoint(centerPoint, -hLineLengthRadius, 0), GetSumPoint(centerPoint, hLineLengthRadius, 0)));
+                }
+                else if (rangeVCase02 < circleOD && circleOD <= rangeVCase03 && circleOD < rangeHCase03)
+                {
+                    // 3장
                     returnValue = true;//초기화
                     hLineList.Add(new Line(GetSumPoint(centerPoint, -hLineLengthRadius, plateWidthHalf), GetSumPoint(centerPoint, hLineLengthRadius, plateWidthHalf)));
                 }
-                else if (7225 <= circleOD && circleOD <= 9144)
+                else if (rangeVCase03 < circleOD && circleOD <= rangeVCase04 && circleOD < rangeHCase04)
                 {
                     returnValue = true;//초기화
                     hLineList.Add(new Line(GetSumPoint(centerPoint, -hLineLengthRadius, plateWidth), GetSumPoint(centerPoint, hLineLengthRadius, plateWidth)));
