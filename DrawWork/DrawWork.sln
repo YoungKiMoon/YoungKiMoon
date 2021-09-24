@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrengthCalLib", "..\Streng
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPDataLib", "..\EPDataLib\EPDataLib.csproj", "{57C694EC-D561-4BE8-80E6-63FD2CB22EFB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawCalculationLib", "..\DrawCalculationLib\DrawCalculationLib.csproj", "{CC03D061-5327-4417-941E-64338799BEB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{57C694EC-D561-4BE8-80E6-63FD2CB22EFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57C694EC-D561-4BE8-80E6-63FD2CB22EFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57C694EC-D561-4BE8-80E6-63FD2CB22EFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC03D061-5327-4417-941E-64338799BEB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC03D061-5327-4417-941E-64338799BEB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC03D061-5327-4417-941E-64338799BEB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC03D061-5327-4417-941E-64338799BEB8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

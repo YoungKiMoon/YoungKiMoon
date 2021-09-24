@@ -270,6 +270,10 @@
       <Project>{1f7ff11e-e2d3-4c5c-b003-d7601ec118bc}</Project>
       <Name>DesignLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DrawCalculationLib\DrawCalculationLib.csproj">
+      <Project>{cc03d061-5327-4417-941e-64338799beb8}</Project>
+      <Name>DrawCalculationLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DrawLogicLib\DrawLogicLib.csproj">
       <Project>{f83adbdc-13a0-4154-bb37-4c355e5f5643}</Project>
       <Name>DrawLogicLib</Name>

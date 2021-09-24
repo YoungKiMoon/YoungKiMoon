@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roof Cal Function", "Roof Cal Function\Roof Cal Function.csproj", "{22294664-96BE-4186-9ED7-745E9BBDD671}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalFunctionLib", "..\CalFunctionLib\CalFunctionLib.csproj", "{2D0C4BA3-11C0-4B22-88DF-9E02CCEE397A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{22294664-96BE-4186-9ED7-745E9BBDD671}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22294664-96BE-4186-9ED7-745E9BBDD671}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22294664-96BE-4186-9ED7-745E9BBDD671}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22294664-96BE-4186-9ED7-745E9BBDD671}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D0C4BA3-11C0-4B22-88DF-9E02CCEE397A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D0C4BA3-11C0-4B22-88DF-9E02CCEE397A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D0C4BA3-11C0-4B22-88DF-9E02CCEE397A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D0C4BA3-11C0-4B22-88DF-9E02CCEE397A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5F3386BA-3E3D-46F7-B7CA-E47505C2E5FB}
+	EndGlobalSection
+EndGlobal
