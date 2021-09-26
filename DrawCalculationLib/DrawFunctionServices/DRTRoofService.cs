@@ -9,7 +9,7 @@ namespace DrawCalculationLib.DrawFunctionServices
     public class DRTRoofService
     {
 
-        GeometryService geoSerivce = new GeometryService();
+        GeometryService geoService = new GeometryService();
 
         public DRTRoofService()
         {
@@ -64,9 +64,9 @@ namespace DrawCalculationLib.DrawFunctionServices
             double centerCircleHalfArcLength = GetOptimalLengthByPlateWidth(ShapeType.Arc, plateWidth, platePieceOverlap);
             double centerCircleArcLength = centerCircleHalfArcLength * 2;
             // Center Circle 각도
-            double centerCircleAngle = geoSerivce.GetArcAngleByArcLength(DRTRoofRadius, centerCircleArcLength);
+            double centerCircleAngle = geoService.GetArcAngleByArcLength(DRTRoofRadius, centerCircleArcLength);
             // Center Circle 지름 곡률x 
-            double centerCircleStringLength = geoSerivce.GetStringLengthByArcAngle(DRTRoofRadius, centerCircleAngle);
+            double centerCircleStringLength = geoService.GetStringLengthByArcAngle(DRTRoofRadius, centerCircleAngle);
             // Cutting Plan Length 곡률x
 
             #endregion
@@ -76,9 +76,9 @@ namespace DrawCalculationLib.DrawFunctionServices
 
 
             // DRT Roof 곡률 반영된 길이
-            double DRTRoofArcLength = geoSerivce.GetArcLengthByStringLength(DRTRoofRadius, DRTRoofStringLength);
+            double DRTRoofArcLength = geoService.GetArcLengthByStringLength(DRTRoofRadius, DRTRoofStringLength);
             // DRTRoofR 중심점에서 Dome의 각도 
-            double DRTRoofArcAngle = geoSerivce.GetArcAngleByArcLength(DRTRoofRadius, DRTRoofArcLength);
+            double DRTRoofArcAngle = geoService.GetArcAngleByArcLength(DRTRoofRadius, DRTRoofArcLength);
             double DRTArrngeArcLength = (DRTRoofArcLength - centerCircleArcLength) / 2;
 
 
@@ -132,10 +132,10 @@ namespace DrawCalculationLib.DrawFunctionServices
                     for (int j = 0; j < plateDiveLine; j++)
                     {
                         double tempArcLength = sumLayerLength + (oneVerticalLength * (j + 1));
-                        double tempArcAngle = geoSerivce.GetArcAngleByArcLength(DRTRoofRadius, tempArcLength * 2);
-                        double tempLineDiameter = geoSerivce.GetStringLengthByArcAngle(DRTRoofRadius, tempArcAngle);
+                        double tempArcAngle = geoService.GetArcAngleByArcLength(DRTRoofRadius, tempArcLength * 2);
+                        double tempLineDiameter = geoService.GetStringLengthByArcAngle(DRTRoofRadius, tempArcAngle);
 
-                        double tempLineCircum = geoSerivce.GetCircleCircumByDiameter(tempLineDiameter);
+                        double tempLineCircum = geoService.GetCircleCircumByDiameter(tempLineDiameter);
                         double tempLineHeight = tempLineCircum / layerCountList[i];
 
                         // tempLine Height : 최종
@@ -343,13 +343,11 @@ namespace DrawCalculationLib.DrawFunctionServices
 
         private double GetLayerPieceQtyByPlateWidth(double currentLayerArcLength, double arcRadius, double centerArcLength, double plateWidth)
         {
-            GeomertyFunctions geoSerivce = new GeomertyFunctions();
-
 
             double layerArcAngle = GetEachLayerAngle(currentLayerArcLength, arcRadius, centerArcLength);
 
-            double eachLayerStringLength = geoSerivce.GetStringLengthByArcAngle(arcRadius, layerArcAngle);
-            double eachLayerArcLength = geoSerivce.GetCircleCircumByDiameter(eachLayerStringLength);
+            double eachLayerStringLength = geoService.GetStringLengthByArcAngle(arcRadius, layerArcAngle);
+            double eachLayerArcLength = geoService.GetCircleCircumByDiameter(eachLayerStringLength);
 
 
 
@@ -362,12 +360,11 @@ namespace DrawCalculationLib.DrawFunctionServices
 
         private double GetEachLayerAngle(double layerLength, double arcRadius, double centerArcLength)
         {
-            GeomertyFunctions geoSerivce = new GeomertyFunctions();
 
             double currentLayerArcLength = centerArcLength;
 
             currentLayerArcLength += layerLength * 2;
-            double eachLayerAngle = geoSerivce.GetArcAngleByArcLength(arcRadius, currentLayerArcLength);
+            double eachLayerAngle = geoService.GetArcAngleByArcLength(arcRadius, currentLayerArcLength);
 
             return eachLayerAngle;
         }
