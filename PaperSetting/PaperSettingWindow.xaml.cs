@@ -139,8 +139,8 @@ namespace PaperSetting
 
 
 
-            if(workbookName=="")
-                workbookName = @"C:\Users\tree\Desktop\CAD\TABAS\20210903 점검\TABAS_TK-19104.xlsm";
+            //if(workbookName=="")
+            //    workbookName = @"C:\Users\tree\Desktop\CAD\TABAS\20210903 점검\TABAS_TK-19001.xlsm";
 
 
 
@@ -182,7 +182,7 @@ namespace PaperSetting
                 {
                     // 자동 실행
                     //testBackStart();
-                    //SetAssemblyData();
+                    SetAssemblyData();
                 }
                 else
                 {
@@ -194,7 +194,7 @@ namespace PaperSetting
             {
                 // 자동 실행
                 //testBackStart();
-                //SetAssemblyData();
+                SetAssemblyData();
             }
 
             gridLoading.Visibility = Visibility.Collapsed;
@@ -337,6 +337,7 @@ namespace PaperSetting
                         //DoEvents();
                         CreateDraw1st();
 
+                        //SampleDraw();
 
                         //SetAssemblyDataSub();
                         Console.WriteLine("완료");
@@ -657,7 +658,7 @@ namespace PaperSetting
 
 
             PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
-            PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
+            PaperDrawService paperService = new PaperDrawService(selView.newTankData, this.testModel, this.testDraw);
 
             //paperService.assemblyData = assemblyData;
             // Clear
@@ -757,7 +758,7 @@ namespace PaperSetting
                     break;
                 case 4:
                     PaperSettingViewModel selView = this.DataContext as PaperSettingViewModel;
-                    PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
+                    //PaperDrawService paperService = new PaperDrawService(this.testModel, this.testDraw);
                     //paperService.CreatePaperDraw(selView.PaperListSelectionColl);
                     break;
                 default:

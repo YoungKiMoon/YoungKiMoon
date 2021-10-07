@@ -20,12 +20,13 @@ using DrawWork.Commons;
 using AssemblyLib.AssemblyModels;
 using DrawWork.DrawSacleServices;
 using DrawWork.DrawStyleServices;
+using DrawWork.DrawShapes;
 
 namespace DrawWork.DrawServices
 {
     public class DrawService
     {
-        private AssemblyModel assemblyData;
+        public AssemblyModel assemblyData;
 
         private DrawWorkingPointService cpService;
         private ValueService valueService;
@@ -36,7 +37,7 @@ namespace DrawWork.DrawServices
         private LayerStyleService layerService;
 
         private DrawEditingService editingService;
-
+        public DrawBreakSymbols breakService;
 
         public DrawService(AssemblyModel selAssembly)
         {
@@ -48,7 +49,7 @@ namespace DrawWork.DrawServices
             styleSerivce = new StyleFunctionService();
             layerService = new LayerStyleService();
             editingService = new DrawEditingService();
-
+            breakService = new DrawBreakSymbols();
         }
 
 

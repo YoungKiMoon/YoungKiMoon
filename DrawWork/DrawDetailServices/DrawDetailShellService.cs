@@ -69,11 +69,11 @@ namespace DrawWork.DrawDetailServices
 
             // Plate Info
             double plateLength = 8000;
-            double plateWidth = 3000;
+            //double plateWidth = 3000;
             if (assemblyData.ShellInput.Count > 0)
             {
                 plateLength = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateMaxLength);
-                plateWidth = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateWidth);
+                //plateWidth = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateWidth);
             }
 
             
@@ -547,7 +547,7 @@ namespace DrawWork.DrawDetailServices
             // List
             DrawEntityModel drawList = new DrawEntityModel();
 
-            double plateWidth = valueService.GetDoubleValue( assemblyData.ShellInput[0].PlateWidth);
+            //double plateWidth = valueService.GetDoubleValue( assemblyData.ShellInput[0].PlateWidth);
             double plateMaxLength = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateMaxLength);
 
             double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
@@ -557,12 +557,12 @@ namespace DrawWork.DrawDetailServices
 
 
             // Validation
-            if (oneCourseWidth > plateWidth)
-            {
+            //if (oneCourseWidth > plateWidth)
+            //{
                 // Plate 크기가 첫번째 Course 보다 작다
-                Console.WriteLine("Plate 크기가 첫번째 course 보다 작다");
+                //Console.WriteLine("Plate 크기가 첫번째 course 보다 작다");
                 //return drawList;
-            }
+            //}
 
             // One Plate : Length
             double tankCircumference = Math.PI * tankOD;

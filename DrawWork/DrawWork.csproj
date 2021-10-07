@@ -127,6 +127,7 @@
     <Compile Include="DrawModels\DrawEntityModel.cs" />
     <Compile Include="DrawModels\DrawOnePlateModel.cs" />
     <Compile Include="DrawModels\DrawPlateCuttingModel.cs" />
+    <Compile Include="DrawModels\DrawPlateCuttingSectorModel.cs" />
     <Compile Include="DrawModels\DrawPlateModel.cs" />
     <Compile Include="DrawModels\DrawPointModel.cs" />
     <Compile Include="DrawModels\DrawPositionValueModel.cs" />

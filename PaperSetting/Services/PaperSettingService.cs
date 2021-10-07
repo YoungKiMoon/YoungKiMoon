@@ -133,6 +133,19 @@ namespace PaperSetting.Services
                     newPaper01.Tables.Add(newTable04);
 
 
+
+                    if (assemData.BottomInput[0].DripRing.ToLower() == "yes")
+                    {
+                        PaperTableModel newTable05 = new PaperTableModel();
+                        newTable05.No = "445";
+                        newTable05.Name = "DRIP RING";
+                        newTable05.TableSelection = "DRIP RING";
+                        newTable05.Dock.DockPosition = DOCKPOSITION_TYPE.FLOATING;
+                        newTable05.Dock.HorizontalAlignment = HORIZONTALALIGNMENT_TYPE.RIGHT;
+                        newTable05.Dock.DockPriority = 5;
+                        newPaper01.Tables.Add(newTable05);
+                    }
+
                     // Note : 없음
 
                     if (true)

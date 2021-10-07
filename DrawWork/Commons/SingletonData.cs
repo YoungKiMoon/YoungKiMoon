@@ -189,6 +189,22 @@ namespace DrawWork.Commons
 
 
 
+
+
+
+
+
+
+
+        public static double tempDRTRoofRadius
+        {
+            get { return _tempDRTRoofRadius; }
+            set { _tempDRTRoofRadius = value; }
+        }
+        private static double _tempDRTRoofRadius = 0;
+
+
+
         // Method
         public static void Clear()
         {

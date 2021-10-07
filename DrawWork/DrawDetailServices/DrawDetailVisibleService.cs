@@ -215,14 +215,14 @@ namespace DrawWork.DrawDetailServices
                         case PAPERSUB_TYPE.AnnularPlateCuttingPlan:
 
 
-                            //case PAPERSUB_TYPE.RoofPlateArrangement:
-                            //case PAPERSUB_TYPE.RoofPlateWeldingDetailD:
-                            //case PAPERSUB_TYPE.RoofPlateWeldingDetailC:
-                            //case PAPERSUB_TYPE.RoofPlateWeldingDetailDD:
-                            //case PAPERSUB_TYPE.RoofCompressionRingJointDetail:
+                        case PAPERSUB_TYPE.RoofPlateArrangement:
+                        case PAPERSUB_TYPE.RoofPlateWeldingDetailD:
+                        case PAPERSUB_TYPE.RoofPlateWeldingDetailC:
+                        case PAPERSUB_TYPE.RoofPlateWeldingDetailDD:
+                        case PAPERSUB_TYPE.RoofCompressionRingJointDetail:
 
-                            //case PAPERSUB_TYPE.RoofPlateCuttingPlan:
-                            //case PAPERSUB_TYPE.RoofCompressionRingCuttingPlan:
+                        case PAPERSUB_TYPE.RoofPlateCuttingPlan:
+                        case PAPERSUB_TYPE.RoofCompressionRingCuttingPlan:
 
 
                             eachArea.visible = true;

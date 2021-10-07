@@ -35,6 +35,7 @@ namespace DrawWork.DrawServices
             double bmCount = 0;
             // DWG : ShellPlateArrangement
             newList.AddRange(GetShellPlate(bmCount));
+
             bmCount = newList.Count;
             newList.AddRange(GetTopAngle(bmCount));
             bmCount = newList.Count;
@@ -90,7 +91,13 @@ namespace DrawWork.DrawServices
                 double eachCoursePermiter = Math.PI * eachCourseDiameter;  // 둘레길이
                 double eachPlateCount = Math.Ceiling(eachCoursePermiter / plateLength);
                 double eachPlateLength = eachCoursePermiter / eachPlateCount;
-                string eachPlateLenghtStr = Math.Round(eachPlateLength, 1, MidpointRounding.AwayFromZero).ToString();
+
+                // Fab Margin = 2*10;
+                double fabMarginPlateLength = eachPlateLength + 2 * 10;
+                string fabMarginPlateLengthStr = Math.Round(eachPlateLength, 1, MidpointRounding.AwayFromZero).ToString();
+
+                double fabMarginPlateWidth = valueService.GetDoubleValue( eachShell.PlateWidth) + 2*10;
+                string fabMarginPlateWidthStr = fabMarginPlateWidth.ToString();
 
                 DrawBMModel newModel = new DrawBMModel();
                 newModel.DWGName = DrawSettingLib.Commons.PAPERMAIN_TYPE.ShellPlateArrangement;
@@ -98,7 +105,7 @@ namespace DrawWork.DrawServices
                 newModel.No = bmCount.ToString();
                 newModel.Name = "SHELL PLATE";
                 newModel.Material = eachShell.Material;
-                newModel.Dimension = GetDimension(eachShell.Thickness, eachShell.PlateWidth, eachPlateLenghtStr);
+                newModel.Dimension = GetDimension(eachShell.Thickness, fabMarginPlateWidthStr, fabMarginPlateLengthStr);
                 newModel.Set = eachPlateCount.ToString();
                 newModel.Weight = "";// 현재 공백
                 newModel.Remark = "";
@@ -110,8 +117,8 @@ namespace DrawWork.DrawServices
                 newModel.ExportData.Description = bmCount + " Shell Platte";
                 newModel.ExportData.Material = eachShell.Material;
                 newModel.ExportData.DimThk = eachShell.Thickness;
-                newModel.ExportData.DimWidth = eachShell.PlateWidth;
-                newModel.ExportData.DimLength = eachPlateLenghtStr;
+                newModel.ExportData.DimWidth = fabMarginPlateWidthStr;
+                newModel.ExportData.DimLength = fabMarginPlateLengthStr;
                 newModel.ExportData.DimQty = eachPlateCount.ToString();
 
                 newModel.ExportData.TankQty = tankCount.ToString();
@@ -418,8 +425,8 @@ namespace DrawWork.DrawServices
         {
 
             double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
-            double plateLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateLength);
-            double plateWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateWidth);
+            double plateLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateLength);
+            double plateWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateWidth);
             double plateThk = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateThickness);
 
             string bottomMaterial = assemblyData.GeneralMaterialSpecifications[0].BottomPlate;
@@ -493,8 +500,8 @@ namespace DrawWork.DrawServices
         {
 
             double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
-            double plateLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateLength);
-            double plateWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateWidth);
+            double plateLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateLength);
+            double plateWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateWidth);
             double plateThk = valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateThickness);
 
             string bottomAnnularMaterial = assemblyData.GeneralMaterialSpecifications[0].AnnularPlate;
@@ -557,7 +564,8 @@ namespace DrawWork.DrawServices
 
                 newList.Add(newModel);
 
-                // Backing Strip
+                // 2021-09-29 Samsung : 제외
+
                 DrawBMModel newModelBS = new DrawBMModel();
                 newModelBS.DWGName = DrawSettingLib.Commons.PAPERMAIN_TYPE.BottomPlateCuttingPlan;
                 newModelBS.Page = 1;
@@ -585,6 +593,7 @@ namespace DrawWork.DrawServices
 
 
                 newList.Add(newModelBS);
+
             }
 
 
@@ -758,37 +767,68 @@ namespace DrawWork.DrawServices
         {
             List<List<string>> bmList = new List<List<string>>();
 
-            foreach(DrawBMModel eachBM in SingletonData.BMList)
+            // Adj
+            foreach (DrawBMModel eachBM in SingletonData.BMList)
             {
                 if (eachBM.ExportData.Description != "")
                 {
-                    List<string> newBM = new List<string>();
-                    newBM.Add(eachBM.ExportData.PORNo);
-                    newBM.Add(eachBM.ExportData.TankNo);
-                    newBM.Add(eachBM.ExportData.TankName);
-                    newBM.Add(eachBM.ExportData.Description);
-                    newBM.Add(eachBM.ExportData.Material);
+                    // 넓이와 길이 정수 : 소수 첫째 자리 올림
+                    double tempDimWidth = valueService.GetDoubleValue(eachBM.ExportData.DimWidth);
+                    eachBM.ExportData.DimWidth = valueService.IntRound(tempDimWidth, 0).ToString();
+                    double tempDimLength = valueService.GetDoubleValue(eachBM.ExportData.DimLength);
+                    eachBM.ExportData.DimLength = valueService.IntRound(tempDimLength, 0).ToString();
 
-                    newBM.Add(eachBM.ExportData.DimThk);
-                    newBM.Add(eachBM.ExportData.DimWidth);
-                    newBM.Add(eachBM.ExportData.DimLength);
-                    newBM.Add(eachBM.ExportData.DimQty);
-
-                    newBM.Add(eachBM.ExportData.UnitWeight);
-
-                    newBM.Add(eachBM.ExportData.TankQty);
-
-                    newBM.Add(eachBM.ExportData.Margin);
-
-                    newBM.Add(eachBM.ExportData.TotalQty);
-                    newBM.Add(eachBM.ExportData.TotalWeight);
-                    newBM.Add(eachBM.ExportData.Remarks);
-
-                    bmList.Add(newBM);
                 }
 
 
             }
+
+            foreach (DrawBMModel eachBM in SingletonData.BMList)
+            {
+                if (eachBM.ExportData.Description != "")
+                {
+                    switch (eachBM.Name)
+                    {
+                        case "SHELL PLATE":
+                        case "BOTTOM PLATE":
+                        case "ANNULAR PLATE":
+                        case "ROOF PLATE":
+                        case "COM. RING PLATE":
+                            List<string> newBM = new List<string>();
+                            newBM.Add(eachBM.ExportData.PORNo);
+                            newBM.Add(eachBM.ExportData.TankNo);
+                            newBM.Add(eachBM.ExportData.TankName);
+                            newBM.Add(eachBM.ExportData.Description);
+                            newBM.Add(eachBM.ExportData.Material);
+
+                            newBM.Add(eachBM.ExportData.DimThk);
+                            // 넓이와 길이 정수 : 소수 첫째 자리 올림
+                            double tempDimWidth = valueService.GetDoubleValue(eachBM.ExportData.DimWidth);
+                            double tempDimLength = valueService.GetDoubleValue(eachBM.ExportData.DimLength);
+                            newBM.Add(valueService.IntRound(tempDimWidth, 0).ToString());
+                            newBM.Add(valueService.IntRound(tempDimLength, 0).ToString());
+                            newBM.Add(eachBM.ExportData.DimQty);
+
+                            newBM.Add(eachBM.ExportData.UnitWeight);
+
+                            newBM.Add(eachBM.ExportData.TankQty);
+
+                            newBM.Add(eachBM.ExportData.Margin);
+
+                            newBM.Add(eachBM.ExportData.TotalQty);
+                            newBM.Add(eachBM.ExportData.TotalWeight);
+                            newBM.Add(eachBM.ExportData.Remarks);
+
+                            bmList.Add(newBM);
+                            break;
+                    }
+
+                }
+
+
+            }
+
+            
 
             return bmList;
         }

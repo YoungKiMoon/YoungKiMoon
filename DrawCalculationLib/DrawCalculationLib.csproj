@@ -42,6 +42,10 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="DrawFunctionServices\DRTRoofService.cs" />
+    <Compile Include="DrawModels\DRTLayerModel.cs" />
+    <Compile Include="DrawModels\DRTRoofPlateLineModel.cs" />
+    <Compile Include="DrawModels\DRTRoofModel.cs" />
+    <Compile Include="DrawModels\DRTRoofPlateModel.cs" />
     <Compile Include="FunctionServices\GeometryService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

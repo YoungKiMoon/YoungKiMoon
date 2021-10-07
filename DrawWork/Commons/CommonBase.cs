@@ -287,6 +287,8 @@ namespace DrawWork.Commons
         ArcRectangleArc = 3,
         Arc =4,
         Segment =5,
+        Sector=6,
+        Circle=7,
     }
 
 
@@ -305,6 +307,12 @@ namespace DrawWork.Commons
         Use,
     }
 
+    public enum CircleArrange_Type
+    {
+        NotSet,
+        PieSegment,
+        Square,
+    }
 
 
 }

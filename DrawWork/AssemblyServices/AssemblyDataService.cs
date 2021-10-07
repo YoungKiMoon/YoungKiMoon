@@ -694,15 +694,30 @@ namespace DrawWork.AssemblyServices
                 selAssembly.StructureDRTCenteringRafterOutput.Clear();
                 foreach(StructureDRTRafterInputModel eachInputRafter in selAssembly.StructureDRTRafterInput)
                 {
-                    foreach (StructureCenteringRafterModel eachRafter in selAssembly.StructureCenteringRafterList)
+                    if (StructureDivService.centeringInEx == "internal")
                     {
-                        if (eachRafter.TankType == StructureDivService.tankType)
-                            if (eachRafter.InEx == StructureDivService.centeringInEx)
-                                if (eachRafter.Angle == StructureDivService.topAngleType)
+                        foreach (StructureCenteringRafterModel eachRafter in selAssembly.StructureCenteringRafterList)
+                        {
+                            if (eachRafter.TankType.Contains(StructureDivService.tankType))
+                                if (eachRafter.InEx == StructureDivService.centeringInEx)
+                                    if (eachRafter.Angle == StructureDivService.topAngleType)
+                                        if (eachRafter.SIZE == eachInputRafter.Size)
+                                            selAssembly.StructureDRTCenteringRafterOutput.Add(eachRafter);
+
+                        }
+                    }
+                    else
+                    {
+                        foreach (StructureCenteringRafterModel eachRafter in selAssembly.StructureCenteringRafterList)
+                        {
+                            if (eachRafter.TankType.Contains(StructureDivService.tankType))
+                                if (eachRafter.InEx == StructureDivService.centeringInEx)
                                     if (eachRafter.SIZE == eachInputRafter.Size)
                                         selAssembly.StructureDRTCenteringRafterOutput.Add(eachRafter);
 
+                        }
                     }
+
                 }
 
 

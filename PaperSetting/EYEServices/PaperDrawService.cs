@@ -29,6 +29,7 @@ using DrawSettingLib.SettingServices;
 using DrawSettingLib.SettingModels;
 using DrawSettingLib.Commons;
 using DrawWork.DrawGridServices;
+using DrawWork.DrawServices;
 
 namespace PaperSetting.EYEServices
 {
@@ -43,9 +44,12 @@ namespace PaperSetting.EYEServices
         StyleFunctionService styleService;
 
         DrawShapeService shapeService;
+
+        private DrawService drawService;
         #endregion
 
         #region Property
+        public AssemblyModel assemblyData;
         private Model singleModel = null;
         private Drawings singleDraw = null;
 
@@ -62,8 +66,11 @@ namespace PaperSetting.EYEServices
         #endregion
 
         #region CONSTRUCTOR
-        public PaperDrawService(Model selModel, Drawings selDraw)
+        public PaperDrawService(AssemblyModel selAssembly, Model selModel, Drawings selDraw)
         {
+
+            assemblyData = selAssembly;
+
             valueService = new ValueService();
             scaleService = new DrawScaleService();
             layerService = new LayerStyleService();
@@ -71,6 +78,8 @@ namespace PaperSetting.EYEServices
             shapeService = new DrawShapeService();
             editingService = new DrawEditingService();
             styleService = new StyleFunctionService();
+
+            drawService = new DrawService(null);
 
             singleModel = selModel;
             singleDraw = selDraw;
@@ -205,7 +214,7 @@ namespace PaperSetting.EYEServices
                 oneSheetBlock = new Dictionary<string, DockModel>();
 
                 //string sheetName = "GENERAL A" + sheetIndex.ToString();
-                string sheetName = eachPaper.Basic.Title+ eachPaper.Page;
+                string sheetName = eachPaper.Basic.Title +eachPaper.Page;
                 //newSheet.Name = eachPaper.Basic.Title;
                 //newSheet = CreateSheet(eachPaper);
                 Sheet newSheet = new Sheet(linearUnitsType.Millimeters, eachPaper.SheetSize.Width, eachPaper.SheetSize.Height, sheetName);
@@ -256,6 +265,8 @@ namespace PaperSetting.EYEServices
                     CreateTableBlockGA(eachPaper.Tables[1], newSheet, eachPaper.Tables[1].No, assemblyData);
                     CreateTableBlockGA2(eachPaper.Tables[2], newSheet, eachPaper.Tables[2].No, assemblyData);
                     CreateTableBlockGANozzleProjection(eachPaper.Tables[3], newSheet, eachPaper.Tables[3].No, assemblyData);
+                    if(assemblyData.BottomInput[0].DripRing.ToLower()=="yes")
+                        CreateTableBlockGADripRing(eachPaper.Tables[4], newSheet, eachPaper.Tables[4].No, assemblyData);
                 }
 
                 if (eachPaper.Basic.Title == "GENERAL ASSEMBLY(2-2)")
@@ -755,7 +766,20 @@ namespace PaperSetting.EYEServices
             selSheet.Entities.Add(newBr);
             oneSheetBlock.Add(newBr.BlockName, selTable.Dock);
         }
-        
+
+        private void CreateTableBlockGADripRing(PaperTableModel selTable, Sheet selSheet, string bName, AssemblyModel assemblyData)
+        {
+            BlockReference newBr = BuildPaperTableDripRing(selTable, assemblyData, out Block tableBlock);
+            newBr.LayerName = layerService.LayerBlock;
+
+            tableBlock.Name += bName + "_" + singleDraw.Blocks.Count;
+            newBr.BlockName = tableBlock.Name;
+
+            singleDraw.Blocks.Add(tableBlock);
+            selSheet.Entities.Add(newBr);
+            oneSheetBlock.Add(newBr.BlockName, selTable.Dock);
+        }
+
         private void CreateTableBlockDirection(PaperTableModel selTable, Sheet selSheet, string bName, AssemblyModel assemblyData)
         {
             BlockReference newBr = BuildPaperTableDirection(selTable, assemblyData, out Block tableBlock);
@@ -2223,6 +2247,301 @@ namespace PaperSetting.EYEServices
 
         }
 
+
+        private BlockReference BuildPaperTableDripRing(PaperTableModel selTable, AssemblyModel assemblyData, out Block selBlock)
+        {
+            Point3D refPoint = new Point3D(0, 0);
+
+            List<Entity> dripRingList = new List<Entity>();
+
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+
+            ////////////////////////////////////////////// ///////////////////////////////////////////
+            dripRingList.AddRange(GetDripRing(referencePoint));
+
+            BlockReference newBr = new BlockReference(selTable.Location.X, selTable.Location.Y, 0, "PAPER_TABLE" + selTable.No, 1, 1, 1, 0);
+
+            Block newBl = new Block("PAPER_TABLE_" + selTable.No);
+            newBl.Entities.AddRange(dripRingList);
+            selBlock = newBl;
+            return newBr;
+
+        }
+
+        public List<Entity> GetDripRing(Point3D refPoint)
+        {
+
+            List<Entity> allOutLineList = new List<Entity>();
+            List<Entity> outlinesList = new List<Entity>();
+            List<Entity> concreteBoxleList = new List<Entity>();
+            List<Entity> virtualPlateList = new List<Entity>();
+            Point3D referencePoint = GetSumPoint(refPoint, 15, 20);
+
+            //////////////////////////////////////////////////////////
+            // CAD DATA
+            //////////////////////////////////////////////////////////
+            double concreteWidth = 25.2;
+            double concreteLength = 40;
+
+            double topPlateWidth = 13.9;
+            double topPlateLength = 1.5;
+            double topPlateXGap = 9.3;
+
+            double bottomPlateWidth = 2;
+            double bottomPlateLength = 15.3;
+            double bottomPlateXGap = 3.6;
+
+            double splineGap = 3;
+
+            double DripRIngWidth = 0.5;
+            double topDripRIngLength = 29;
+            double BottomDripRIngLength = 3;
+
+
+            //////////////////////////////////////////////////////////
+            // Draw 
+            //////////////////////////////////////////////////////////
+
+            // Draw Boxes
+            Point3D bottomPlateStartPoint = GetSumPoint(referencePoint, bottomPlateXGap, concreteWidth); ;
+            List<Entity> bottomPlateList = GetRectangle(bottomPlateStartPoint, bottomPlateWidth, bottomPlateLength, RECTANGLUNVIEW.LEFT);
+            virtualPlateList.AddRange(bottomPlateList);
+
+            Point3D topPlateStartPoint = GetSumPoint(bottomPlateStartPoint, topPlateXGap, bottomPlateWidth); ;
+            List<Entity> topPlateList = GetRectangle(topPlateStartPoint, topPlateWidth, topPlateLength, RECTANGLUNVIEW.TOP);
+            virtualPlateList.AddRange(topPlateList);
+
+            concreteBoxleList = GetRectangle(referencePoint, concreteWidth, concreteLength, RECTANGLUNVIEW.LEFT);
+            outlinesList.AddRange(concreteBoxleList);
+
+
+            // Draw Spline
+            List<Point3D> splinePointList = new List<Point3D>();
+
+            Line splineGuideLine = new Line(((Line)concreteBoxleList[2]).StartPoint, ((Line)concreteBoxleList[0]).StartPoint);
+            Line splineTopGuide = new Line(splineGuideLine.StartPoint, splineGuideLine.MidPoint);
+            Line splineBottomGuide = new Line(splineGuideLine.MidPoint, splineGuideLine.EndPoint);
+
+            splinePointList.Add(GetSumPoint(splineTopGuide.StartPoint, 0, 0));
+            splinePointList.Add(GetSumPoint(splineTopGuide.MidPoint, -splineGap, 0));
+            splinePointList.Add(GetSumPoint(splineTopGuide.EndPoint, 0, 0));
+            splinePointList.Add(GetSumPoint(splineBottomGuide.MidPoint, splineGap, 0));
+            splinePointList.Add(GetSumPoint(splineBottomGuide.EndPoint, 0, 0));
+
+            Curve bottomSpline = Curve.CubicSplineInterpolation(splinePointList);
+            outlinesList.Add(bottomSpline);
+
+
+            // Draw Drip Ring
+            Point3D topDripRIngStartPoint = GetSumPoint(((Line)bottomPlateList[0]).EndPoint, 0, 0); ;
+            List<Entity> topDripRIngList = GetRectangle(topDripRIngStartPoint, DripRIngWidth, topDripRIngLength);
+            outlinesList.AddRange(topDripRIngList);
+
+            Point3D bottomDripRIngStartPoint = GetSumPoint(((Line)topDripRIngList[0]).EndPoint, 0, 0); ;
+            List<Entity> bottomDripRIngList = GetRectangleLT(bottomDripRIngStartPoint, BottomDripRIngLength, DripRIngWidth);
+            outlinesList.AddRange(bottomDripRIngList);
+
+
+            outlinesList.AddRange(new Entity[] {
+
+            });
+
+            styleService.SetLayerListLine(ref virtualPlateList, layerService.LayerVirtualLine);
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+
+            allOutLineList.AddRange(virtualPlateList);
+            allOutLineList.AddRange(outlinesList);
+
+            // Draw : Concrete detail - circle(DOT)
+            List<Entity> newList = new List<Entity>();
+            newList.AddRange(GetTriangle(GetSumPoint(referencePoint, 5, 6), 0.5, 45));
+            newList.AddRange(GetTriangle(GetSumPoint(referencePoint, 10, 3), 0.5, 30));
+            newList.AddRange(GetTriangle(GetSumPoint(referencePoint, 8, 20), 0.5, 90));
+            newList.AddRange(GetTriangle(GetSumPoint(referencePoint, 20, 18), 0.5, 25));
+            newList.AddRange(GetTriangle(GetSumPoint(referencePoint, 30, 5), 0.5, 110));
+            newList.AddRange(GetTriangle(GetSumPoint(referencePoint, 35, 23), 0.5, 70));
+
+            Point3D[] circlePointList = new Point3D[]{
+                GetSumPoint(referencePoint,3,17),
+                GetSumPoint(referencePoint,5,22),
+                GetSumPoint(referencePoint,10,10),
+                GetSumPoint(referencePoint,15,20),
+                GetSumPoint(referencePoint,20,5),
+                GetSumPoint(referencePoint,23,18),
+                GetSumPoint(referencePoint,30,8),
+                GetSumPoint(referencePoint,37,5),
+                GetSumPoint(referencePoint,33,20),
+            };
+            newList.AddRange(GetManyCircles(referencePoint, 0.03, circlePointList.ToList()));
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+            allOutLineList.AddRange(newList);
+
+
+
+            // Title
+            Point3D referencePointTitle = GetSumPoint(referencePoint, 35, -20);
+            List<Entity> titleList = new List<Entity>();
+            Point3D titleBaseCenter1 = GetSumPoint(referencePointTitle, 0, 7);
+            Point3D titleBaseCenter2 = GetSumPoint(referencePointTitle, 0, 8);
+            Point3D titleTextCenter = GetSumPoint(referencePointTitle, 0, 9);
+
+            double baseLineWidth = 30;
+            Line titleBaseLine1 = new Line(GetSumPoint(titleBaseCenter1, -baseLineWidth / 2, 0), GetSumPoint(titleBaseCenter1, baseLineWidth / 2, 0));
+            styleService.SetLayer(ref titleBaseLine1, layerService.LayerOutLine);
+            Line titleBaseLine2 = new Line(GetSumPoint(titleBaseCenter2, -baseLineWidth / 2, 0), GetSumPoint(titleBaseCenter2, baseLineWidth / 2, 0));
+            styleService.SetLayer(ref titleBaseLine2, layerService.LayerDimension);
+            Text titleText = new Text(titleTextCenter, "DRIP RING", 4);
+            titleText.Alignment = Text.alignmentType.BaselineCenter;
+            titleText.ColorMethod = colorMethodType.byEntity;
+            titleText.Color = Color.Yellow;
+            titleList.AddRange(new Entity[] { titleBaseLine1, titleBaseLine2, titleText });
+            allOutLineList.AddRange(titleList);
+
+
+
+            // Leader
+            double scaleValue = 1;
+            DrawBMLeaderModel leaderInfoModel2 = new DrawBMLeaderModel() { 
+                position = POSITION_TYPE.RIGHT, 
+                upperText = "SEAL WELDING", 
+                textAlign = POSITION_TYPE.CENTER,
+                leaderPointRadian=Utility.DegToRad(60),
+                leaderPointLength= 20
+                };
+            DrawEntityModel leaderInfoList2 = drawService.Draw_OneLineLeader(ref singleModel, GetSumPoint(topDripRIngStartPoint, 0, DripRIngWidth), leaderInfoModel2, scaleValue);
+            allOutLineList.AddRange(leaderInfoList2.GetDrawEntity());
+
+            string dripRingThickness = assemblyData.BottomInput[0].DripRingThickness;
+            DrawBMLeaderModel leaderInfoModel3 = new DrawBMLeaderModel()
+            {
+                position = POSITION_TYPE.RIGHT,
+                upperText = "t" + dripRingThickness +" DRIP RING",
+                textAlign = POSITION_TYPE.CENTER,
+                leaderPointRadian = Utility.DegToRad(60),
+                leaderPointLength = 12};
+            DrawEntityModel leaderInfoList3 = drawService.Draw_OneLineLeader(ref singleModel, GetSumPoint(topDripRIngStartPoint, topDripRIngLength*5/6, DripRIngWidth), leaderInfoModel3, scaleValue);
+            allOutLineList.AddRange(leaderInfoList3.GetDrawEntity());
+
+
+            double tempDimWidth01 = 7.9;
+            DrawDimensionModel dimModelTop01 = new DrawDimensionModel()
+            {
+                position = POSITION_TYPE.BOTTOM,
+                textUpper = "75",
+                textLower = "(MIN.)",
+                extLineLeftVisible = false,
+
+                dimHeight = 15,
+                scaleValue = scaleValue
+            };
+            DrawEntityModel dimEntityTop01 = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(topDripRIngStartPoint, topDripRIngLength- tempDimWidth01, 0), GetSumPoint(topDripRIngStartPoint, topDripRIngLength, -BottomDripRIngLength), scaleValue, dimModelTop01);
+            allOutLineList.AddRange(dimEntityTop01.GetDrawEntity());
+
+            DrawDimensionModel dimModelTop02 = new DrawDimensionModel()
+            {
+                position = POSITION_TYPE.RIGHT,
+                textUpper = "25",
+                textLower = "(MIN.)",
+                arrowLeftHeadOut=true,
+                arrowRightHeadOut=true,
+                dimHeight = 15,
+                scaleValue = scaleValue
+            };
+            DrawEntityModel dimEntityTop02 = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(topDripRIngStartPoint, topDripRIngLength + DripRIngWidth, -BottomDripRIngLength), GetSumPoint(topDripRIngStartPoint, topDripRIngLength + DripRIngWidth,0), scaleValue, dimModelTop02);
+            allOutLineList.AddRange(dimEntityTop02.GetDrawEntity());
+
+
+            // S Line
+            double sLineLength = bottomPlateWidth;
+
+            List<Entity> newSLineList1 = drawService.breakService.GetSLine(GetSumPoint(topPlateStartPoint, 0, topPlateWidth), topPlateLength, true,0);
+            List<Entity> newSLineList2 = drawService.breakService.GetSLine(GetSumPoint(bottomPlateStartPoint, 0, bottomPlateWidth), bottomPlateWidth, false, 90);
+            styleService.SetLayerListEntity(ref newSLineList1, layerService.LayerVirtualLine);
+            styleService.SetLayerListEntity(ref newSLineList2, layerService.LayerVirtualLine);
+            allOutLineList.AddRange(newSLineList1);
+            allOutLineList.AddRange(newSLineList2);
+
+            return allOutLineList;
+        }
+        public enum RECTANGLUNVIEW { NONE, LEFT, RIGHT, TOP, BOTTOM, }
+        public List<Entity> GetRectangle(Point3D startPoint, double width, double length, RECTANGLUNVIEW unViewPosition = RECTANGLUNVIEW.NONE)
+        {
+            // startPoint = LeftBottom point
+            List<Entity> rectangleLineList = new List<Entity>();
+
+            if (unViewPosition != RECTANGLUNVIEW.BOTTOM)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, 0, 0), GetSumPoint(startPoint, length, 0)));
+            if (unViewPosition != RECTANGLUNVIEW.RIGHT)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, length, width), GetSumPoint(startPoint, length, 0)));
+            if (unViewPosition != RECTANGLUNVIEW.TOP)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, 0, width), GetSumPoint(startPoint, length, width)));
+            if (unViewPosition != RECTANGLUNVIEW.LEFT)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, 0, width), GetSumPoint(startPoint, 0, 0)));
+
+            return rectangleLineList;
+        }
+        public List<Entity> GetRectangleLT(Point3D startPoint, double width, double length, RECTANGLUNVIEW unViewPosition = RECTANGLUNVIEW.NONE)
+        {
+            // startPoint = LeftTop point
+            List<Entity> rectangleLineList = new List<Entity>();
+
+            if (unViewPosition != RECTANGLUNVIEW.BOTTOM)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, 0, -width), GetSumPoint(startPoint, length, -width)));
+            if (unViewPosition != RECTANGLUNVIEW.RIGHT)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, length, 0), GetSumPoint(startPoint, length, -width)));
+            if (unViewPosition != RECTANGLUNVIEW.TOP)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, 0, 0), GetSumPoint(startPoint, length, 0)));
+            if (unViewPosition != RECTANGLUNVIEW.LEFT)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, 0, 0), GetSumPoint(startPoint, 0, -width)));
+
+            return rectangleLineList;
+        }
+        public List<Entity> GetTriangle(Point3D refPoint, double length, double angle = 0)
+        {
+            Point3D RefPoint = GetSumPoint(refPoint, 0, 0);
+            List<Entity> triangleList = new List<Entity>();
+
+            Line bottomLine = new Line(GetSumPoint(RefPoint, 0, 0), GetSumPoint(RefPoint, length, 0));
+
+            Line leftLine = new Line(GetSumPoint(RefPoint, 0, 0), GetSumPoint(RefPoint, length, 0));
+            leftLine.Rotate(Utility.DegToRad(60), Vector3D.AxisZ, RefPoint);
+
+            Line rightLine = new Line(GetSumPoint(RefPoint, 0, 0), GetSumPoint(bottomLine.EndPoint, 0, 0));
+            rightLine.Rotate(Utility.DegToRad(-60), Vector3D.AxisZ, bottomLine.EndPoint);
+
+            triangleList.AddRange(new Line[] {
+                bottomLine, leftLine, rightLine
+            });
+
+            if (angle != 0)
+            {
+                foreach (Line eachLine in triangleList)
+                {
+                    eachLine.Rotate(Utility.DegToRad(angle), Vector3D.AxisZ, RefPoint);
+                }
+            }
+
+            styleService.SetLayerListEntity(ref triangleList, layerService.LayerOutLine);
+            return triangleList;
+        }
+        public List<Entity> GetManyCircles(Point3D refPoint, double Radius, List<Point3D> pointList)
+        {
+            List<Entity> circleList = new List<Entity>();
+
+            foreach (Point3D eachPoint in pointList)
+            {
+                Circle eachCircle = new Circle(eachPoint, Radius);
+                circleList.Add(eachCircle);
+            }
+
+            styleService.SetLayerListEntity(ref circleList, layerService.LayerOutLine);
+            return circleList;
+        }
+
+
+
+
         private BlockReference BuildPaperTableDirection(PaperTableModel selTable, AssemblyModel assemblyData, out Block selBlock)
         {
 
@@ -3321,41 +3640,47 @@ namespace PaperSetting.EYEServices
                 }
             }
 
-            // Float
-            //var floatDicOrderby = floatDic.OrderBy(num => num.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
-            //double topLeftX = 7;
-            //double topLeftY = 7;
+            //Float
+            var floatDicOrderby = floatDic.OrderBy(num => num.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+            double topLeftX = 7;
+            double topLeftY = 7;
 
 
-            //foreach (string eachName in floatDicOrderby.Keys)
-            //{
-            //    foreach (Entity eachEntity in singleDraw.Sheets[selIndex].Entities)
-            //    {
-            //        string eachType = eachEntity.GetType().Name;
-            //        if (eachType.Contains("BlockReference"))
-            //        {
-            //            BlockReference selBlock = eachEntity as BlockReference;
-            //            selBlock.Regen(new RegenParams(0, singleDraw));
-            //            //newText01.Regen(new RegenParams(0, ssModel));
-            //            if (eachName == selBlock.BlockName)
-            //            {
-            //                selBlock.InsertionPoint = new Point3D(bottomLeftX, bottomLeftY);
-            //                bottomLeftX += selBlock.BoxSize.X;
-            //            }
-            //        }
-            //        else if (eachType.Contains("VectorView"))
-            //        {
-            //            VectorView selView = eachEntity as VectorView;
-            //            if (eachName == selView.BlockName)
-            //            {
-            //                selView.InsertionPoint = new Point3D(bottomLeftX + selView.BoxSize.X, bottomLeftY);
-            //                bottomLeftY = selView.BoxSize.Y;
-            //                bottomLeftX += selView.BoxSize.X;
-            //            }
-            //        }
+            foreach (string eachName in floatDicOrderby.Keys)
+            {
+                foreach (Entity eachEntity in singleDraw.Sheets[selIndex].Entities)
+                {
+                    string eachType = eachEntity.GetType().Name;
+                    if (eachType.Contains("BlockReference"))
+                    {
+                        BlockReference selBlock = eachEntity as BlockReference;
+                        selBlock.Regen(new RegenParams(0, singleDraw));
+                        //newText01.Regen(new RegenParams(0, ssModel));
+                        if (eachName == selBlock.BlockName)
+                        {
+                            //selBlock.InsertionPoint = new Point3D(bottomLeftX, bottomLeftY);
+                            //bottomLeftX += selBlock.BoxSize.X;
 
-            //    }
-            //}
+                            if (eachName.Contains("445"))
+                            {
+                                selBlock.InsertionPoint = new Point3D(841 - 166 - 7 -(99), 99+7);
+                            }
+
+                        }
+                    }
+                    else if (eachType.Contains("VectorView"))
+                    {
+                        VectorView selView = eachEntity as VectorView;
+                        if (eachName == selView.BlockName)
+                        {
+                            selView.InsertionPoint = new Point3D(bottomLeftX + selView.BoxSize.X, bottomLeftY);
+                            bottomLeftY = selView.BoxSize.Y;
+                            bottomLeftX += selView.BoxSize.X;
+                        }
+                    }
+
+                }
+            }
 
         }
         #endregion

@@ -2,6 +2,7 @@
 using devDept.Eyeshot;
 using devDept.Eyeshot.Entities;
 using devDept.Geometry;
+using DrawCalculationLib.DrawModels;
 using DrawWork.Commons;
 using DrawWork.DrawModels;
 using DrawWork.DrawSacleServices;
@@ -74,8 +75,20 @@ namespace DrawWork.DrawDetailServices
             // Scale : 매우 중요 함
             double realScaleValue = scaleService.GetScaleCalValue(135, 50, plateActualLength, plateActualWidth);
 
+            bool pieSegmentCutting = CheckPieSegmentPlate(SingletonData.RoofPlateInfo);
+
+            SingletonData.RoofPlateList.Clear();
+
+            if (pieSegmentCutting)
+            {
+                drawList.AddDrawEntity(DrawCuttingPlan_PieSegment(PlateArrange_Type.Roof, referencePoint, SingletonData.RoofPlateInfo, plateActualWidth, plateActualLength, realScaleValue));
+            }
+            else
+            {
+                drawList.AddDrawEntity(DrawCuttingPlan(PlateArrange_Type.Roof, referencePoint, SingletonData.RoofPlateInfo, plateActualWidth, plateActualLength, realScaleValue));
+            }
             
-            drawList.AddDrawEntity(DrawCuttingPlan(PlateArrange_Type.Roof, referencePoint, SingletonData.RoofPlateInfo, plateActualWidth, plateActualLength, realScaleValue));
+
             
             return drawList;
         }
@@ -84,17 +97,34 @@ namespace DrawWork.DrawDetailServices
 
         {
             DrawEntityModel drawList = new DrawEntityModel();
-            double plateActualWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateWidth);
-            double plateActualLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateLength);
+            double plateActualWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateWidth);
+            double plateActualLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateLength);
 
             Point3D referencePoint = new Point3D(refPoint.X, refPoint.Y);
             // Scale : 매우 중요 함
             double realScaleValue = scaleService.GetScaleCalValue(135, 50, plateActualLength, plateActualWidth);
 
+            SingletonData.BottomPlateList.Clear();
+
             drawList.AddDrawEntity(DrawCuttingPlan(PlateArrange_Type.Bottom,referencePoint, SingletonData.BottomPlateInfo, plateActualWidth, plateActualLength, realScaleValue));
             return drawList;
         }
 
+        // Pie Segment Plate : Sector 점검
+        private bool CheckPieSegmentPlate(List<DrawPlateModel> selPlateList)
+        {
+            bool returnValue = false;   
+            foreach(DrawPlateModel eachPlate in selPlateList)
+            {
+                if (eachPlate.ShapeType == Plate_Type.Sector)
+                {
+                    returnValue = true;
+                    break;
+                }
+            }
+
+            return returnValue;
+        }
 
         public void SetPlateAddLength(List<DrawPlateModel> selList)
         {
@@ -134,6 +164,8 @@ namespace DrawWork.DrawDetailServices
 
             }
         }
+
+
         public void SetCuttingInfo(List<DrawPlateModel> selPlateList,double plateWidth, double plateLength)
         {
             // 가로로 배열한다고 가정 함
@@ -175,6 +207,7 @@ namespace DrawWork.DrawDetailServices
                         eachPlate.CuttingPlan.LengthBetweenStringAndArc = valueService.GetLengthBetweenStringAndArc(eachPlate.Radius, eachPlate.CuttingPlan.StringLength);
                         eachPlate.CuttingPlan.XLengthOfArcTangent = valueService.GetHypotenuseByWidth(eachPlate.CuttingPlan.VMinusSlope, eachPlate.CuttingPlan.LengthBetweenStringAndArc);
                         break;
+
                     case Plate_Type.RectangleArc:
                         eachPlate.CuttingPlan.LengthSpacing = eachPlate.CuttingPlan.MaxLength - eachPlate.CuttingPlan.MinLength;
                         eachPlate.CuttingPlan.StringLength = valueService.GetHypotenisuByPythagoras(eachPlate.CuttingPlan.Width, eachPlate.CuttingPlan.LengthSpacing);
@@ -183,6 +216,7 @@ namespace DrawWork.DrawDetailServices
                         eachPlate.CuttingPlan.LengthBetweenStringAndArc = valueService.GetLengthBetweenStringAndArc(eachPlate.Radius, eachPlate.CuttingPlan.StringLength);
                         eachPlate.CuttingPlan.XLengthOfArcTangent = valueService.GetHypotenuseByWidth(eachPlate.CuttingPlan.VMinusSlope, eachPlate.CuttingPlan.LengthBetweenStringAndArc);
                         break;
+
                     case Plate_Type.ArcRectangleArc:
                         eachPlate.CuttingPlan.Width = plateWidth;
                         eachPlate.CuttingPlan.StringLength = eachPlate.CuttingPlan.Width;
@@ -191,6 +225,8 @@ namespace DrawWork.DrawDetailServices
                         eachPlate.CuttingPlan.XLengthOfArcTangent = eachPlate.CuttingPlan.LengthBetweenStringAndArc;
                         break;
 
+                    case Plate_Type.Sector:
+                        break;
                 }
 
 
@@ -209,6 +245,334 @@ namespace DrawWork.DrawDetailServices
                 //        break;
                 //}
             }
+        }
+
+
+
+        private DrawEntityModel DrawCuttingPlan_PieSegment(PlateArrange_Type arrangeType, Point3D refPoint, List<DrawPlateModel> selPlateList, double plateActualWidth, double plateActualLength, double scaleValue)
+        {
+            DrawEntityModel drawList = new DrawEntityModel();
+
+            List<DrawPlateModel> etcPlateList = new List<DrawPlateModel>();
+            List<DrawPlateModel> sectorPlateList = new List<DrawPlateModel>();
+            foreach (DrawPlateModel eachPlate in selPlateList)
+            {
+                if (eachPlate.ShapeType == Plate_Type.Sector)
+                {
+                    sectorPlateList.Add(eachPlate);
+                }
+                else
+                {
+                    etcPlateList.Add(eachPlate);
+                }
+            }
+
+            // Roof 관련 Singleton 초기화 일어남
+            SingletonData.RoofPlateList.Clear();
+
+            // Sector
+            drawList.AddDrawEntity(DrawCuttingPlan_Sector(arrangeType, refPoint, sectorPlateList, plateActualWidth, plateActualLength, scaleValue, out Point3D nextPoint));
+
+            // OutPoint -> Next Point
+            // 기타
+            drawList.AddDrawEntity(DrawCuttingPlan(arrangeType, nextPoint, etcPlateList, plateActualWidth, plateActualLength, scaleValue));
+
+
+
+
+            return drawList;
+        }
+
+        private DrawEntityModel DrawCuttingPlan_Sector(PlateArrange_Type arrangeType, Point3D refPoint, List<DrawPlateModel> selPlateList, double plateActualWidth, double plateActualLength, double scaleValue, out Point3D outNextPoint)
+        {
+            DrawEntityModel drawList = new DrawEntityModel();
+
+            outNextPoint = GetSumPoint(refPoint, 0, 0);
+
+            // 정렬 필요 없음
+
+            List<DrawPlateModel> sortPlateList = selPlateList.OrderBy(x => x.Number).ToList();
+
+            // Circle -> Segment -> Sector(Length 가 큰 것 부터)
+            Dictionary<string, List<DrawPlateModel>> divPlateDic = new Dictionary<string, List<DrawPlateModel>>();
+            Dictionary<string, List<DrawPlateCuttingSectorModel>> divSectorDic = new Dictionary<string, List<DrawPlateCuttingSectorModel>>();
+            Dictionary<string, int> divPlateCountDic = new Dictionary<string, int>();
+            foreach (DrawPlateModel eachPlate in sortPlateList)
+            {
+                if (eachPlate.ShapeType == Plate_Type.Sector)
+                {
+
+                }
+                string displayName = eachPlate.DisplayName;
+                if (!divPlateDic.ContainsKey(displayName))
+                {
+                    // 신규
+                    divPlateCountDic.Add(displayName, 1);
+                    divPlateDic.Add(displayName, new List<DrawPlateModel>() { eachPlate });
+                    divSectorDic.Add(displayName, new List<DrawPlateCuttingSectorModel>() { GetPieSegmentOverlap(eachPlate) });
+                }
+                else
+                {
+                    // 기존
+                    divPlateCountDic[displayName]++;
+                    divPlateDic[displayName].Add(eachPlate);
+                }
+            }
+
+            List<string> divPlateNameList = divPlateCountDic.Keys.ToList();
+            List<int> divPlateCountList = divPlateCountDic.Values.ToList();
+
+            // 2개 들어가는 것 고정
+            string doubleArrangeName = divPlateNameList[0];
+
+            // Arrange : One Plate
+            double maximumCuttingInPlate = 10; // 매우 중요
+            double spacingValue = 30;   // 매우 중요
+            bool leftDirection = true;
+            double newPlateCount = 0;
+            double maxPlateCount = sortPlateList.Count;
+            List<DrawOnePlateModel> onePlateList = new List<DrawOnePlateModel>();
+            while (onePlateList.Count < maxPlateCount)
+            {
+                // NewPlate
+                newPlateCount++;
+                DrawOnePlateModel newOnePlate = new DrawOnePlateModel();
+                onePlateList.Add(newOnePlate);
+                newOnePlate.PlateWidth = plateActualWidth;
+                newOnePlate.PlateLength = plateActualLength;
+                newOnePlate.InsertPoint = GetPlateNextPoint(refPoint, newPlateCount, scaleValue);
+                newOnePlate.RemainingLength = plateActualLength;
+
+                leftDirection = true;
+                bool addPlate = false;
+                bool cuttingArrange = true;
+                double onePlateArrangeCount = 0;
+
+                while (cuttingArrange)
+                {
+                    addPlate = false;
+
+
+                    if (leftDirection)
+                    {
+                        for (int i = 0; i < divPlateCountList.Count; i++)
+                        {
+                            if (divPlateNameList[i] == doubleArrangeName)
+                            {
+
+                                if (divPlateCountList[i] > 0)
+                                {
+                                    // 2개씩 배정
+                                    int leftRemainingIndex = divPlateCountList[i] - 1;
+                                    DrawPlateModel leftPlate = divPlateDic[divPlateNameList[i]][leftRemainingIndex];
+                                    newOnePlate.CuttingPlateList.Add(leftPlate);
+                                    newOnePlate.CuttingPlateNameList.Add(leftPlate.DisplayName);
+                                    newOnePlate.RemainingLength = 0;
+
+                                    divPlateCountList[i]--;// 1차감
+
+                                    
+                                    for (int j = 0; j < divPlateCountList.Count; j++)
+                                    {
+                                        if (divPlateNameList[j] == doubleArrangeName)
+                                        {
+                                            int leftRemainingIndex2 = divPlateCountList[j] - 1;
+                                            DrawPlateModel leftPlate2 = divPlateDic[divPlateNameList[j]][leftRemainingIndex];
+                                            newOnePlate.CuttingPlateList.Add(leftPlate2);
+                                            newOnePlate.CuttingPlateNameList.Add(leftPlate2.DisplayName);
+                                            newOnePlate.RemainingLength = 0;
+
+                                            divPlateCountList[i]--;// 1차감
+
+                                            break;
+                                        }
+                                    }
+
+                                    addPlate = false;
+                                    break;
+                                }
+
+
+                            }
+                            else
+                            {
+                                if (divPlateCountList[i] > 0)
+                                {
+                                    // 1개씩 배정
+                                    int leftRemainingIndex = divPlateCountList[i] - 1;
+                                    DrawPlateModel leftPlate = divPlateDic[divPlateNameList[i]][leftRemainingIndex];
+                                    if (newOnePlate.RemainingLength > leftPlate.SectorLength + spacingValue)
+                                    {
+                                        newOnePlate.CuttingPlateList.Add(leftPlate);
+                                        newOnePlate.CuttingPlateNameList.Add(leftPlate.DisplayName);
+                                        newOnePlate.RemainingLength -= spacingValue + leftPlate.SectorLength;
+
+                                        divPlateCountList[i]--;// 1차감
+                                        addPlate = true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        addPlate = false;
+                                    }
+                                }
+
+                            }
+
+
+                        }
+
+                    }
+                    else
+                    {
+                        for (int i = 0; i < divPlateCountList.Count; i++)
+                        {
+                            // 1개씩 배정
+                            int leftRemainingIndex = divPlateCountList[i] - 1;
+                            DrawPlateModel leftPlate = divPlateDic[divPlateNameList[i]][leftRemainingIndex];
+                            if (newOnePlate.RemainingLength > leftPlate.SectorLength + spacingValue)
+                            {
+                                newOnePlate.CuttingPlateList.Add(leftPlate);
+                                newOnePlate.CuttingPlateNameList.Add(leftPlate.DisplayName);
+                                newOnePlate.RemainingLength -= spacingValue + leftPlate.SectorLength;
+
+                                divPlateCountList[i]--;// 1차감
+                                addPlate = true;
+                                break;
+                            }
+                            else
+                            {
+                                addPlate = false;
+                            }
+
+                        }
+                    }
+
+                    // Break Condition
+                    if (newOnePlate.RemainingLength <= 0)
+                        cuttingArrange = false;
+                    if (newOnePlate.CuttingPlateList.Count == maximumCuttingInPlate)
+                        cuttingArrange = false;
+                    if (!addPlate)
+                        cuttingArrange = false;
+
+
+
+                }
+            }
+
+
+            // Internal Alignment : One Plate
+
+            // Deuplication
+            Dictionary<string, DrawOnePlateModel> displayNameDic = new Dictionary<string, DrawOnePlateModel>();
+            for (int i = onePlateList.Count - 1; i >= 0; i--)
+            {
+                if (onePlateList[i].CuttingPlateList.Count == 0)
+                {
+                    onePlateList.RemoveAt(i);
+                }
+                else
+                {
+                    string sumOfDisplayName = string.Join("", onePlateList[i].CuttingPlateNameList);
+                    if (!displayNameDic.ContainsKey(sumOfDisplayName))
+                    {
+                        onePlateList[i].Requirement = 1;
+                        displayNameDic.Add(sumOfDisplayName, onePlateList[i]);
+                    }
+                    else
+                    {
+                        displayNameDic[sumOfDisplayName].Requirement++;
+                        onePlateList.RemoveAt(i);
+                    }
+                }
+            }
+
+            // Draw
+            // Draw
+            List<Entity> arrangeCuttingPlateList = new List<Entity>();
+            List<Entity> arrangePlateList = new List<Entity>();
+            List<Point3D> outPoint = new List<Point3D>();
+            double drawPlateCount = 0;
+            foreach (DrawOnePlateModel eachOnePlate in onePlateList)
+            {
+                DrawEntityModel dimOnePlateModel = new DrawEntityModel();
+
+                drawPlateCount++;
+                Point3D insertPoint = GetPlateNextPoint(refPoint, drawPlateCount, scaleValue);
+                eachOnePlate.InsertPoint = insertPoint;
+                eachOnePlate.CenterPoint = GetSumPoint(insertPoint, eachOnePlate.PlateLength / 2, eachOnePlate.PlateWidth / 2);
+                eachOnePlate.PlateOutlineList.AddRange(DrawPlate(eachOnePlate, out dimOnePlateModel, scaleValue));
+                arrangePlateList.AddRange(eachOnePlate.PlateOutlineList);
+                drawList.AddDrawEntity(dimOnePlateModel);
+
+                double cutIndex = 0;
+                double beforeX = 0;
+                double sumOfBeforeX = 0;
+                foreach (DrawPlateModel eachPlate in eachOnePlate.CuttingPlateList)
+                {
+                    cutIndex++;
+                    sumOfBeforeX += beforeX;
+                    DrawEntityModel dimPlateModel = new DrawEntityModel();
+                    eachOnePlate.PlateCuttingList.AddRange(DrawCuttingPlate_Sector(eachPlate.CuttingPlan.LeftPlate,
+                                                            GetSumPoint(eachOnePlate.InsertPoint, 0, 0),
+                                                            GetSumPoint(eachOnePlate.InsertPoint, sumOfBeforeX, 0),
+                                                            eachPlate,
+                                                            scaleValue,
+                                                            plateActualWidth,
+                                                            plateActualLength,
+                                                            cutIndex,
+                                                            eachOnePlate.CuttingPlateList,
+                                                            eachOnePlate.RemainingLength,
+                                                            out dimPlateModel,
+                                                            out beforeX));
+                    arrangeCuttingPlateList.AddRange(eachOnePlate.PlateCuttingList);
+                    drawList.AddDrawEntity(dimPlateModel);
+                }
+
+
+                outNextPoint = GetPlateNextPoint(refPoint, drawPlateCount+1, scaleValue);
+            }
+
+            styleService.SetLayerListEntity(ref arrangePlateList, layerService.LayerVirtualLine);
+            drawList.outlineList.AddRange(arrangeCuttingPlateList);
+            drawList.outlineList.AddRange(arrangePlateList);
+
+
+            // Singleton Data
+            if (arrangeType == PlateArrange_Type.Roof)
+            {
+                //SingletonData.RoofPlateList.Clear();
+                SingletonData.RoofPlateList.AddRange(onePlateList);
+            }
+            else if (arrangeType == PlateArrange_Type.Bottom)
+            {
+                //SingletonData.BottomPlateList.Clear();
+                SingletonData.BottomPlateList.AddRange(onePlateList);
+            }
+
+
+            return drawList;
+        }
+
+
+        private DrawPlateCuttingSectorModel GetPieSegmentOverlap(DrawPlateModel selModel, double overlapValue=0)
+        {
+            // 이미 Overlap 이 적용 됨
+
+            DrawPlateCuttingSectorModel newModel = new DrawPlateCuttingSectorModel();
+
+
+            newModel.SectorLength = selModel.SectorLength;
+
+            newModel.SectorDivCount = selModel.SectorPlate.plateDivLine;
+            newModel.SectorDivOneLength= selModel.SectorPlate.oneVerticalLength;
+            newModel.DivLineList.AddRange(selModel.SectorPlate.PlateLineList);
+
+
+            // Rect 계산 필요
+
+            return newModel;
         }
 
         private DrawEntityModel DrawCuttingPlan(PlateArrange_Type arrangeType, Point3D refPoint,List<DrawPlateModel> selPlateList,  double plateActualWidth, double plateActualLength, double scaleValue)
@@ -491,12 +855,10 @@ namespace DrawWork.DrawDetailServices
             // Singleton Data
             if (arrangeType == PlateArrange_Type.Roof)
             {
-                SingletonData.RoofPlateList.Clear();
                 SingletonData.RoofPlateList.AddRange(onePlateList);
             }
             else if (arrangeType == PlateArrange_Type.Bottom)
             {
-                SingletonData.BottomPlateList.Clear();
                 SingletonData.BottomPlateList.AddRange(onePlateList);
             }
 
@@ -520,6 +882,293 @@ namespace DrawWork.DrawDetailServices
 
 
             return newList;
+        }
+
+        private List<Entity> DrawCuttingPlate_Sector(bool leftPlate,Point3D plateLeftPoint, Point3D selPoint, DrawPlateModel selPlate, double scaleValue,
+                                        double plateWidth, double plateLength, double cutIndex, List<DrawPlateModel> cutPlateList,
+                                        double remainingLength, out DrawEntityModel dimModel, out double beforeX)
+        {
+
+            DrawPlateCuttingSectorModel sectorCutModel = GetPieSegmentOverlap(selPlate);
+
+            List<Entity> newList = new List<Entity>();
+
+            List<Entity> overlapList = new List<Entity>();
+            List<Entity> overlapLineList = new List<Entity>();
+
+            List<Entity> eachSectorList = new List<Entity>();
+            List<Entity> eachSectorLineList = new List<Entity>();
+
+            dimModel = new DrawEntityModel();
+            beforeX = 0;
+
+            Point3D innerCenterPoint = null;
+
+
+            double overlapValue = 25;
+            double cuttingLoss = 15;
+
+            bool verticalCenter = true;
+            leftPlate = true;
+
+
+            // same Plate Check : Sector를 두개 배열 할 경우
+            bool samePlateCheck = false;
+            if (cutPlateList.Count == 2)
+            {
+                if (selPlate.SectorLength > plateLength / 2)
+                {
+                    samePlateCheck = true;
+                    double tempLength = selPlate.SectorLength;
+                    foreach( DrawPlateModel eachPlate in cutPlateList)
+                    {
+                        if(eachPlate.SectorLength!= tempLength)
+                        {
+                            samePlateCheck = false;
+                            break;
+                        }
+                    }
+
+                }
+            }
+            if (samePlateCheck)
+            {
+                selPoint = GetSumPoint(plateLeftPoint, 0,0);
+                verticalCenter = false;
+                if (cutIndex == 1)
+                {
+                    leftPlate = true;
+                }
+                else
+                {
+                    leftPlate = false;
+                }
+            }
+
+            Point3D upperUpperPoint = null;
+            Point3D originUpperPoint = null;
+            double rotateAngle = 0;
+
+            Arc outerArc = null;
+            Arc innerArc = null;
+
+            if (sectorCutModel.DivLineList.Count > 0)
+            {
+                List<Point3D> upperPointList = new List<Point3D>();
+                List<Point3D> lowerPointList = new List<Point3D>();
+
+
+
+
+
+                DRTRoofPlateLineModel outerLine = sectorCutModel.DivLineList.Last();
+                DRTRoofPlateLineModel innerLine = sectorCutModel.DivLineList.First();
+                Point3D outerCenterPoint = GetSumPoint(selPoint, cuttingLoss, plateWidth / 2);
+
+
+                // Draw : Sector : Overlap
+                // Overlap : Outer : 있는지 확인
+                if (outerLine.OuterOverlap >= 0)
+                {
+                    Point3D upperPoint = null;
+                    Point3D lowerPoint = null;
+                    double tempRadius = outerLine.Radius + outerLine.OuterOverlap;
+                    GetSectorArcIntersect(GetSumPoint(outerCenterPoint, tempRadius, 0), tempRadius, outerLine.ArcAngle, overlapValue, out upperPoint, out lowerPoint);
+
+                    outerArc = new Arc(GetSumPoint(outerCenterPoint, tempRadius, 0), GetSumPoint(lowerPoint, 0, 0), GetSumPoint(upperPoint, 0, 0));
+                    overlapList.Add(outerArc);
+
+                    // Sector 양쪽 배열을 위한 값
+                    originUpperPoint = GetSumPoint(lowerPoint, 0, 0);
+                    upperUpperPoint = new Point3D(outerCenterPoint.X,lowerPoint.Y);
+
+                }
+
+                double sumArcLength = 0;
+                Point3D eachCenterPoint = GetSumPoint(outerCenterPoint, outerLine.OuterOverlap, 0);
+                for (int i = 0; i < sectorCutModel.DivLineList.Count; i++)
+                {
+                    int reverseIndex = sectorCutModel.DivLineList.Count - 1 - i;
+                    DRTRoofPlateLineModel eachLine = sectorCutModel.DivLineList[reverseIndex];
+
+                    sumArcLength = eachLine.OneDivLength * i;
+
+                    Point3D upperPoint = null;
+                    Point3D lowerPoint = null;
+                    GetSectorArcIntersect(GetSumPoint(eachCenterPoint, sumArcLength + eachLine.Radius, 0), eachLine.Radius, eachLine.ArcAngle, 0, out upperPoint, out lowerPoint);
+
+                    Arc eachArc = new Arc(GetSumPoint(eachCenterPoint, sumArcLength + eachLine.Radius, 0), GetSumPoint(lowerPoint, 0, 0), GetSumPoint(upperPoint, 0, 0));
+                    eachSectorList.Add(eachArc);
+
+                }
+
+                // Overalp : Inner : 항상
+                if (innerLine.InnerOverlap >= 0)
+                {
+                    Point3D upperPoint = null;
+                    Point3D lowerPoint = null;
+                    double tempRadius = innerLine.Radius - innerLine.InnerOverlap;
+                    GetSectorArcIntersect(GetSumPoint(eachCenterPoint, sumArcLength + innerLine.InnerOverlap + tempRadius, 0), tempRadius, innerLine.ArcAngle, overlapValue, out upperPoint, out lowerPoint);
+
+                    innerArc = new Arc(GetSumPoint(eachCenterPoint, sumArcLength + innerLine.InnerOverlap + tempRadius, 0), GetSumPoint(lowerPoint, 0, 0), GetSumPoint(upperPoint, 0, 0));
+                    overlapList.Add(innerArc);
+
+                    // 매우중요
+                    beforeX = GetSumPoint(upperPoint, 0, 0).X - selPoint.X;
+                }
+
+
+                // Line : Over
+                Line overlapUpperLine = new Line(GetSumPoint(outerArc.StartPoint, 0, 0), GetSumPoint(innerArc.StartPoint, 0, 0));
+                Line overlapLowerLine = new Line(GetSumPoint(outerArc.EndPoint, 0, 0), GetSumPoint(innerArc.EndPoint, 0, 0));
+                overlapLineList.Add(overlapUpperLine);
+                overlapLineList.Add(overlapLowerLine);
+
+                // Sector 양쪽 배열을 위한 값
+                rotateAngle = editingService.GetAngleOfLine(overlapLowerLine);
+
+
+                for (int i = 1; i < eachSectorList.Count; i++)
+                {
+                    Arc beforeArc = (Arc)eachSectorList[i - 1];
+                    Arc currentArc = (Arc)eachSectorList[i];
+
+                    Line sectorUpperLine = new Line(GetSumPoint(beforeArc.StartPoint, 0, 0), GetSumPoint(currentArc.StartPoint, 0, 0));
+                    Line sectorLowerLine = new Line(GetSumPoint(beforeArc.EndPoint, 0, 0), GetSumPoint(currentArc.EndPoint, 0, 0));
+                    eachSectorLineList.Add(sectorUpperLine);
+                    eachSectorLineList.Add(sectorLowerLine);
+                }
+
+
+            }
+
+            if (samePlateCheck)
+            {
+                styleService.SetLayerListEntity(ref overlapList, layerService.LayerOutLine);
+                styleService.SetLayerListEntity(ref overlapLineList, layerService.LayerOutLine);
+                styleService.SetLayerListEntity(ref eachSectorList, layerService.LayerOutLine);
+                styleService.SetLayerListEntity(ref eachSectorLineList, layerService.LayerOutLine);
+
+                List<Entity> tempNewList = new List<Entity>();
+                tempNewList.AddRange(overlapList);
+                tempNewList.AddRange(overlapLineList);
+                tempNewList.AddRange(eachSectorList);
+                tempNewList.AddRange(eachSectorLineList);
+
+                //editingService.SetTranslate(ref tempNewList, GetSumPoint(plateLeftPoint, cuttingLoss, cuttingLoss), upperUpperPoint);
+                //Point3D tempRotatePoint = new Point3D(originUpperPoint.X, GetSumPoint(plateLeftPoint, 0, cuttingLoss).Y);
+                editingService.SetTranslate(ref tempNewList, GetSumPoint(plateLeftPoint, cuttingLoss, cuttingLoss), originUpperPoint);
+                Point3D tempRotatePoint= GetSumPoint(plateLeftPoint, cuttingLoss, cuttingLoss);
+                List<Entity> tempRotateNewList = editingService.GetRotate(tempNewList, tempRotatePoint, rotateAngle);
+                // Draw : Right Plate
+                if (leftPlate)
+                {
+                    newList.AddRange(tempRotateNewList);
+
+                }
+                else
+                {
+                    //Plane mirrorRightPlane = Plane.YX;
+                    //mirrorRightPlane.Origin = GetSumPoint(plateLeftPoint, plateLength / 2, plateWidth / 2);
+
+                    List<Entity> tempMirrorList = editingService.GetRotate(tempRotateNewList, GetSumPoint(plateLeftPoint, plateLength / 2, plateWidth / 2),Utility.DegToRad(180));
+
+                    newList.AddRange(tempMirrorList);
+                }
+            }
+            else
+            {
+                // 오직 Left Plate
+                styleService.SetLayerListEntity(ref overlapList, layerService.LayerOutLine);
+                styleService.SetLayerListEntity(ref overlapLineList, layerService.LayerOutLine);
+                styleService.SetLayerListEntity(ref eachSectorList, layerService.LayerOutLine);
+                styleService.SetLayerListEntity(ref eachSectorLineList, layerService.LayerOutLine);
+
+                newList.AddRange(overlapList);
+                newList.AddRange(overlapLineList);
+                newList.AddRange(eachSectorList);
+                newList.AddRange(eachSectorLineList);
+            }
+
+
+            
+
+
+
+
+
+
+            // Dimension
+
+
+
+
+
+
+            // Number
+            double textHeight = 2.5;
+
+
+            //Point3D insertTextPoint = GetNumberPoint(selPoint, selPlate, leftPlate, plateWidth);
+            Point3D insertTextPoint = GetNumberPointBySector(newList);
+            Text displayNameText = new Text(Plane.XY, insertTextPoint, selPlate.DisplayName, textHeight * scaleValue) { Alignment = Text.alignmentType.MiddleCenter };
+            styleService.SetLayer(ref displayNameText, layerService.LayerDimension);
+            newList.Add(displayNameText);
+
+            return newList;
+        }
+        private Point3D GetNumberPointBySector(List<Entity> selList)
+        {
+            Point3D returnValue = new Point3D();
+
+            List<Arc> arcList = new List<Arc>();
+            foreach(Entity eachEntity in selList)
+                if(eachEntity is Arc)
+                    arcList.Add((Arc)eachEntity);
+
+            List<Arc> arcSortList = arcList.OrderByDescending(x => x.Length()).ToList();
+
+            if(arcSortList.Count % 2 == 0)
+            {
+                // 짝수
+                Line tempList = new Line(arcSortList[0].MidPoint, arcSortList[arcSortList.Count - 1].MidPoint);
+                returnValue = tempList.MidPoint;
+            }
+            else
+            {
+                // 홀수
+                Line tempList = new Line(arcSortList[0].MidPoint, arcSortList[arcSortList.Count - 3].MidPoint);
+                returnValue = tempList.MidPoint;
+            }
+
+            return returnValue;
+        }
+
+
+        private bool GetSectorArcIntersect(Point3D centerPoint, double selRadius, double selAngle,double overlap, out Point3D upperPoint, out Point3D lowerPoint)
+        {
+            bool returnValue = false;
+
+            double interFactor = 200;
+            Circle newCir = new Circle(centerPoint, selRadius);
+           
+            Line upperLine = new Line(GetSumPoint(centerPoint, 0, 0), GetSumPoint(centerPoint, -interFactor - selRadius, 0));
+            upperLine.Rotate(Utility.DegToRad(-selAngle / 2), Vector3D.AxisZ, GetSumPoint(centerPoint, 0, 0));
+
+            Line upperLineOffset = upperLine;
+            if (overlap > 0)
+                upperLineOffset= (Line)upperLine.Offset(overlap, Vector3D.AxisZ);
+
+            Line lowerLine = new Line(GetSumPoint(centerPoint, 0, 0), GetSumPoint(centerPoint, -interFactor - selRadius, 0));
+            lowerLine.Rotate(Utility.DegToRad(selAngle/ 2), Vector3D.AxisZ, GetSumPoint(centerPoint, 0, 0));
+            Line lowerLineOffset = lowerLine;
+            if (overlap > 0)
+                lowerLineOffset=(Line)lowerLine.Offset(-overlap, Vector3D.AxisZ);
+
+            upperPoint = editingService.GetIntersectWidth(newCir, upperLineOffset, 0);
+            lowerPoint = editingService.GetIntersectWidth(newCir, lowerLineOffset, 0);
+
+            return returnValue;
         }
 
         private List<Entity> DrawCuttingPlate(bool leftPlate, Point3D selPoint,DrawPlateModel selPlate, double scaleValue,
@@ -1101,8 +1750,8 @@ namespace DrawWork.DrawDetailServices
         {
 
             DrawEntityModel drawList = new DrawEntityModel();
-            double plateActualWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateWidth);
-            double plateActualLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateLength);
+            double plateActualWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateWidth);
+            double plateActualLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateLength);
 
             Point3D referencePoint = new Point3D(refPoint.X, refPoint.Y);
             // Scale : 매우 중요 함
@@ -1464,3 +2113,4 @@ namespace DrawWork.DrawDetailServices
 
     }
 }
+

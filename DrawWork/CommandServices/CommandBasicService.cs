@@ -294,7 +294,7 @@ namespace DrawWork.CommandServices
                             if (assemblyData.ShellOutput.Count > 0)
                             {
                                 double oneCourseWidth = valueService.GetDoubleValue(assemblyData.ShellOutput[0].PlateWidth);
-                                double plateWidth = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateWidth);
+                                double plateWidth = valueService.GetDoubleValue(assemblyData.ShellOutput[0].PlateWidth); // <===== 검토 필요 함
                                 double plateMaxLength = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateMaxLength);
 
                                 // Auto Size

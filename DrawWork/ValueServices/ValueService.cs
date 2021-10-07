@@ -92,6 +92,8 @@ namespace DrawWork.ValueServices
                 selWidth = GetDoubleValue(selSlope);
             }
 
+            if (selWidth == 0)
+                selHeight = 0;
             return GetDegreeOfSlope(selHeight, selWidth);
         }
 
@@ -342,5 +344,35 @@ namespace DrawWork.ValueServices
             return returnValue;
         }
         #endregion
+
+
+
+        // 최대 공약수
+        public int GCD(int num1, int num2)
+        {
+            int temp = 0;
+            while (num2 != 0)
+            {
+                temp = num1 % num2;
+                num1 = num2;
+                num2 = temp;
+            }
+
+            return num1;
+        }
+
+        // 최소 공배수
+        public int LCM(int num1, int num2, int gcd)
+        {
+            if (gcd == 0) return 0;
+
+            int result = (num1 * num2) / gcd;
+
+            return result;
+        }
+
+
+
+
     }
 }

@@ -1456,7 +1456,7 @@ namespace DrawWork.DrawDetailServices
             double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
 
             // Plate Info
-            double plateWidth = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateWidth);
+            //double plateWidth = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateWidth);
             double plateLength = valueService.GetDoubleValue(assemblyData.ShellInput[0].PlateMaxLength);
 
             // course Count
@@ -7868,8 +7868,8 @@ namespace DrawWork.DrawDetailServices
                 //plateWidth = 2408;
                 //plateLength = 9114;
 
-                plateActualWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateWidth);
-                plateActualLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].PlateLength);
+                plateActualWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateWidth);
+                plateActualLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateLength);
 
                 SetPlateAddLength(SingletonData.BottomPlateInfo);
                 orgPlateInfoList.AddRange(GetPlateToTempPlateInfo(SingletonData.BottomPlateInfo, plateActualWidth, plateActualLength));

@@ -1,4 +1,5 @@
 ﻿using devDept.Geometry;
+using DrawCalculationLib.DrawModels;
 using DrawWork.Commons;
 using System;
 using System.Collections.Generic;
@@ -15,15 +16,16 @@ namespace DrawWork.DrawModels
 
 
         public double Number { get; set; }
-
         public double NumberCount { get; set; }
+        public Point3D NumberPoint { get; set; }
         public string DisplayName { get; set; }
 
         public List<Point3D> Points { get; set; }
         public List<double> VLength { get; set; }
         public List<double> HLength { get; set; }
 
-       
+
+
 
         public Plate_Type ShapeType { get; set; }
         public bool IsAdjustment { get; set; }
@@ -33,10 +35,19 @@ namespace DrawWork.DrawModels
         public double RectWidth { get; set; }
         public double RectLength { get; set; }
 
-        public Point3D NumberPoint { get; set; }
+
 
 
         public DrawPlateCuttingModel CuttingPlan { get; set; }
+
+
+        // Pie Segment 전용 : Sector
+        public List<double> SectorRadius { get; set; }
+        public double SectorAngle { get; set; }
+        public double SectorLength { get; set; }
+        public DRTRoofPlateModel SectorPlate { get; set; }
+
+
 
         public DrawPlateModel()
         {
@@ -70,6 +81,15 @@ namespace DrawWork.DrawModels
             RectLength = 0;
 
             CuttingPlan = new DrawPlateCuttingModel();
+
+
+
+            // Pie Segment  전용 : Sector
+            SectorRadius = new List<double>();
+            SectorAngle = 0;
+            SectorLength = 0;
+            SectorPlate = new DRTRoofPlateModel();
         }
+
     }
 }

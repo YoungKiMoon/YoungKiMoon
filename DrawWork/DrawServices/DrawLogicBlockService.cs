@@ -2355,6 +2355,28 @@ namespace DrawWork.DrawServices
                     }
                     else if (StructureDivService.centeringInEx == "external")
                     {
+                        List<Entity> centerRingList = new List<Entity>();
+                        List<Entity> raftarList = new List<Entity>();
+
+                        Point3D referencePoint = GetSumPoint(workingPointService.DRTWorkingData.RoofCenterPoint, 0, 0);
+                        ////////////////////////////////////////////// ///////////////////////////////////////////
+                        #region CenterRing
+
+                        //Point3D refPoint, double outDiameter, double diaInnerThk, double diaOuterThk, double heightA, double DomeRadius, double plateThkHorizontal, double plateThkVertial)
+                        centerRingList = GetDrtEXTCenterRing(referencePoint);
+                        customBlockList.AddRange(centerRingList);
+                        #endregion
+
+                        Point3D workPoint = GetSumPoint(workingPointService.DRTWorkingData.PointLeftRoofUp,0,0);
+                        Point3D centerRoofUp = GetSumPoint(workingPointService.DRTWorkingData.PointCenterTopUp, 0, 0);
+                        double outDiameter = valueService.GetDoubleValue(assemblyData.StructureDRTCenteringInput[0].CenteringOD) / 2;
+                        Point3D centerRoofUpLeft = GetSumPoint(centerRoofUp, -outDiameter, 0);
+                        Line centerRoofVLine = new Line(centerRoofUpLeft,GetSumPoint(centerRoofUpLeft, 0, -outDiameter));
+                        Point3D ArcCenterPoint = editingService.GetIntersectWidth(workingPointService.DRTWorkingData.circleRoofUpper, centerRoofVLine,0);
+                        Line roofEndLine = new Line(workingPointService.DRTWorkingData.RoofCenterPoint, workingPointService.DRTWorkingData.PointLeftRoofUp);
+                        double roofAngle = editingService.GetAngleOfLine(roofEndLine);
+                        raftarList = GetDrtEXTRafter(workPoint, ArcCenterPoint, roofAngle);
+                        customBlockList.AddRange(raftarList);
 
                     }
                 }
@@ -2372,8 +2394,246 @@ namespace DrawWork.DrawServices
         }
 
 
+        public List<Entity> GetDrtEXTRafter(Point3D refWorkPoint, Point3D ArcCenterPoint, double rafterAngle)
+        {
+
+            double domeRadius = workingPointService.DRTWorkingData.DomeRaidus;
+            double rafterWidth= valueService.GetDoubleValue(assemblyData.StructureDRTCenteringInput[0].Height);
 
 
+            StructureCenteringRafterModel lastRafter = new StructureCenteringRafterModel();
+            if (assemblyData.StructureDRTCenteringRafterOutput.Count > 0)
+                lastRafter = assemblyData.StructureDRTCenteringRafterOutput[assemblyData.StructureDRTCenteringRafterOutput.Count - 1];
+
+            double headGap = valueService.GetDoubleValue(lastRafter.B1);
+            double A1 = valueService.GetDoubleValue(lastRafter.A1);
+
+            double headHeight = valueService.GetDoubleValue(lastRafter.A);
+            double headHLength = valueService.GetDoubleValue(assemblyData.StructureDRTCenteringInput[0].C) + A1;
+
+            // HBeam
+            HBeamModel firstRafterHBeam = new HBeamModel();
+            if (assemblyData.StructureDRTRafterHBeamOutput.Count > 0)
+            {
+                firstRafterHBeam = assemblyData.StructureDRTRafterHBeamOutput[0];
+            }
+            double beamThk = valueService.GetDoubleValue(firstRafterHBeam.t2);
+            if (beamThk == 0)
+                beamThk = 10;
+            // headHeight : Rafter Head Y축 높이
+            // headHLength :Rafter Head X축 길이 ( @ : (OD+B) +30 )
+            // rafterAngel : WorkPoint 부터 왼쪽 fafter 끝까지의 각도, 혹은 호의 길이로 각도 넣기
+            //               호의 길이로 넣을때는 Rafter Body + Head 전체 길이
+            //
+            //               ArcLength(L)  L = R@, @(radian) = L/R
+            // rafterLength : rafterAngelRadian = rafterLength/domeRadius;
+            //                rafterAngel = Utility.DegToRad(rafterAngelRadian);
+
+
+            List <Entity> outlinesList = new List<Entity>();
+            Point3D workPoint = GetSumPoint(refWorkPoint, 0, 0);
+            Point3D arcCenterPoint = GetSumPoint(ArcCenterPoint, 0, 0);
+
+
+
+            //////////////////////////////////////////////////////////
+            // CAD DATA
+            //////////////////////////////////////////////////////////
+
+
+            // Get WorkPoint angle
+            Point3D roofCenterCenterPoint = workingPointService.DRTWorkingData.RoofCenterPoint;
+            Point3D roofCenterUpper = workingPointService.DRTWorkingData.PointCenterTopUp;
+
+            /**/
+
+            // Get Rafter Head GuideLine
+            Line guideHeadVRLine = new Line(GetSumPoint(arcCenterPoint, 0, -headHeight*2), GetSumPoint(arcCenterPoint, 0, headHeight * 2));
+            Line guideHeadVLLine = new Line(GetSumPoint(guideHeadVRLine.StartPoint, -headHLength, 0), GetSumPoint(guideHeadVRLine.EndPoint, -headHLength, 0));
+
+            // Get Guide Arc
+            Arc guideArcBottom = new Arc(roofCenterCenterPoint, roofCenterUpper,workPoint);
+            Arc guideArcBottomOffset = (Arc)guideArcBottom.Offset(beamThk, Vector3D.AxisZ);
+            Arc guideArcHeadBottom = (Arc)guideArcBottomOffset.Offset(headGap, Vector3D.AxisZ);
+
+            Arc guideArcTop = (Arc)guideArcBottom.Offset(rafterWidth, Vector3D.AxisZ);
+            Arc guideArcTopOffset = (Arc)guideArcTop.Offset(-beamThk, Vector3D.AxisZ);
+
+            editingService.GetIntersectWidth(guideHeadVRLine, guideArcHeadBottom, 0);
+
+            // intersectPoint
+            Point3D[] GheadRightVLineEndPoint = guideHeadVRLine.IntersectWith(guideArcHeadBottom);
+            Point3D[] GheadLeftVLineBottomInnerPoint = guideHeadVLLine.IntersectWith(guideArcHeadBottom);
+            Point3D[] GheadLeftVLineBottomOffsetPoint = guideHeadVLLine.IntersectWith(guideArcBottomOffset);
+            Point3D[] GheadLeftVLineBottomPoint = guideHeadVLLine.IntersectWith(guideArcBottom);
+            Point3D[] GheadLeftVLineTopPoint = guideHeadVLLine.IntersectWith(guideArcTop);
+            Point3D[] GheadLeftVLineTopOffsetPoint = guideHeadVLLine.IntersectWith(guideArcTopOffset);
+            Point3D headRightVLineEndPoint = GetSumPoint(GheadRightVLineEndPoint[0],0,0);
+            Point3D headLeftVLineBottomInnerPoint = GetSumPoint(GheadLeftVLineBottomInnerPoint[0],0,0);
+            Point3D headLeftVLineBottomOffsetPoint = GetSumPoint(GheadLeftVLineBottomOffsetPoint[0],0,0);
+            Point3D headLeftVLineBottomPoint = GetSumPoint(GheadLeftVLineBottomPoint[0],0,0);
+            Point3D headLeftVLineTopPoint = GetSumPoint(GheadLeftVLineTopPoint[0],0,0);
+            Point3D headLeftVLineTopOffsetPoint = GetSumPoint(GheadLeftVLineTopOffsetPoint[0],0,0);
+            
+            // Draw Rafter Head Line
+            Line headLeftVTopLine = new Line(GetSumPoint(headLeftVLineTopPoint, 0, -headGap), headLeftVLineTopPoint); //////
+            Line headRightLine = new Line(headRightVLineEndPoint, new Point3D(headRightVLineEndPoint.X, headLeftVTopLine.StartPoint.Y));
+            Line headTopLine = new Line(headLeftVTopLine.StartPoint, GetSumPoint(headRightLine.EndPoint,0, 0));
+            
+
+
+            Line headLeftVBottomLine = new Line(headLeftVLineBottomInnerPoint, headLeftVLineBottomPoint);
+            Arc headBottomArc = new Arc(roofCenterCenterPoint, headLeftVLineBottomInnerPoint, headRightVLineEndPoint);
+
+
+            // Draw Rafter Body
+            Arc rafterBottomArc = new Arc(roofCenterCenterPoint, headLeftVLineBottomPoint, guideArcBottom.EndPoint);
+            Arc rafterBottomOffsetArc = new Arc(roofCenterCenterPoint, headLeftVLineBottomOffsetPoint, guideArcBottomOffset.EndPoint);
+
+            Arc rafterTopArc = new Arc(roofCenterCenterPoint, headLeftVLineTopPoint, guideArcTop.EndPoint);
+            Arc rafterTopOffsetArc = new Arc(roofCenterCenterPoint, headLeftVLineTopOffsetPoint, guideArcTopOffset.EndPoint);
+
+            Line leftLine = new Line(guideArcTop.EndPoint, guideArcBottom.EndPoint);
+
+
+            outlinesList.AddRange(new Entity[] {
+                headRightLine, headTopLine, headLeftVTopLine, headLeftVBottomLine, headBottomArc,
+                rafterBottomArc, rafterBottomOffsetArc, leftLine,
+                rafterTopArc, rafterTopOffsetArc,
+                //guideHeadVRLine,
+                //guideHeadVLLine, 
+                //guideArcBottom, guideArcBottomInner, guideArcHeadBottom
+                //guideArcTop, 
+                // guideArcTopOffset
+            });
+
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+
+            return outlinesList;
+        }
+
+        public List<Entity> GetDrtEXTCenterRing(Point3D refPoint )
+        {
+
+            List<Entity> outlinesList = new List<Entity>();
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+
+            //////////////////////////////////////////////////////////
+            // CAD DATA
+            //////////////////////////////////////////////////////////
+            double DomeRadius = workingPointService.DRTWorkingData.DomeRaidus;
+            double plateThkHorizontal = valueService.GetDoubleValue(assemblyData.StructureDRTCenteringInput[0].Thickness1); 
+            double plateThkVertial = valueService.GetDoubleValue(assemblyData.StructureDRTCenteringInput[0].Thickness2);
+
+            double outDiameter = valueService.GetDoubleValue(assemblyData.StructureDRTCenteringInput[0].CenteringOD)/2; 
+            double inDiameter = valueService.GetDoubleValue(assemblyData.StructureDRTCenteringInput[0].FlangeID)/2;
+            //double sideDiameter = outDiameter + diaOuterThk;
+            double enumA = valueService.GetDoubleValue(assemblyData.StructureDRTCenteringInput[0].Height); 
+            double enumB = valueService.GetDoubleValue(assemblyData.StructureDRTCenteringInput[0].C);
+            double enumC = valueService.GetDoubleValue(assemblyData.StructureDRTCenteringInput[0].D);
+            double enumE = valueService.GetDoubleValue(assemblyData.StructureDRTCenteringInput[0].FlangeOD)/2;
+
+            double cRightAngle2 = Utility.RadToDeg(Math.Asin(enumC / (2 * DomeRadius))) * 2;
+
+
+            // Get Arc
+            Circle guideCircle = new Circle(referencePoint, DomeRadius);
+            Line guideLineWP_InterSect = new Line(GetSumPoint(referencePoint, -outDiameter, 0), GetSumPoint(referencePoint, -outDiameter, DomeRadius * 2));
+            Point3D[] tempWP = guideLineWP_InterSect.IntersectWith(guideCircle);
+
+            Line getAngleLine = new Line(referencePoint, tempWP[0]);
+            double radianWP = getAngleLine.Direction.Angle;
+            double angleWP = Utility.RadToDeg(radianWP);
+
+
+            Point3D arcCenterPoint = GetSumPoint(referencePoint, 0, 0);
+            Arc guideArcBottom = new Arc(referencePoint, DomeRadius, Utility.DegToRad(90), radianWP);
+            Arc guideArcTop = (Arc)guideArcBottom.Offset(plateThkHorizontal, Vector3D.AxisZ);
+
+
+            // Draw Vertical Plate
+            Point3D workPoint = GetSumPoint(tempWP[0], 0, 0);
+            Line guideVeticalLeftLine = new Line(GetSumPoint(workPoint,0,0), GetSumPoint(workPoint, 0, enumA - plateThkHorizontal));
+            Line guideVeticalRightLine = new Line(GetSumPoint(guideVeticalLeftLine.StartPoint, plateThkVertial, 0),
+                                                  GetSumPoint(guideVeticalLeftLine.EndPoint, plateThkVertial, 0));
+
+            Point3D[] intersectArcTopLeft = guideVeticalLeftLine.IntersectWith(guideArcTop);
+            Point3D[] intersectArcTopRight = guideVeticalRightLine.IntersectWith(guideArcTop);
+
+            Line verticalLeftLine = new Line(guideVeticalLeftLine.EndPoint, intersectArcTopLeft[0]);
+            Line verticalRightLine = new Line(guideVeticalRightLine.EndPoint, intersectArcTopRight[0]);
+
+
+            // Draw Top Plate
+            Point3D topPlateStartPoint = GetSumPoint(verticalLeftLine.StartPoint, -enumB, 0);
+            List<Line> topPlateList = GetRectangle(topPlateStartPoint, plateThkHorizontal, enumE, RECTANGLUNVIEW.RIGHT);
+
+            Line indiameterVLine = new Line(GetSumPoint(workPoint, enumC, enumA),
+                                            GetSumPoint(workPoint, enumC, enumA - plateThkHorizontal));
+
+
+            // Draw Bottom Plate (Arc)
+            double ArcRightAngleRadian = enumC / DomeRadius;    // ArcLength(L)  L = R@, @(radian) = L/R
+            double ArcLeftAngleRadian = enumB / DomeRadius;     // Asin(CHL/2R)*2
+            double arcRightAngle = Utility.RadToDeg(ArcRightAngleRadian);
+            double arcLeftAngle = Utility.RadToDeg(ArcLeftAngleRadian);
+
+
+
+            Arc arcBottomRight = new Arc(arcCenterPoint, DomeRadius, radianWP, Utility.DegToRad(angleWP - arcRightAngle));
+            Arc arcBottomLeft = new Arc(arcCenterPoint, DomeRadius, radianWP, Utility.DegToRad(angleWP + arcLeftAngle));
+
+            Arc arcTopRight = (Arc)arcBottomRight.Offset(-plateThkHorizontal, Vector3D.AxisZ);
+            Arc arcTopLeft = (Arc)arcBottomLeft.Offset(plateThkHorizontal, Vector3D.AxisZ);
+
+            Line diagonalLeft = new Line(arcTopLeft.EndPoint, arcBottomLeft.EndPoint);
+            Line diagonalRight = new Line(arcTopRight.EndPoint, arcBottomRight.EndPoint);
+
+
+            outlinesList.AddRange(topPlateList);
+            outlinesList.AddRange(new Entity[] {
+                //guideArcBottom, 
+                //guideArcTop,
+                //guideVeticalLeftLine, guideVeticalRightLine,
+                verticalLeftLine, verticalRightLine,
+
+                indiameterVLine,
+
+                arcBottomRight,arcBottomLeft, arcTopRight, arcTopLeft,
+                diagonalLeft, diagonalRight
+            });
+
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+
+            return outlinesList;
+        }
+
+        // Mr. Jang
+        public enum RECTANGLUNVIEW { NONE, LEFT, RIGHT, TOP, BOTTOM, }
+
+        // Mr. Jang
+        public double GetArcHeight(double Radius, double Angle)
+        {
+            return Radius - (Radius * (Math.Cos(Utility.DegToRad(Angle / 2))));
+        }
+
+        // Mr. Jang
+        public List<Line> GetRectangle(Point3D startPoint, double width, double length, RECTANGLUNVIEW unViewPosition = RECTANGLUNVIEW.NONE)
+        {
+            // startPoint = LeftBottom point
+            List<Line> rectangleLineList = new List<Line>();
+
+            if (unViewPosition != RECTANGLUNVIEW.BOTTOM)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, 0, 0), GetSumPoint(startPoint, length, 0)));
+            if (unViewPosition != RECTANGLUNVIEW.RIGHT)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, length, width), GetSumPoint(startPoint, length, 0)));
+            if (unViewPosition != RECTANGLUNVIEW.TOP)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, 0, width), GetSumPoint(startPoint, length, width)));
+            if (unViewPosition != RECTANGLUNVIEW.LEFT)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, 0, width), GetSumPoint(startPoint, 0, 0)));
+
+            return rectangleLineList;
+        }
 
 
 
@@ -3219,7 +3479,7 @@ namespace DrawWork.DrawServices
             double tankIDHalf = tankID / 2;
             double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[firstIndex].SizeTankHeight);
 
-            double plateWidth = valueService.GetDoubleValue(assemblyData.ShellInput[firstIndex].PlateWidth);
+            //double plateWidth = valueService.GetDoubleValue(assemblyData.ShellInput[firstIndex].PlateWidth);
             double plateLength = valueService.GetDoubleValue(assemblyData.ShellInput[firstIndex].PlateMaxLength);
 
             // Working point
@@ -3342,7 +3602,7 @@ namespace DrawWork.DrawServices
             double tankIDHalf = tankID / 2;
             double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[firstIndex].SizeTankHeight);
 
-            double plateWidth = valueService.GetDoubleValue(assemblyData.ShellInput[firstIndex].PlateWidth);
+            //double plateWidth = valueService.GetDoubleValue(assemblyData.ShellInput[firstIndex].PlateWidth);
             double plateLength = valueService.GetDoubleValue(assemblyData.ShellInput[firstIndex].PlateMaxLength);
 
             // Working point
@@ -3387,8 +3647,12 @@ namespace DrawWork.DrawServices
                 for (int i = 0; i < verCount; i++)
                 {
                     double startPointXOne = startPointX + (plateLengthOne * i);
-                    Line lineVer01 = new Line(new Point3D(wpPoint.X + startPointXOne, refPoint.Y + courseBaseY), new Point3D(wpPoint.X + startPointXOne, refPoint.Y + courseBaseY + plateWidthOfCourse));
-                    customBlockList.Add(lineVer01);
+                    if(startPointXOne < tankIDHalf)
+                    {
+                        Line lineVer01 = new Line(new Point3D(wpPoint.X + startPointXOne, refPoint.Y + courseBaseY), new Point3D(wpPoint.X + startPointXOne, refPoint.Y + courseBaseY + plateWidthOfCourse));
+                        customBlockList.Add(lineVer01);
+                    }
+
                 }
 
                 // increase : plate width
@@ -3440,8 +3704,11 @@ namespace DrawWork.DrawServices
                     for (int i = 0; i < verCount1; i++)
                     {
                         double startPointXOne = startPointXLast + (plateLengthOne * i);
-                        Line lineVer01 = new Line(new Point3D(wpPoint.X + startPointXOne, refPoint.Y + courseBaseY), new Point3D(wpPoint.X + startPointXOne, wpShellTop.Y - B));
-                        customBlockList.Add(lineVer01);
+                        if (startPointXOne < tankIDHalf)
+                        {
+                            Line lineVer01 = new Line(new Point3D(wpPoint.X + startPointXOne, refPoint.Y + courseBaseY), new Point3D(wpPoint.X + startPointXOne, wpShellTop.Y - B));
+                            customBlockList.Add(lineVer01);
+                        }
                     }
                     break;
 
@@ -3450,8 +3717,12 @@ namespace DrawWork.DrawServices
                     for (int i = 0; i < verCount1; i++)
                     {
                         double startPointXOne = startPointXLast + (plateLengthOne * i);
-                        Line lineVer01 = new Line(new Point3D(wpPoint.X + startPointXOne, refPoint.Y + courseBaseY), new Point3D(wpPoint.X + startPointXOne, wpShellTop.Y));
-                        customBlockList.Add(lineVer01);
+                        if (startPointXOne < tankIDHalf)
+                        {
+                            Line lineVer01 = new Line(new Point3D(wpPoint.X + startPointXOne, refPoint.Y + courseBaseY), new Point3D(wpPoint.X + startPointXOne, wpShellTop.Y));
+                            customBlockList.Add(lineVer01);
+                        }
+
                     }
                     break;
 
