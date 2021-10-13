@@ -155,6 +155,8 @@ namespace DrawWork.DrawDetailServices
         public DrawEntityModel DrawSection_D_D(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
         {
 
+            
+
             DrawEntityModel drawList = new DrawEntityModel();
 
             // Section DD

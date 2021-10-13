@@ -108,6 +108,7 @@
     <Compile Include="DrawDetailServices\DrawDetailRoofBottomService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailShellService.cs" />
+    <Compile Include="DrawDetailServices\DrawDetailStructureService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailTempService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailVisibleService.cs" />
     <Compile Include="DrawGridServices\DrawPaperGridService.cs" />

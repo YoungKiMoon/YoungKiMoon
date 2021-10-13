@@ -179,7 +179,7 @@ namespace DrawWork.DrawDetailServices
 
 
 
-        private DrawEntityModel GetPlateArrange(TANK_TYPE tankType, PlateArrange_Type arrangeType,Point3D refPoint,double circleOD,double circleODExtend,double plateActualWidth, double plateActualLength, double scaleValue)
+        private DrawEntityModel GetPlateArrange(TANK_TYPE tankType, PlateArrange_Type arrangeType, Point3D refPoint,double circleOD,double circleODExtend,double plateActualWidth, double plateActualLength, double scaleValue)
         {
 
             DrawEntityModel drawEntity = new DrawEntityModel();
@@ -3718,6 +3718,97 @@ namespace DrawWork.DrawDetailServices
                     Point3D outerPoint = editingService.GetIntersectWidth(tempLine, outerCircle, 0);
                     Line newLine = new Line(innerPoint, outerPoint);
                     newLine.Rotate(startAngel, Vector3D.AxisZ,GetSumPoint(centerPoint,0,0));
+                    plateList.Add(newLine);
+                    startAngel += onePlateAngle;
+                }
+
+                if (i != drtModel.layerList.Count)
+                    plateList.Add(outerCircle);
+
+                innerCircle = outerCircle;
+            }
+
+
+
+
+
+            return returnValue;
+        }
+
+
+
+        // Custom Arrangement : Case 03
+        // CRT : Roof : Pie Segment
+        public bool GetCustomArrangementCase03(TANK_TYPE tankType, PlateArrange_Type arrangeType, bool circleExtendValue, double circleRadius,
+                                                double plateWidth, double plateLength,
+                                                Point3D centerPoint, double scaleValue,
+                                                out List<Entity> plateList,
+                                                out DRTRoofModel drtModel)
+        {
+            bool returnValue = true;
+
+
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double DRTCurvature = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].DomeRadiusRatio);
+            double DRTRoofStringLength = circleRadius * 2;
+
+            DRTRoofService drtService = new DRTRoofService();
+            drtModel = drtService.GetRoofDRTValue_New(tankID, DRTCurvature, DRTRoofStringLength, plateLength, plateWidth);
+
+            double intersectFactor = 200;
+
+
+            // Out Circle
+            //Circle outCircle = new Circle(Plane.XY, GetSumPoint(centerPoint, 0, 0), DRTRoofStringLength);
+
+            // Center Circle : 현의 길이
+            Circle centerCircle = new Circle(Plane.XY, GetSumPoint(centerPoint, 0, 0), drtModel.centerCircleStringLength / 2);
+
+            // Layer Circle
+            plateList = new List<Entity>();
+            plateList.Add(centerCircle);
+
+
+
+            // 2개로 나룰 경우
+            // Plate Model : Center Circel
+            if (!(drtModel.centerCircleStringLength + drtModel.platePieceOverlap * 2 < plateWidth))
+            {
+                Line centerHLine = new Line(GetSumPoint(centerPoint, -drtModel.centerCircleStringLength / 2, 0),
+                                          GetSumPoint(centerPoint, +drtModel.centerCircleStringLength / 2, 0));
+                plateList.Add(centerHLine);
+
+                // Center Start : Angle
+                if (drtModel.layerList.Count > 0)
+                {
+                    double centerCount = 2;
+                    drtModel.centerStartAngle = drtService.GetCircleOptimalAngle(drtModel.layerList[0].Count, centerCount);
+                    centerHLine.Rotate(Utility.DegToRad(-drtModel.centerStartAngle), Vector3D.AxisZ, GetSumPoint(centerPoint, 0, 0));
+                }
+            }
+
+            // Circle 의 기준은 현의 길이 String Length
+            Circle innerCircle = centerCircle;
+            for (int i = 0; i < drtModel.layerList.Count; i++)
+            {
+                DRTLayerModel eachLayer = drtModel.layerList[i];
+
+                // Layer 의 String Length  기준
+                Circle outerCircle = new Circle(Plane.XY, GetSumPoint(centerPoint, 0, 0), eachLayer.CurrentHalfStringLengthFromCenter);
+
+
+                // Start Angle : 등각으로 = 1/2
+                double onePlateAngle = Utility.DegToRad(eachLayer.Angle);
+                //double startAngel = Utility.DegToRad(0)- (onePlateAngle / 2);
+                double startAngel = Utility.DegToRad(0) - Utility.DegToRad(eachLayer.startAngle);
+
+                for (int j = 0; j < eachLayer.Count; j++)
+                {
+                    Line tempLine = new Line(GetSumPoint(centerPoint, 0, 0), GetSumPoint(centerPoint, 0, eachLayer.CurrentHalfStringLengthFromCenter + intersectFactor));
+                    Point3D innerPoint = editingService.GetIntersectWidth(tempLine, innerCircle, 0);
+                    Point3D outerPoint = editingService.GetIntersectWidth(tempLine, outerCircle, 0);
+                    Line newLine = new Line(innerPoint, outerPoint);
+                    newLine.Rotate(startAngel, Vector3D.AxisZ, GetSumPoint(centerPoint, 0, 0));
                     plateList.Add(newLine);
                     startAngel += onePlateAngle;
                 }
