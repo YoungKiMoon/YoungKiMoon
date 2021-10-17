@@ -86,6 +86,11 @@ namespace DrawWork.DrawServices
                     newList.Remove(lineD);
             }
 
+            selOutputPointList.Add(lineA.StartPoint);
+            selOutputPointList.Add(lineA.EndPoint);
+            selOutputPointList.Add(lineC.EndPoint);
+            selOutputPointList.Add(lineC.StartPoint);
+
             return newList;
         }
 

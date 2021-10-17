@@ -1707,10 +1707,10 @@ namespace DrawWork.DrawDetailServices
             if (assemblyData.RoofCompressionRing[0].CompressionRingType.Contains("Detail i"))
                 cirOD = roofbottomService.GetRoofODByCompressionRingDetailI();
 
-            double innerWidth = cirODExtend - cirOD;
+            double innerWidth = (cirODExtend - cirOD)/2;
 
             if (innerWidth > 0)
-                drawList.AddDrawEntity(DrawPlate_CuttingPlan_Divide_V2(PlateArrange_Type.RoofCompressionRing, referencePoint, plateActualWidth, plateActualLength,cirODExtend,innerWidth, realScaleValue));
+                drawList.AddDrawEntity(DrawPlate_CuttingPlan_Divide_V2(PlateArrange_Type.RoofCompressionRing, referencePoint, plateActualWidth, plateActualLength,cirODExtend/2,innerWidth, realScaleValue));
 
 
             return drawList;
@@ -1734,12 +1734,12 @@ namespace DrawWork.DrawDetailServices
             if (assemblyData.RoofCompressionRing[0].CompressionRingType.Contains("Detail i"))
                 cirOD = roofbottomService.GetRoofODByCompressionRingDetailI();
 
-            double innerWidth = cirODExtend - cirOD;
+            double innerWidth = (cirODExtend - cirOD)/2;
             double needTotalPlate = 0;
             maxBendPlateOfOnePlate = 0;
             totalBendingPlate = 0;
             if (innerWidth>0)
-                needTotalPlate = GetPlateCoutByCutting(plateActualWidth, plateActualLength, cirODExtend, innerWidth,
+                needTotalPlate = GetPlateCoutByCutting(plateActualWidth, plateActualLength, cirODExtend/2, innerWidth,
                                             out maxBendPlateOfOnePlate,
                                             out totalBendingPlate);
 
@@ -1773,7 +1773,7 @@ namespace DrawWork.DrawDetailServices
             double innerWidth = (cirODExtend - cirOD)/2;
 
             if (innerWidth > 0)
-                drawList.AddDrawEntity(DrawPlate_CuttingPlan_Divide_V2(PlateArrange_Type.BottomAnnular, referencePoint, plateActualWidth, plateActualLength, cirODExtend, innerWidth, realScaleValue));
+                drawList.AddDrawEntity(DrawPlate_CuttingPlan_Divide_V2(PlateArrange_Type.BottomAnnular, referencePoint, plateActualWidth, plateActualLength, cirODExtend/2, innerWidth, realScaleValue));
 
             return drawList;
 
@@ -1800,7 +1800,7 @@ namespace DrawWork.DrawDetailServices
             maxBendPlateOfOnePlate = 0;
             totalBendingPlate = 0;
             if (innerWidth > 0)
-                needTotalPlate= GetPlateCoutByCutting(plateActualWidth, plateActualLength, cirODExtend, innerWidth,
+                needTotalPlate= GetPlateCoutByCutting(plateActualWidth, plateActualLength, cirODExtend/2, innerWidth,
                                             out maxBendPlateOfOnePlate,
                                             out totalBendingPlate);
 
@@ -1878,6 +1878,8 @@ namespace DrawWork.DrawDetailServices
             int totalDrawLoop = 1;
             if (isRemainderPiece) totalDrawLoop = 2;
 
+            // Dimension
+            List<Entity> dimLineList = new List<Entity>();
 
             List<Point3D> outPointList = new List<Point3D>();
             for (int loopCount = 0; loopCount < totalDrawLoop; loopCount++)
@@ -1915,7 +1917,11 @@ namespace DrawWork.DrawDetailServices
                     });
                 }
 
-
+                // Dimension
+                string leaderCourseInfoD = "   REQ'D  : " + valueService.GetOrdinalSheet(newOnePlate.Requirement);
+                DrawBMLeaderModel leaderInfoModel = new DrawBMLeaderModel() { position = POSITION_TYPE.RIGHT, upperText = leaderCourseInfoD, bmNumber = "", textAlign = POSITION_TYPE.CENTER, arrowHeadVisible = false };
+                DrawEntityModel leaderInfoList = drawService.Draw_OneLineLeader(ref singleModel, GetSumPoint(outPointList[2], plateLength, 0), leaderInfoModel, scaleValue);
+                dimLineList.AddRange(leaderInfoList.GetDrawEntity());
             }
 
             styleService.SetLayerListEntity(ref plateList, layerService.LayerVirtualLine);
@@ -1923,6 +1929,10 @@ namespace DrawWork.DrawDetailServices
 
             styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
             drawList.outlineList.AddRange(outlinesList);
+
+
+            styleService.SetLayerListEntity(ref dimLineList, layerService.LayerDimension);
+            drawList.dimlineList.AddRange(dimLineList);
 
 
             // Singleton Data
@@ -1936,6 +1946,14 @@ namespace DrawWork.DrawDetailServices
                 SingletonData.BottomAnnularPlateList.Clear();
                 SingletonData.BottomAnnularPlateList.AddRange(onePlateList);
             }
+
+
+
+
+
+
+
+
 
 
             return drawList;

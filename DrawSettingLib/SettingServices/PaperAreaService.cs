@@ -2518,8 +2518,8 @@ namespace DrawSettingLib.SettingServices
             Detail106.otherHeight = 50;
 
 
-            Detail106.ReferencePoint.X = 970000;
-            Detail106.ReferencePoint.Y = 130000;
+            Detail106.ReferencePoint.X = 1000000;
+            Detail106.ReferencePoint.Y = 100000;
             Detail106.ModelCenterLocation.X = Detail106.ReferencePoint.X;
             Detail106.ModelCenterLocation.Y = Detail106.ReferencePoint.Y;
 
@@ -2544,8 +2544,8 @@ namespace DrawSettingLib.SettingServices
             Detail107.otherHeight = 50;
 
 
-            Detail107.ReferencePoint.X = 980000;
-            Detail107.ReferencePoint.Y = 130000;
+            Detail107.ReferencePoint.X = 1000000;
+            Detail107.ReferencePoint.Y = 70000;
             Detail107.ModelCenterLocation.X = Detail107.ReferencePoint.X;
             Detail107.ModelCenterLocation.Y = Detail107.ReferencePoint.Y;
 
@@ -2729,8 +2729,8 @@ namespace DrawSettingLib.SettingServices
             Detail116.otherHeight = 50;
 
 
-            Detail116.ReferencePoint.X = 970000;
-            Detail116.ReferencePoint.Y = 130000;
+            Detail116.ReferencePoint.X = 1000000;
+            Detail116.ReferencePoint.Y = 100000;
             Detail116.ModelCenterLocation.X = Detail116.ReferencePoint.X;
             Detail116.ModelCenterLocation.Y = Detail116.ReferencePoint.Y;
 
@@ -2755,8 +2755,8 @@ namespace DrawSettingLib.SettingServices
             Detail117.otherHeight = 50;
 
 
-            Detail117.ReferencePoint.X = 980000;
-            Detail117.ReferencePoint.Y = 130000;
+            Detail117.ReferencePoint.X = 1000000;
+            Detail117.ReferencePoint.Y = 70000;
             Detail117.ModelCenterLocation.X = Detail117.ReferencePoint.X;
             Detail117.ModelCenterLocation.Y = Detail117.ReferencePoint.Y;
 
@@ -2915,8 +2915,8 @@ namespace DrawSettingLib.SettingServices
             Detail125.otherHeight = 50;
 
 
-            Detail125.ReferencePoint.X = 960000;
-            Detail125.ReferencePoint.Y = 130000;
+            Detail125.ReferencePoint.X = 1000000;
+            Detail125.ReferencePoint.Y = 100000;
             Detail125.ModelCenterLocation.X = Detail125.ReferencePoint.X;
             Detail125.ModelCenterLocation.Y = Detail125.ReferencePoint.Y;
 
@@ -3075,8 +3075,8 @@ namespace DrawSettingLib.SettingServices
             Detail135.otherHeight = 50;
 
 
-            Detail135.ReferencePoint.X = 960000;
-            Detail135.ReferencePoint.Y = 130000;
+            Detail135.ReferencePoint.X = 1000000;
+            Detail135.ReferencePoint.Y = 100000;
             Detail135.ModelCenterLocation.X = Detail135.ReferencePoint.X;
             Detail135.ModelCenterLocation.Y = Detail135.ReferencePoint.Y;
 

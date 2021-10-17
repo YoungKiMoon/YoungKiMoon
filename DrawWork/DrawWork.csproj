@@ -99,6 +99,7 @@
     <Compile Include="DrawAutomationServices\AutomationDimensionService.cs" />
     <Compile Include="DrawAutomationServices\AutomationLeaderService.cs" />
     <Compile Include="DrawBuilders\LogicBuilder.cs" />
+    <Compile Include="DrawCommonServices\DrawCommonService.cs" />
     <Compile Include="DrawCustomObjectModels\CustomEntityModel.cs" />
     <Compile Include="DrawCustomObjectModels\CustomLine.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedHatch.cs" />

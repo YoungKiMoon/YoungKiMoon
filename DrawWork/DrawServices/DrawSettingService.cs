@@ -28,6 +28,7 @@ using DrawWork.CutomModels;
 using DrawWork.DrawShapes;
 using DrawWork.DrawSacleServices;
 using DrawWork.DrawDetailServices;
+using DrawWork.AssemblyServices;
 
 namespace DrawWork.DrawServices
 {
@@ -1518,6 +1519,8 @@ namespace DrawWork.DrawServices
             //}
             #endregion
 
+
+            #region old Sample
             if (visibleFalse)
             {
                 //Solid newSolid = new Solid(,);
@@ -3470,7 +3473,7 @@ namespace DrawWork.DrawServices
             }
 
 
-            if (true)
+            if (visibleFalse)
             {
                 double customScaleValue = 3;
 
@@ -3642,6 +3645,7 @@ namespace DrawWork.DrawServices
 
 
 
+            #region Sample
             // Plate Arrangement
             //if (true)
             //{
@@ -3909,6 +3913,8 @@ namespace DrawWork.DrawServices
             //    singleModel.Entities.AddRange(drawList);
 
             //}
+
+            #endregion
 
             if (visibleFalse)
             {
@@ -4318,6 +4324,35 @@ namespace DrawWork.DrawServices
                 singleModel.Entities.AddRange(refcc);
 
             }
+
+            #endregion
+
+
+
+            #region Structure
+            if (true)
+            {
+                SingletonData.Clear();
+
+                // Assembly
+                AssemblyDataService assemblyService = new AssemblyDataService();
+                //AssemblyModel newTankData = assemblyService.CreateMappingData(ExcelFile.Text);
+
+                string excelFile = @"";
+                // New Excel Read
+                AssemblyModel newTankData = assemblyService.CreateMappingDataNew(excelFile);
+                DrawDetailStructureService DDSService = new DrawDetailStructureService(newTankData, singleModel);
+
+
+                double scaleValue = 20;
+                CDPoint refPoint = new CDPoint(1000, 1000,0);
+                CDPoint curPoint = new CDPoint(refPoint.X, refPoint.Y,0);
+                DrawEntityModel structureDraw = DDSService.DrawDetailRoofStructureAssembly(ref refPoint, ref curPoint, singleModel, scaleValue);
+                singleModel.Entities.AddRange(structureDraw.GetDrawEntity());
+            }
+
+            #endregion
+
 
             singleModel.Entities.Regen();
             singleModel.ZoomFit();

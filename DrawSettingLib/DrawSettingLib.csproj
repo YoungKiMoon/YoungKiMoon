@@ -50,10 +50,12 @@
     <Compile Include="SettingModels\GAAreaModel.cs" />
     <Compile Include="SettingModels\PaperAreaListModel.cs" />
     <Compile Include="SettingModels\PaperAreaModel.cs" />
+    <Compile Include="SettingModels\PaperModel.cs" />
     <Compile Include="SettingModels\PointModel.cs" />
     <Compile Include="SettingModels\SizeModel.cs" />
     <Compile Include="SettingServices\ModelAreaService.cs" />
     <Compile Include="SettingServices\PaperAreaService.cs" />
+    <Compile Include="SettingServices\PaperService.cs" />
     <Compile Include="Utils\Notifier.cs" />
   </ItemGroup>
   <ItemGroup>

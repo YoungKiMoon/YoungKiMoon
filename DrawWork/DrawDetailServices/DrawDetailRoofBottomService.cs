@@ -28,6 +28,8 @@ namespace DrawWork.DrawDetailServices
         private DrawService drawService;
 
 
+        private DrawWorkingPointService workingPointService;
+
         private ValueService valueService;
         private StyleFunctionService styleService;
         private LayerStyleService layerService;
@@ -44,6 +46,9 @@ namespace DrawWork.DrawDetailServices
             singleModel = selModel as Model;
 
             assemblyData = selAssembly;
+
+
+            workingPointService = new DrawWorkingPointService(selAssembly);
 
             drawService = new DrawService(selAssembly);
 
@@ -198,6 +203,9 @@ namespace DrawWork.DrawDetailServices
 
             List<Entity> plateHorizontalList = new List<Entity>();
 
+            List<Entity> extendLineList = new List<Entity>();
+            List<Entity> extendTextList = new List<Entity>();
+
             Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
 
             bool circleExtendValue = false;
@@ -212,14 +220,14 @@ namespace DrawWork.DrawDetailServices
 
             double circleRadius = circleOD / 2;
             double circleExtendRadius = circleODExtend / 2;
-
+            double circleExtendLength = circleODExtend - circleOD;
 
             // Outer : Circle
             Circle outCircle = new Circle(GetSumPoint(referencePoint, 0, 0), circleRadius);
             circleList.Add(outCircle);
 
             // Outer : Circle : Extend
-            if (circleODExtend > 0)
+            if (circleExtendLength > 0)
             {
                 Circle outCircleExtend = new Circle(GetSumPoint(referencePoint, 0, 0), circleExtendRadius);
                 circleList.Add(outCircleExtend);
@@ -463,7 +471,7 @@ namespace DrawWork.DrawDetailServices
             if (circleArrangeType == CircleArrange_Type.PieSegment)
             {
 
-                plateModelList = GetPlateModel_New_PieSagment(arrangeType,drtMdodel,plateWidth, circleExtendRadius, referencePoint);
+                plateModelList = GetPlateModel_New_PieSagment(arrangeType,drtMdodel,plateWidth, circleRadius, referencePoint);
                 // Draw Center Cut : 보류
 
                 // Draw Number : Rotate
@@ -513,6 +521,42 @@ namespace DrawWork.DrawDetailServices
 
 
 
+            // Bottom : Annular
+            // Roof : Compression Ring
+            List<Point3D> extendTextPointList = new List<Point3D>();
+            if (circleExtendValue)
+            {
+                // Text
+                extendLineList.AddRange( GetExtendCuttingLine(arrangeType, referencePoint, circleRadius, circleExtendRadius, plateLength, out extendTextPointList));
+
+                // Number
+                string numberStr = "";
+                if (arrangeType == PlateArrange_Type.Bottom)
+                {
+                    numberStr = "A";
+                }
+                else if (arrangeType == PlateArrange_Type.Roof)
+                {
+                    numberStr = "C";
+                }
+                double numberCount = 0;
+                foreach (Point3D eachExtendPoint in extendTextPointList)
+                {
+                    numberCount++;
+                    string textDisplayName = numberStr;// +  numberCount;
+                    extendTextList.Add(new Text(GetSumPoint(eachExtendPoint, 0, 0), textDisplayName, 2.5 * scaleValue) { Alignment = Text.alignmentType.MiddleCenter });
+                }
+
+                // Circle
+                if (circleArrangeType == CircleArrange_Type.PieSegment)
+                {
+                    Circle outCircleExtend = new Circle(GetSumPoint(referencePoint, 0, 0), circleExtendRadius);
+                    circleList.Add(outCircleExtend);
+                }
+
+            }
+
+
 
             // SingletonData
             if (arrangeType == PlateArrange_Type.Bottom)
@@ -528,7 +572,11 @@ namespace DrawWork.DrawDetailServices
                 SingletonData.RoofPlateInfo.AddRange(plateModelList);
             }
 
-
+            
+            styleService.SetLayerListEntity(ref extendTextList, layerService.LayerDimension);
+            drawEntity.outlineList.AddRange(extendTextList);
+            styleService.SetLayerListEntity(ref extendLineList, layerService.LayerOutLine);
+            drawEntity.outlineList.AddRange(extendLineList);
 
 
             styleService.SetLayerListEntity(ref textList, layerService.LayerDimension);
@@ -545,6 +593,71 @@ namespace DrawWork.DrawDetailServices
         }
 
 
+
+        public List<Entity> GetExtendCuttingLine(PlateArrange_Type arrangeType, Point3D selCenterPoint, double circleRadius, double circleExtendRadius,double plateLength, out List<Point3D> textPointList)
+        {
+            List<Entity> newList = new List<Entity>();
+            DrawDetailPlateCuttingPlanService cuttingPlanService = new DrawDetailPlateCuttingPlanService(null,null);
+
+
+            textPointList = new List<Point3D>();
+
+            double extendCuttingLength = circleExtendRadius + 200;
+
+            double extendLength = (circleExtendRadius - circleRadius)/2;
+            double textRadius = circleRadius + extendLength ;
+
+
+            double cuttingCount = cuttingPlanService.GetNeedAnnularCompRingCount(circleExtendRadius, plateLength, extendLength);
+            double eachCuttingDegree = 360 / cuttingCount;
+            double eahcCuttingDegreeHalf = eachCuttingDegree / 2;
+
+            // Start Arngle
+            double startAngle = 0;
+            if (arrangeType == PlateArrange_Type.Bottom)
+            {
+                startAngle = 0; // Bottom : Annular : Start  필요함
+            }
+            else if (arrangeType == PlateArrange_Type.Roof)
+            {
+                startAngle = 0; // Roof : Compression Ring : Start  필요함
+            }
+
+
+            // Outer : Circle
+            Circle outCircleExtend = new Circle(GetSumPoint(selCenterPoint, 0, 0), circleExtendRadius);
+            Circle textCircle = new Circle(GetSumPoint(selCenterPoint, 0, 0), textRadius);
+            Circle outCircle = new Circle(GetSumPoint(selCenterPoint, 0, 0), circleRadius);
+
+            double referenceRadian = 0; // Utility.DegToRad(90);
+            double currentAngle = 0;
+            for(int i = 0; i < cuttingCount; i++)
+            {
+                currentAngle = startAngle + (i * eachCuttingDegree);
+
+                // Line
+                Line eachLine = new Line(GetSumPoint(selCenterPoint, 0, 0), GetSumPoint(selCenterPoint, 0, extendCuttingLength));
+                eachLine.Rotate(referenceRadian - Utility.DegToRad(currentAngle), Vector3D.AxisZ,GetSumPoint(selCenterPoint,0,0));
+
+                Point3D startPoint = editingService.GetIntersectWidth(outCircleExtend, eachLine, 0);
+                Point3D endPoint = editingService.GetIntersectWidth(outCircle, eachLine, 0);
+
+                newList.Add(new Line(GetSumPoint(startPoint, 0, 0), GetSumPoint(endPoint, 0, 0)));
+
+                // Text
+                Line eachTextLine = new Line(GetSumPoint(selCenterPoint, 0, 0), GetSumPoint(selCenterPoint, 0, extendCuttingLength));
+                eachTextLine.Rotate(referenceRadian - Utility.DegToRad(currentAngle) + Utility.DegToRad(eahcCuttingDegreeHalf), Vector3D.AxisZ, GetSumPoint(selCenterPoint, 0, 0));
+
+                Point3D textPoint = editingService.GetIntersectWidth(textCircle, eachTextLine, 0);
+
+                textPointList.Add(textPoint);
+            }
+
+
+
+
+            return newList;
+        }
 
 
 
@@ -3213,6 +3326,7 @@ namespace DrawWork.DrawDetailServices
 
             if (tankRoofType.ToLower() == "crt")
             {
+                // Development
                 switch (topAngleType)
                 {
                     case "Detail b":
@@ -3225,8 +3339,7 @@ namespace DrawWork.DrawDetailServices
                         retrunValue = valueService.GetHypotenuseByWidth(roofSlopeDegree, actualRadius) * 2;
                         break;
                     case "Detail e":
-                        actualRadius += valueService.GetDoubleValue(eachAngle.E) +
-                                        valueService.GetDoubleValue(eachAngle.t);
+                        actualRadius += -(valueService.GetDoubleValue(eachAngle.E) -valueService.GetDoubleValue(eachAngle.t));
                         retrunValue = valueService.GetHypotenuseByWidth(roofSlopeDegree, actualRadius) * 2;
                         break;
                     case "Detail i":
@@ -3251,6 +3364,7 @@ namespace DrawWork.DrawDetailServices
             }
             else if (tankRoofType.ToLower() == "drt")
             {
+                // Top View
                 switch (topAngleType)
                 {
                     case "Detail b":
@@ -3263,15 +3377,14 @@ namespace DrawWork.DrawDetailServices
                         retrunValue = actualRadius * 2;
                         break;
                     case "Detail e":
-                        actualRadius += valueService.GetDoubleValue(eachAngle.E) +
-                                        valueService.GetDoubleValue(eachAngle.t);
+                        actualRadius += -(valueService.GetDoubleValue(eachAngle.E) - valueService.GetDoubleValue(eachAngle.t));
                         retrunValue = actualRadius * 2;
                         break;
                     case "Detail i":
                         double tempDetaili = GetRoofODByCompressionRingDetailI();
-                        double A = valueService.GetDoubleValue(assemblyData.RoofCRTInput[0].DetailIOutsideProjection);
-                        double B = valueService.GetDoubleValue(assemblyData.RoofCRTInput[0].DetailIWidth);
-                        double C = valueService.GetDoubleValue(assemblyData.RoofCRTInput[0].DetailIOverlap);
+                        double A = valueService.GetDoubleValue(assemblyData.RoofDRTInput[0].DetailIOutsideProjection);
+                        double B = valueService.GetDoubleValue(assemblyData.RoofDRTInput[0].DetailIWidth);
+                        double C = valueService.GetDoubleValue(assemblyData.RoofDRTInput[0].DetailIOverlap);
                         double insideX = valueService.GetAdjacentByHypotenuse(roofSlopeDegree, B - C);
                         retrunValue = tempDetaili + (insideX) * 2;
                         break;
@@ -3337,12 +3450,17 @@ namespace DrawWork.DrawDetailServices
                 {
                     case "Detail i":
                         string roofSlopeString = assemblyData.RoofCompressionRing[0].RoofSlope;
-                        double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
+                        //double roofSlopeDegree = valueService.GetDegreeOfSlope(roofSlopeString);
 
-                        double A = valueService.GetDoubleValue(assemblyData.RoofCRTInput[0].DetailIOutsideProjection);
-                        double B = valueService.GetDoubleValue(assemblyData.RoofCRTInput[0].DetailIWidth);
-                        double C = valueService.GetDoubleValue(assemblyData.RoofCRTInput[0].DetailIOverlap);
-                        double t1 = valueService.GetDoubleValue(assemblyData.RoofCRTInput[0].DetailIThickness);
+                        // 지금의 처리가 매우 필요함
+                        if(SingletonData.RefPoint ==null)
+                            SingletonData.RefPoint =new CDPoint(0,0,0);
+                        double roofSlopeDegree= workingPointService.DRTWorkingData.CompressionRingDegree;
+
+                        double A = valueService.GetDoubleValue(assemblyData.RoofDRTInput[0].DetailIOutsideProjection);
+                        double B = valueService.GetDoubleValue(assemblyData.RoofDRTInput[0].DetailIWidth);
+                        double C = valueService.GetDoubleValue(assemblyData.RoofDRTInput[0].DetailIOverlap);
+                        double t1 = valueService.GetDoubleValue(assemblyData.RoofDRTInput[0].DetailIThickness);
 
                         double insideX = valueService.GetAdjacentByHypotenuse(roofSlopeDegree, B - A - C);
                         double insideY = valueService.GetOppositeByHypotenuse(roofSlopeDegree, B - A - C);
@@ -3660,6 +3778,9 @@ namespace DrawWork.DrawDetailServices
             double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
             double DRTCurvature = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].DomeRadiusRatio);
             double DRTRoofStringLength = circleRadius *2;
+
+            // DRT Roof 넓이 관련 이슈
+            DRTRoofStringLength = GetRoofODByCompressionRingDetailI();
 
             DRTRoofService drtService = new DRTRoofService();
             drtModel = drtService.GetRoofDRTValue_New(tankID, DRTCurvature, DRTRoofStringLength, plateLength,plateWidth);
