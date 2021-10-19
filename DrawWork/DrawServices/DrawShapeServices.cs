@@ -88,8 +88,8 @@ namespace DrawWork.DrawServices
 
             selOutputPointList.Add(lineA.StartPoint);
             selOutputPointList.Add(lineA.EndPoint);
-            selOutputPointList.Add(lineC.EndPoint);
             selOutputPointList.Add(lineC.StartPoint);
+            selOutputPointList.Add(lineC.EndPoint);
 
             return newList;
         }

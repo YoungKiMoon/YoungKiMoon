@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DrawSettingLib.Commons;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,8 @@ namespace DrawSettingLib.SettingModels
     {
         public PaperModel()
         {
+            DWGName = PAPERMAIN_TYPE.NotSet;
+
             Page = 1;
             ColumnDef = 1;
             RowDef = 1;
@@ -22,8 +25,16 @@ namespace DrawSettingLib.SettingModels
 
 
 
-
-
+        private PAPERMAIN_TYPE _DWGName;
+        public PAPERMAIN_TYPE DWGName
+        {
+            get { return _DWGName; }
+            set
+            {
+                _DWGName = value;
+                //OnPropertyChanged(nameof(DWGName));
+            }
+        }
 
         private double _Page;
         public double Page

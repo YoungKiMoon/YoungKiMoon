@@ -129,6 +129,10 @@ namespace DrawWork.DrawServices
 
             return mirrorList;
         }
+        public List<Entity> GetMirrorEntity(Plane selPlane, List<Entity> selList, Point3D selPoint,bool copyCmd=false)
+        {
+            return GetMirrorEntity(selPlane, selList, selPoint.X, selPoint.Y, copyCmd);
+        }
 
         public List<Entity> GetEntityByMirror(Plane selPlane, List<Entity> selEntity)
         {

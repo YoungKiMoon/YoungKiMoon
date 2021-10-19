@@ -313,12 +313,12 @@ namespace DrawWork.DrawDetailServices
                     {
                         if (eachWeldingModel.BottomWeldingSingle)
                         {
-                            dimCourseLeftWeldingArcList = drawService.Draw_DimensionArc(GetSumPoint(exPoint[3], 0, 0), GetSumPoint(exPoint[4], 0, 0), "top", dimArcRadius, "45˚", 45, 90, 45, 0, customScaleValue, layerService.LayerDimension);
+                            dimCourseLeftWeldingArcList = drawService.Draw_DimensionArc(GetSumPoint(exPoint[3], 0, 0), GetSumPoint(exPoint[4], 0, 0), "top", dimArcRadius, "45%%D", 45, 90, 45, 0, customScaleValue, layerService.LayerDimension);
                         }
                         else
                         {
-                            dimCourseLeftWeldingArcList = drawService.Draw_DimensionArc(GetSumPoint(exPoint[3], 0, 0), GetSumPoint(exPoint[4], 0, 0), "top", dimArcRadius, "45˚", 45, 90, 45, 0, customScaleValue, layerService.LayerDimension);
-                            dimCourseRightWeldingArcList = drawService.Draw_DimensionArc(GetSumPoint(exPoint[5], 0, 0), GetSumPoint(exPoint[2], 0, 0), "top",dimArcRadius, "45˚", 45, -45, -90, 0, customScaleValue, layerService.LayerDimension);
+                            dimCourseLeftWeldingArcList = drawService.Draw_DimensionArc(GetSumPoint(exPoint[3], 0, 0), GetSumPoint(exPoint[4], 0, 0), "top", dimArcRadius, "45%%D", 45, 90, 45, 0, customScaleValue, layerService.LayerDimension);
+                            dimCourseRightWeldingArcList = drawService.Draw_DimensionArc(GetSumPoint(exPoint[5], 0, 0), GetSumPoint(exPoint[2], 0, 0), "top",dimArcRadius, "45%%D", 45, -45, -90, 0, customScaleValue, layerService.LayerDimension);
                         }
 
                         drawList.AddDrawEntity(dimCourseLeftWeldingArcList);

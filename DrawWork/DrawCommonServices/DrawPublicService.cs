@@ -1,4 +1,5 @@
 ﻿using AssemblyLib.AssemblyModels;
+using DrawWork.Commons;
 using DrawWork.DrawServices;
 using DrawWork.DrawStyleServices;
 using DrawWork.ValueServices;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DrawWork.DrawCommonServices
 {
-    public class DrawCommonService
+    public class DrawPublicService
     {
         private AssemblyModel assemblyData;
 
@@ -20,7 +21,7 @@ namespace DrawWork.DrawCommonServices
 
         private DrawEditingService editingService;
 
-        public DrawCommonService(AssemblyModel selAssembly)
+        public DrawPublicService(AssemblyModel selAssembly)
         {
             assemblyData = selAssembly;
 
@@ -279,5 +280,86 @@ namespace DrawWork.DrawCommonServices
         {
             return 70;
         }
+
+        #region Angle Type : b, d, e, i, k
+        public TopAngle_Type GetCurrentTopAngleType()
+        {
+            TopAngle_Type retunValue = TopAngle_Type.NotSet;
+            string topAngleType = assemblyData.RoofCompressionRing[0].CompressionRingType;
+
+            switch (topAngleType)
+            {
+                case "Detail b":
+                    retunValue = TopAngle_Type.b;
+                    break;
+                case "Detail d":
+                    retunValue = TopAngle_Type.d;
+                    break;
+                case "Detail e":
+                    retunValue = TopAngle_Type.e;
+                    break;
+                case "Detail i":
+                    retunValue = TopAngle_Type.i;
+                    break;
+                case "Detail k":
+                    retunValue = TopAngle_Type.k;
+                    break;
+            }
+
+
+            return retunValue;
+        }
+        public double TopAnglebTypeLastCourseAjdHeight()
+        {
+            return 10;
+        }
+        #endregion
+
+        #region Botton
+        public bool isAnnular()
+        {
+            bool returnValue = false;
+            string annularYes = assemblyData.BottomInput[0].AnnularPlate;
+
+            if (annularYes.Contains("Yes"))
+            {
+                returnValue = true; ;
+            }
+
+            return returnValue;
+        }
+        #endregion
+
+        #region Shell Plate Course
+        public List<double> GetShellCourseWidthForDrawing()
+        {
+            List<double> newList = new List<double>();
+
+            foreach(ShellOutputModel eachCourse  in assemblyData.ShellOutput)
+            {
+                newList.Add(valueService.GetDoubleValue(eachCourse.PlateWidth));
+            }
+
+            TopAngle_Type topAngle = GetCurrentTopAngleType();
+            if (topAngle == TopAngle_Type.i)
+            {
+                int maxCount = newList.Count-1;
+                newList[maxCount] -= TopAnglebTypeLastCourseAjdHeight();
+            }
+
+            return newList;
+        }
+        public List<double> GetShellCourseThickneeForDrawing()
+        {
+            List<double> newList = new List<double>();
+
+            foreach (ShellOutputModel eachCourse in assemblyData.ShellOutput)
+            {
+                newList.Add(valueService.GetDoubleValue(eachCourse.Thickness));
+            }
+
+            return newList;
+        }
+        #endregion
     }
 }

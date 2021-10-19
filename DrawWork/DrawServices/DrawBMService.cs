@@ -94,7 +94,7 @@ namespace DrawWork.DrawServices
 
                 // Fab Margin = 2*10;
                 double fabMarginPlateLength = eachPlateLength + 2 * 10;
-                string fabMarginPlateLengthStr = Math.Round(eachPlateLength, 1, MidpointRounding.AwayFromZero).ToString();
+                string fabMarginPlateLengthStr = Math.Round(fabMarginPlateLength, 1, MidpointRounding.AwayFromZero).ToString();
 
                 double fabMarginPlateWidth = valueService.GetDoubleValue( eachShell.PlateWidth) + 2*10;
                 string fabMarginPlateWidthStr = fabMarginPlateWidth.ToString();
@@ -105,7 +105,7 @@ namespace DrawWork.DrawServices
                 newModel.No = bmCount.ToString();
                 newModel.Name = "SHELL PLATE";
                 newModel.Material = eachShell.Material;
-                newModel.Dimension = GetDimension(eachShell.Thickness, fabMarginPlateWidthStr, fabMarginPlateLengthStr);
+                newModel.Dimension = GetDimension(eachShell.Thickness, eachShell.PlateWidth, Math.Round(eachPlateLength, 1, MidpointRounding.AwayFromZero).ToString());
                 newModel.Set = eachPlateCount.ToString();
                 newModel.Weight = "";// 현재 공백
                 newModel.Remark = "";

@@ -109,7 +109,7 @@ namespace DrawWork.DrawDetailServices
 
             scaleValue = 10;
 
-            drawEntity = GetPlateArrange(SingletonData.TankType, plateType, referencePoint, cirOD, cirODExtend, plateActualWidth, plateActualLength, scaleValue);
+            //drawEntity = GetPlateArrange(SingletonData.TankType, plateType, referencePoint, cirOD, cirODExtend, plateActualWidth, plateActualLength, scaleValue);
 
             return drawEntity;
         }
@@ -121,6 +121,7 @@ namespace DrawWork.DrawDetailServices
 
             double cirOD = GetRoofOuterDiameter();
             double cirODExtend = 0;
+            double cirHiddenOD = 0;
             double plateActualWidth = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateWidth);
             double plateActualLength = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].PlateLength);
             PlateArrange_Type plateType = PlateArrange_Type.Roof;
@@ -139,12 +140,15 @@ namespace DrawWork.DrawDetailServices
             cirODExtend = GetRoofOD();
             cirOD = cirODExtend;
             if (assemblyData.RoofCompressionRing[0].CompressionRingType.Contains("Detail i"))
+            {
                 cirOD = GetRoofODByCompressionRingDetailI();
+                cirHiddenOD = cirOD - valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].OverlapOfRoofAndCompRingC);
+            }
 
 
 
             
-            drawEntity =GetPlateArrange(SingletonData.TankType,plateType, referencePoint, cirOD, cirODExtend, plateActualWidth, plateActualLength, scaleValue);
+            drawEntity =GetPlateArrange(SingletonData.TankType,plateType, referencePoint, cirOD, cirODExtend, cirHiddenOD, plateActualWidth, plateActualLength, scaleValue);
 
             return drawEntity;
         }
@@ -157,6 +161,7 @@ namespace DrawWork.DrawDetailServices
 
             double cirOD = GetRoofOuterDiameter();
             double cirODExtend = 0;
+            double cirHiddenOD = 0;
             double plateActualWidth = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateWidth);
             double plateActualLength = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateLength);
             PlateArrange_Type plateType = PlateArrange_Type.Bottom;
@@ -174,22 +179,26 @@ namespace DrawWork.DrawDetailServices
             cirODExtend = GetBottomOD();
             cirOD = cirODExtend;
             if (assemblyData.BottomInput[0].AnnularPlate.Contains("Yes"))
+            {
                 cirOD = GetAnnularPlateBottomOD();
+                cirHiddenOD = valueService.GetDoubleValue(assemblyData.BottomInput[0].AnnularPlateID);
+            }
 
 
-            drawEntity = GetPlateArrange(SingletonData.TankType,plateType, referencePoint, cirOD, cirODExtend, plateActualWidth, plateActualLength, scaleValue);
+            drawEntity = GetPlateArrange(SingletonData.TankType,plateType, referencePoint, cirOD, cirODExtend, cirHiddenOD, plateActualWidth, plateActualLength, scaleValue);
 
             return drawEntity;
         }
 
 
 
-        private DrawEntityModel GetPlateArrange(TANK_TYPE tankType, PlateArrange_Type arrangeType, Point3D refPoint,double circleOD,double circleODExtend,double plateActualWidth, double plateActualLength, double scaleValue)
+        private DrawEntityModel GetPlateArrange(TANK_TYPE tankType, PlateArrange_Type arrangeType, Point3D refPoint,double circleOD,double circleODExtend,double circleHiddenOD,double plateActualWidth, double plateActualLength, double scaleValue)
         {
 
             DrawEntityModel drawEntity = new DrawEntityModel();
 
             List<Entity> circleList = new List<Entity>();
+            List<Entity> circleHiddenList = new List<Entity>();
             List<Entity> centerLineList = new List<Entity>();
             List<Entity> virtualList = new List<Entity>();
 
@@ -221,6 +230,7 @@ namespace DrawWork.DrawDetailServices
             double circleRadius = circleOD / 2;
             double circleExtendRadius = circleODExtend / 2;
             double circleExtendLength = circleODExtend - circleOD;
+            double circleHiddenRadius = circleHiddenOD / 2;
 
             // Outer : Circle
             Circle outCircle = new Circle(GetSumPoint(referencePoint, 0, 0), circleRadius);
@@ -232,6 +242,9 @@ namespace DrawWork.DrawDetailServices
                 Circle outCircleExtend = new Circle(GetSumPoint(referencePoint, 0, 0), circleExtendRadius);
                 circleList.Add(outCircleExtend);
 
+                Circle circleHidden = new Circle(GetSumPoint(referencePoint, 0, 0), circleHiddenRadius);
+                circleHiddenList.Add(circleHidden);
+
                 circleExtendValue = true;
             }
             else
@@ -240,7 +253,7 @@ namespace DrawWork.DrawDetailServices
             }
 
             // Center Line
-            double centerLineExt = 20;
+            double centerLineExt = 6;
             double centerLineLength= circleRadius;
             if (centerLineLength < circleExtendRadius)
                 centerLineLength = circleExtendRadius;
@@ -474,6 +487,36 @@ namespace DrawWork.DrawDetailServices
                 plateModelList = GetPlateModel_New_PieSagment(arrangeType,drtMdodel,plateWidth, circleRadius, referencePoint);
                 // Draw Center Cut : 보류
 
+
+                // Draw Center Cut
+                //List<Entity> emptyList01 = new List<Entity>();
+                //List<Entity> emptyList02 = new List<Entity>();
+                //foreach(Entity eachEntity in plateLineList)
+                //{
+                //    if(eachEntity is Circle)
+                //    {
+                //        Circle eachCircle = (Circle)eachEntity;
+                //        Line eachLineTop = new Line(GetSumPoint(eachCircle.Center, 0, eachCircle.Radius), GetSumPoint(eachCircle.Center, 100, eachCircle.Radius));
+                //        Line eachLineBottom = new Line(GetSumPoint(eachCircle.Center, 0, -eachCircle.Radius), GetSumPoint(eachCircle.Center, 100, -eachCircle.Radius));
+                //        emptyList02.Add(eachLineTop);
+                //        emptyList02.Add(eachLineBottom);
+                //    }
+                //}
+                //if (circleExtendValue)
+                //{
+                //    Line eachLineTop = new Line(GetSumPoint(referencePoint, 0, circleExtendRadius), GetSumPoint(referencePoint, 100, circleExtendRadius));
+                //    Line eachLineBottom = new Line(GetSumPoint(referencePoint, 0, -circleExtendRadius), GetSumPoint(referencePoint, 100, -circleExtendRadius));
+                //    emptyList02.Add(eachLineTop);
+                //    emptyList02.Add(eachLineBottom);
+                //}
+
+                //List<Entity> centerCutList = DrawCenterCutPlane(tankType,arrangeType, circleExtendValue,
+                //                                                circleRadius,
+                //                                                circleExtendRadius,
+                //                                                circleHiddenRadius,
+                //                                                emptyList01, emptyList02, referencePoint, scaleValue);
+                //drawEntity.outlineList.AddRange(centerCutList);
+
                 // Draw Number : Rotate
                 foreach (DrawPlateModel eachPlate in plateModelList)
                 {
@@ -490,7 +533,11 @@ namespace DrawWork.DrawDetailServices
             else
             {
                 // Draw Center Cut
-                List<Entity> centerCutList = DrawCenterCutPlane(arrangeType, circleExtendValue, circleExtendRadius, plateLineList, plateHorizontalList, referencePoint, scaleValue);
+                List<Entity> centerCutList = DrawCenterCutPlane(tankType,arrangeType, circleExtendValue,
+                                                                circleRadius, 
+                                                                circleExtendRadius,
+                                                                circleHiddenRadius, 
+                                                                plateLineList, plateHorizontalList, referencePoint, scaleValue);
                 drawEntity.outlineList.AddRange(centerCutList);
 
                 // Additional
@@ -572,7 +619,47 @@ namespace DrawWork.DrawDetailServices
                 SingletonData.RoofPlateInfo.AddRange(plateModelList);
             }
 
-            
+
+
+
+
+            // Dimension
+            double dimVerticalHeight = circleExtendRadius / scaleValue + 12;
+            // Dimension
+            List<Entity> dimLineList = new List<Entity>();
+            DrawDimensionModel dimCrossModel = new DrawDimensionModel()
+            {
+                position = POSITION_TYPE.BOTTOM,
+                textUpper = Math.Round(circleRadius, 1, MidpointRounding.AwayFromZero).ToString(),
+                //textLower = "(TYP.)",
+                dimHeight = dimVerticalHeight,
+                scaleValue = scaleValue,
+            };
+            DrawEntityModel dimCross = drawService.Draw_DimensionDetail(ref singleModel, 
+                                        GetSumPoint(referencePoint, -circleRadius, 0), 
+                                        GetSumPoint(referencePoint, circleRadius, 0), scaleValue, dimCrossModel, 0);
+            dimLineList.AddRange(dimCross.GetDrawEntity());
+
+            if (circleExtendValue)
+            {
+                DrawDimensionModel dimCrossModel2 = new DrawDimensionModel()
+                {
+                    position = POSITION_TYPE.BOTTOM,
+                    textUpper = Math.Round(circleExtendRadius, 1, MidpointRounding.AwayFromZero).ToString(),
+                    //textLower = "(TYP.)",
+                    dimHeight = dimVerticalHeight + 7,
+                    scaleValue = scaleValue,
+                };
+                DrawEntityModel dimCross2 = drawService.Draw_DimensionDetail(ref singleModel,
+                                            GetSumPoint(referencePoint, -circleExtendRadius, 0),
+                                            GetSumPoint(referencePoint, circleExtendRadius, 0), scaleValue, dimCrossModel2, 0);
+                dimLineList.AddRange(dimCross2.GetDrawEntity());
+            }
+
+
+            styleService.SetLayerListEntity(ref dimLineList, layerService.LayerDimension);
+            drawEntity.dimlineList.AddRange(dimLineList);
+
             styleService.SetLayerListEntity(ref extendTextList, layerService.LayerDimension);
             drawEntity.outlineList.AddRange(extendTextList);
             styleService.SetLayerListEntity(ref extendLineList, layerService.LayerOutLine);
@@ -589,6 +676,10 @@ namespace DrawWork.DrawDetailServices
             drawEntity.centerlineList.AddRange(centerLineList);
             styleService.SetLayerListEntity(ref circleList, layerService.LayerOutLine);
             drawEntity.outlineList.AddRange(circleList);
+            styleService.SetLayerListEntity(ref circleHiddenList, layerService.LayerHiddenLine);
+            drawEntity.outlineList.AddRange(circleHiddenList);
+
+            
             return drawEntity;
         }
 
@@ -2398,7 +2489,10 @@ namespace DrawWork.DrawDetailServices
             return roofOD;
         }
 
-        private List<Entity> DrawCenterCutPlane(PlateArrange_Type arrangeType,bool circleExtendValue,double circleLength,  
+        private List<Entity> DrawCenterCutPlane(TANK_TYPE tankType, PlateArrange_Type arrangeType,bool circleExtendValue,
+                                                double circleRadius,
+                                                double circleExtendRadius,
+                                                double circleHiddneRadius,
                                                 List<Entity> selPlateList, List<Entity> selHLineList, 
                                                 Point3D centerPoint,double scaleValue)
         {
@@ -2406,7 +2500,7 @@ namespace DrawWork.DrawDetailServices
 
             // Scale : Page
             double distanceValue = 260;
-            if (circleLength*2 >= 24801)
+            if (circleExtendRadius * 2 >= 24801)
                 distanceValue = 350;
             double scaleDistanceValue = distanceValue * scaleValue;
             //----------------------------------------------
@@ -2417,15 +2511,12 @@ namespace DrawWork.DrawDetailServices
             double plateVerticalGap = 0.5;
             double scalePlateVerticalGap = plateVerticalGap * scaleValue;
 
-            double slopeAngel = 0;
+            // Reference : Slope : Radian
+            double slopeRadian = 0;
             if (arrangeType == PlateArrange_Type.Roof)
-            {
-                slopeAngel = -Utility.DegToRad(6);
-            }
+                slopeRadian = -Utility.DegToRad(6);
             else if (arrangeType == PlateArrange_Type.Bottom)
-            {
-                slopeAngel = -Utility.DegToRad(4);
-            }
+                slopeRadian = -Utility.DegToRad(4);
 
             Dictionary<double, double> YDic = new Dictionary<double, double>();
             foreach(Line eachEntity in selPlateList)
@@ -2449,23 +2540,29 @@ namespace DrawWork.DrawDetailServices
 
 
 
-
             Point3D yCenterPoint = GetSumPoint(centerPoint, scaleDistanceValue, 0);
-            Point3D yTopPoint = new Point3D(yCenterPoint.X, YList[0]);
-            Point3D yBottomPoint = new Point3D(yCenterPoint.X, YList[YList.Count-1]);
 
-
+            Point3D yTopOriginPoint = new Point3D(yCenterPoint.X, YList[0]);
+            Point3D yBottomOriginPoint = new Point3D(yCenterPoint.X, YList[YList.Count - 1]);
+            bool addAnnularPlate = false;
             if (arrangeType == PlateArrange_Type.Bottom)
             {
                 if (circleExtendValue)
                 {
                     if (YList.Count > 2)
                     {
+                        addAnnularPlate = true;
                         YList.RemoveAt(YList.Count - 1);
                         YList.RemoveAt(0);
                     }
                 }
             }
+
+
+
+            Point3D yTopPoint = new Point3D(yCenterPoint.X, YList[0]);
+            Point3D yBottomPoint = new Point3D(yCenterPoint.X, YList[YList.Count - 1]);
+
 
             double minY = YList[0]; ;
             double maxY = YList[YList.Count-1];
@@ -2482,12 +2579,44 @@ namespace DrawWork.DrawDetailServices
 
             List<Line> plateUpperList = new List<Line>();
             List<Line> plateUpperHorizontalLineList = new List<Line>();
-            List<Entity> plateEtcList = new List<Entity>();
 
-            double plateLength = circleLength * 2;
-            Point3D yTopPlatePoint = new Point3D(yCenterPoint.X, YList[0]);
-            Point3D yBottomPlatePoint = new Point3D(yCenterPoint.X, YList[YList.Count-1]);
-            plateEtcList.Add(new Line(GetSumPoint(yTopPoint, 0, 0), GetSumPoint(yBottomPlatePoint, 0, 0)));
+
+
+            List<Entity> plateEtcList = new List<Entity>();
+            double plateLength = circleExtendRadius * 2;
+            //Point3D yTopPlatePoint = new Point3D(yCenterPoint.X, YList[0]);
+            //Point3D yBottomPlatePoint = new Point3D(yCenterPoint.X, YList[YList.Count-1]);
+            Point3D yTopPlatePoint = GetSumPoint(yTopPoint, 0, 0);
+            Point3D yBottomPlatePoint = GetSumPoint(yBottomPoint,0,0);
+            plateEtcList.Add(new Line(GetSumPoint(yTopPlatePoint, 0, 0), GetSumPoint(yBottomPlatePoint, 0, 0)));
+
+            List<Entity> plateBottomEtcList = new List<Entity>();
+            if (addAnnularPlate)
+            {
+                double hiddenValue = circleRadius - circleHiddneRadius;
+                plateBottomEtcList.Add(new Line(GetSumPoint(yTopOriginPoint, 0, 0), GetSumPoint(yTopPoint, 0, -hiddenValue)));
+                plateBottomEtcList.Add(new Line(GetSumPoint(yBottomOriginPoint, 0, 0), GetSumPoint(yBottomPoint, 0, hiddenValue)));
+            }
+
+            bool DRTRoofValue = false;
+            if (tankType == TANK_TYPE.DRT)
+            {
+                if (arrangeType == PlateArrange_Type.Roof)
+                {
+                    DRTRoofService drtService = new DRTRoofService();
+                    double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+                    double DRTCurvature = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[0].DomeRadiusRatio);
+                    double DRTRoofStringLength = circleExtendRadius * 2;
+
+                    DRTRoofModel drtModel = drtService.GetRoofDRTValue_New(tankID, DRTCurvature, DRTRoofStringLength, 0, 0);
+
+                    Circle centerCircle = new Circle(Plane.XY, GetSumPoint(centerPoint, 0, 0), drtModel.centerCircleStringLength / 2);
+                }
+                DRTRoofValue = true;
+
+
+
+            }
 
             for (int i = 1; i < middleValue ; i++)
             {
@@ -2504,12 +2633,16 @@ namespace DrawWork.DrawDetailServices
                 }
 
                 Line newPlate = new Line(GetSumPoint(yTopPoint, 0, 0), GetSumPoint(yTopPoint, 0, -plateLength));
-                newPlate.Rotate(slopeAngel,Vector3D.AxisZ,GetSumPoint(yTopPoint,0,0));
+                newPlate.Rotate(slopeRadian, Vector3D.AxisZ,GetSumPoint(yTopPoint,0,0));
                 plateUpperList.Add(newPlate);
 
-                Line newPlateHLine = new Line(new Point3D(yTopPoint.X+ plateLength, eachYNext), new Point3D(yTopPoint.X-plateLength, eachYNext));
+                Line newPlateHLine = new Line(new Point3D(yTopPoint.X+ plateLength, eachYNext), 
+                                              new Point3D(yTopPoint.X-plateLength, eachYNext));
                 plateUpperHorizontalLineList.Add(newPlateHLine);
             }
+
+
+
 
 
 
@@ -2523,6 +2656,8 @@ namespace DrawWork.DrawDetailServices
             Point3D eachBottomPoint = null;
             double plateOffsetValue = 0;
             DrawCenterLineModel newCenterModel = new DrawCenterLineModel();
+
+            Point3D centerLeftPoint = GetSumPoint(yTopOriginPoint, 0, 0);
             // 겹치는 부분 자르기
             for (int i = 0; i < plateUpperList.Count ; i++)
             {
@@ -2576,10 +2711,23 @@ namespace DrawWork.DrawDetailServices
                 plateUpperNewList.Add(eachNewLine);
 
 
+                // 매우중요
                 eachHLineBeforeT = eachHLineT;
-
                 plateOffsetValue += scalePlateVerticalGap;
+
+
+                // Min X, Min
+                if (eachBottomPoint.Y <= centerLeftPoint.Y)
+                {
+                    if (eachBottomPoint.X <= centerLeftPoint.X)
+                    {
+                        centerLeftPoint = GetSumPoint(eachBottomPoint, 0, 0);
+                    }
+                }
             }
+
+
+
 
             // Left
             // Mirror
@@ -2608,6 +2756,65 @@ namespace DrawWork.DrawDetailServices
 
             }
 
+
+
+
+            // Dimension
+            List<Entity> dimLineList = new List<Entity>();
+
+            double dimSlopeRadius = 0;
+            if (arrangeType == PlateArrange_Type.Roof)
+            {
+                dimSlopeRadius = circleExtendRadius;
+            }
+            else if (arrangeType == PlateArrange_Type.Bottom)
+            {
+                dimSlopeRadius = circleRadius;
+            }
+
+            // Right
+            DrawDimensionModel dimCrossModel2 = new DrawDimensionModel()
+            {
+                position = POSITION_TYPE.RIGHT,
+                textUpper = Math.Round(circleExtendRadius *2, 1, MidpointRounding.AwayFromZero).ToString(),
+                //textLower = "(TYP.)",
+                dimHeight = 12,
+                scaleValue = scaleValue,
+            };
+            DrawEntityModel dimCross2 = drawService.Draw_DimensionDetail(ref singleModel, 
+                                                    GetSumPoint(yBottomOriginPoint, 0, 0), 
+                                                    GetSumPoint(yTopOriginPoint, 0, 0), scaleValue, dimCrossModel2, 0);
+            dimLineList.AddRange(dimCross2.GetDrawEntity());
+
+            // Slope
+            Line dimSlopeLine = new Line(GetSumPoint(yBottomPoint, 0, 0), GetSumPoint(centerLeftPoint, 0, 0));
+            double dimSlopeLineRadian = editingService.GetAngleOfLine(dimSlopeLine)- Utility.DegToRad(90);
+            double dimSlopeLineLength = dimSlopeLine.Length();
+
+            // Right
+            DrawDimensionModel dimCrossModel3 = new DrawDimensionModel()
+            {
+                position = POSITION_TYPE.LEFT,
+                textUpper = Math.Round(dimSlopeRadius, 1, MidpointRounding.AwayFromZero).ToString(),
+                //textLower = "(TYP.)",
+                dimHeight = 12,
+                scaleValue = scaleValue,
+            };
+            DrawEntityModel dimCross3 = drawService.Draw_DimensionDetail(ref singleModel,
+                                                    GetSumPoint(yBottomPoint, 0, 0),
+                                                    GetSumPoint(yBottomPoint, 0, dimSlopeLineLength), scaleValue, dimCrossModel3, 0);
+            List<Entity> dimSlopeList = new List<Entity>();
+            dimSlopeList.AddRange(dimCross3.GetDrawEntity());
+
+            dimLineList.AddRange(editingService.GetRotate(dimSlopeList,GetSumPoint(yBottomPoint,0,0),dimSlopeLineRadian));
+
+
+
+            styleService.SetLayerListEntity(ref dimLineList, layerService.LayerDimension);
+            newList.AddRange(dimLineList);
+
+
+
             styleService.SetLayerListLine(ref plateUpperNewList, layerService.LayerOutLine);
             newList.AddRange(plateUpperNewList);
             styleService.SetLayerListLine(ref PlateUpperCenterLineList, layerService.LayerCenterLine);
@@ -2618,6 +2825,9 @@ namespace DrawWork.DrawDetailServices
             styleService.SetLayerListLine(ref PlateLowerCenterLineList, layerService.LayerCenterLine);
             newList.AddRange(PlateLowerCenterLineList);
 
+
+            styleService.SetLayerListLine(ref plateBottomEtcList, layerService.LayerOutLine);
+            newList.AddRange(plateBottomEtcList);
 
             styleService.SetLayerListLine(ref plateEtcList, layerService.LayerVirtualLine);
             newList.AddRange(plateEtcList);

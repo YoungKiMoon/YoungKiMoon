@@ -86,6 +86,7 @@
     <Compile Include="CommandServices\TranslateDataModelService.cs" />
     <Compile Include="CommandServices\TranslateDataService.cs" />
     <Compile Include="Commons\CommonBase.cs" />
+    <Compile Include="Commons\CommonBaseDraw.cs" />
     <Compile Include="Commons\CommonGlobal.cs" />
     <Compile Include="Commons\CommonMethod.cs" />
     <Compile Include="Commons\SingletonData.cs" />
@@ -99,7 +100,7 @@
     <Compile Include="DrawAutomationServices\AutomationDimensionService.cs" />
     <Compile Include="DrawAutomationServices\AutomationLeaderService.cs" />
     <Compile Include="DrawBuilders\LogicBuilder.cs" />
-    <Compile Include="DrawCommonServices\DrawCommonService.cs" />
+    <Compile Include="DrawCommonServices\DrawPublicService.cs" />
     <Compile Include="DrawCustomObjectModels\CustomEntityModel.cs" />
     <Compile Include="DrawCustomObjectModels\CustomLine.cs" />
     <Compile Include="DrawCustomObjectModels\CustomRenderedHatch.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="DrawDetailServices\DrawDetailService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailShellService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailStructureService.cs" />
+    <Compile Include="DrawDetailServices\DrawDetailStructureShareService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailTempService.cs" />
     <Compile Include="DrawDetailServices\DrawDetailVisibleService.cs" />
     <Compile Include="DrawGridServices\DrawPaperGridService.cs" />
@@ -284,6 +286,10 @@
     <ProjectReference Include="..\DrawSettingLib\DrawSettingLib.csproj">
       <Project>{09af4a28-824a-4ea4-b217-98a964d4b112}</Project>
       <Name>DrawSettingLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DrawShapeLib\DrawShapeLib.csproj">
+      <Project>{ada325a6-7098-46a2-bab9-271d01333c70}</Project>
+      <Name>DrawShapeLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPDataLib\EPDataLib.csproj">
       <Project>{57C694EC-D561-4BE8-80E6-63FD2CB22EFB}</Project>

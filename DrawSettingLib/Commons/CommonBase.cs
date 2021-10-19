@@ -19,11 +19,14 @@ namespace DrawSettingLib.Commons
         RoofPlateArrangement,
         RoofPlateCuttingPlan,
         DETAIL,
+        DetailOfRoofStructure
     }
 
     public enum PAPERSUB_TYPE
     {
         NotSet = 0,
+
+        EmptyArea,
 
         HORIZONTALJOINT,
 
@@ -82,6 +85,49 @@ namespace DrawSettingLib.Commons
 
         RoofPlateCuttingPlan,
         RoofCompressionRingCuttingPlan,
+
+
+
+        //Strcuture Int
+        RoofStructureOrientation,
+        RoofStructureAssembly,
+        RafterDetail,
+        RafterSideClipDetail,
+        CenterRingDetail,
+        RafterCenterClipDetail,
+        PurlinDetail,
+        SectionAA,
+        RibPlateDetail,
+
+        //Structure Ext
+        CenterRingRafterDetail,
+        DetailB,
+        SectionCC,
+        ViewCC,
+        RafterAndReinfPadCrossDetail,
+
+        //Structure Column
+        CenterColumnDetail,
+        DetailF,
+        DrainDetail,
+        SectionBB,
+        DetailC,
+        SectionEE,
+        DetailD,
+        GirderBracketDetail,
+        Rafter,
+        InnerRafter,
+        MidRafter,
+        OutterRafter,
+
+        G1Girder,
+        DetailA,
+        BracketDetail,
+        Table1,
+        Table2,
+        Table3,
+        Table4,
+        Girder,
 
 
 

@@ -1920,8 +1920,38 @@ namespace DrawWork.DrawDetailServices
                 // Dimension
                 string leaderCourseInfoD = "   REQ'D  : " + valueService.GetOrdinalSheet(newOnePlate.Requirement);
                 DrawBMLeaderModel leaderInfoModel = new DrawBMLeaderModel() { position = POSITION_TYPE.RIGHT, upperText = leaderCourseInfoD, bmNumber = "", textAlign = POSITION_TYPE.CENTER, arrowHeadVisible = false };
-                DrawEntityModel leaderInfoList = drawService.Draw_OneLineLeader(ref singleModel, GetSumPoint(outPointList[2], plateLength, 0), leaderInfoModel, scaleValue);
+                DrawEntityModel leaderInfoList = drawService.Draw_OneLineLeader(ref singleModel, GetSumPoint(outPointList[3], plateLength, 0), leaderInfoModel, scaleValue);
                 dimLineList.AddRange(leaderInfoList.GetDrawEntity());
+
+
+                // 위 : 2
+                // 왼 : 3
+
+                // Dimension
+                DrawDimensionModel dimCrossModel = new DrawDimensionModel()
+                {
+                    position = POSITION_TYPE.TOP,
+                    textUpper = Math.Round(plateLength, 1, MidpointRounding.AwayFromZero).ToString(),
+                    //textLower = "(TYP.)",
+                    dimHeight = 12,
+                    scaleValue = scaleValue,
+                };
+                DrawEntityModel dimCross = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(outPointList[0], 0, 0), GetSumPoint(outPointList[1], 0, 0), scaleValue, dimCrossModel, 0);
+                dimLineList.AddRange(dimCross.GetDrawEntity());
+
+                // Dimension
+                DrawDimensionModel dimCrossModel2 = new DrawDimensionModel()
+                {
+                    position = POSITION_TYPE.LEFT,
+                    textUpper = Math.Round(plateWidth, 1, MidpointRounding.AwayFromZero).ToString(),
+                    //textLower = "(TYP.)",
+                    dimHeight = 12,
+                    scaleValue = scaleValue,
+                };
+                DrawEntityModel dimCross2 = drawService.Draw_DimensionDetail(ref singleModel, GetSumPoint(outPointList[3], 0, 0), GetSumPoint(outPointList[0], 0, 0), scaleValue, dimCrossModel2, 0);
+                dimLineList.AddRange(dimCross2.GetDrawEntity());
+                
+
             }
 
             styleService.SetLayerListEntity(ref plateList, layerService.LayerVirtualLine);

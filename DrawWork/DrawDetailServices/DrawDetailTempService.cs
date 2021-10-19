@@ -1484,7 +1484,7 @@ namespace DrawWork.DrawDetailServices
                 newDimModel.No = "S-" + dimCount;
                 newDimModel.W = eachShell.PlateWidth;
                 newDimModel.Thk = "t" + eachShell.Thickness;
-                newDimModel.PartNo = (dimCount - 1).ToString();
+                newDimModel.PartNo = (dimCount).ToString();
                 if (newDimModel.PartNo == "0")
                     newDimModel.PartNo = "-";
 
@@ -5724,7 +5724,7 @@ namespace DrawWork.DrawDetailServices
             double dimLeftLength = 15;
             string dimTop01 = Math.Round(plateLength, 1, MidpointRounding.AwayFromZero).ToString();
             string dimLeft01 = Math.Round(plateWidth, 1, MidpointRounding.AwayFromZero).ToString();
-            string dimReqCount = "REQ'D : " + totalPlate + " SH'T";
+            string dimReqCount = "REQ'D : " + valueService.GetOrdinalSheet(totalPlate);
             string dimLeaderStr01 = "t" + plateThk + " COMP. RING";
             string dimLeaderNumber = "9";
 
@@ -5950,7 +5950,7 @@ namespace DrawWork.DrawDetailServices
             string dimTop01 = Math.Round(plateLength, 1, MidpointRounding.AwayFromZero).ToString();
             string dimTop02 = Math.Round(topRingLength, 1, MidpointRounding.AwayFromZero).ToString();
             string dimLeft01 = Math.Round(plateWidth, 1, MidpointRounding.AwayFromZero).ToString();
-            string dimReqCount= "REQ'D : " + totalPlate + " SH'T";
+            string dimReqCount= "REQ'D : " + valueService.GetOrdinalSheet(totalPlate);
             string dimLeaderStr01 = "TOP MOST THICKENED";
             string dimLeaderStr02 = "SHELL RING";
             string dimLeaderNumber = "8";

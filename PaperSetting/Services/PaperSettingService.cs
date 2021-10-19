@@ -1,6 +1,7 @@
 ﻿using AssemblyLib.AssemblyModels;
 using DrawSettingLib.Commons;
 using DrawSettingLib.SettingModels;
+using DrawSettingLib.SettingServices;
 using DrawWork.Commons;
 using DrawWork.DrawDetailServices;
 using DrawWork.DrawGridServices;
@@ -573,6 +574,21 @@ namespace PaperSetting.Services
                     }
 
 
+                }
+
+                else if (newDescription=="DETAIL OF ROOF STRUCTURE")
+                {
+                    // 현재 CRT만 고려됨
+                    if (SingletonData.TankType == TANK_TYPE.CRT)
+                    {
+                        // Column 타입만 고려됨
+                        if (assemData.StructureCRTInput[0].SupportingType.ToLower().Contains("column"))
+                        {
+                            double columnCount=
+                            PaperService paperService = new PaperService();
+                            paperService.GetPaperModel_StructureColumnType()
+                        }
+                    }
                 }
 
 
