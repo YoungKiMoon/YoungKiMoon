@@ -107,8 +107,8 @@ namespace PaperSetting
 
             tabDetail.SelectedItem = tabletable;
 
-            testDraw.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
-            testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
+            testDraw.Unlock("UF21-7LEVP-EN12E-8L83-F1NY");
+            testModel.Unlock("UF21-7LEVP-EN12E-8L83-F1NY");
 
             testModel.Renderer = rendererType.OpenGL;
             testModel.ActiveViewport.DisplayMode = devDept.Eyeshot.displayType.Wireframe;

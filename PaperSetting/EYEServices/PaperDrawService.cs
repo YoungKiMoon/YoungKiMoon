@@ -2600,14 +2600,14 @@ namespace PaperSetting.EYEServices
             Triangle cc = new Triangle(circleCenterTopPoint, leftLineIntetr, centerLineIntetr);
 
             //HatchRegion hatchDirection = new HatchRegion((ICurve)cc );
-            List<ICurve> hatchLine = new List<ICurve>();
-            hatchLine.AddRange(new Line[] { dLine1, dLine2, dLine5 });
-            HatchRegion hatchDirection = new HatchRegion(hatchLine, Plane.XY);
-            hatchDirection.Color = Color.White;
-            hatchDirection.HatchName = "aa";
+            //List<ICurve> hatchLine = new List<ICurve>();
+            //hatchLine.AddRange(new Line[] { dLine1, dLine2, dLine5 });
+            //HatchRegion hatchDirection = new HatchRegion(hatchLine, Plane.XY);
+            //hatchDirection.Color = Color.White;
+            //hatchDirection.HatchName = "aa";
 
             //CustomRenderedHatch hhh = new CustomRenderedHatch(hatchDirection);
-            newList.Add(hatchDirection);
+            //newList.Add(hatchDirection);
             // Text
 
             double extLength = 4;

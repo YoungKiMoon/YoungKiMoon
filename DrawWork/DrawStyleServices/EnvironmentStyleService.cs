@@ -64,7 +64,7 @@ namespace DrawWork.DrawStyleServices
 
             if (singleModel != null)
             {
-                foreach (LinePattern eachLine in singleModel.LineTypes)
+                foreach (LineType eachLine in singleModel.LineTypes)
                 {
                     CustomLineModel newLine = new CustomLineModel();
                     newLine.Name = eachLine.Name;

@@ -15,9 +15,9 @@ namespace DrawShapeLib.DrawStyleServices
 
         }
 
-        public List<LinePattern> GetDefaultStyle()
+        public List<LineType> GetDefaultStyle()
         {
-            List<LinePattern> newList = new List<LinePattern>();
+            List<LineType> newList = new List<LineType>();
             newList.Add(GetPattern("CENTER2", new float[] { 7.5f, -1.25f, 1.25f, -1.25f }, "Center2"));
             newList.Add(GetPattern("PHANTOM2", new float[] { 6.25f, -1.25f, 1.25f, -1.25f, 1.25f, -1.25f }, "Phantom"));
             newList.Add(GetPattern("HIDDEN", new float[] { 2.5f, -1.25f }, "Hidden"));
@@ -26,9 +26,9 @@ namespace DrawShapeLib.DrawStyleServices
 
             return newList;
         }
-        public LinePattern GetPattern(string lineName, float[] selPattern, string selDescription)
+        public LineType GetPattern(string lineName, float[] selPattern, string selDescription)
         {
-            LinePattern newPattern = new LinePattern(lineName, selPattern, selDescription);
+            LineType newPattern = new LineType(lineName, selPattern, selDescription);
             return newPattern;
         }
 

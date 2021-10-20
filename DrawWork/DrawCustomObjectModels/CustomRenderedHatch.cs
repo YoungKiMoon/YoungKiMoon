@@ -16,63 +16,63 @@ using System.Drawing;
 
 namespace DrawWork.DrawCustomObjectModels
 {
-    public class CustomRenderedHatch : HatchRegion
-    {
-        public CustomRenderedHatch(HatchRegion another)
-              : base(another)
-        {
-        }
+    //public class CustomRenderedHatch : HatchRegion
+    //{
+    //    public CustomRenderedHatch(HatchRegion another)
+    //          : base(another)
+    //    {
+    //    }
 
-        protected override void DrawWireframe(DrawParams data)
-        {
-            Pre(data.RenderContext);
-            SetRenderedShader(data);
+    //    protected override void DrawWireframe(DrawParams data)
+    //    {
+    //        Pre(data.RenderContext);
+    //        SetRenderedShader(data);
 
-            Color col = Color;
-            if (data.Selected)
-                col = Color.Yellow;
+    //        Color col = Color;
+    //        if (data.Selected)
+    //            col = Color.Yellow;
 
-            data.RenderContext.SetColorDiffuse(col, col);
+    //        data.RenderContext.SetColorDiffuse(col, col);
 
-            Draw(data);
+    //        Draw(data);
 
-            Post(data.RenderContext);
-        }
-        public void SetRenderedShader(DrawParams data)
-        {
-            if (data.ShaderParams != null)
-            {
-                bool prevLighting = data.ShaderParams.Lighting;
-                var prevPrimitiveType = data.ShaderParams.PrimitiveType;
+    //        Post(data.RenderContext);
+    //    }
+    //    public void SetRenderedShader(DrawParams data)
+    //    {
+    //        if (data.ShaderParams != null)
+    //        {
+    //            bool prevLighting = data.ShaderParams.Lighting;
+    //            var prevPrimitiveType = data.ShaderParams.PrimitiveType;
 
-                data.ShaderParams.Lighting = true;
-                data.ShaderParams.PrimitiveType = shaderPrimitiveType.Polygon;
+    //            data.ShaderParams.Lighting = true;
+    //            data.ShaderParams.PrimitiveType = shaderPrimitiveType.Polygon;
 
-                base.SetShader(data);
+    //            base.SetShader(data);
 
-                data.ShaderParams.Lighting = prevLighting;
-                data.ShaderParams.PrimitiveType = prevPrimitiveType;
-            }
-        }
-        protected override void DrawIsocurves(DrawParams data)
-        {
-            //base.DrawIsocurves(data);
-        }
-        protected override void DrawForSelection(GfxDrawForSelectionParams data)
-        {
-            Pre(data.RenderContext);
-            base.DrawForSelection(data);
-            Post(data.RenderContext);
-        }
-        private void Post(RenderContextBase context)
-        {
-            context.PopRasterizerState();
-        }
-        private void Pre(RenderContextBase context)
-        {
-            context.PushRasterizerState();
-            context.SetState(rasterizerStateType.CCW_PolygonFill_CullFaceBack_PolygonOffset_1_1);
-        }
+    //            data.ShaderParams.Lighting = prevLighting;
+    //            data.ShaderParams.PrimitiveType = prevPrimitiveType;
+    //        }
+    //    }
+    //    protected override void DrawIsocurves(DrawParams data)
+    //    {
+    //        //base.DrawIsocurves(data);
+    //    }
+    //    protected override void DrawForSelection(GfxDrawForSelectionParams data)
+    //    {
+    //        Pre(data.RenderContext);
+    //        base.DrawForSelection(data);
+    //        Post(data.RenderContext);
+    //    }
+    //    private void Post(RenderContextBase context)
+    //    {
+    //        context.PopRasterizerState();
+    //    }
+    //    private void Pre(RenderContextBase context)
+    //    {
+    //        context.PushRasterizerState();
+    //        context.SetState(rasterizerStateType.CCW_PolygonFill_CullFaceBack_PolygonOffset_1_1);
+    //    }
 
-    }
+    //}
 }

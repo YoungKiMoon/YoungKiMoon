@@ -60,7 +60,7 @@ namespace DrawWork
         {
             InitializeComponent();
 
-            this.testModel.Unlock("UF20-LX12S-KRDSL-F0GT-FD74");
+            this.testModel.Unlock("UF21-7LEVP-EN12E-8L83-F1NY");
             this.testModel.ActionMode = devDept.Eyeshot.actionType.SelectByPick;
 
             //this.testModel.Renderer = rendererType.OpenGL;
