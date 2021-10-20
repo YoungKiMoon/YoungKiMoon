@@ -88,6 +88,15 @@
     <Compile Include="AssemblyModels\LeaderListEFRTInputModel.cs" />
     <Compile Include="AssemblyModels\LeaderListIFRTInputModel.cs" />
     <Compile Include="AssemblyModels\ModelScaleModel.cs" />
+    <Compile Include="AssemblyModels\NCenteringInternalModel.cs" />
+    <Compile Include="AssemblyModels\NCenteringPlanModel.cs" />
+    <Compile Include="AssemblyModels\NCenteringRafterDetailModel.cs" />
+    <Compile Include="AssemblyModels\NColumnBaseSupportModel.cs" />
+    <Compile Include="AssemblyModels\NColumnCenterTopSupportModel.cs" />
+    <Compile Include="AssemblyModels\NColumnGirderModel.cs" />
+    <Compile Include="AssemblyModels\NColumnRafterModel.cs" />
+    <Compile Include="AssemblyModels\NColumnSideTopSupportModel.cs" />
+    <Compile Include="AssemblyModels\NDRTRafterJointClipModel.cs" />
     <Compile Include="AssemblyModels\NotesCRTInputModel.cs" />
     <Compile Include="AssemblyModels\NotesDRTInputModel.cs" />
     <Compile Include="AssemblyModels\NotesEFRTInputModel.cs" />
@@ -95,6 +104,11 @@
     <Compile Include="AssemblyModels\NozzleFRTRoofInputModel.cs" />
     <Compile Include="AssemblyModels\NozzleRoofInputModel.cs" />
     <Compile Include="AssemblyModels\NozzleShellInputModel.cs" />
+    <Compile Include="AssemblyModels\NRafterCenteringInternalModel.cs" />
+    <Compile Include="AssemblyModels\NRafterSupportClipCenterSideModel.cs" />
+    <Compile Include="AssemblyModels\NRafterSupportClipShellSideModel.cs" />
+    <Compile Include="AssemblyModels\NStructureBoltHoleSizeModel.cs" />
+    <Compile Include="AssemblyModels\NStructureBoltTypeModel.cs" />
     <Compile Include="AssemblyModels\PipeModel.cs" />
     <Compile Include="AssemblyModels\PipeScheduleModel.cs" />
     <Compile Include="AssemblyModels\ReducerModel.cs" />
