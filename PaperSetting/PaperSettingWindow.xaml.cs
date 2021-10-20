@@ -403,7 +403,18 @@ namespace PaperSetting
             string annularStr = newTankData.BottomInput[0].AnnularPlate;
             string topAngelType = newTankData.RoofCompressionRing[0].CompressionRingType;
             string tankType = newTankData.GeneralDesignData[0].RoofType;
-            SingletonData.PaperArea.AreaList = paperAreaService.GetPaperAreaData(tankType,bottomRoofOD, annularStr, topAngelType);
+
+            string structureType = newTankData.StructureCRTInput[0].SupportingType;
+            double layerCount = newTankData.StructureCRTColumnInput.Count;
+            if (SingletonData.TankType == TANK_TYPE.DRT)
+            {
+                structureType = newTankData.StructureDRTInput[0].SupportingType;
+                layerCount = 0;
+            }
+            double roofOD = roofBottomService.GetRoofOD();
+
+            SingletonData.PaperArea.AreaList = paperAreaService.GetPaperAreaData(tankType,bottomRoofOD, annularStr, topAngelType,
+                                                                                structureType, layerCount,roofOD);
             // Virtual Design
             DrawDetailVisibleService detailService = new DrawDetailVisibleService(newTankData,testModel);
             detailService.SetDetailVisible(SingletonData.PaperArea.AreaList);

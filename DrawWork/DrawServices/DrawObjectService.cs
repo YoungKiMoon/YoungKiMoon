@@ -2948,8 +2948,11 @@ namespace DrawWork.DrawServices
                 }
             }
 
-
+            // Visible 매우 중요
             DrawEntityModel returnEntity = new DrawEntityModel();
+            if (selPaperAreaModel.Name != PAPERMAIN_TYPE.NotSet)
+                if (selPaperAreaModel.visible == false)
+                    return returnEntity;
 
             // Drawing Logic Block
             switch (drawDetailName)
@@ -3112,22 +3115,16 @@ namespace DrawWork.DrawServices
 
 
 
+                //case "roofarrange":
+                //    // 차장님 새
+                //    // returnEntity = detailService.detailRoofBottomService.GetRoofSampleArrange(ref refPoint, ref curPoint,  scaleValue);
+                //    goto case "allways";
 
 
 
-
-
-
-
-
-
-
-
-
-
-                case "roofarrange":
-                    // 차장님 새
-                    returnEntity = detailService.detailRoofBottomService.GetRoofSampleArrange(ref refPoint, ref curPoint,  scaleValue);
+                // Structure
+                case "detailstructure":
+                    returnEntity.AddDrawEntity(detailService.detailStructureService.DrawDetailRoofStructureMain(ref refPoint, ref curPoint, selModel, scaleValue));
                     goto case "allways";
 
                 // allways

@@ -156,6 +156,56 @@ namespace DrawWork.DrawDetailServices
 
 
 
+                        // Structure 
+                        case PAPERSUB_TYPE.RoofStructureAssembly:
+                        case PAPERSUB_TYPE.RoofStructureOrientation:
+                        case PAPERSUB_TYPE.RafterDetail:
+                        case PAPERSUB_TYPE.RafterSideClipDetail:
+                        case PAPERSUB_TYPE.CenterRingDetail:
+                        case PAPERSUB_TYPE.RafterCenterClipDetail:
+                        case PAPERSUB_TYPE.PurlinDetail:
+                        case PAPERSUB_TYPE.SectionAA:
+                        case PAPERSUB_TYPE.RibPlateDetail:
+                        
+                            eachArea.visible = true;
+                            break;
+
+                        // Structure Ext
+                        case PAPERSUB_TYPE.CenterRingRafterDetail:
+                        case PAPERSUB_TYPE.DetailB:
+                        case PAPERSUB_TYPE.SectionCC:
+                        case PAPERSUB_TYPE.ViewCC:
+                        case PAPERSUB_TYPE.RafterAndReinfPadCrossDetail:
+
+                            eachArea.visible = true;
+                            break;
+
+                        // Structure Column
+                        case PAPERSUB_TYPE.CenterColumnDetail:
+                        case PAPERSUB_TYPE.DetailF:
+                        case PAPERSUB_TYPE.DrainDetail:
+                        case PAPERSUB_TYPE.SectionBB:
+                        case PAPERSUB_TYPE.DetailC:
+                        case PAPERSUB_TYPE.SectionEE:
+
+                        case PAPERSUB_TYPE.DetailD:
+                        case PAPERSUB_TYPE.GirderBracketDetail:
+                        case PAPERSUB_TYPE.Rafter:
+                        case PAPERSUB_TYPE.InnerRafter:
+                        case PAPERSUB_TYPE.MidRafter:
+                        case PAPERSUB_TYPE.OutterRafter:
+
+                        case PAPERSUB_TYPE.G1Girder:
+                        case PAPERSUB_TYPE.DetailA:
+                        case PAPERSUB_TYPE.BracketDetail:
+                        case PAPERSUB_TYPE.Table1:
+                        case PAPERSUB_TYPE.Table2:
+                        case PAPERSUB_TYPE.Table3:
+                        case PAPERSUB_TYPE.Table4:
+                        case PAPERSUB_TYPE.Girder:
+                            eachArea.visible = true;
+                            break;
+
                     }
                 }
 

@@ -4345,9 +4345,9 @@ namespace DrawWork.DrawServices
 
 
                 double scaleValue = 20;
-                CDPoint refPoint = new CDPoint(1000, 1000,0);
-                CDPoint curPoint = new CDPoint(refPoint.X, refPoint.Y,0);
-                DrawEntityModel structureDraw = DDSService.DrawDetailRoofStructureAssembly_Side(ref refPoint, ref curPoint, singleModel, scaleValue);
+                Point3D refPoint = new Point3D(1000, 1000,0);
+                Point3D curPoint = new Point3D(refPoint.X, refPoint.Y,0);
+                DrawEntityModel structureDraw = DDSService.DrawDetailRoofStructureAssembly(refPoint,singleModel,scaleValue);
                 singleModel.Entities.AddRange(structureDraw.GetDrawEntity());
             }
 

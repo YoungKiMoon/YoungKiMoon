@@ -17,7 +17,8 @@ namespace DrawSettingLib.SettingServices
         }
 
 
-        public List<PaperAreaModel> GetPaperAreaData(string selTankType, double selTankOD, string selAnnularString, string selTopAngleType)
+        public List<PaperAreaModel> GetPaperAreaData(string selTankType, double selTankOD, string selAnnularString, string selTopAngleType,
+                                                     string selStructureType, double selLayerCount, double selRoofOD)
         {
 
             //double selTankOD = 23000;
@@ -32,7 +33,7 @@ namespace DrawSettingLib.SettingServices
             newAreaList.AddRange(GetPaperAreaDataEtc());
             newAreaList.AddRange(GetPaperAreaBottom01(selTankOD, selAnnular));
             newAreaList.AddRange(GetPaperAreaRoofPlate(selTankType, selTankOD, selTopAngleType));
-
+            newAreaList.AddRange(GetPaperAreaStructure(selTankType, selStructureType, selLayerCount, selRoofOD));
 
             return newAreaList;
         }
@@ -1483,7 +1484,7 @@ namespace DrawSettingLib.SettingServices
 
         #endregion
 
-
+        #region Roof
         private List<PaperAreaModel> GetPaperAreaRoofPlate(string selTankType,double selRoofOD, string selTopAngleType)
         {
             List<PaperAreaModel> newList = new List<PaperAreaModel>();
@@ -3094,10 +3095,10 @@ namespace DrawSettingLib.SettingServices
 
         #endregion
 
+        #endregion
 
 
-
-
+        
 
 
 
@@ -3113,7 +3114,7 @@ namespace DrawSettingLib.SettingServices
                     newList.AddRange(GetPaperAreaCRTStructure(selStructureType, selLayerCount));
                     break;
                 case "drt":
-                    newList.AddRange(GetPaperAreaDRTStructure(selStructureType, selLayerCount));
+                    newList.AddRange(GetPaperAreaDRTStructure(selStructureType, selRoofOD));
                     break;
 
             }
@@ -3127,16 +3128,19 @@ namespace DrawSettingLib.SettingServices
         private List<PaperAreaModel> GetPaperAreaCRTStructure(string selStructureType, double selLayerCount)
         {
             List<PaperAreaModel> newList = new List<PaperAreaModel>();
+
+
             switch (selStructureType)
             {
-                case "CenterRingInt":
+                case "Rafter only (internal)":
                     newList.AddRange(GetPaperAreaCRTCenterRingInternal());
                     break;
 
-                case "CenterRingExt":
+                case "Rafter only (external)":
                     newList.AddRange(GetPaperAreaCRTCenterRingExternal());
                     break;
-                case "Column":
+                case "Rafter w/Column":
+                case "Rafter w/Column & Girder":
                     if (selLayerCount == 1)
                     {
                         //LayerCount 1 = Assembly, Orientation 1장, Girder 없음
@@ -4739,12 +4743,12 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail212 = new PaperAreaModel();
             Detail212.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail212.Page = 3;
+            Detail212.Page = 4;
 
             Detail212.Name = PAPERMAIN_TYPE.DETAIL;
             Detail212.SubName = PAPERSUB_TYPE.Rafter;
             Detail212.TitleName = "RAFTER"; //Rafter 번호 표기 요함
-            Detail212.TitleSubName = "(ㄷ200x80x7.35x11)"; //Rafter 정보 수정요함
+            Detail212.TitleSubName = "(200x80x7.35x11)"; //Rafter 정보 수정요함
             Detail212.IsFix = false;
             Detail212.RowSpan = 1;
             Detail212.ColumnSpan = 2;
@@ -4765,15 +4769,14 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail213 = new PaperAreaModel();
             Detail213.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail213.Page = 2;
+            Detail213.Page = 4;
 
             Detail213.Name = PAPERMAIN_TYPE.DETAIL;
             Detail213.SubName = PAPERSUB_TYPE.RafterSideClipDetail;
             Detail213.TitleName = "RAFTER SIDE CLIP DETAIL";
             Detail213.TitleSubName = "(SCALE : " + Detail213.ScaleValue + ")";
-            Detail213.IsFix = true;
-            Detail213.Row = 1;
-            Detail213.Column = 3;
+            Detail213.IsFix = false;
+            
             Detail213.RowSpan = 2;
             Detail213.ColumnSpan = 2;
             Detail213.ScaleValue = 0;//Auto Scali
@@ -4794,7 +4797,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail214 = new PaperAreaModel();
             Detail214.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail214.Page = 3;
+            Detail214.Page = 4;
 
             Detail214.Name = PAPERMAIN_TYPE.DETAIL;
             Detail214.SubName = PAPERSUB_TYPE.Table2; ;
@@ -4816,7 +4819,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail220 = new PaperAreaModel();
             Detail220.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail220.Page = 4;
+            Detail220.Page = 5;
 
             Detail220.Name = PAPERMAIN_TYPE.DETAIL;
             Detail220.SubName = PAPERSUB_TYPE.SectionAA;
@@ -4839,7 +4842,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail221 = new PaperAreaModel();
             Detail221.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail221.Page = 4;
+            Detail221.Page = 5;
 
             Detail221.Name = PAPERMAIN_TYPE.DETAIL;
             Detail221.SubName = PAPERSUB_TYPE.CenterColumnDetail;
@@ -4865,7 +4868,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail222 = new PaperAreaModel();
             Detail222.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail222.Page = 4;
+            Detail222.Page = 5;
 
             Detail222.Name = PAPERMAIN_TYPE.DETAIL;
             Detail222.SubName = PAPERSUB_TYPE.DetailF;
@@ -4889,7 +4892,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail223 = new PaperAreaModel();
             Detail223.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail223.Page = 4;
+            Detail223.Page = 5;
 
             Detail223.Name = PAPERMAIN_TYPE.DETAIL;
             Detail223.SubName = PAPERSUB_TYPE.DrainDetail;
@@ -4913,7 +4916,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail224 = new PaperAreaModel();
             Detail224.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail224.Page = 4;
+            Detail224.Page = 5;
 
             Detail224.Name = PAPERMAIN_TYPE.DETAIL;
             Detail224.SubName = PAPERSUB_TYPE.SectionBB;
@@ -4937,7 +4940,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail225 = new PaperAreaModel();
             Detail225.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail225.Page = 4;
+            Detail225.Page = 5;
 
             Detail225.Name = PAPERMAIN_TYPE.DETAIL;
             Detail225.SubName = PAPERSUB_TYPE.DetailC;
@@ -4963,7 +4966,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail226 = new PaperAreaModel();
             Detail226.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail226.Page = 4;
+            Detail226.Page = 5;
 
             Detail226.Name = PAPERMAIN_TYPE.DETAIL;
             Detail226.SubName = PAPERSUB_TYPE.SectionEE;
@@ -4988,7 +4991,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail227 = new PaperAreaModel();
             Detail227.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail227.Page = 4;
+            Detail227.Page = 5;
 
             Detail227.Name = PAPERMAIN_TYPE.DETAIL;
             Detail227.SubName = PAPERSUB_TYPE.DetailD;
@@ -5013,7 +5016,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail230 = new PaperAreaModel();
             Detail230.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail230.Page = 5;
+            Detail230.Page = 6;
 
             Detail230.Name = PAPERMAIN_TYPE.DETAIL;
             Detail230.SubName = PAPERSUB_TYPE.SectionAA;
@@ -5036,7 +5039,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail231 = new PaperAreaModel();
             Detail231.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail231.Page = 5;
+            Detail231.Page = 6;
 
             Detail231.Name = PAPERMAIN_TYPE.DETAIL;
             Detail231.SubName = PAPERSUB_TYPE.CenterColumnDetail;
@@ -5062,7 +5065,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail232 = new PaperAreaModel();
             Detail232.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail232.Page = 5;
+            Detail232.Page = 6;
 
             Detail232.Name = PAPERMAIN_TYPE.DETAIL;
             Detail232.SubName = PAPERSUB_TYPE.GirderBracketDetail;
@@ -5086,7 +5089,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail234 = new PaperAreaModel();
             Detail234.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail234.Page = 5;
+            Detail234.Page = 6;
 
             Detail234.Name = PAPERMAIN_TYPE.DETAIL;
             Detail234.SubName = PAPERSUB_TYPE.DrainDetail;
@@ -5110,7 +5113,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail235 = new PaperAreaModel();
             Detail235.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail235.Page = 5;
+            Detail235.Page = 6;
 
             Detail235.Name = PAPERMAIN_TYPE.DETAIL;
             Detail235.SubName = PAPERSUB_TYPE.SectionBB;
@@ -5134,7 +5137,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail236 = new PaperAreaModel();
             Detail236.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail236.Page = 5;
+            Detail236.Page = 6;
 
             Detail236.Name = PAPERMAIN_TYPE.DETAIL;
             Detail236.SubName = PAPERSUB_TYPE.DetailC;
@@ -5160,7 +5163,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail237 = new PaperAreaModel();
             Detail237.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail237.Page = 5;
+            Detail237.Page = 6;
 
             Detail237.Name = PAPERMAIN_TYPE.DETAIL;
             Detail237.SubName = PAPERSUB_TYPE.SectionEE;
@@ -5185,7 +5188,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail238 = new PaperAreaModel();
             Detail238.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail238.Page = 5;
+            Detail238.Page = 6;
 
             Detail238.Name = PAPERMAIN_TYPE.DETAIL;
             Detail238.SubName = PAPERSUB_TYPE.DetailD;
@@ -5209,7 +5212,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail240 = new PaperAreaModel();
             Detail240.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail240.Page = 6;
+            Detail240.Page = 7;
 
             Detail240.Name = PAPERMAIN_TYPE.DETAIL;
             Detail240.SubName = PAPERSUB_TYPE.SectionAA;
@@ -5232,7 +5235,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail241 = new PaperAreaModel();
             Detail241.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail241.Page = 6;
+            Detail241.Page = 7;
 
             Detail241.Name = PAPERMAIN_TYPE.DETAIL;
             Detail241.SubName = PAPERSUB_TYPE.CenterColumnDetail;
@@ -5258,7 +5261,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail242 = new PaperAreaModel();
             Detail242.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail242.Page = 6;
+            Detail242.Page = 7;
 
             Detail242.Name = PAPERMAIN_TYPE.DETAIL;
             Detail242.SubName = PAPERSUB_TYPE.GirderBracketDetail;
@@ -5282,7 +5285,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail244 = new PaperAreaModel();
             Detail244.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail244.Page = 6;
+            Detail244.Page = 7;
 
             Detail244.Name = PAPERMAIN_TYPE.DETAIL;
             Detail244.SubName = PAPERSUB_TYPE.DrainDetail;
@@ -5306,7 +5309,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail245 = new PaperAreaModel();
             Detail245.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail245.Page = 6;
+            Detail245.Page = 7;
 
             Detail245.Name = PAPERMAIN_TYPE.DETAIL;
             Detail245.SubName = PAPERSUB_TYPE.SectionBB;
@@ -5330,7 +5333,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail246 = new PaperAreaModel();
             Detail246.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail246.Page = 6;
+            Detail246.Page = 7;
 
             Detail246.Name = PAPERMAIN_TYPE.DETAIL;
             Detail246.SubName = PAPERSUB_TYPE.DetailC;
@@ -5356,7 +5359,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail247 = new PaperAreaModel();
             Detail247.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail247.Page = 6;
+            Detail247.Page = 7;
 
             Detail247.Name = PAPERMAIN_TYPE.DETAIL;
             Detail247.SubName = PAPERSUB_TYPE.SectionEE;
@@ -5381,7 +5384,7 @@ namespace DrawSettingLib.SettingServices
 
             PaperAreaModel Detail248 = new PaperAreaModel();
             Detail248.DWGName = PAPERMAIN_TYPE.DetailOfRoofStructure;
-            Detail248.Page = 6;
+            Detail248.Page = 7;
 
             Detail248.Name = PAPERMAIN_TYPE.DETAIL;
             Detail248.SubName = PAPERSUB_TYPE.DetailD;

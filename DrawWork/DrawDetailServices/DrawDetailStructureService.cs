@@ -2,7 +2,11 @@
 using devDept.Eyeshot;
 using devDept.Eyeshot.Entities;
 using devDept.Geometry;
+using DrawSettingLib.Commons;
+using DrawSettingLib.SettingModels;
+using DrawSettingLib.SettingServices;
 using DrawShapeLib.DrawServices;
+using DrawWork.Commons;
 using DrawWork.DrawCommonServices;
 using DrawWork.DrawModels;
 using DrawWork.DrawServices;
@@ -36,6 +40,9 @@ namespace DrawWork.DrawDetailServices
 
         private DrawDetailStructureShareService drawShareService;
 
+
+        public PaperAreaService areaService;
+
         public DrawDetailStructureService(AssemblyModel selAssembly, object selModel)
         {
             singleModel = selModel as Model;
@@ -53,9 +60,234 @@ namespace DrawWork.DrawDetailServices
 
             drawComService = new DrawCommonService();
             drawShareService = new DrawDetailStructureShareService();
+
+            areaService = new PaperAreaService();
         }
 
-        public DrawEntityModel DrawDetailRoofStructureAssembly_Side(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double scaleValue)
+        public DrawEntityModel DrawDetailRoofStructureMain(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double selScaleValue)
+        {
+            DrawEntityModel drawList = new DrawEntityModel();
+
+
+            // Structure
+            foreach(PaperAreaModel eachModel in SingletonData.PaperArea.AreaList)
+            {
+                //PaperAreaModel eachModel = areaService.GetPaperAreaModel(eachModel.Name, eachModel.SubName, SingletonData.PaperArea.AreaList);
+                // RefPoint
+                Point3D referencePoint = new Point3D(eachModel.ReferencePoint.X, eachModel.ReferencePoint.Y);
+                //SingletonData.RefPoint = referencePoint;
+                // Scale
+                double scaleValue = GetStructureCustomScale(eachModel);
+
+                // Structure
+                if (eachModel.SubName== PAPERSUB_TYPE.RoofStructureOrientation)               
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.RoofStructureAssembly)
+                {
+                    drawList.AddDrawEntity(DrawDetailRoofStructureAssembly(referencePoint, selModel, scaleValue));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.RafterDetail)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.RafterSideClipDetail)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.CenterRingDetail)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.RafterCenterClipDetail)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.PurlinDetail)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.SectionAA)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.RibPlateDetail)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+
+
+                // Structure Ext
+                else if (eachModel.SubName == PAPERSUB_TYPE.CenterRingRafterDetail)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.DetailB)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.SectionCC)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.ViewCC)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.RafterAndReinfPadCrossDetail)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+
+
+                // Structure Column
+                else if (eachModel.SubName == PAPERSUB_TYPE.CenterColumnDetail)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.DetailF)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.DrainDetail)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.SectionBB)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.DetailC)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+
+
+                else if (eachModel.SubName == PAPERSUB_TYPE.SectionEE)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.DetailD)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.GirderBracketDetail)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.Rafter)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.Rafter)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+
+
+                else if (eachModel.SubName == PAPERSUB_TYPE.MidRafter)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.OutterRafter)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.G1Girder)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.DetailA)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.BracketDetail)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+
+
+                else if (eachModel.SubName == PAPERSUB_TYPE.Table1)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.Table2)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.Table3)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.Table4)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+                else if (eachModel.SubName == PAPERSUB_TYPE.Girder)
+                {
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                }
+
+            }
+
+            return drawList;
+        }
+
+        private double GetStructureCustomScale(PaperAreaModel selModel)
+        {
+            double returnValue = 1;
+
+            // Custom Scale
+            switch (selModel.SubName)
+            {
+                case PAPERSUB_TYPE.RoofStructureAssembly:
+                    //selModel.ScaleValue=1
+                    break;
+            }
+
+            // AutoScale
+            if (selModel.ScaleValue == 0)
+                selModel.ScaleValue = 1;
+            returnValue = selModel.ScaleValue;
+            return returnValue;
+        }
+
+        private DrawEntityModel DrawDetailAssembly(Point3D refPoint, object selModel, double scaleValue,PaperAreaModel selPaperModel)
+        {
+            DrawEntityModel drawList = new DrawEntityModel();
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+            List<Entity> newList = new List<Entity>();
+
+
+
+            double testRecSize = 40 * scaleValue;
+            double textHeight = 2.5 * scaleValue;
+
+            Point3D recPoint = GetSumPoint(referencePoint, -testRecSize/2, -testRecSize/2);
+            Line testLine01 = new Line(GetSumPoint(recPoint, 0, 0), GetSumPoint(recPoint, 0, testRecSize));
+            Line testLine02 = new Line(GetSumPoint(recPoint, 0, testRecSize), GetSumPoint(recPoint, testRecSize, testRecSize));
+            Line testLine03 = new Line(GetSumPoint(recPoint, testRecSize, testRecSize), GetSumPoint(recPoint, testRecSize,0));
+            Line testLine04 = new Line(GetSumPoint(recPoint, testRecSize, 0), GetSumPoint(recPoint, 0, 0));
+
+
+            Text text01 = new Text(GetSumPoint(referencePoint, 0, 0), selPaperModel.SubName.ToString(), textHeight);
+
+
+            newList.Add(testLine01);
+            newList.Add(testLine02);
+            newList.Add(testLine03);
+            newList.Add(testLine04);
+
+            newList.Add(text01);
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+            drawList.outlineList.AddRange(newList);
+
+            return drawList;
+        }
+
+        public DrawEntityModel DrawDetailRoofStructureAssembly(Point3D refPoint, object selModel, double scaleValue)
         {
             // List
             DrawEntityModel drawList = new DrawEntityModel();

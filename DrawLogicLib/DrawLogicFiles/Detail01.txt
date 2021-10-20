@@ -330,4 +330,14 @@ drawassembly name detail subname roofcompressionringcuttingplan
 refpoint xy 1400000,200000
 drawdetail name roofcompressionringcuttingplan
 
+
+
+#endregion
+
+
+#region Structure
+
+drawassembly name detail subname detailstructure
+refpoint xy 1400000,200000
+drawdetail name detailstructure
 #endregion

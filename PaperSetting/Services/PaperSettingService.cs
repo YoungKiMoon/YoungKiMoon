@@ -578,16 +578,31 @@ namespace PaperSetting.Services
 
                 else if (newDescription=="DETAIL OF ROOF STRUCTURE")
                 {
+                    List<PaperModel> eachPaperList = new List<PaperModel>();
                     // 현재 CRT만 고려됨
                     if (SingletonData.TankType == TANK_TYPE.CRT)
                     {
                         // Column 타입만 고려됨
                         if (assemData.StructureCRTInput[0].SupportingType.ToLower().Contains("column"))
                         {
-                            double columnCount=
+                            double columnCount = assemData.StructureCRTColumnInput.Count;
                             PaperService paperService = new PaperService();
-                            paperService.GetPaperModel_StructureColumnType()
+                            eachPaperList= paperService.GetPaperModel_StructureColumnType(columnCount);
                         }
+                    }
+
+                    foreach(PaperModel eachModel in eachPaperList)
+                    {
+                        PaperDwgModel newPaper = new PaperDwgModel();
+                        newPaper.Name = eachModel.DWGName;
+                        newPaper.Page = eachModel.Page;
+
+                        newPaper.SheetSize = GetSizeModel(PAPERFORMAT_TYPE.A1_ISO);
+                        newPaper.RowDef = eachModel.RowDef;
+                        newPaper.ColumnDef = eachModel.ColumnDef;
+                        // Basic
+                        newPaper.Basic = new PaperBasicModel(true, etcIndex.ToString("00"), newDescription, "VP-210424-MF-" + etcIndex.ToString("000"), "AS BUILT");
+                        newList.Add(newPaper);
                     }
                 }
 

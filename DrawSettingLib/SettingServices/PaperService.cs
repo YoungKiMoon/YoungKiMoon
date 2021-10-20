@@ -29,7 +29,7 @@ namespace DrawSettingLib.SettingServices
             {
                 newList.AddRange(GetPaperModel_StructureColumn2());
             }
-            else if (selColumnCount == 3 && selColumnCount == 4)
+            else if (selColumnCount == 3 || selColumnCount == 4)
             {
                 newList.AddRange(GetPaperModel_StructureColumn34());
             }

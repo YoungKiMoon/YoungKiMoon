@@ -614,11 +614,10 @@ namespace DrawWork.CommandServices
                 case "drawdetail":
 
                     PaperAreaModel selPaperAreaModel = areaService.GetPaperAreaModel(currentDrawAssy.mainName, currentDrawAssy.subName, SingletonData.PaperArea.AreaList);
-                    if (selPaperAreaModel.visible)
-                    {
-                        DrawEntityModel newLogicDetail = drawObject.DoBlockDetail(eachCmd, ref refPoint, ref curPoint, singleModel, scaleData.Value, selPaperAreaModel);
-                        drawEntity.AddDrawEntity(newLogicDetail);
-                    }
+                    
+                    DrawEntityModel newLogicDetail = drawObject.DoBlockDetail(eachCmd, ref refPoint, ref curPoint, singleModel, scaleData.Value, selPaperAreaModel);
+                    drawEntity.AddDrawEntity(newLogicDetail);
+
                     goto case "allways";
 
                     
