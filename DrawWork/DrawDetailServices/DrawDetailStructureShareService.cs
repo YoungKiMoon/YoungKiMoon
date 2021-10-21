@@ -1,10 +1,15 @@
-﻿using devDept.Eyeshot.Entities;
+﻿using AssemblyLib.AssemblyModels;
+using devDept.Eyeshot;
+using devDept.Eyeshot.Entities;
 using devDept.Geometry;
+using DrawSettingLib.SettingServices;
 using DrawShapeLib.DrawServices;
 using DrawWork.Commons;
+using DrawWork.DrawCommonServices;
 using DrawWork.DrawModels;
 using DrawWork.DrawServices;
 using DrawWork.DrawStyleServices;
+using DrawWork.ValueServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,25 +21,52 @@ namespace DrawWork.DrawDetailServices
     public class DrawDetailStructureShareService
     {
 
+        private Model singleModel;
+        private AssemblyModel assemblyData;
+
+        private DrawPublicService drawCommon;
+
+        private ValueService valueService;
         private StyleFunctionService styleService;
         private LayerStyleService layerService;
 
-
+        private DrawEditingService editingService;
         private DrawShapeServices shapeService;
 
 
-        // Jang
         private DrawCommonService drawComService;
+        private DrawReferenceBlockService refBlockService;
+        private DrawWorkingPointService workingPointService;
 
 
-        public DrawDetailStructureShareService()
+        public PaperAreaService areaService;
+
+
+
+
+
+        public DrawDetailStructureShareService(AssemblyModel selAssembly, object selModel)
         {
+            singleModel = selModel as Model;
+            assemblyData = selAssembly;
+
+            drawCommon = new DrawPublicService(selAssembly);
+            refBlockService = new DrawReferenceBlockService(selAssembly);
+            workingPointService = new DrawWorkingPointService(selAssembly);
+
+            valueService = new ValueService();
             styleService = new StyleFunctionService();
             layerService = new LayerStyleService();
 
+
+            editingService = new DrawEditingService();
             shapeService = new DrawShapeServices();
 
             drawComService = new DrawCommonService();
+
+
+            areaService = new PaperAreaService();
+
         }
 
 
@@ -389,48 +421,42 @@ namespace DrawWork.DrawDetailServices
 
 
 
-        public List<Entity> DrawDetailRafter(Point3D refPoint, double scaleValue, double rafterLength, double rotateValue )
+        public DrawEntityModel Rafter(Point3D refPoint, object selModel, double scaleValue, NColumnRafterModel padModel)
         {
+            DrawEntityModel drawList = new DrawEntityModel();
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+            List<Entity> newList = new List<Entity>();
 
-            List<Entity> outlinesList = new List<Entity>();
 
-
-            // 좌측 하단
-            Point3D workingPoint = GetSumPoint(refPoint, 0, 0);
-
-            //ABC
-            double A = rafterLength; //rafter Lenth
-            double A1 = 70;  //woking Point to rafter : NOT USED
-            double B = 180; //rafter Width
-            double B1 = 30;  //centering Point to rafter : NOT USED
-            double C = 60;  //rafter to hole : NOT USED
-            double C1 = 70;  //hole to hole length gap
-            double D = 80;  //hole to hole width gap
-            double D1 = 40;  //workingPoint부터 rafter까지의 x축 거리
-            double E = 0;   //SHELL ID/4 : NOT USED
+            double A = valueService.GetDoubleValue(padModel.A);    //rafter Lenth
+            double A1 = valueService.GetDoubleValue(padModel.A1);   //woking Point to rafter : NOT USED
+            double B = valueService.GetDoubleValue(padModel.B);    //rafter Width
+            double B1 = valueService.GetDoubleValue(padModel.B1);   //workingPoint부터 rafter까지의 x축 거리
+            double C = valueService.GetDoubleValue(padModel.C);    //centering Point to rafter : NOT USED  //rafter to hole : NOT USED
+            double C1 = valueService.GetDoubleValue(padModel.C1);   //hole to hole length gap
+            double D = valueService.GetDoubleValue(padModel.D);    //hole to hole width gap
+            double E = valueService.GetDoubleValue(padModel.E);    //SHELL ID/4 : NOT USED
 
             double slotholeHT = 23.0;
             double slotholeWD = 45.0;
 
-
-            //FIXED??
-            double clipAngle = rotateValue;
-
-
             //AEMAE
-            double t2 = 6;   //Thk of doubleLine
-            
+            double t = 6;   //Thk of doubleLine
+            double clipAngle = Utility.DegToRad(10);
+
+
+            Point3D workingPoint = GetSumPoint(refPoint, 0, 0);
 
             //rafter And Holes
-            List<Line> rafter = GetDoubleLineRectangle(GetSumPoint(workingPoint, 0, 0), B, A, t2, RECTANGLUNVIEW.NONE);
+            List<Line> rafter = GetDoubleLineRectangle(GetSumPoint(workingPoint, 0, 0), B, A, t, RECTANGLUNVIEW.NONE);
 
             //Left
-            List<Entity> leftSlotHoles = GetSlotHoles(GetSumPoint(rafter[3].MidPoint, D1 + C1 / 2, 0), slotholeHT / 2, D, slotholeWD / 2, C1);
-            List<Entity> leftHoles = GetHoles(GetSumPoint(rafter[3].MidPoint, D1 + C1 / 2, 0), slotholeHT / 2, C1, D);
+            List<Entity> leftSlotHoles = GetSlotHoles(GetSumPoint(rafter[3].MidPoint, B1 + C1 / 2, 0), slotholeHT / 2, D, slotholeWD / 2, C1);
+            List<Entity> leftHoles = GetHoles(GetSumPoint(rafter[3].MidPoint, B1 + C1 / 2, 0), slotholeHT / 2, C1, D);
 
             //Right
-            List<Entity> rightSlotHoles = GetSlotHoles(GetSumPoint(rafter[1].MidPoint, -(D1 + C1 / 2), 0), slotholeHT / 2, D, slotholeWD / 2, C1);
-            List<Entity> rightHoles = GetHoles(GetSumPoint(rafter[1].MidPoint, -(D1 + C1 / 2), 0), slotholeHT / 2, C1, D);
+            List<Entity> rightSlotHoles = GetSlotHoles(GetSumPoint(rafter[1].MidPoint, -(B1 + C1 / 2), 0), slotholeHT / 2, D, slotholeWD / 2, C1);
+            List<Entity> rightHoles = GetHoles(GetSumPoint(rafter[1].MidPoint, -(B1 + C1 / 2), 0), slotholeHT / 2, C1, D);
 
 
             List<Entity> rafterNslot = new List<Entity>();
@@ -444,17 +470,16 @@ namespace DrawWork.DrawDetailServices
                 //rater의 회전기준점 : 라프타를 구성하는 사각형의 좌측 상단
                 eachEntity.Rotate(clipAngle, Vector3D.AxisZ, GetSumPoint(rafter[2].StartPoint, 0, 0));
             }
-            outlinesList.AddRange(rafterNslot);
+            drawList.outlineList.AddRange(rafterNslot);
 
-            outlinesList.AddRange(new Entity[] {
+            drawList.outlineList.AddRange(new Entity[] {
 
 
             });
 
 
             //styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
-            return outlinesList;
-
+            return drawList;
         }
 
 
@@ -487,9 +512,9 @@ namespace DrawWork.DrawDetailServices
 
             double t = 6;   //현재 있는 값은 t2, t3등도 전부 동일함
 
-
+            
             //FIXED??
-            double roofSlope = Utility.DegToRad(10); //Angle의 경우 나중에 rad값으로 받기로 함!!
+            double roofSlope = Utility.DegToRad(A); //Angle의 경우 나중에 rad값으로 받기로 함!!
             double value_byD1 = D1 * Math.Tan(roofSlope); //for slothole info : workingPoint부터 rafter까지의 y축 거리
 
             //AEMAE
@@ -543,12 +568,12 @@ namespace DrawWork.DrawDetailServices
             Circle forClipDistance = new Circle(rafter[2].StartPoint, A1);
             Point3D[] clipSlideStartPoint = rafter[3].IntersectWith(forClipDistance);
             Circle underHole = (Circle)holes[0];
-            Line clipRightGuideLine = new Line(GetSumPoint(underHole.Center, E1, 0), GetSumPoint(underHole.Center, E1, 500));
+            Line clipRightGuideLine = new Line(GetSumPoint(underHole.Center, E1, -50), GetSumPoint(underHole.Center, E1, 500));
 
             //clip Line
             Line clipTopLinkLine = new Line(GetSumPoint(workingPoint, t, -B1 - C1), GetSumPoint(clipSlideStartPoint[0], 0, 0));
             //Using intersect//
-            Line clipTopslideLineGuide = new Line(GetSumPoint(clipTopLinkLine.EndPoint, 0, 0), GetSumPoint(clipTopLinkLine.EndPoint, 500, 0));
+            Line clipTopslideLineGuide = new Line(GetSumPoint(clipTopLinkLine.EndPoint, -500, 0), GetSumPoint(clipTopLinkLine.EndPoint, 500, 0));
             clipTopslideLineGuide.Rotate(roofSlope, Vector3D.AxisZ, clipTopLinkLine.EndPoint);
             Point3D[] clipSlideEndPoint = clipTopslideLineGuide.IntersectWith(clipRightGuideLine);
 

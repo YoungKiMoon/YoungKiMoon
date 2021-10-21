@@ -37,7 +37,8 @@ namespace DrawWork.DrawStyleServices
 
             // Model
             newList.Add(GetLayer(LayerCenterLine, Color.Red, "CENTER2", 0.25f, true));
-            newList.Add(GetLayer(LayerVirtualLine, Color.FromArgb(0,128,0), "PHANTOM2", 0.25f, true));
+            newList.Add(GetLayer(LayerVirtualLine, Color.FromArgb(63,127,79), "PHANTOM2", 0.25f, true)); //2021-10-21
+            //newList.Add(GetLayer(LayerVirtualLine, Color.FromArgb(0, 128, 0), "PHANTOM2", 0.25f, true));
             newList.Add(GetLayer(LayerOutLine, Color.Yellow, "CONTINU", 0.25f, true));
             //newList.Add(GetLayer(LayerHiddenLine, Color.FromArgb(135, 206, 235), "HIDDEN", 0.25f, true));
             newList.Add(GetLayer(LayerHiddenLine, Color.FromArgb(0, 255, 255), "HIDDEN", 0.25f, true));

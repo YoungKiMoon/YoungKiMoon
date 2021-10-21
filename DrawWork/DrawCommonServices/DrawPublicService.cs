@@ -341,10 +341,15 @@ namespace DrawWork.DrawCommonServices
             }
 
             TopAngle_Type topAngle = GetCurrentTopAngleType();
-            if (topAngle == TopAngle_Type.i)
+            if (topAngle == TopAngle_Type.b)
             {
                 int maxCount = newList.Count-1;
                 newList[maxCount] -= TopAnglebTypeLastCourseAjdHeight();
+            }
+            if (topAngle == TopAngle_Type.k)
+            {
+                if (newList.Count > 0)
+                    newList.RemoveAt(newList.Count - 1);
             }
 
             return newList;
@@ -357,7 +362,12 @@ namespace DrawWork.DrawCommonServices
             {
                 newList.Add(valueService.GetDoubleValue(eachCourse.Thickness));
             }
-
+            TopAngle_Type topAngle = GetCurrentTopAngleType();
+            if (topAngle == TopAngle_Type.k)
+            {
+                if (newList.Count > 0)
+                    newList.RemoveAt(newList.Count - 1);
+            }
             return newList;
         }
         #endregion

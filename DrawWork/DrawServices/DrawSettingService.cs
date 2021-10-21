@@ -4338,7 +4338,7 @@ namespace DrawWork.DrawServices
                 AssemblyDataService assemblyService = new AssemblyDataService();
                 //AssemblyModel newTankData = assemblyService.CreateMappingData(ExcelFile.Text);
 
-                string excelFile = @"C:\Users\tree\Desktop\CAD\TABAS\20211017 제출\19101.xlsm";
+                string excelFile = @"C:\Users\tree\Desktop\CAD\TABAS\20211025 제출\19101_CRT.xlsm";
                 // New Excel Read
                 AssemblyModel newTankData = assemblyService.CreateMappingDataNew(excelFile);
                 DrawDetailStructureService DDSService = new DrawDetailStructureService(newTankData, singleModel);

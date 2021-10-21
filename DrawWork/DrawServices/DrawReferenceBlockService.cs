@@ -203,7 +203,7 @@ namespace DrawWork.DrawServices
             return customBlockList.ToArray();
         }
 
-        public Entity[] DrawReference_CompressionRingI(CDPoint selPoint1, ref CDPoint refPoint)
+        public Entity[] DrawReference_CompressionRingI(CDPoint selPoint1)
         {
             int firstIndex = 0;
             double A = valueService.GetDoubleValue(assemblyData.RoofCompressionRing[firstIndex].OutsideProjectionA);

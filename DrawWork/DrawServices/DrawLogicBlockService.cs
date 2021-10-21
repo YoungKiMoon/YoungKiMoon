@@ -134,7 +134,7 @@ namespace DrawWork.DrawServices
                                               -valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness),
 
                                                valueService.GetDoubleValue(selSizeTankHeight));
-                    angleEntityAll.AddRange(refBlockService.DrawReference_CompressionRingI(drawPoint, ref refPoint));
+                    angleEntityAll.AddRange(refBlockService.DrawReference_CompressionRingI(drawPoint));
                     break;
 
                 case "Detail k":

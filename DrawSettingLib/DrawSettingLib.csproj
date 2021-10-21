@@ -52,14 +52,31 @@
     <Compile Include="SettingModels\PaperAreaModel.cs" />
     <Compile Include="SettingModels\PaperModel.cs" />
     <Compile Include="SettingModels\PointModel.cs" />
+    <Compile Include="SettingModels\StructureModel.cs" />
+    <Compile Include="SettingModels\StructureRafterModel.cs" />
     <Compile Include="SettingModels\SizeModel.cs" />
+    <Compile Include="SettingModels\StructureClipModel.cs" />
+    <Compile Include="SettingModels\StructureGirderModel.cs" />
+    <Compile Include="SettingModels\StructureLayerModel.cs" />
+    <Compile Include="SettingModels\StructureColumnModel.cs" />
     <Compile Include="SettingServices\ModelAreaService.cs" />
     <Compile Include="SettingServices\PaperAreaService.cs" />
     <Compile Include="SettingServices\PaperService.cs" />
+    <Compile Include="SettingServices\StructureService.cs" />
     <Compile Include="Utils\Notifier.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AssemblyLib\AssemblyLib.csproj">
+      <Project>{0e54a176-e260-4436-ad95-d3a4f5c10b10}</Project>
+      <Name>AssemblyLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DrawCalculationLib\DrawCalculationLib.csproj">
+      <Project>{cc03d061-5327-4417-941e-64338799beb8}</Project>
+      <Name>DrawCalculationLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

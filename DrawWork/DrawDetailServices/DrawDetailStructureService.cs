@@ -38,11 +38,13 @@ namespace DrawWork.DrawDetailServices
 
         private DrawCommonService drawComService;
         private DrawReferenceBlockService refBlockService;
+        private DrawWorkingPointService workingPointService;
 
         private DrawDetailStructureShareService drawShareService;
 
 
         public PaperAreaService areaService;
+
 
         public DrawDetailStructureService(AssemblyModel selAssembly, object selModel)
         {
@@ -51,6 +53,7 @@ namespace DrawWork.DrawDetailServices
 
             drawCommon = new DrawPublicService(selAssembly);
             refBlockService = new DrawReferenceBlockService(selAssembly);
+            workingPointService = new DrawWorkingPointService(selAssembly);
 
             valueService = new ValueService();
             styleService = new StyleFunctionService();
@@ -61,7 +64,7 @@ namespace DrawWork.DrawDetailServices
             shapeService = new DrawShapeServices();
 
             drawComService = new DrawCommonService();
-            drawShareService = new DrawDetailStructureShareService();
+            drawShareService = new DrawDetailStructureShareService(selAssembly,selModel) ;
 
             areaService = new PaperAreaService();
         }
@@ -305,8 +308,11 @@ namespace DrawWork.DrawDetailServices
             double roofSlope= valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
             double bottomSlope = valueService.GetDegreeOfSlope(assemblyData.BottomInput[0].BottomPlateSlope);
 
+            List<Entity> topAngleList = new List<Entity>();
             List<Entity> shellList = new List<Entity>();
             List<Entity> bottomList = new List<Entity>();
+            List<Entity> roofList = new List<Entity>();
+
             List<Entity> centerLineList = new List<Entity>();
 
 
@@ -338,9 +344,13 @@ namespace DrawWork.DrawDetailServices
 
             // Shell
             shellList.AddRange(GetShellAssembly(GetSumPoint(referencePoint,0,0))) ;
-            // Bottom : Annular 적용
+            // Bottom
             bottomList.AddRange(GetBottomAssembly(GetSumPoint(referencePoint, 0, 0)));
+            // TopAngle
+            topAngleList.AddRange(GetTopAngleAssembly(GetSumPoint(referencePoint, 0, 0)));
             // Roof
+            roofList.AddRange(GetRoofAssembly(GetSumPoint(referencePoint, 0, 0)));
+
 
             // 
             // 1
@@ -353,12 +363,16 @@ namespace DrawWork.DrawDetailServices
 
             etcList.AddRange(drawShareService.DrawDetailRafterSideClipDetail(GetSumPoint(referencePoint, 0, tankHeight), 1));
 
-            etcList.AddRange(drawShareService.DrawDetailRafter(GetSumPoint(referencePoint, 0, tankHeight), scaleValue, tankIDHalf, roofSlope));
+            //etcList.AddRange(drawShareService.Rafter(GetSumPoint(referencePoint, 0, tankHeight), scaleValue,));
+
 
 
 
 
             drawList.outlineList.AddRange(etcList);
+
+            styleService.SetLayerListEntity(ref topAngleList, layerService.LayerVirtualLine);
+            drawList.outlineList.AddRange(topAngleList);
 
             styleService.SetLayerListEntity(ref shellList, layerService.LayerVirtualLine);
             drawList.outlineList.AddRange(shellList);
@@ -366,13 +380,16 @@ namespace DrawWork.DrawDetailServices
             styleService.SetLayerListEntity(ref bottomList, layerService.LayerVirtualLine);
             drawList.outlineList.AddRange(bottomList);
 
+            styleService.SetLayerListEntity(ref roofList, layerService.LayerVirtualLine);
+            drawList.outlineList.AddRange(roofList);
+
             styleService.SetLayerListEntity(ref centerLineList, layerService.LayerCenterLine);
             drawList.outlineList.AddRange(centerLineList);
 
             return drawList;
         }
 
-        public List<Entity> GetAngleAssembly(Point3D refPoint)
+        public List<Entity> GetTopAngleAssembly(Point3D refPoint)
         {
             List<Entity> newList = new List<Entity>();
             List<Entity> leftList = new List<Entity>();
@@ -380,39 +397,44 @@ namespace DrawWork.DrawDetailServices
             Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
 
 
+            Point3D anglePoint = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftRoofDown, referencePoint);
+
             string selAngleType = assemblyData.RoofCompressionRing[0].CompressionRingType;
             string selAngleSize = assemblyData.RoofCompressionRing[0].AngleSize;
-
             AngleSizeModel selAngleModel = refBlockService.GetAngleSizeModel(selAngleSize);
 
+            int maxCourse = assemblyData.ShellOutput.Count - 1;
+            double lastShellCourseThk = -valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness);
 
-            double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
+            TopAngle_Type currentAngle = drawCommon.GetCurrentTopAngleType();
+            switch (currentAngle)
+            {
+                case TopAngle_Type.b:
+                case TopAngle_Type.d:
+                case TopAngle_Type.e:
+                    leftList.AddRange(refBlockService.DrawReference_Angle(GetSumCDPoint(anglePoint, 0, 0), selAngleModel));
+                    break;
+                case TopAngle_Type.i:
+                    anglePoint = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftShellTop, referencePoint);
+                    leftList.AddRange(refBlockService.DrawReference_CompressionRingI(GetSumCDPoint(anglePoint,lastShellCourseThk,0)));
+                    break;
+                case TopAngle_Type.k:
+                    anglePoint = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftShellTop, referencePoint);
+                    leftList.AddRange(refBlockService.DrawReference_CompressionRingK(GetSumCDPoint(anglePoint, 0, 0)));
+                    break;
+                
+
+            }
+
+
+            
+
+
             double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
             double tankIDHalf = tankID / 2;
-
             Point3D mirrorPoint = GetSumPoint(referencePoint, tankIDHalf, 0);
 
             // 좌측 하단이 기준
-
-
-            List<double> shellWidth = drawCommon.GetShellCourseWidthForDrawing();
-            List<double> shellThickness = drawCommon.GetShellCourseThickneeForDrawing();
-
-            List<Point3D> outPointList = new List<Point3D>();
-            Point3D shellCurrentPoint = GetSumPoint(referencePoint, 0, 0);
-            for (int i = 0; i < shellWidth.Count; i++)
-            {
-                double eachWidth = shellWidth[i];
-                double eachThickness = shellThickness[i];
-                leftList.AddRange(shapeService.GetRectangle(out outPointList, GetSumPoint(shellCurrentPoint, 0, 0), eachThickness, eachWidth, 0, 0, 2));
-                shellCurrentPoint = GetSumPoint(outPointList[1], 0, 0);
-            }
-
-            Line leftID = new Line(GetSumPoint(referencePoint, 0, 0), GetSumPoint(refPoint, 0, tankHeight));
-
-
-            leftList.Add(leftID);
-
 
             newList.AddRange(leftList);
             newList.AddRange(editingService.GetMirrorEntity(Plane.YZ, leftList, GetSumPoint(mirrorPoint, 0, 0), true));
@@ -433,26 +455,22 @@ namespace DrawWork.DrawDetailServices
 
             Point3D mirrorPoint = GetSumPoint(referencePoint, tankIDHalf, 0);
 
-            // 좌측 하단이 기준
+
+            Point3D leftRoofDown = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftRoofDown, referencePoint);
+            Point3D leftRoofUp = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftRoofUp, referencePoint);
+            Point3D centerRoofDown = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointCenterTopUp, referencePoint);
+            Point3D centerRoofUp = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointCenterTopDown, referencePoint);
 
 
-            List<double> shellWidth = drawCommon.GetShellCourseWidthForDrawing();
-            List<double> shellThickness = drawCommon.GetShellCourseThickneeForDrawing();
-
-            List<Point3D> outPointList = new List<Point3D>();
-            Point3D shellCurrentPoint = GetSumPoint(referencePoint, 0, 0);
-            for (int i = 0; i < shellWidth.Count; i++)
-            {
-                double eachWidth = shellWidth[i];
-                double eachThickness = shellThickness[i];
-                leftList.AddRange(shapeService.GetRectangle(out outPointList, GetSumPoint(shellCurrentPoint, 0, 0), eachThickness, eachWidth, 0, 0, 2));
-                shellCurrentPoint = GetSumPoint(outPointList[1], 0, 0);
-            }
-
-            Line leftID = new Line(GetSumPoint(referencePoint, 0, 0), GetSumPoint(refPoint, 0, tankHeight));
+            Line plateLowerLine = new Line(GetSumPoint(leftRoofDown, 0, 0), GetSumPoint(centerRoofDown, 0, 0));
+            Line plateLeftLine = new Line(GetSumPoint(leftRoofDown, 0, 0), GetSumPoint(leftRoofUp, 0, 0));
+            Line plateUpperLine = new Line(GetSumPoint(leftRoofUp, 0, 0), GetSumPoint(centerRoofUp, 0, 0));
 
 
-            leftList.Add(leftID);
+            leftList.Add(plateLowerLine);
+            leftList.Add(plateLeftLine);
+            leftList.Add(plateUpperLine);
+
 
 
             newList.AddRange(leftList);
@@ -569,10 +587,47 @@ namespace DrawWork.DrawDetailServices
                 shellCurrentPoint = GetSumPoint(outPointList[1],0,0);
             }
 
-            Line leftID = new Line(GetSumPoint(referencePoint, 0, 0), GetSumPoint(refPoint, 0, tankHeight));
+            //Line leftID = new Line(GetSumPoint(referencePoint, 0, 0), GetSumPoint(refPoint, 0, tankHeight));
+            //leftList.Add(leftID);
 
 
-            leftList.Add(leftID);
+            newList.AddRange(leftList);
+            newList.AddRange(editingService.GetMirrorEntity(Plane.YZ, leftList, GetSumPoint(mirrorPoint, 0, 0), true));
+
+            return newList;
+        }
+
+        public List<Entity> GetStructureRafterAssembly(Point3D refPoint,double scaleValue)
+        {
+            List<Entity> newList = new List<Entity>();
+            List<Entity> leftList = new List<Entity>();
+
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+            double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double tankIDHalf = tankID / 2;
+
+            Point3D mirrorPoint = GetSumPoint(referencePoint, tankIDHalf, 0);
+
+            NColumnRafterModel selRafter = new NColumnRafterModel();
+            //leftList.AddRange(drawShareService.Rafter(GetSumPoint(referencePoint, 0, tankHeight), scaleValue,selRa));
+
+
+            Point3D leftRoofDown = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftRoofDown, referencePoint);
+            Point3D leftRoofUp = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftRoofUp, referencePoint);
+            Point3D centerRoofDown = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointCenterTopUp, referencePoint);
+            Point3D centerRoofUp = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointCenterTopDown, referencePoint);
+
+
+            Line plateLowerLine = new Line(GetSumPoint(leftRoofDown, 0, 0), GetSumPoint(centerRoofDown, 0, 0));
+            Line plateLeftLine = new Line(GetSumPoint(leftRoofDown, 0, 0), GetSumPoint(leftRoofUp, 0, 0));
+            Line plateUpperLine = new Line(GetSumPoint(leftRoofUp, 0, 0), GetSumPoint(centerRoofUp, 0, 0));
+
+
+            leftList.Add(plateLowerLine);
+            leftList.Add(plateLeftLine);
+            leftList.Add(plateUpperLine);
+
 
 
             newList.AddRange(leftList);
@@ -582,13 +637,37 @@ namespace DrawWork.DrawDetailServices
         }
 
 
+
+        private NColumnRafterModel GetRafterModel(string rafterSize)
+        {
+            NColumnRafterModel newModel = new NColumnRafterModel();
+            foreach(NColumnRafterModel eachModel in assemblyData.NColumnRafterList)
+            {
+                if (eachModel.Size == rafterSize)
+                {
+                    newModel = eachModel;
+                }
+            }
+            return newModel;
+        }
+
+
         private Point3D GetSumPoint(Point3D selPoint1, double X, double Y, double Z = 0)
         {
             return new Point3D(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
         }
+        private CDPoint GetSumCDPoint(Point3D selPoint1, double X, double Y, double Z = 0)
+        {
+            return new CDPoint(selPoint1.X + X, selPoint1.Y + Y, selPoint1.Z + Z);
+        }
 
 
 
+
+
+        #region Lee
+
+        #endregion
 
 
 

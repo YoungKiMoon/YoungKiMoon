@@ -51,6 +51,8 @@ namespace DrawWork.DrawServices
             DRTWorkingData = null;
         }
 
+
+        // Text 용
         public CDPoint WorkingPoint(string selPoint, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             return WorkingPointOrigin(CommonMethod.WorkingPointToEnum(selPoint), 0, ref refPoint, ref curPoint);
@@ -60,6 +62,8 @@ namespace DrawWork.DrawServices
             return WorkingPointOrigin(CommonMethod.WorkingPointToEnum(selPoint), valueService.GetDoubleValue(selPointValue), ref refPoint, ref curPoint);
         }
 
+
+        // CDPoint 용
         public CDPoint WorkingPoint(WORKINGPOINT_TYPE selPoint, ref CDPoint refPoint, ref CDPoint curPoint)
         {
             return WorkingPointOrigin(selPoint, 0, ref refPoint, ref curPoint);
@@ -380,6 +384,24 @@ namespace DrawWork.DrawServices
             }
 
             return WPPoint;
+        }
+
+        // Point3D 전용
+        public Point3D WorkingPointNew(WORKINGPOINT_TYPE selPoint, Point3D refPoint)
+        {
+            CDPoint refPointTemp = new CDPoint(refPoint.X, refPoint.Y, 0);
+            CDPoint curPointTemp = new CDPoint(refPoint.X, refPoint.Y, 0);
+            SingletonData.RefPoint = refPointTemp;
+            CDPoint returnPoint = WorkingPointOrigin(selPoint, 0, ref refPointTemp, ref curPointTemp);
+            return new Point3D(returnPoint.X, returnPoint.Y);
+        }
+
+        public Point3D WorkingPointNew(WORKINGPOINT_TYPE selPoint, double selPointValue, Point3D refPoint)
+        {
+            CDPoint refPointTemp = new CDPoint(refPoint.X, refPoint.Y,0);
+            CDPoint curPointTemp = new CDPoint(refPoint.X, refPoint.Y,0);
+            CDPoint returnPoint = WorkingPointOrigin(selPoint, selPointValue, ref refPointTemp, ref curPointTemp);
+            return new Point3D(returnPoint.X, returnPoint.Y);
         }
 
 
