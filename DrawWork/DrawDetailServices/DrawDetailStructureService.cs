@@ -37,6 +37,7 @@ namespace DrawWork.DrawDetailServices
 
 
         private DrawCommonService drawComService;
+        private DrawReferenceBlockService refBlockService;
 
         private DrawDetailStructureShareService drawShareService;
 
@@ -49,6 +50,7 @@ namespace DrawWork.DrawDetailServices
             assemblyData = selAssembly;
 
             drawCommon = new DrawPublicService(selAssembly);
+            refBlockService = new DrawReferenceBlockService(selAssembly);
 
             valueService = new ValueService();
             styleService = new StyleFunctionService();
@@ -368,6 +370,95 @@ namespace DrawWork.DrawDetailServices
             drawList.outlineList.AddRange(centerLineList);
 
             return drawList;
+        }
+
+        public List<Entity> GetAngleAssembly(Point3D refPoint)
+        {
+            List<Entity> newList = new List<Entity>();
+            List<Entity> leftList = new List<Entity>();
+
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+
+
+            string selAngleType = assemblyData.RoofCompressionRing[0].CompressionRingType;
+            string selAngleSize = assemblyData.RoofCompressionRing[0].AngleSize;
+
+            AngleSizeModel selAngleModel = refBlockService.GetAngleSizeModel(selAngleSize);
+
+
+            double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double tankIDHalf = tankID / 2;
+
+            Point3D mirrorPoint = GetSumPoint(referencePoint, tankIDHalf, 0);
+
+            // 좌측 하단이 기준
+
+
+            List<double> shellWidth = drawCommon.GetShellCourseWidthForDrawing();
+            List<double> shellThickness = drawCommon.GetShellCourseThickneeForDrawing();
+
+            List<Point3D> outPointList = new List<Point3D>();
+            Point3D shellCurrentPoint = GetSumPoint(referencePoint, 0, 0);
+            for (int i = 0; i < shellWidth.Count; i++)
+            {
+                double eachWidth = shellWidth[i];
+                double eachThickness = shellThickness[i];
+                leftList.AddRange(shapeService.GetRectangle(out outPointList, GetSumPoint(shellCurrentPoint, 0, 0), eachThickness, eachWidth, 0, 0, 2));
+                shellCurrentPoint = GetSumPoint(outPointList[1], 0, 0);
+            }
+
+            Line leftID = new Line(GetSumPoint(referencePoint, 0, 0), GetSumPoint(refPoint, 0, tankHeight));
+
+
+            leftList.Add(leftID);
+
+
+            newList.AddRange(leftList);
+            newList.AddRange(editingService.GetMirrorEntity(Plane.YZ, leftList, GetSumPoint(mirrorPoint, 0, 0), true));
+
+            return newList;
+        }
+
+
+        public List<Entity> GetRoofAssembly(Point3D refPoint)
+        {
+            List<Entity> newList = new List<Entity>();
+            List<Entity> leftList = new List<Entity>();
+
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+            double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double tankIDHalf = tankID / 2;
+
+            Point3D mirrorPoint = GetSumPoint(referencePoint, tankIDHalf, 0);
+
+            // 좌측 하단이 기준
+
+
+            List<double> shellWidth = drawCommon.GetShellCourseWidthForDrawing();
+            List<double> shellThickness = drawCommon.GetShellCourseThickneeForDrawing();
+
+            List<Point3D> outPointList = new List<Point3D>();
+            Point3D shellCurrentPoint = GetSumPoint(referencePoint, 0, 0);
+            for (int i = 0; i < shellWidth.Count; i++)
+            {
+                double eachWidth = shellWidth[i];
+                double eachThickness = shellThickness[i];
+                leftList.AddRange(shapeService.GetRectangle(out outPointList, GetSumPoint(shellCurrentPoint, 0, 0), eachThickness, eachWidth, 0, 0, 2));
+                shellCurrentPoint = GetSumPoint(outPointList[1], 0, 0);
+            }
+
+            Line leftID = new Line(GetSumPoint(referencePoint, 0, 0), GetSumPoint(refPoint, 0, tankHeight));
+
+
+            leftList.Add(leftID);
+
+
+            newList.AddRange(leftList);
+            newList.AddRange(editingService.GetMirrorEntity(Plane.YZ, leftList, GetSumPoint(mirrorPoint, 0, 0), true));
+
+            return newList;
         }
 
         public List<Entity> GetBottomAssembly(Point3D refPoint)
