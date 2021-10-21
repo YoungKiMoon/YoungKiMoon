@@ -14,6 +14,7 @@ namespace DrawSettingLib.SettingModels
 
             AngleOne = 0;
             Length = 0;
+            Height = 0;
 
             Size = "";
         }
@@ -22,6 +23,8 @@ namespace DrawSettingLib.SettingModels
 
         public double AngleOne { get; set; }
         public double Length { get; set; }
+
+        public double Height { get; set; }
 
 
         // 형상정보

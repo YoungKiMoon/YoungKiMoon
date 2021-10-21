@@ -4338,7 +4338,7 @@ namespace DrawWork.DrawServices
                 AssemblyDataService assemblyService = new AssemblyDataService();
                 //AssemblyModel newTankData = assemblyService.CreateMappingData(ExcelFile.Text);
 
-                string excelFile = @"C:\Users\tree\Desktop\CAD\TABAS\20211025 제출\19101_CRT.xlsm";
+                string excelFile = @"C:\Users\tree\Desktop\CAD\TABAS\20211025 제출\TABAS_20211020.xlsm";
                 // New Excel Read
                 AssemblyModel newTankData = assemblyService.CreateMappingDataNew(excelFile);
                 DrawDetailStructureService DDSService = new DrawDetailStructureService(newTankData, singleModel);
@@ -4347,8 +4347,11 @@ namespace DrawWork.DrawServices
                 double scaleValue = 20;
                 Point3D refPoint = new Point3D(1000, 1000,0);
                 Point3D curPoint = new Point3D(refPoint.X, refPoint.Y,0);
-                DrawEntityModel structureDraw = DDSService.DrawDetailRoofStructureAssembly(refPoint,singleModel,scaleValue);
+                DrawEntityModel structureDraw = DDSService.DrawDetailRoofStructureAssembly(refPoint,singleModel,scaleValue,null);
                 singleModel.Entities.AddRange(structureDraw.GetDrawEntity());
+
+                DrawEntityModel structureOrin = DDSService.DrawDetailRoofStructureOrientation(refPoint, singleModel, scaleValue,null);
+                singleModel.Entities.AddRange(structureOrin.GetDrawEntity());
             }
 
             #endregion

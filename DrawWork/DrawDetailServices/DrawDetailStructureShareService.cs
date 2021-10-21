@@ -421,6 +421,7 @@ namespace DrawWork.DrawDetailServices
 
 
 
+
         public DrawEntityModel Rafter(Point3D refPoint, object selModel, double scaleValue, NColumnRafterModel padModel)
         {
             DrawEntityModel drawList = new DrawEntityModel();
@@ -442,7 +443,7 @@ namespace DrawWork.DrawDetailServices
 
             //AEMAE
             double t = 6;   //Thk of doubleLine
-            double clipAngle = Utility.DegToRad(10);
+            double clipAngle = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
 
 
             Point3D workingPoint = GetSumPoint(refPoint, 0, 0);
@@ -451,12 +452,12 @@ namespace DrawWork.DrawDetailServices
             List<Line> rafter = GetDoubleLineRectangle(GetSumPoint(workingPoint, 0, 0), B, A, t, RECTANGLUNVIEW.NONE);
 
             //Left
-            List<Entity> leftSlotHoles = GetSlotHoles(GetSumPoint(rafter[3].MidPoint, B1 + C1 / 2, 0), slotholeHT / 2, D, slotholeWD / 2, C1);
-            List<Entity> leftHoles = GetHoles(GetSumPoint(rafter[3].MidPoint, B1 + C1 / 2, 0), slotholeHT / 2, C1, D);
+            List<Entity> leftSlotHoles = GetSlotHoles(GetSumPoint(rafter[3].MidPoint, B1 + C1 / 2, 0), slotholeHT, slotholeWD, C1, D);
+            List<Entity> leftHoles = GetHoles(GetSumPoint(rafter[3].MidPoint, B1 + C1 / 2, 0), slotholeHT, C1, D);
 
             //Right
-            List<Entity> rightSlotHoles = GetSlotHoles(GetSumPoint(rafter[1].MidPoint, -(B1 + C1 / 2), 0), slotholeHT / 2, D, slotholeWD / 2, C1);
-            List<Entity> rightHoles = GetHoles(GetSumPoint(rafter[1].MidPoint, -(B1 + C1 / 2), 0), slotholeHT / 2, C1, D);
+            List<Entity> rightSlotHoles = GetSlotHoles(GetSumPoint(rafter[1].MidPoint, -(B1 + C1 / 2), 0), slotholeHT, slotholeWD, C1, D);
+            List<Entity> rightHoles = GetHoles(GetSumPoint(rafter[1].MidPoint, -(B1 + C1 / 2), 0), slotholeHT, C1, D);
 
 
             List<Entity> rafterNslot = new List<Entity>();
@@ -483,49 +484,47 @@ namespace DrawWork.DrawDetailServices
         }
 
 
-
-        public List<Entity> DrawDetailRafterSideClipDetail(Point3D refPoint, double drawType = 1)
+        public DrawEntityModel RafterSideClipDetail(Point3D refPoint, object selModel, double scaleValue, NRafterSupportClipShellSideModel padModel)
         {
-
+            DrawEntityModel drawList = new DrawEntityModel();
             List<Entity> outlinesList = new List<Entity>();
-
             Point3D workingPoint = GetSumPoint(refPoint, 0, 0);
 
-            //ABC
-            double A = 200; //rafterWidth
-            double A1 = 7;   //roof to clip Distance 
-            double B = 48;  //clip To rafter hole center : NOT USED
-            double B1 = 30;  //working Point to pad Start Point
-            double C = 200; //clipRightWidth
-            double C1 = 25;  //pad Start Point to clip start Point
-            double D = 55;  //rafter to hole : NOT USED
-            double D1 = 70;  //workingPoint부터 rafter까지의 x축 거리
-            double E = 90;  //hole to hole width gap
-            double E1 = 55;  //slothole to clip right line
-            double F = 350; //Pad Width\
-            double F1 = 40;  //rafter의 끝에서 첫번째 홀 중심까지의 거리
-            double G = 300; //clip left width
-            double G1 = 70;  //hole to hole length gap
-            double H1 = 50;  //clipBottomLength
+            double A = valueService.GetDoubleValue(padModel.A);  //rafterWidth
+            double A1 = valueService.GetDoubleValue(padModel.A1);   //roof to clip Distance 
+            double B = valueService.GetDoubleValue(padModel.B);  //clip To rafter hole center : NOT USED
+            double B1 = valueService.GetDoubleValue(padModel.B1);  //working Point to pad Start Point
+            double C = valueService.GetDoubleValue(padModel.C); //clipRightWidth
+            double C1 = valueService.GetDoubleValue(padModel.C1);  //pad Start Point to clip start Point
+            double D = valueService.GetDoubleValue(padModel.D);  //rafter to hole : NOT USED
+            double D1 = valueService.GetDoubleValue(padModel.D1);  //workingPoint부터 rafter까지의 x축 거리
+            double E = valueService.GetDoubleValue(padModel.E);  //hole to hole width gap
+            double E1 = valueService.GetDoubleValue(padModel.E1);  //slothole to clip right line
+            double F = valueService.GetDoubleValue(padModel.F); //Pad Width\
+            double F1 = valueService.GetDoubleValue(padModel.F1); //rafter to hole
+            double G = valueService.GetDoubleValue(padModel.G);  //clip left width
+            double G1 = valueService.GetDoubleValue(padModel.G1);  //hole to hole length gap
+            double H1 = valueService.GetDoubleValue(padModel.H1);  //clipBottomLength
+
             double slotholeHT = 23.0;
             double slotholeWD = 45.0;
 
             double t = 6;   //현재 있는 값은 t2, t3등도 전부 동일함
 
-            
+
             //FIXED??
-            double roofSlope = Utility.DegToRad(A); //Angle의 경우 나중에 rad값으로 받기로 함!!
-            double value_byD1 = D1 * Math.Tan(roofSlope); //for slothole info : workingPoint부터 rafter까지의 y축 거리
 
             //AEMAE
+            double clipAngle = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope); //Angle의 경우 나중에 rad값으로 받기로 함!!
             double roofLenth = 600;                  //for loof info : 임의값
             double roofwidth = 7;                    //for loof info : 임의값
             double rafterLength = 236.7;                //for rafter info : 임의값
-            double columnWidth = 420;                  //for column info : 임의값
 
             //for moving roof start point
             double move_x = -6;
             double move_y = 0;
+
+            double drawType = 1;
 
             Point3D topViewWorkingPoint = GetSumPoint(refPoint, 0, 0);
             Point3D frontViewWorkingPoint = GetSumPoint(refPoint, 0, 0);
@@ -533,48 +532,44 @@ namespace DrawWork.DrawDetailServices
             Point3D roofStartPoint = GetSumPoint(refPoint, move_x, move_y);
             //roof Line
             List<Line> roof = GetRectangle(GetSumPoint(roofStartPoint, 0, 0), roofwidth, roofLenth, RECTANGLUNVIEW.NONE);
-            foreach (Entity eachEntity in roof)
+            List<Line> rafter = GetDoubleLineRectangle(GetSumPoint(roofStartPoint, D1, -A), A, rafterLength, t, RECTANGLUNVIEW.NONE); //thk는 임의값
+            List<Line> roofNrafter = new List<Line>();
+            roofNrafter.AddRange(roof);
+            roofNrafter.AddRange(rafter);
+
+
+            foreach (Entity eachEntity in roofNrafter)
             {
-                eachEntity.Rotate(roofSlope, Vector3D.AxisZ, GetSumPoint(roofStartPoint, 0, 0));
+                eachEntity.Rotate(clipAngle, Vector3D.AxisZ, GetSumPoint(roofStartPoint, 0, 0));
             }
 
-            //angle Line
-            List<Entity> angle = GetAngleList(GetSumPoint(workingPoint, -t, 0), 75, 75, 7, SHAPEDIRECTION.LEFTTOP, 4);// 앵글 수치는 임의값
-            //column Line
-            List<Line> column = GetRectangle(GetSumPoint(workingPoint, -t, -10 - columnWidth), columnWidth, t, RECTANGLUNVIEW.NONE);//y축으로 내려오는 10은 앵글이 있는 경우 고정값
+            //pad
             List<Line> pad = GetRectangle(GetSumPoint(workingPoint, 0, -B1 - F), F, t, RECTANGLUNVIEW.NONE);
             //rafter And Holes
-            List<Line> rafter = GetDoubleLineRectangle(GetSumPoint(roofStartPoint, D1, -A + value_byD1), A, rafterLength, 10, RECTANGLUNVIEW.NONE); //thk는 임의값
-            List<Entity> slotHoles = GetSlotHoles(GetSumPoint(rafter[3].MidPoint, F1 + G1 / 2, 0), slotholeHT / 2, E, slotholeWD / 2, G1);
-            List<Entity> holes = GetHoles(GetSumPoint(rafter[3].MidPoint, F1 + G1 / 2, 0), slotholeHT / 2, G1, E);
+            List<Entity> slotHoles = GetSlotHoles(GetSumPoint(rafter[3].MidPoint, F1 + G1 / 2, 0), slotholeHT, slotholeWD, G1, E);
+            List<Entity> holes = GetHoles(GetSumPoint(rafter[3].MidPoint, F1 + G1 / 2, 0), slotholeHT, G1, E);
 
-            List<Entity> slots = new List<Entity>();
-            slots.AddRange(slotHoles);
-            slots.AddRange(holes);
+            List<Entity> slotNholes = new List<Entity>();
+            slotNholes.AddRange(slotHoles);
+            slotNholes.AddRange(holes);
 
-            foreach (Entity eachEntity in slots)
+            foreach (Entity eachEntity in slotNholes)
             {
-                //rater의 회전기준점 : 라프타를 구성하는 사각형의 좌측 상단
-                eachEntity.Rotate(roofSlope, Vector3D.AxisZ, GetSumPoint(rafter[2].StartPoint, 0, 0));
-            }
-
-            foreach (Entity eachEntity in rafter)
-            {
-                //rater의 회전기준점 : 라프타를 구성하는 사각형의 좌측 상단
-                eachEntity.Rotate(roofSlope, Vector3D.AxisZ, GetSumPoint(rafter[2].StartPoint, 0, 0));
+                //회전기준점 : 라프타를 구성하는 사각형의 좌측 상단
+                eachEntity.Rotate(clipAngle, Vector3D.AxisZ, GetSumPoint(rafter[2].StartPoint, 0, 0));
             }
 
             //Using intersect for ClipDistance//
-            Circle forClipDistance = new Circle(rafter[2].StartPoint, A1);
+            Circle forClipDistance = new Circle(rafter[3].StartPoint, A1);
             Point3D[] clipSlideStartPoint = rafter[3].IntersectWith(forClipDistance);
-            Circle underHole = (Circle)holes[0];
-            Line clipRightGuideLine = new Line(GetSumPoint(underHole.Center, E1, -50), GetSumPoint(underHole.Center, E1, 500));
+            Circle underHole = (Circle)holes[3];
+            Line clipRightGuideLine = new Line(GetSumPoint(underHole.Center, E1, 0), GetSumPoint(underHole.Center, E1, 500));
 
             //clip Line
             Line clipTopLinkLine = new Line(GetSumPoint(workingPoint, t, -B1 - C1), GetSumPoint(clipSlideStartPoint[0], 0, 0));
             //Using intersect//
-            Line clipTopslideLineGuide = new Line(GetSumPoint(clipTopLinkLine.EndPoint, -500, 0), GetSumPoint(clipTopLinkLine.EndPoint, 500, 0));
-            clipTopslideLineGuide.Rotate(roofSlope, Vector3D.AxisZ, clipTopLinkLine.EndPoint);
+            Line clipTopslideLineGuide = new Line(GetSumPoint(clipTopLinkLine.EndPoint, 0, 0), GetSumPoint(clipTopLinkLine.EndPoint, 500, 0));
+            clipTopslideLineGuide.Rotate(clipAngle, Vector3D.AxisZ, clipTopLinkLine.EndPoint);
             Point3D[] clipSlideEndPoint = clipTopslideLineGuide.IntersectWith(clipRightGuideLine);
 
             Line clipTopslideLine = new Line(GetSumPoint(clipTopLinkLine.EndPoint, 0, 0), GetSumPoint(clipSlideEndPoint[0], 0, 0));
@@ -585,10 +580,10 @@ namespace DrawWork.DrawDetailServices
             //////////////////////CALCULATE DISTANCE for OTHER VIEW////////////////////////
             //////////////////////The order of the holes represents ///////////////////////
             /////////////////the order from the pad based on the TOP VIEW./////////////////
-            Circle firstHole = (Circle)holes[2];
-            Circle secondHole = (Circle)holes[0];
-            Circle thirdHole = (Circle)holes[3];
-            Circle fourthHole = (Circle)holes[1];
+            Circle firstHole = (Circle)holes[0];
+            Circle secondHole = (Circle)holes[1];
+            Circle thirdHole = (Circle)holes[2];
+            Circle fourthHole = (Circle)holes[3];
 
 
             double padTOhole1 = firstHole.Center.X - (workingPoint.X + t + t);
@@ -636,14 +631,10 @@ namespace DrawWork.DrawDetailServices
             if (drawType == 1)
             {
                 //clip
-                //outlinesList.AddRange(roof);
-                //outlinesList.AddRange(angle);
-                //outlinesList.AddRange(column);
-                outlinesList.AddRange(pad);
-                outlinesList.AddRange(slots);
+                drawList.outlineList.AddRange(pad);
+                drawList.outlineList.AddRange(slotHoles);
 
-                
-                outlinesList.AddRange(new Entity[] {
+                drawList.outlineList.AddRange(new Entity[] {
 
                 clipTopLinkLine, clipTopslideLine, clipRightLine,
                 clipBottomLine, clipBottomslideLine,
@@ -654,10 +645,10 @@ namespace DrawWork.DrawDetailServices
             else if (drawType == 2)
             {
                 //Top View
-                outlinesList.AddRange(padTop);
-                outlinesList.AddRange(clipTop);
+                drawList.outlineList.AddRange(padTop);
+                drawList.outlineList.AddRange(clipTop);
 
-                outlinesList.AddRange(new Entity[] {
+                drawList.outlineList.AddRange(new Entity[] {
 
                 columnOuterLine, columnInnerLine, HoleCenterLine1, HoleCenterLine2, HoleCenterLine3, HoleCenterLine4,
 
@@ -666,18 +657,83 @@ namespace DrawWork.DrawDetailServices
             else if (drawType == 3)
             {
                 //Front View
-                outlinesList.AddRange(padFront);
-                outlinesList.AddRange(clipFront);
+                drawList.outlineList.AddRange(padFront);
+                drawList.outlineList.AddRange(clipFront);
 
-                outlinesList.AddRange(new Entity[] {
+                drawList.outlineList.AddRange(new Entity[] {
 
                 clipFrontStartLine, clipRightEndLine, clipFrontTopLeftLine, clipFrontTopRightLine
             });
             }
 
 
-            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
-            return outlinesList;
+            //styleService.SetLayerListEntity(ref outlineList, layerService.LayerOutLine);
+            return drawList;
+
+        }
+
+
+
+
+
+
+
+        private List<Entity> GetHoles(Point3D refPoint, double holeRadius, double lengthGap, double widthGap = 0)
+        {
+            //refPoint는 홀과 홀 사이의 중앙인 점을 입력해주시면됩니다
+            //lengthGap=0인경우는 2개, lengthGap에 값이 입력된 경우는 홀이 4개로 그려집니다 :)
+
+            List<Entity> holeList = new List<Entity>();
+            Point3D workingPoint = GetSumPoint(refPoint, 0, 0);
+
+
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    Point3D circleCenterPoint = GetSumPoint(workingPoint, lengthGap / 2 * (2 * i - 1), widthGap / 2 * (1 - 2 * j));
+
+                    Circle hole = new Circle(circleCenterPoint, holeRadius / 2);
+
+                    holeList.AddRange(new Entity[] { hole });
+                }
+            }
+
+            styleService.SetLayerListEntity(ref holeList, layerService.LayerOutLine);
+
+            return holeList;
+
+        }
+
+        private List<Entity> GetSlotHoles(Point3D refPoint, double holeRadius, double slotHoleLength, double lengthGap, double widthGap = 0)
+        {
+            //refPoint는 홀과 홀 사이의 중앙인 점을 입력해주시면됩니다
+            //lengthGap=0인경우는 2개, lengthGap에 값이 입력된 경우는 홀이 4개로 그려집니다 :)
+
+            List<Entity> slotHoleList = new List<Entity>();
+            Point3D workingPoint = GetSumPoint(refPoint, 0, 0);
+
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    Point3D circleCenterPoint = GetSumPoint(workingPoint, lengthGap / 2 * (2 * i - 1), widthGap / 2 * (1 - 2 * j));
+
+                    Arc SlotLeftArc = new Arc(GetSumPoint(circleCenterPoint, (-slotHoleLength + holeRadius) / 2, holeRadius / 2),
+                                                GetSumPoint(circleCenterPoint, -slotHoleLength / 2, 0),
+                                                GetSumPoint(circleCenterPoint, (-slotHoleLength + holeRadius) / 2, -holeRadius / 2), false);
+                    Arc SlotRightArc = new Arc(GetSumPoint(circleCenterPoint, (slotHoleLength - holeRadius) / 2, holeRadius / 2),
+                                                GetSumPoint(circleCenterPoint, slotHoleLength / 2, 0),
+                                                GetSumPoint(circleCenterPoint, (slotHoleLength - holeRadius) / 2, -holeRadius / 2), false);
+                    Line SlotTopLine = new Line(GetSumPoint(SlotRightArc.StartPoint, 0, 0), GetSumPoint(SlotLeftArc.StartPoint, 0, 0));
+                    Line SlotBottomLine = new Line(GetSumPoint(SlotRightArc.EndPoint, 0, 0), GetSumPoint(SlotLeftArc.EndPoint, 0, 0));
+
+                    slotHoleList.AddRange(new Entity[] { SlotLeftArc, SlotRightArc, SlotTopLine, SlotBottomLine });
+                }
+            }
+
+            styleService.SetLayerListEntity(ref slotHoleList, layerService.LayerOutLine);
+            return slotHoleList;
 
         }
 
@@ -1030,106 +1086,8 @@ namespace DrawWork.DrawDetailServices
         }
 
 
-        private List<Entity> GetSlotHoles(Point3D refPoint, double holeRadius, double widthGap, double slotHoleLength, double lengthGap)
-        {
-            //refPoint는 홀과 홀 사이의 중앙인 점을 입력해주시면됩니다
-            //lengthGap=0인경우는 2개, lengthGap에 값이 입력된 경우는 홀이 4개로 그려집니다 :)
 
-            List<Entity> slotHoleList = new List<Entity>();
-            //List<Entity> holeList = new List<Entity>();
-            List<Entity> mergeList = new List<Entity>();
-            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
-
-            for (int i = 0; i < 2; i++)
-            {
-                for (int j = 0; j < 2; j++)
-                {
-                    Point3D circleCenterPoint = GetSumPoint(referencePoint, lengthGap / 2 * (2 * i - 1), widthGap / 2 * (1 - 2 * j));
-
-                    //Circle Hole = new Circle(circleCenterPoint, holeRadius);
-                    Arc SlotLeftArc = new Arc(GetSumPoint(circleCenterPoint, -slotHoleLength / 2, holeRadius),
-                                                GetSumPoint(circleCenterPoint, -holeRadius - slotHoleLength / 2, 0),
-                                                GetSumPoint(circleCenterPoint, -slotHoleLength / 2, -holeRadius), false);
-                    Arc SlotRightArc = new Arc(GetSumPoint(circleCenterPoint, slotHoleLength / 2, holeRadius),
-                                                GetSumPoint(circleCenterPoint, holeRadius + slotHoleLength / 2, 0),
-                                                GetSumPoint(circleCenterPoint, slotHoleLength / 2, -holeRadius), false);
-                    Line SlotTopLine = new Line(GetSumPoint(SlotRightArc.StartPoint, 0, 0), GetSumPoint(SlotLeftArc.StartPoint, 0, 0));
-                    Line SlotBottomLine = new Line(GetSumPoint(SlotRightArc.EndPoint, 0, 0), GetSumPoint(SlotLeftArc.EndPoint, 0, 0));
-
-
-                    //holeList.Add(Hole);
-                    slotHoleList.AddRange(new Entity[] { SlotLeftArc, SlotRightArc, SlotTopLine, SlotBottomLine });
-                }
-            }
-
-            //styleService.SetLayerListEntity(ref holeList, layerService.LayerVirtualLine);
-            styleService.SetLayerListEntity(ref slotHoleList, layerService.LayerOutLine);
-
-            //mergeList.AddRange(holeList);
-            //smergeList.AddRange(slotHoleList);
-
-            return slotHoleList;
-
-        }
-
-        private List<Entity> GetHoles(Point3D refPoint, double holeRadius, double lengthGap, double widthGap = 0, double angle = 0)
-        {
-            //refPoint는 홀과 홀 사이의 중앙
-            //기본적으로 2개의 홀을 그리는 함수이나,
-            //widthGap 입력된 경우는 홀이 4인것으로 인식해서 4개가 그려집니다 :)
-
-            List<Entity> holeList = new List<Entity>();
-            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
-
-            //widthGap이 있는데 각도가 입력된 경우에는 각도를 임의로 0으로 초기화합니다.
-            if (widthGap != 0 && angle != 0) { angle = 0; }
-
-            double radian = Utility.DegToRad(angle);
-
-
-            Line guideLine = new Line(GetSumPoint(referencePoint, lengthGap / 2, widthGap / 2),
-                                        GetSumPoint(referencePoint, -lengthGap / 2, widthGap / 2));
-
-            guideLine.Rotate(radian, Vector3D.AxisZ);
-
-            Circle topHole = new Circle(guideLine.StartPoint, holeRadius);
-            Circle bottomHole = new Circle(guideLine.EndPoint, holeRadius);
-
-
-            //widthGap 입력받아 2개의 원을 추가로 그려주는 합수입니다.
-            if (widthGap != 0)
-            {
-                Circle LTopHole = new Circle(GetSumPoint(referencePoint, lengthGap / 2, -widthGap / 2), holeRadius);
-                Circle LBottomHole = new Circle(GetSumPoint(referencePoint, -lengthGap / 2, -widthGap / 2), holeRadius);
-
-                holeList.Add(LTopHole);
-                holeList.Add(LBottomHole);
-            }
-
-            holeList.AddRange(new Entity[] {topHole, bottomHole,
-                });
-
-            //2개의 원이 그려질 때, 각도를 입력받는 경우에는 플레이트와 별개로 회전합니다.
-            //즉, 플레이트와 수평이 아닌 경우에만 각도를 입력해주시면 됩니다.
-            //Circle TopHole = new Circle(GetSumPoint(referencePoint, lengthGap / 2 , widthGap / 2 ), holeRadius);
-            //Circle BottomHole = new Circle(GetSumPoint(referencePoint, lengthGap / 2, -widthGap / 2), holeRadius);
-
-            //TopHole.Rotate(radian, Vector3D.AxisZ, referencePoint);
-            //BottomHole.Rotate(radian, Vector3D.AxisZ, referencePoint);
-
-            //로테이션 함수를 쓰지 않고 바로 회전시키는 경우입니다.
-            //Circle TopHole = new Circle(GetSumPoint(referencePoint, lengthGap/ 2 - widthGap/2*Math.Sin(radian) , widthGap / 2 * Math.Cos(radian)), holeRadius);
-            //Circle BottomHole = new Circle(GetSumPoint(referencePoint, lengthGap/2 + widthGap / 2 * Math.Sin(radian), -widthGap / 2 * Math.Cos(radian)), holeRadius);
-
-
-
-
-
-            styleService.SetLayerListEntity(ref holeList, layerService.LayerOutLine);
-
-            return holeList;
-
-        }
+        
 
         private List<Line> GetDoubleLineRectangle(Point3D refPoint, double width, double length, double thk, RECTANGLUNVIEW unview = RECTANGLUNVIEW.NONE)
         {

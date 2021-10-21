@@ -46,6 +46,11 @@ namespace DrawWork.DrawDetailServices
         public PaperAreaService areaService;
 
 
+        // Structure
+        private StructureService structureService;
+        private StructureModel structureCRTModel;
+
+
         public DrawDetailStructureService(AssemblyModel selAssembly, object selModel)
         {
             singleModel = selModel as Model;
@@ -67,15 +72,20 @@ namespace DrawWork.DrawDetailServices
             drawShareService = new DrawDetailStructureShareService(selAssembly,selModel) ;
 
             areaService = new PaperAreaService();
+
+            structureService = new StructureService();
+            structureCRTModel = new StructureModel();
         }
 
         public DrawEntityModel DrawDetailRoofStructureMain(ref CDPoint refPoint, ref CDPoint curPoint, object selModel, double selScaleValue)
         {
             DrawEntityModel drawList = new DrawEntityModel();
 
+            // Structure Model : CRT
+            CreateStructureCRTModel();
 
             // Structure
-            foreach(PaperAreaModel eachModel in SingletonData.PaperArea.AreaList)
+            foreach (PaperAreaModel eachModel in SingletonData.PaperArea.AreaList)
             {
                 //PaperAreaModel eachModel = areaService.GetPaperAreaModel(eachModel.Name, eachModel.SubName, SingletonData.PaperArea.AreaList);
                 // RefPoint
@@ -87,7 +97,7 @@ namespace DrawWork.DrawDetailServices
                 // Structure
                 if (eachModel.SubName== PAPERSUB_TYPE.RoofStructureOrientation)               
                 {
-                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
+                    drawList.AddDrawEntity(DrawDetailRoofStructureOrientation(referencePoint, selModel, scaleValue, eachModel));
                 }
                 else if (eachModel.SubName == PAPERSUB_TYPE.RoofStructureAssembly)
                 {
@@ -239,6 +249,103 @@ namespace DrawWork.DrawDetailServices
             return drawList;
         }
 
+
+
+        public void CreateStructureCRTModel()
+        {
+
+
+            // Input : Rafter , Column, Girder
+            List<StructureCRTRafterInputModel> rafterInputList = assemblyData.StructureCRTRafterInput.ToList();
+            List<StructureCRTColumnInputModel> columnInputList = assemblyData.StructureCRTColumnInput.ToList();
+            List<StructureCRTGirderInputModel> girderInputList = assemblyData.StructureCRTGirderInput.ToList();
+
+
+            // Output : Rafter -> Column Rafter
+            List<NColumnRafterModel> rafterOutputList = new List<NColumnRafterModel>();
+            foreach (StructureCRTRafterInputModel eachRafter in rafterInputList)
+            {
+                NColumnRafterModel eachNewRafter = GetRafterModel(eachRafter.Size);
+                rafterOutputList.Add(eachNewRafter);
+            }
+
+            // Output : Rafter -> H Beam
+            List<HBeamModel> girderHbeamList = new List<HBeamModel>();
+            foreach (StructureCRTGirderInputModel eachGirder in girderInputList)
+            {
+                HBeamModel eachHBeam = GetHBeamModel(eachGirder.Size);
+                girderHbeamList.Add(eachHBeam);
+            }
+
+            // Output : Column -> First Column = Cetner Top Support
+            NColumnCenterTopSupportModel columnCenterTopSupport = new NColumnCenterTopSupportModel();
+            if (rafterInputList.Count > 0)
+            {
+                StructureCRTRafterInputModel rafter = rafterInputList[0];
+                columnCenterTopSupport = GetNewColumnCenterTopSupportModel(rafter.Size);
+            }
+
+            // Output : Column -> First Column = Center Top Support : Pipe
+            PipeModel columnCenterPipe = new PipeModel();
+            if (columnInputList.Count > 0)
+            {
+                StructureCRTColumnInputModel column = columnInputList[0];
+                columnCenterPipe = GetPipeModel(column.Size);
+            }
+            // Pipe Schedule 적용 안됨
+
+
+
+            // Tank : Basic Information
+            double selTankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double selTankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
+
+            // Tank : Roof
+            double selRoofOD = drawCommon.GetRoofOD();
+            double selRoofSlope = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
+
+            // Tank : Bottom
+            double selBottomThk = valueService.GetDoubleValue(assemblyData.BottomInput[0].BottomPlateThickness);
+            double selBottoSlope = valueService.GetDegreeOfSlope(assemblyData.BottomInput[0].BottomPlateSlope);
+            double selAnnularInnerWidth = 0;
+            if (drawCommon.isAnnular())
+                selAnnularInnerWidth = (selTankID - valueService.GetDoubleValue(assemblyData.BottomInput[0].OD)) / 2;
+            
+            // Tnak : Shell Reduce : k Type Shell  안쪽으로 들어 옴
+            double selShellReduce = 0;
+            if (drawCommon.GetCurrentTopAngleType() == TopAngle_Type.k)
+            {
+                if (assemblyData.ShellOutput.Count >= 2)
+                {
+                    int maxCourse = assemblyData.ShellOutput.Count - 1;
+                    double lastThk = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness);
+                    double lastThkBefore = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse - 1].Thickness);
+                    selShellReduce = (lastThk - lastThkBefore) / 2;
+                }
+            }
+
+            // Create Structure
+            structureCRTModel = structureService.CreateStructureCRTColumn(
+                
+                                    rafterInputList, columnInputList, girderInputList,
+
+                                    girderHbeamList, columnCenterTopSupport, columnCenterPipe,
+
+                                    rafterOutputList,
+
+                                    selTankID,
+                                    selTankHeight,
+                                    selAnnularInnerWidth,
+                                    selRoofOD,
+                                    selBottomThk,
+                                    selRoofSlope,
+                                    selBottoSlope,
+                                    selShellReduce   );
+
+
+        }
+
+        #region Detail Sample
         private double GetStructureCustomScale(PaperAreaModel selModel)
         {
             double returnValue = 1;
@@ -291,8 +398,17 @@ namespace DrawWork.DrawDetailServices
 
             return drawList;
         }
+        #endregion
 
-        public DrawEntityModel DrawDetailRoofStructureAssembly(Point3D refPoint, object selModel, double scaleValue)
+
+
+
+
+
+
+
+
+        public DrawEntityModel DrawDetailRoofStructureAssembly(Point3D refPoint, object selModel, double scaleValue, PaperAreaModel selPaperModel)
         {
             // List
             DrawEntityModel drawList = new DrawEntityModel();
@@ -352,6 +468,59 @@ namespace DrawWork.DrawDetailServices
             roofList.AddRange(GetRoofAssembly(GetSumPoint(referencePoint, 0, 0)));
 
 
+
+
+            // Lee Test
+
+            #region 임시 데이터 배정
+            string sizeName = "C200x80x7.5x11";
+            NRafterSupportClipShellSideModel padModel = new NRafterSupportClipShellSideModel();
+            foreach (NRafterSupportClipShellSideModel eachModel in assemblyData.NRafterSupportClipShellSideList)
+            {
+                if (eachModel.RafterSize == sizeName)
+                {
+                    padModel = eachModel;
+                    break;
+                }
+            }
+            #endregion
+
+            #region 임시 데이터 배정 for Rafter
+            string sizeName2 = "C250x90x9x13";
+            NColumnRafterModel padModel2 = new NColumnRafterModel();
+            foreach (NColumnRafterModel eachModel in assemblyData.NColumnRafterList)
+            {
+                if (eachModel.Size == sizeName2)
+                {
+                    padModel2 = eachModel;
+                    break;
+                }
+            }
+            #endregion
+
+
+            #region 임시 데이터 배정 for rafter Support Clip Shell side
+            string sizeName3 = "C200x80x7.5x11";
+            NRafterSupportClipShellSideModel padModel3 = new NRafterSupportClipShellSideModel();
+            foreach (NRafterSupportClipShellSideModel eachModel in assemblyData.NRafterSupportClipShellSideList)
+            {
+                if (eachModel.RafterSize == sizeName3)
+                {
+                    padModel3 = eachModel;
+                    break;
+                }
+            }
+            #endregion
+
+
+            // Rafter
+            etcList.AddRange(drawShareService.Rafter(GetSumPoint(referencePoint, 0, tankHeight), singleModel, scaleValue, padModel2).GetDrawEntity());
+
+
+            // Clip
+            etcList.AddRange(drawShareService.RafterSideClipDetail(GetSumPoint(referencePoint, 0, tankHeight), singleModel, scaleValue, padModel3).GetDrawEntity());
+
+
             // 
             // 1
             etcList.AddRange(drawComService.GetColumnCenterTopSupport_TopView(GetSumPoint(referencePoint, 0, 0), scaleValue));
@@ -361,7 +530,7 @@ namespace DrawWork.DrawDetailServices
 
 
 
-            etcList.AddRange(drawShareService.DrawDetailRafterSideClipDetail(GetSumPoint(referencePoint, 0, tankHeight), 1));
+            
 
             //etcList.AddRange(drawShareService.Rafter(GetSumPoint(referencePoint, 0, tankHeight), scaleValue,));
 
@@ -638,14 +807,109 @@ namespace DrawWork.DrawDetailServices
 
 
 
+
+        public DrawEntityModel DrawDetailRoofStructureOrientation(Point3D refPoint, object selModel, double scaleValue, PaperAreaModel selPaperModel)
+        {
+            // List
+            DrawEntityModel drawList = new DrawEntityModel();
+
+            // Reference Point
+            Point3D referencePoint = new Point3D(refPoint.X, refPoint.Y);
+
+            Point3D shellBottomPoint = GetSumPoint(referencePoint, 0, 0);
+
+            double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
+            double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
+            double tankIDHalf = tankID / 2;
+            double roofSlope = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
+            double bottomSlope = valueService.GetDegreeOfSlope(assemblyData.BottomInput[0].BottomPlateSlope);
+
+
+            List<Entity> orientationList = new List<Entity>();
+
+            List<Entity> centerLineList = new List<Entity>();
+
+
+
+
+
+
+
+
+
+
+            
+
+
+
+
+
+
+            styleService.SetLayerListEntity(ref orientationList, layerService.LayerOutLine);
+            drawList.outlineList.AddRange(orientationList);
+
+            styleService.SetLayerListEntity(ref centerLineList, layerService.LayerCenterLine);
+            drawList.outlineList.AddRange(centerLineList);
+
+            return drawList;
+
+
+
+        }
+
+
+        // 형상 정보 가져오기
         private NColumnRafterModel GetRafterModel(string rafterSize)
         {
             NColumnRafterModel newModel = new NColumnRafterModel();
-            foreach(NColumnRafterModel eachModel in assemblyData.NColumnRafterList)
+            foreach (NColumnRafterModel eachModel in assemblyData.NColumnRafterList)
             {
                 if (eachModel.Size == rafterSize)
                 {
                     newModel = eachModel;
+                    break;
+                }
+            }
+            return newModel;
+        }
+
+        private NColumnCenterTopSupportModel GetNewColumnCenterTopSupportModel(string selSize)
+        {
+            NColumnCenterTopSupportModel newModel = new NColumnCenterTopSupportModel();
+            foreach (NColumnCenterTopSupportModel eachModel in assemblyData.NColumnCenterTopSupportList)
+            {
+                if (eachModel.RafterSize == selSize)
+                {
+                    newModel = eachModel;
+                    break;
+                }
+            }
+            return newModel;
+        }
+
+        private HBeamModel GetHBeamModel(string hBeamSize)
+        {
+            HBeamModel newModel = new HBeamModel();
+            foreach (HBeamModel eachModel in assemblyData.HBeamList)
+            {
+                if (eachModel.SIZE == hBeamSize)
+                {
+                    newModel = eachModel;
+                    break;
+                }
+            }
+            return newModel;
+        }
+
+        private PipeModel GetPipeModel(string selSize)
+        {
+            PipeModel newModel = new PipeModel();
+            foreach (PipeModel eachModel in assemblyData.PipeList)
+            {
+                if (eachModel.NPS == selSize)
+                {
+                    newModel = eachModel;
+                    break;
                 }
             }
             return newModel;
