@@ -422,12 +422,16 @@ namespace DrawWork.DrawDetailServices
 
 
 
-        public DrawEntityModel Rafter(Point3D refPoint, object selModel, double scaleValue, NColumnRafterModel padModel)
+        public DrawEntityModel Rafter(Point3D refPoint, object selModel, double scaleValue, NColumnRafterModel padModel,
+                                        double rotationPoint, double rotateValue)
         {
             DrawEntityModel drawList = new DrawEntityModel();
             Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+
             List<Entity> newList = new List<Entity>();
 
+            List<Entity> rafterList = new List<Entity>();
+            List<Entity> rafterNslot = new List<Entity>();
 
             double A = valueService.GetDoubleValue(padModel.A);    //rafter Lenth
             double A1 = valueService.GetDoubleValue(padModel.A1);   //woking Point to rafter : NOT USED
@@ -446,10 +450,11 @@ namespace DrawWork.DrawDetailServices
             double clipAngle = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
 
 
-            Point3D workingPoint = GetSumPoint(refPoint, 0, 0);
+            Point3D workingPoint = GetSumPoint(referencePoint, 0, 0);
 
             //rafter And Holes
             List<Line> rafter = GetDoubleLineRectangle(GetSumPoint(workingPoint, 0, 0), B, A, t, RECTANGLUNVIEW.NONE);
+            rafterList.AddRange(rafter);
 
             //Left
             List<Entity> leftSlotHoles = GetSlotHoles(GetSumPoint(rafter[3].MidPoint, B1 + C1 / 2, 0), slotholeHT, slotholeWD, C1, D);
@@ -459,13 +464,18 @@ namespace DrawWork.DrawDetailServices
             List<Entity> rightSlotHoles = GetSlotHoles(GetSumPoint(rafter[1].MidPoint, -(B1 + C1 / 2), 0), slotholeHT, slotholeWD, C1, D);
             List<Entity> rightHoles = GetHoles(GetSumPoint(rafter[1].MidPoint, -(B1 + C1 / 2), 0), slotholeHT, C1, D);
 
-
-            List<Entity> rafterNslot = new List<Entity>();
-            rafterNslot.AddRange(rafter);
             rafterNslot.AddRange(leftSlotHoles);
             rafterNslot.AddRange(leftHoles);
             rafterNslot.AddRange(rightSlotHoles);
             rafterNslot.AddRange(rightHoles);
+
+
+            newList.AddRange(rafterList);
+            newList.AddRange(rafterNslot);
+
+            // Rotate
+
+
             foreach (Entity eachEntity in rafterNslot)
             {
                 //rater의 회전기준점 : 라프타를 구성하는 사각형의 좌측 상단
@@ -473,18 +483,107 @@ namespace DrawWork.DrawDetailServices
             }
             drawList.outlineList.AddRange(rafterNslot);
 
-            drawList.outlineList.AddRange(new Entity[] {
-
-
-            });
-
 
             //styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
             return drawList;
         }
 
 
-        public DrawEntityModel RafterSideClipDetail(Point3D refPoint, object selModel, double scaleValue, NRafterSupportClipShellSideModel padModel)
+        public List<Entity> RafterNew(out List<Point3D> selOutputPointList, Point3D refPoint,double selLength , double selRotate, double selRotateCenter, double selTranslateNumber, bool[] selVisibleLine = null, 
+                                    NColumnRafterModel padModel=null)
+        {
+            selOutputPointList = new List<Point3D>();
+            List<Entity> newList = new List<Entity>();
+            List<Entity> slotHoleList = new List<Entity>();
+
+
+            // Model Data
+            double A = valueService.GetDoubleValue(padModel.A);    //rafter Lenth
+            double A1 = valueService.GetDoubleValue(padModel.A1);   //woking Point to rafter : NOT USED
+            double B = valueService.GetDoubleValue(padModel.B);    //rafter Width
+            double B1 = valueService.GetDoubleValue(padModel.B1);   //workingPoint부터 rafter까지의 x축 거리
+            double C = valueService.GetDoubleValue(padModel.C);    //centering Point to rafter : NOT USED  //rafter to hole : NOT USED
+            double C1 = valueService.GetDoubleValue(padModel.C1);   //hole to hole length gap
+            double D = valueService.GetDoubleValue(padModel.D);    //hole to hole width gap
+            double E = valueService.GetDoubleValue(padModel.E);    //SHELL ID/4 : NOT USED
+            double holeDia = valueService.GetDoubleValue(padModel.BoltHoleDia);
+
+            double selHeight = A;
+
+            double t = 6;   //Thk of doubleLine
+
+            // Reference Point : Top Left
+            Point3D pointA = GetSumPoint(refPoint, 0, 0);
+            Point3D pointB = GetSumPoint(refPoint, selLength, 0);
+            Point3D pointC = GetSumPoint(refPoint, selLength, -selHeight);
+            Point3D pointD = GetSumPoint(refPoint, 0, -selHeight);
+
+            // Line
+            Line lineA = new Line(GetSumPoint(pointA, 0, 0), GetSumPoint(pointB, 0, 0));
+            Line lineB = new Line(GetSumPoint(pointB, 0, 0), GetSumPoint(pointC, 0, 0));
+            Line lineC = new Line(GetSumPoint(pointC, 0, 0), GetSumPoint(pointD, 0, 0));
+            Line lineD = new Line(GetSumPoint(pointD, 0, 0), GetSumPoint(pointA, 0, 0));
+
+            // Inner Line : HBeam,Channel Tpye에 따라서 달라짐
+            Line lineAinner = (Line)lineA.Offset(t, Vector3D.AxisZ);
+            Line lineCinner = (Line)lineB.Offset(t, Vector3D.AxisZ);
+
+            newList.AddRange(new Line[] { lineA, lineB, lineC, lineD, lineAinner, lineCinner });
+
+            // Slot Hole : Center Line 처리 필요함
+            slotHoleList.AddRange(GetHoles(GetSumPoint(lineD.MidPoint, B1 + C1 / 2, 0), holeDia, C1, D));
+            slotHoleList.AddRange(GetHoles(GetSumPoint(lineD.MidPoint, B1 + C1 / 2, 0), holeDia, C1, D));
+            slotHoleList.AddRange(GetHoles(GetSumPoint(lineB.MidPoint, -(B1 + C1 / 2), 0), holeDia, C1, D));
+            slotHoleList.AddRange(GetHoles(GetSumPoint(lineB.MidPoint, -(B1 + C1 / 2), 0), holeDia, C1, D));
+
+            if (selRotate != 0)
+            {
+                Point3D WPRotate = GetSumPoint(pointA, 0, 0);
+                if (selRotateCenter == 1)
+                    WPRotate = GetSumPoint(pointB, 0, 0);
+                else if (selRotateCenter == 2)
+                    WPRotate = GetSumPoint(pointC, 0, 0);
+                else if (selRotateCenter == 3)
+                    WPRotate = GetSumPoint(pointD, 0, 0);
+
+                foreach (Entity eachEntity in newList)
+                    eachEntity.Rotate(selRotate, Vector3D.AxisZ, WPRotate);
+            }
+            // 나중에 맨 앞으로 옮겨야 함
+            if (selTranslateNumber > 0)
+            {
+                Point3D WPTranslate = new Point3D();
+                if (selTranslateNumber == 1)
+                    WPTranslate = GetSumPoint(pointB, 0, 0);
+                else if (selTranslateNumber == 2)
+                    WPTranslate = GetSumPoint(pointC, 0, 0);
+                else if (selTranslateNumber == 3)
+                    WPTranslate = GetSumPoint(pointD, 0, 0);
+                editingService.SetTranslate(ref newList, GetSumPoint(refPoint, 0, 0), WPTranslate);
+
+            }
+            if (selVisibleLine != null)
+            {
+                if (selVisibleLine[0] == false)
+                    newList.Remove(lineA);
+                if (selVisibleLine[1] == false)
+                    newList.Remove(lineB);
+                if (selVisibleLine[2] == false)
+                    newList.Remove(lineC);
+                if (selVisibleLine[3] == false)
+                    newList.Remove(lineD);
+            }
+
+            selOutputPointList.Add(lineA.StartPoint);
+            selOutputPointList.Add(lineA.EndPoint);
+            selOutputPointList.Add(lineC.StartPoint);
+            selOutputPointList.Add(lineC.EndPoint);
+
+            return newList;
+        }
+
+
+        public DrawEntityModel RafterSideClipDetail(Point3D refPoint,Point3D roofPoint, object selModel, double scaleValue, NRafterSupportClipShellSideModel padModel)
         {
             DrawEntityModel drawList = new DrawEntityModel();
             List<Entity> outlinesList = new List<Entity>();
@@ -529,10 +628,11 @@ namespace DrawWork.DrawDetailServices
             Point3D topViewWorkingPoint = GetSumPoint(refPoint, 0, 0);
             Point3D frontViewWorkingPoint = GetSumPoint(refPoint, 0, 0);
 
-            Point3D roofStartPoint = GetSumPoint(refPoint, move_x, move_y);
+            //Point3D roofStartPoint = GetSumPoint(refPoint, move_x, move_y);
+            Point3D roofStartPoint = roofPoint;
             //roof Line
             List<Line> roof = GetRectangle(GetSumPoint(roofStartPoint, 0, 0), roofwidth, roofLenth, RECTANGLUNVIEW.NONE);
-            List<Line> rafter = GetDoubleLineRectangle(GetSumPoint(roofStartPoint, D1, -A), A, rafterLength, t, RECTANGLUNVIEW.NONE); //thk는 임의값
+            List<Line> rafter = GetDoubleLineRectangle(GetSumPoint(workingPoint, D1, -A), A, rafterLength, t, RECTANGLUNVIEW.NONE); //thk는 임의값
             List<Line> roofNrafter = new List<Line>();
             roofNrafter.AddRange(roof);
             roofNrafter.AddRange(rafter);
@@ -736,6 +836,11 @@ namespace DrawWork.DrawDetailServices
             return slotHoleList;
 
         }
+
+
+
+
+
 
 
 
@@ -985,8 +1090,992 @@ namespace DrawWork.DrawDetailServices
             return drawList;
         }
 
+
+
+
+
+
+        // 2021-10-22
+
+
+        public DrawEntityModel DrawColumnBaseSupport(Point3D refPoint, object selModel, double scaleValue, NColumnBaseSupportModel padModel)
+        {
+            DrawEntityModel drawList = new DrawEntityModel();
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+            List<Entity> newList = new List<Entity>();
+
+
+
+            double A = valueService.GetDoubleValue(padModel.A);
+
+
+            // refPoint : Bottom Center
+
+            List<Entity> entityList = new List<Entity>();
+            List<Entity> centerlinesList = new List<Entity>();
+            List<Entity> hiddenlinesList = new List<Entity>();
+            List<Entity> outlinesList = new List<Entity>();
+
+            //////////////////////////////////////////////////////////
+            // Input CAD DATA
+            //////////////////////////////////////////////////////////
+            // column_BaseSupport Data
+
+            double pipeOD = valueService.GetDoubleValue(padModel.OD);// PipeOD
+            double pipeThk = 7.11; // Pipe THK : SCH.40S
+            double ribLength = valueService.GetDoubleValue(padModel.A); // A
+            double ribWidth = valueService.GetDoubleValue(padModel.A1); // A1
+            double sleeveLength = valueService.GetDoubleValue(padModel.B);//pipeOD + 26; // B
+            double baseTopPlateLength = valueService.GetDoubleValue(padModel.C); // C
+            double baseTopPlateThk = valueService.GetDoubleValue(padModel.I1); // I1
+            double ribTopFlat = valueService.GetDoubleValue(padModel.D1); // D1
+            double ribChamfer = 15; // @1
+            double sleeveWidth = valueService.GetDoubleValue(padModel.B1); // B1 = a1-c1 500 // data shee 오류  200으로 나옴
+            double RibTopWidth = valueService.GetDoubleValue(padModel.C); // C1
+            double radius = valueService.GetDoubleValue(padModel.F1); // F1
+            double sleeveThk = valueService.GetDoubleValue(padModel.H1); // H1
+            double baseBottomPlateLength = 700; // valueService.GetDoubleValue(padModel.E); // E
+            double baseBottomPlateThk = 12; // D BTM plate thk.
+            double gapEachAngle = valueService.GetDoubleValue(padModel.F); // F
+            double angleLenght = 75; // J1  - string 일부 읽기
+            double angleThk = 6; // J1
+            double angleWidth = valueService.GetDoubleValue(padModel.K1); // K1
+            double distanceSleeve = valueService.GetDoubleValue(padModel.E1); // E1
+
+            double drainLength = 24;
+            double drainRadius = 5;
+
+
+            double distanceRib = sleeveThk + distanceSleeve; // E1+H1
+            double radiusOuter = pipeOD / 2;
+            double pipeInnerRadius = radiusOuter - pipeThk;
+
+            double pipeHeight = ribWidth + RibTopWidth;  // +Ribtopwidth = 임의갑 추가높이
+
+
+            ////////////////////////////////
+            /// Draw 
+            ////////////////////////////////
+
+            double basePlateHeight = baseTopPlateThk + baseBottomPlateThk;
+            double distanceWorkPoint = (distanceRib + radiusOuter); // Gap Sleeve for PipeCenterPoint
+
+            // Draw : Rib
+            List<Entity> ribList = GetColumnRib(GetSumPoint(referencePoint, -(distanceRib + radiusOuter), basePlateHeight), distanceWorkPoint, scaleValue, padModel);
+            outlinesList.AddRange(ribList);
+            // mirror Rib(right)
+            outlinesList.AddRange(editingService.GetMirrorEntity(Plane.YZ, ribList, referencePoint.X, referencePoint.Y, true));
+
+            // Draw : Sleeve
+            List<Entity> sleeveList = GetColumnSleeve(GetSumPoint(referencePoint, -(distanceRib + radiusOuter), basePlateHeight), distanceWorkPoint,
+                                                                   scaleValue, padModel);
+            outlinesList.AddRange(sleeveList);
+            // mirror Sleeve(right)
+            outlinesList.AddRange(editingService.GetMirrorEntity(Plane.YZ, sleeveList, referencePoint.X, referencePoint.Y, true));
+
+
+
+            // Draw : Base Plate // baseTopPlateLength, baseBottomPlateLength
+            // Draw : base TopPlate
+            // todo : Chanage Calculate length
+            Line guideBaseTopLength = new Line(CopyPoint(referencePoint), GetSumPoint(referencePoint, baseTopPlateLength, 0));
+            guideBaseTopLength.Rotate(Utility.DegToRad(45), Vector3D.AxisZ, referencePoint);
+            /**/
+            double baseTopDiagonalLength = guideBaseTopLength.EndPoint.X - guideBaseTopLength.StartPoint.X;
+            List<Line> baseTopPlate = GetRectangle(
+                GetSumPoint(referencePoint, -baseTopDiagonalLength, baseBottomPlateThk), baseTopPlateThk, baseTopDiagonalLength * 2);
+            outlinesList.AddRange(baseTopPlate);
+
+            // Draw : base BottomPlate
+            // todo : Chanage Calculate length
+            Line guideBaseBottomLength = new Line(CopyPoint(referencePoint), GetSumPoint(referencePoint, baseBottomPlateLength, 0));
+            guideBaseBottomLength.Rotate(Utility.DegToRad(45), Vector3D.AxisZ, referencePoint);
+            /**/
+            double baseBottomDiagonalLength = guideBaseBottomLength.EndPoint.X - guideBaseBottomLength.StartPoint.X;
+            List<Line> baseBottomPlate = GetRectangle(
+                GetSumPoint(referencePoint, -baseBottomDiagonalLength, 0), baseBottomPlateThk, baseBottomDiagonalLength * 2);
+            outlinesList.AddRange(baseBottomPlate);
+
+
+
+
+            // Draw : CenterLine
+
+
+
+            outlinesList.AddRange(new Entity[] {
+                //pipeInnerLeft, pipeInnerRight,
+            });
+
+            centerlinesList.AddRange(new Entity[] {
+
+            });
+
+            hiddenlinesList.AddRange(new Entity[] {
+               // sleeveTopHiddenLn, sleeveVeticalHiddenLn,
+            });
+
+            styleService.SetLayerListEntity(ref centerlinesList, layerService.LayerCenterLine);
+            styleService.SetLayerListEntity(ref hiddenlinesList, layerService.LayerHiddenLine);
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+
+            newList.AddRange(centerlinesList);
+            newList.AddRange(hiddenlinesList);
+            newList.AddRange(outlinesList);
+
+            drawList.outlineList.AddRange(newList);
+
+            return drawList;
+        }
+
+        public DrawEntityModel DrawColumnCenterTopSupport(Point3D refPoint, object selModel, double scaleValue, NColumnCenterTopSupportModel padModel)
+        {
+            DrawEntityModel drawList = new DrawEntityModel();
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+
+
+            // refPoint : Column Height Top Center
+
+            List<Entity> outlinesList = new List<Entity>();
+            List<Entity> topPlateList = new List<Entity>();
+            List<Entity> topRIbList = new List<Entity>();
+
+            //////////////////////////////////////////////////////////
+            // Input CAD DATA
+            //////////////////////////////////////////////////////////
+
+            double pipeOD = 168.3; // PipeOD
+            double distanceRib = valueService.GetDoubleValue(padModel.A1); // A1
+            double ribTop = valueService.GetDoubleValue(padModel.B1); // B1
+            double centerRingThk = valueService.GetDoubleValue(padModel.C1);// C1
+            double ribChamfer = valueService.GetDoubleValue(padModel.E1); // E1
+            double ribLength = valueService.GetDoubleValue(padModel.G); // G
+            double ribHeight = valueService.GetDoubleValue(padModel.H); // H
+            double radiusOuter = (pipeOD / 2) + ribLength + distanceRib; // CenterRing RadiusOD
+
+            /////////////////////
+
+
+            ////////////////////////////////
+            /// Draw 
+            ////////////////////////////////
+
+            Point3D centerRIngStarPoint = GetSumPoint(referencePoint, -radiusOuter, -centerRingThk);
+            topPlateList.AddRange(GetRectangle(CopyPoint(centerRIngStarPoint), centerRingThk, radiusOuter, RECTANGLUNVIEW.RIGHT));
+
+            List<Line> guideRibBox = GetRectangleLT(GetSumPoint(centerRIngStarPoint, distanceRib, 0), ribHeight, ribLength);
+
+            //guideRibBox[0].TrimBy(GetSumPoint(guideRibBox[0].EndPoint, -ribTop,0), true);
+            guideRibBox[0].TrimAt(ribLength - ribTop, true);
+            guideRibBox[3].TrimAt(ribTop, false);
+            Line ribDiagonal = new Line(guideRibBox[3].EndPoint, guideRibBox[0].StartPoint);
+
+            Line ribChamferLine = GetChamferLine(guideRibBox[2], guideRibBox[1], ribChamfer);
+            guideRibBox[2].TrimBy(ribChamferLine.StartPoint, false);
+            guideRibBox[1].TrimBy(ribChamferLine.EndPoint, true);
+
+
+            topRIbList.AddRange(guideRibBox);
+
+            //outlinesList.AddRange(rightBoxList);
+            topRIbList.AddRange(new Entity[] {
+                ribDiagonal, ribChamferLine,
+                //RBoxBottomLine, RBoxRightLine, RBoxTopLine,
+            });
+
+            // mirror topPlate(right)
+            topPlateList.AddRange(editingService.GetMirrorEntity(Plane.YZ, topPlateList, referencePoint.X, referencePoint.Y, true));
+            outlinesList.AddRange(topPlateList);
+
+            // mirror topRib(right)
+            topRIbList.AddRange(editingService.GetMirrorEntity(Plane.YZ, topRIbList, referencePoint.X, referencePoint.Y, true));
+            outlinesList.AddRange(topRIbList);
+
+
+            styleService.SetLayerListEntity(ref topPlateList, layerService.LayerOutLine);
+            styleService.SetLayerListEntity(ref topRIbList, layerService.LayerOutLine);
+
+            drawList.outlineList.AddRange(outlinesList);
+
+            return drawList;
+
+        }
+
+
+        public List<Entity> GetColumnRib(Point3D refPoint, double distanceWorkPoint, double scaleValue, NColumnBaseSupportModel padModel)
+        {
+
+            // refPoint : sleeveThk+ distanceSleeve + CenterPipe
+
+            List<Entity> entityList = new List<Entity>();
+            List<Entity> centerlinesList = new List<Entity>();
+            List<Entity> hiddenlinesList = new List<Entity>();
+            List<Entity> outlinesList = new List<Entity>();
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+
+            //////////////////////////////////////////////////////////
+            // Input CAD DATA
+            //////////////////////////////////////////////////////////
+
+            double pipeOD = 168.3; // PipeOD
+            double ribLength = valueService.GetDoubleValue(padModel.A);// 300; // A
+            double ribWidth = valueService.GetDoubleValue(padModel.A1);//700; // A1
+            double ribTopFlat = valueService.GetDoubleValue(padModel.D1);//50; // D1
+            double ribChamfer = 15; // @1
+            double sleeveWidth = valueService.GetDoubleValue(padModel.B1);// 500; // B1
+            double RibTopWidth = valueService.GetDoubleValue(padModel.C1);// 200; // C1
+            double radius = valueService.GetDoubleValue(padModel.F1);// 15; // F1
+            double sleeveThk = valueService.GetDoubleValue(padModel.H1);// 10; // H1
+            double distanceSleeve = valueService.GetDoubleValue(padModel.E1);// 3; // E1
+
+            /////////////////////
+
+
+            ////////////////////////////////
+            /// Draw 
+            ////////////////////////////////
+            double ribBottomLength = ribLength - sleeveThk;
+            List<Point3D> topBoxPointList = new List<Point3D>();
+            List<Entity> guideTopBox = GetRectangleK(GetSumPoint(referencePoint, -ribBottomLength, sleeveWidth), RibTopWidth, ribLength, out topBoxPointList);
+            List<Line> guideBottomBox = GetRectangle(GetSumPoint(referencePoint, -ribBottomLength, 0), sleeveWidth, ribBottomLength, RECTANGLUNVIEW.TOP);
+
+            // Draw Arc : CenterPoint of Arc
+            //Point3D arcCenterPoint = CopyPoint( topBoxPointList[1] );
+            Arc guideRibArc = new Arc(topBoxPointList[1], radius, Utility.DegToRad(90), Utility.DegToRad(270));
+
+
+            // Draw : chamfer  index0:bottom  index1: right
+            Line ribChamferLine = GetChamferLine(guideBottomBox[0], guideBottomBox[1], ribChamfer, true);
+
+            // Trim : TopLine, LeftLine, RightLine
+            topBoxPointList[3] = GetSumPoint(topBoxPointList[2], -ribTopFlat, 0);
+            guideBottomBox[2].StartPoint = GetSumPoint(guideBottomBox[2].EndPoint, 0, ribTopFlat);
+            Point3D[] ribBottomRightTop = guideBottomBox[1].IntersectWith(guideRibArc);
+            guideBottomBox[1].StartPoint = CopyPoint(ribBottomRightTop[0]);
+            Arc ribArc = new Arc(topBoxPointList[1], guideRibArc.StartPoint, ribBottomRightTop[0]);
+
+            // Draw : Rib TopLine
+            Line ribTopLine = new Line(topBoxPointList[3], topBoxPointList[2]);
+            Line ribTopRightLine = new Line(topBoxPointList[2], GetSumPoint(topBoxPointList[1], 0, radius));
+
+            // Draw : slope Line
+            Line ribDiagonalLine = new Line(topBoxPointList[3], guideBottomBox[2].StartPoint);
+
+
+            //outlinesList.AddRange(guideRibBox);
+
+            //outlinesList.AddRange(ribList);
+            outlinesList.AddRange(new Entity[] {
+                ribChamferLine, ribArc,
+                ribTopLine, ribTopRightLine, ribDiagonalLine
+                //circleOD, centerHole, //ribLeftLine,ribRightLine
+            });
+
+            centerlinesList.AddRange(new Entity[] {
+                //circleHoleCenter,
+            });
+
+            //hiddenlinesList.AddRange(guideTopBox);
+            hiddenlinesList.AddRange(guideBottomBox);
+            hiddenlinesList.AddRange(new Entity[] {
+                // , guideTopBox,
+            });
+
+            styleService.SetLayerListEntity(ref centerlinesList, layerService.LayerCenterLine);
+            styleService.SetLayerListEntity(ref hiddenlinesList, layerService.LayerHiddenLine);
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+
+            entityList.AddRange(centerlinesList);
+            entityList.AddRange(hiddenlinesList);
+            entityList.AddRange(outlinesList);
+
+            return entityList;
+        }
+
+        public List<Entity> GetColumnSleeve(Point3D refPoint, double distanceWorkPoint, double scaleValue, NColumnBaseSupportModel padModel)
+        {
+            //  double SleeveWidth, double SleeveLength, double SleeveThk,
+            // refPoint : sleeveThk+ distanceSleeve + CenterPipe
+
+            List<Entity> entityList = new List<Entity>();
+            List<Entity> centerlinesList = new List<Entity>();
+            List<Entity> hiddenlinesList = new List<Entity>();
+            List<Entity> outlinesList = new List<Entity>();
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+
+            //////////////////////////////////////////////////////////
+            // Input CAD DATA
+            //////////////////////////////////////////////////////////
+
+            double sleeveWidth = valueService.GetDoubleValue(padModel.B1); //SleeveWidth; // B1
+            double sleeveLength = valueService.GetDoubleValue(padModel.B); //SleeveLength; // B
+            double sleeveThk = valueService.GetDoubleValue(padModel.H1);// SleeveThk; // H1
+            double DistanceSleeve = valueService.GetDoubleValue(padModel.E1); // E1
+            /////////////////////
+
+
+            ////////////////////////////////
+            /// Draw 
+            ////////////////////////////////
+            List<Point3D> sleevePoint = null;
+            outlinesList.AddRange(GetRectangleK(CopyPoint(referencePoint), sleeveWidth, sleeveThk, out sleevePoint));
+
+
+            outlinesList.Add(new Line(sleevePoint[3], GetSumPoint(sleevePoint[3], DistanceSleeve, 0)));
+
+            outlinesList.AddRange(new Entity[] {
+
+            });
+
+            centerlinesList.AddRange(new Entity[] {
+                //circleHoleCenter,
+            });
+
+            hiddenlinesList.AddRange(new Entity[] {
+                // , guideTopBox,
+            });
+
+            styleService.SetLayerListEntity(ref centerlinesList, layerService.LayerCenterLine);
+            styleService.SetLayerListEntity(ref hiddenlinesList, layerService.LayerHiddenLine);
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+
+            entityList.AddRange(centerlinesList);
+            entityList.AddRange(hiddenlinesList);
+            entityList.AddRange(outlinesList);
+
+            return entityList;
+        }
+
+
+
+        public List<Entity> GetRectangleK(Point3D selPoint, double Width, double Length, out List<Point3D> selOutputPointList,
+                    bool isTopLeft = false, double rotateRadian = 0, double rotateCenterNum = 0, double selTranslateNumber = 0,
+                    bool[] selVisibleLine = null)
+        {
+            selOutputPointList = new List<Point3D>();
+            List<Entity> newList = new List<Entity>();
+
+            // selPoint
+            // default : Bottom Left
+
+            // switch : Top Left
+            double switchPoint = 1;
+            if (isTopLeft) { switchPoint = -1; }
+
+            // Reference Point : Bottom Left(A)   -> B:BR -> C:TR -> D:TL
+            Point3D A = GetSumPoint(selPoint, 0, 0);
+            Point3D B = GetSumPoint(selPoint, Length, 0);
+            Point3D C = GetSumPoint(selPoint, Length, Width * switchPoint);
+            Point3D D = GetSumPoint(selPoint, 0, Width * switchPoint);
+
+            // Reference Point : Bottom Left(A)   -> B:BR -> C:TR -> D:TL
+            //Point3D A = GetSumPoint(selPoint, 0, 0);
+            //Point3D B = GetSumPoint(selPoint, Length, 0);
+            //Point3D C = GetSumPoint(selPoint, Length, Width);
+            //Point3D D = GetSumPoint(selPoint, 0, Width);
+
+            if (isTopLeft)
+            {
+                Point3D tempPoint = null;
+
+                tempPoint = CopyPoint(A);
+                A = CopyPoint(D);
+                D = CopyPoint(tempPoint);
+
+                tempPoint = CopyPoint(B);
+                B = CopyPoint(C);
+                C = CopyPoint(tempPoint);
+            }
+
+            // Line : Bottom , Right, Top, Left
+            Line lineA = new Line(GetSumPoint(A, 0, 0), GetSumPoint(B, 0, 0));
+            Line lineB = new Line(GetSumPoint(C, 0, 0), GetSumPoint(B, 0, 0));
+            Line lineC = new Line(GetSumPoint(D, 0, 0), GetSumPoint(C, 0, 0));
+            Line lineD = new Line(GetSumPoint(D, 0, 0), GetSumPoint(A, 0, 0));
+
+            newList.AddRange(new Line[] { lineA, lineB, lineC, lineD });
+
+            // 1,2,3,4 = A, B, C, D  각 포인트를 기준으로 회전
+            if (rotateRadian != 0)
+            {
+                Point3D WPRotate = GetSumPoint(A, 0, 0);
+                if (rotateCenterNum == 1)
+                    WPRotate = GetSumPoint(B, 0, 0);
+                else if (rotateCenterNum == 2)
+                    WPRotate = GetSumPoint(C, 0, 0);
+                else if (rotateCenterNum == 3)
+                    WPRotate = GetSumPoint(D, 0, 0);
+
+                foreach (Entity eachEntity in newList)
+                    eachEntity.Rotate(rotateRadian, Vector3D.AxisZ, WPRotate);
+            }
+
+            // 
+            if (selTranslateNumber > 0)
+            {
+                Point3D WPTranslate = new Point3D();
+                if (selTranslateNumber == 1)
+                    WPTranslate = GetSumPoint(B, 0, 0);
+                else if (selTranslateNumber == 2)
+                    WPTranslate = GetSumPoint(C, 0, 0);
+                else if (selTranslateNumber == 3)
+                    WPTranslate = GetSumPoint(D, 0, 0);
+                editingService.SetTranslate(ref newList, GetSumPoint(selPoint, 0, 0), WPTranslate);
+
+            }
+
+            // Bottom, Right, Top, Left 
+            if (selVisibleLine != null)
+            {
+                if (selVisibleLine[0] == false)
+                    newList.Remove(lineA);
+                if (selVisibleLine[1] == false)
+                    newList.Remove(lineB);
+                if (selVisibleLine[2] == false)
+                    newList.Remove(lineC);
+                if (selVisibleLine[3] == false)
+                    newList.Remove(lineD);
+            }
+
+            // Out : PointList
+            selOutputPointList.AddRange(new Point3D[] { A, B, C, D });
+
+            return newList;
+        }
+
+
+
         #endregion
 
+
+
+
+        #region Lee Ju
+        public List<Entity> GetCenterColumn_BB(Point3D refPoint, double scaleValue)
+        {
+            List<Entity> outlinesList = new List<Entity>();
+
+            Point3D referencePoint = GetSumPoint(new Point3D(refPoint.X, refPoint.Y), 0, 0);
+            double startPoint_plus = 50;
+            double rectangle_Outer = 800;
+            double rectangle_inner = 700;
+
+            double rectangle_Hide_inner = 750 / 2;
+
+            double circle_Length_1 = 120;
+            double circle_Length_2 = 124;
+            double circle_Length_3 = 130;
+            double circle_Length_4 = 134;
+
+            double liner_Length = 485;
+            double liner_Offset_Length = 10;
+
+            double angle = 90;
+            double degrees360 = 360;
+
+            Point3D startPoint = GetSumPoint(referencePoint, 0, 0);
+            Point3D startPointPlus = GetSumPoint(startPoint, startPoint_plus, startPoint_plus);
+            Point3D centerPoint = GetSumPoint(startPoint, rectangle_Outer / 2, rectangle_Outer / 2);
+
+            Point3D filletPoint = GetSumPoint(centerPoint, -rectangle_Hide_inner, rectangle_Hide_inner);
+
+            List<Line> rectangleOuter = GetRectangle(startPoint, rectangle_Outer, rectangle_Outer);
+            List<Line> rectangleInner = GetRectangle(startPointPlus, rectangle_inner, rectangle_inner);
+            Circle center_Circle_1 = new Circle(centerPoint, circle_Length_1);
+            Circle center_Circle_2 = new Circle(centerPoint, circle_Length_2);
+            Circle center_Circle_3 = new Circle(centerPoint, circle_Length_3);
+            Circle center_Circle_4 = new Circle(centerPoint, circle_Length_4);
+
+            /*Fillet참고*/
+            outlinesList.AddRange(GetAngleList(filletPoint, 75, 75, 6, SHAPEDIRECTION.RIGHTTOP, 5));
+            outlinesList.AddRange(GetAngleList(GetSumPoint(filletPoint, 0, -rectangle_Hide_inner * 2), 75, 75, 6, SHAPEDIRECTION.RIGHTBOTTOM, 5));
+            outlinesList.AddRange(GetAngleList(GetSumPoint(filletPoint, rectangle_Hide_inner * 2, -rectangle_Hide_inner * 2), 75, 75, 6, SHAPEDIRECTION.LEFTBOTTOM, 5));
+            outlinesList.AddRange(GetAngleList(GetSumPoint(filletPoint, rectangle_Hide_inner * 2, 0), 75, 75, 6, SHAPEDIRECTION.LEFTTOP, 5));
+
+            //필렛 예시문 private List<Entity> GetAngleList(Point3D refPoint, double width, double length, double thk, SHAPEDIRECTION shapeDirection = SHAPEDIRECTION.LEFTTOP, double radius = 0)
+
+
+
+            for (int i = 0; i < degrees360; i++)
+            {
+                /*
+                Line inner_Rotate_Line001 = new Line(GetSumPoint(centerPoint, circle_Length_4, 7), GetSumPoint(centerPoint, 620 - circle_Length_4, 0));
+                inner_Rotate_Line001.Rotate(Utility.DegToRad((46) + angle * i), Vector3D.AxisZ, centerPoint);
+                Line inner_Rotate_Line002 = new Line(GetSumPoint(centerPoint, circle_Length_4, -7), GetSumPoint(centerPoint, 620 - circle_Length_4, 0));
+                inner_Rotate_Line002.Rotate(Utility.DegToRad((44) + angle * i), Vector3D.AxisZ, centerPoint);
+
+                Line inner_Rotate_Line_Top = new Line(inner_Rotate_Line001.EndPoint, inner_Rotate_Line002.EndPoint);
+                */
+
+                Line inner_Rotate_Line1 = new Line(GetSumPoint(centerPoint, circle_Length_4, liner_Offset_Length), GetSumPoint(centerPoint, liner_Length, liner_Offset_Length));
+                Line inner_Rotate_Line2 = (Line)inner_Rotate_Line1.Offset(liner_Offset_Length * 2, Vector3D.AxisZ);
+                inner_Rotate_Line1.Rotate(Utility.DegToRad((45) + angle * i), Vector3D.AxisZ, centerPoint);
+                inner_Rotate_Line2.Rotate(Utility.DegToRad((45) + angle * i), Vector3D.AxisZ, centerPoint);
+
+
+
+                outlinesList.AddRange(new Entity[]{
+                   //inner_Rotate_Line001, inner_Rotate_Line002, inner_Rotate_Line_Top,
+                   inner_Rotate_Line1, inner_Rotate_Line2,
+                });
+            };
+
+
+            //Line[] rectangle_min = GetRectangleV3(centerPoint, ,);
+
+            /*
+            Point3D rotatePoint = CopyPoint(mPlateTop.EndPoint);
+            Line tPlateIntersectLine1 = new Line(CopyPoint(mPlateTop.StartPoint), GetSumPoint(mPlateTop.StartPoint, totalPlateLength, 0));.
+            Line tPlateIntersectLine2 = (Line)tPlateIntersectLine1.Offset(-plateWidth, Vector3D.AxisZ);
+            tPlateIntersectLine1.Rotate(Utility.DegToRad(-30), Vector3D.AxisZ, rotatePoint);
+            */
+
+
+            outlinesList.AddRange(new Entity[]{
+
+                //바깥네모
+                rectangleOuter[0], rectangleOuter[1], rectangleOuter[2], rectangleOuter[3],
+                //안팎네모
+                rectangleInner[0], rectangleInner[1], rectangleInner[2], rectangleInner[3],
+                //중앙원
+                center_Circle_1, center_Circle_2, center_Circle_3, center_Circle_4,
+                //모서리앵글
+                /*
+                right_Angle_1[0], right_Angle_1[1], right_Angle_1[2], right_Angle_1[3],
+                right_Angle_2[0], right_Angle_2[1], right_Angle_2[2], right_Angle_2[3],
+                */
+
+            });
+
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+
+            return outlinesList;
+        }
+
+        public List<Entity> GetCenterColumn_Detail_C(Point3D refPoint, double scaleValue)
+        {
+            List<Entity> outlinesList = new List<Entity>();
+
+            Point3D referencePoint = GetSumPoint(new Point3D(refPoint.X, refPoint.Y), 0, 0);
+
+            double detail_Under_Length = 10;
+            double detail_Under_Width = 200;
+
+            double detail_Over_Length = 6.1;
+            double detail_Over_Width = 150;
+
+            double arc_Radius = 15;
+            double arc_Width = 15;
+            double arc_Line_Width = 80;
+
+            double detail_Under_Bottom_Right_slant = 2;
+
+            double detail_Over_Bottom_Right_slant = 1;
+            double detail_Over_Right_Top_slant = 3;
+
+            double detail_distance_Length = 3.05;
+
+
+
+
+            Point3D centerPoint = GetSumPoint(referencePoint, 0, 0);
+
+            /*Under Rectangle*/
+            Point3D detail_Under_Bottom_L_Point = GetSumPoint(centerPoint, 0, 0);
+            Point3D detail_Under_Bottom_R_Point = GetSumPoint(detail_Under_Bottom_L_Point, detail_Under_Length, detail_Under_Bottom_Right_slant);
+            Point3D detail_Under_Right_Top_Point = GetSumPoint(detail_Under_Bottom_R_Point, 0, detail_Under_Width);
+            Point3D detail_Under_Left_Top_Point = GetSumPoint(detail_Under_Right_Top_Point, -detail_Under_Length, 0);
+
+            //Under Line 바텀 ==========> Line detail_Under_Bottom_Line = new Line(detail_Under_Bottom_L_Point, detail_Under_Bottom_R_Point);
+            Line detail_Under_Right_Line = new Line(detail_Under_Bottom_R_Point, detail_Under_Right_Top_Point);
+            Line detail_Under_Top_Line = new Line(detail_Under_Right_Top_Point, detail_Under_Left_Top_Point);
+            Line detail_Under_Left_Line = new Line(detail_Under_Left_Top_Point, detail_Under_Bottom_L_Point);
+
+
+
+            /*Over Contents*/
+            //Over Point
+            Point3D detail_Over_Up_Fix_Point = GetSumPoint(detail_Under_Right_Top_Point, detail_distance_Length, detail_Over_Width / 2);
+            Point3D detail_Over_Down_Fix_Point = GetSumPoint(detail_Under_Right_Top_Point, detail_distance_Length, -detail_Over_Width / 2);
+            /*Over Rectangle*/
+            Point3D detail_Over_Bottom_L_Point = GetSumPoint(detail_Over_Down_Fix_Point, 0, 0);
+            Point3D detail_Over_Bottom_R_Point = GetSumPoint(detail_Over_Bottom_L_Point, detail_Over_Length, 0);
+            Point3D detail_Over_Right_Top_Point = GetSumPoint(detail_Over_Bottom_R_Point, 0, detail_Over_Width);
+            Point3D detail_Over_Left_Top_Point = GetSumPoint(detail_Over_Up_Fix_Point, 0, 0);
+
+            //Over Line 바텀 ==========> Line detail_Over_Bottom_Line = new Line(detail_Over_Bottom_L_Point, detail_Over_Bottom_R_Point);
+            Line detail_Over_Right_Line = new Line(detail_Over_Bottom_R_Point, detail_Over_Right_Top_Point);
+            //Line detail_Over_Top_Line = new Line(detail_Over_Right_Top_Point, detail_Over_Left_Top_Point);
+            Line detail_Over_Left_Line = new Line(detail_Over_Left_Top_Point, detail_Over_Bottom_L_Point);
+
+            //Arc Line 
+            Point3D arc_Under_Point = GetSumPoint(detail_Under_Right_Top_Point, 0, arc_Width);
+            Point3D arc_Over_Point = GetSumPoint(arc_Under_Point, 0, arc_Line_Width);
+
+            Point3D arc_First_Point = GetSumPoint(arc_Under_Point, 0, 0);
+            Point3D arc_Second_Point = GetSumPoint(detail_Under_Right_Top_Point, -arc_Radius, 0);
+            Point3D arc_Third_Point = GetSumPoint(detail_Under_Right_Top_Point, 0, -arc_Width);
+
+            Line arc_Line = new Line(arc_Under_Point, arc_Over_Point);
+
+
+            Arc arc_Hide_Semicircle = new Arc(arc_First_Point, arc_Second_Point, arc_Third_Point, false);//리스트에는 빼서 보이지않게 하고 밑의 아크만 보이게하기(이 아크는 단순히 인터셉트위드 교차선 용도)
+            Point3D[] intersect_Arc_Point = detail_Under_Left_Line.IntersectWith(arc_Hide_Semicircle);
+            Arc arc_Semicircle = new Arc(arc_First_Point, arc_Second_Point, intersect_Arc_Point[0], false);
+
+            //Line intersect_Arc_Line = new Line(intersect_Arc_Point[0], detail_Under_Right_Top_Point);
+
+
+
+            //Point3D arctest
+            //Line testLine = new Line(arc_Under_Point, detail_Under_Right_Top_Point);
+            //testLine.Rotate(Utility.DegToRad(138.15), Vector3D.AxisZ, detail_Under_Right_Top_Point);
+
+            //Circle testCircle = new Circle(,);
+
+
+
+
+
+
+
+
+
+            outlinesList.AddRange(new Entity[]{
+
+                //detail_Under_Bottom_Line,
+                detail_Under_Right_Line, detail_Under_Top_Line, detail_Under_Left_Line,
+                //detail_Over_Bottom_Line,
+                detail_Over_Right_Line, detail_Over_Left_Line,
+
+                arc_Line, arc_Semicircle,
+
+
+            });
+
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+
+            return outlinesList;
+        }
+
+        public List<Entity> GetCenterColumn_Detail_D(Point3D refPoint, double scaleValue)
+        {
+            List<Entity> outlinesList = new List<Entity>();
+
+
+
+            return outlinesList;
+        }
+
+
+        public List<Entity> GetCenterColumn_EE(Point3D refPoint, double scaleValue)
+        {
+
+            List<Entity> outlinesList = new List<Entity>();
+            Point3D referencePoint = CopyPoint(refPoint);
+
+            double section_Undefined_Width = 800;
+            double section_Seam_Width = 500;
+            double detail_Length = 3;
+            double detail_over_Right_Length = 6.1;
+            double detail_over_Length = 10;
+
+            //under_Bottom
+            double under_Bottom_Width = 8;
+            double under_Top_Width = 12;
+            double under_Bottom_Undefined_Length1 = 750;
+            double under_Bottom_Undefined_Length2 = 440;
+            double under_Bottom_Undefined_Length3 = 400;
+            double under_Bottom_Undefined_Length23 = 40;
+
+            //over_Left
+            double over_Bottom_Left_Width = 30;
+            double over_Width = 700;
+            double over_Seam_Width = over_Width - over_Bottom_Left_Width;
+            double over_Length = 320;
+            double over_Top_Length = 50;
+            double over_Seam_Length = over_Length - over_Top_Length;
+            double over_Arc_Radius = 15;
+            double over_Seam_Rigth_Top_Width = 200;
+            double over_Seam_Right_Top_Arc_Width = over_Seam_Rigth_Top_Width - over_Arc_Radius;
+            double over_Chamfer = 20;
+
+
+
+
+
+
+            //under_Line
+            Point3D under_Bottom_L_Point1 = GetSumPoint(referencePoint, 0, 0);
+            Point3D under_Bottom_R_Point1 = GetSumPoint(under_Bottom_L_Point1, under_Bottom_Undefined_Length1, 0);
+            Point3D under_Top_L_Point1 = GetSumPoint(under_Bottom_L_Point1, 0, under_Bottom_Width);
+            Point3D under_Top_R_Point1 = GetSumPoint(under_Top_L_Point1, under_Bottom_Undefined_Length1, 0);
+            Line under_Bottom_Line1 = new Line(under_Bottom_L_Point1, under_Bottom_R_Point1);
+            Line under_Top_Line1 = new Line(under_Top_L_Point1, under_Top_R_Point1);
+
+            Point3D under_Bottom_L_Point2 = GetSumPoint(under_Top_L_Point1, under_Bottom_Undefined_Length1 / 4, 0);
+            Point3D under_Bottom_R_Point2 = GetSumPoint(under_Bottom_L_Point2, under_Bottom_Undefined_Length2, 0);
+            Point3D under_Top_L_Point2 = GetSumPoint(under_Bottom_L_Point2, 0, under_Top_Width);
+            Point3D under_Top_R_Point2 = GetSumPoint(under_Top_L_Point2, under_Bottom_Undefined_Length2, 0);
+            Line under_Left_Line1 = new Line(under_Bottom_L_Point2, under_Top_L_Point2);
+            Line under_Bottom_Line2 = new Line(under_Bottom_L_Point2, under_Bottom_R_Point2);
+            Line under_Top_Line2 = new Line(under_Top_L_Point2, under_Top_R_Point2);
+
+            Point3D under_Bottom_L_Point3 = GetSumPoint(under_Top_L_Point2, under_Bottom_Undefined_Length23, 0);
+            Point3D under_Bottom_R_Point3 = GetSumPoint(under_Bottom_L_Point3, under_Bottom_Undefined_Length3, 0);
+            Point3D under_Top_L_Point3 = GetSumPoint(under_Bottom_L_Point3, 0, under_Top_Width);
+            Point3D under_Top_R_Point3 = GetSumPoint(under_Top_L_Point3, under_Bottom_Undefined_Length3, 0);
+            Line under_Left_Line2 = new Line(under_Bottom_L_Point3, under_Top_L_Point3);
+            Line under_Bottom_Line3 = new Line(under_Bottom_L_Point3, under_Bottom_R_Point3);
+            Line under_Top_Line3 = new Line(under_Top_L_Point3, under_Top_R_Point3);
+
+            //over_Line
+            Point3D over_Bottom_L_Point1 = GetSumPoint(under_Top_L_Point3, detail_Length, 0);
+            Point3D over_Top_L_Point1 = GetSumPoint(over_Bottom_L_Point1, 0, over_Bottom_Left_Width);
+            Point3D over_Top_Diagonal = GetSumPoint(over_Top_L_Point1, over_Seam_Length, over_Seam_Width);
+            Point3D over_Top_R_Point1 = GetSumPoint(over_Top_Diagonal, over_Top_Length, 0);
+            Point3D over_Right_Seam_Point1 = GetSumPoint(over_Top_R_Point1, 0, -over_Seam_Right_Top_Arc_Width);//start
+            Point3D over_Right_Seam_Radius_Point = GetSumPoint(over_Right_Seam_Point1, 0, -over_Arc_Radius);//center
+            Point3D arc_End_Point = GetSumPoint(over_Right_Seam_Radius_Point, 0, -over_Arc_Radius);//End
+            Point3D arc_Mid_Point = GetSumPoint(over_Right_Seam_Radius_Point, -over_Arc_Radius, 0);//Mid
+            Point3D over_Left_Seam_Point1 = GetSumPoint(over_Right_Seam_Radius_Point, -detail_over_Length, 0);
+            Point3D over_Bottom_L_Point2 = GetSumPoint(over_Left_Seam_Point1, 0, -section_Seam_Width);
+            Point3D over_Bottom_R_Point1 = GetSumPoint(over_Bottom_L_Point2, detail_over_Length, 0);
+            Point3D over_Right_Top_Point1 = GetSumPoint(over_Bottom_R_Point1, 0, section_Seam_Width);
+            Point3D over_Bottom_L_Chamfer_Point = GetSumPoint(over_Bottom_L_Point2, -over_Chamfer, 0);
+            Point3D over_Bottom_R_Chamfer_Point = GetSumPoint(over_Bottom_L_Point2, 0, over_Chamfer);
+            Point3D over_Bottom_L_Point3 = GetSumPoint(over_Bottom_R_Point1, detail_Length, 0);
+            Point3D over_Bottom_R_Point2 = GetSumPoint(over_Bottom_L_Point3, detail_over_Right_Length, 0);
+            Point3D over_Top_R_Point2 = GetSumPoint(over_Bottom_R_Point2, 0, section_Undefined_Width);
+            Point3D over_Top_L_Point2 = GetSumPoint(over_Bottom_L_Point3, 0, section_Undefined_Width);
+
+
+            Line over_Bottom_Left_Line1 = new Line(over_Bottom_L_Point1, over_Top_L_Point1);
+            Line over_Diagonal_Line = new Line(over_Top_L_Point1, over_Top_Diagonal);
+            Line over_Header_Line = new Line(over_Top_Diagonal, over_Top_R_Point1);
+            Line over_Right_Line1 = new Line(over_Top_R_Point1, over_Right_Seam_Point1);
+            Line over_Seam_Header_Line = new Line(over_Left_Seam_Point1, over_Right_Seam_Radius_Point);
+            Line over_Left_Line1 = new Line(over_Left_Seam_Point1, over_Bottom_L_Point2);
+            Line over_Bottom_Line1 = new Line(over_Bottom_L_Point2, over_Bottom_R_Point1);
+            Line over_Right_Line2 = new Line(over_Bottom_R_Point1, over_Right_Top_Point1);
+            Line over_Chafer_Line = new Line(over_Bottom_L_Chamfer_Point, over_Bottom_R_Chamfer_Point);
+            Line over_Bottom_Line2 = new Line(over_Bottom_L_Point3, over_Bottom_R_Point2);
+            Line over_Right_Line3 = new Line(over_Bottom_R_Point2, over_Top_R_Point2);
+            Line over_Left_Line2 = new Line(over_Bottom_L_Point3, over_Top_L_Point2);
+            Line over_Header_Line2 = new Line(over_Top_L_Point2, over_Top_R_Point2);
+
+            Arc radius = new Arc(over_Right_Seam_Point1, arc_Mid_Point, arc_End_Point, false);//가상 Radius
+            Point3D[] intersect_Arc_Point = over_Left_Line1.IntersectWith(radius);//교차점
+            Arc arc_Semi_Radius = new Arc(over_Right_Seam_Point1, arc_Mid_Point, intersect_Arc_Point[0], false);//Arc 적용
+
+
+            outlinesList.AddRange(new Entity[]{
+                //under_Bottom_Line1
+                under_Bottom_Line1, under_Top_Line1,
+                //under_Bottom_Line2
+                under_Left_Line1, under_Bottom_Line2, under_Top_Line2,
+                //under_Bottom_Line3
+                under_Left_Line2, under_Bottom_Line3, under_Top_Line3,
+
+                //over_Line1
+                over_Bottom_Left_Line1, over_Diagonal_Line, over_Header_Line, over_Right_Line1, over_Seam_Header_Line, over_Left_Line1, over_Bottom_Line1, over_Right_Line2, over_Chafer_Line,
+                over_Bottom_Line2, over_Right_Line3, over_Left_Line2, over_Header_Line2, 
+
+                //arc
+                arc_Semi_Radius,
+            });
+
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+
+            return outlinesList;
+        }
+
+
+        public List<Entity> GetCenterColumn_Drain_Detail(Point3D refPoint, double scaleValue)
+        {
+            List<Entity> EntityList = new List<Entity>();
+            List<Entity> outlinesList = new List<Entity>();
+            List<Entity> centerlinesList = new List<Entity>();
+
+            Point3D referencePoint = CopyPoint(refPoint);
+
+            double CenterlineLength = 3300;
+
+            double outRadius_1 = 3000;
+            double innerRadius_1 = 2850;
+            double outRadius_2 = 2600;
+            double innerRadius_2 = 2450;
+
+            double angle = 120;
+            double degrees90 = 90;
+            double degrees5 = 5;
+            double division_Angle = 360;
+            //double drainHoles_Length = 150;
+
+            Line CenterLineV = new Line(GetSumPoint(referencePoint, 0, CenterlineLength), GetSumPoint(referencePoint, 0, -CenterlineLength));
+            Line CenterLineH = new Line(GetSumPoint(referencePoint, CenterlineLength, 0), GetSumPoint(referencePoint, -CenterlineLength, 0));
+
+            //Point3D referencePoint = GetSumPoint(referencePoint, center_Point_Length_Width, center_Point_Length_Width);
+
+            Circle outCircle_1 = new Circle(referencePoint, outRadius_1);
+            Circle innerCircle_1 = new Circle(referencePoint, innerRadius_1);
+
+            Circle outCircle_2 = new Circle(referencePoint, outRadius_2);
+            Circle innerCircle_2 = new Circle(referencePoint, innerRadius_2);
+
+
+            for (int i = 0; i < division_Angle; i++)
+            {
+
+                //outCircle
+                Line out_drain_Line1 = new Line(GetSumPoint(referencePoint, innerRadius_1, 0), GetSumPoint(referencePoint, outRadius_1, 0));
+                out_drain_Line1.Rotate(Utility.DegToRad((degrees90 + degrees5) + angle * i), Vector3D.AxisZ, referencePoint);
+                Line out_drain_Line2 = new Line(GetSumPoint(referencePoint, innerRadius_1, 0), GetSumPoint(referencePoint, outRadius_1, 0));
+                out_drain_Line2.Rotate(Utility.DegToRad((degrees90 - degrees5) + angle * i), Vector3D.AxisZ, referencePoint);
+
+
+                //innerCircle
+                Line inner_drain_Line1 = new Line(GetSumPoint(referencePoint, innerRadius_2, 0), GetSumPoint(referencePoint, outRadius_2, 0));
+                inner_drain_Line1.Rotate(Utility.DegToRad((degrees90 + degrees5) + angle * i), Vector3D.AxisZ, referencePoint);
+                Line inner_drain_Line2 = new Line(GetSumPoint(referencePoint, innerRadius_2, 0), GetSumPoint(referencePoint, outRadius_2, 0));
+                inner_drain_Line2.Rotate(Utility.DegToRad((degrees90 - degrees5) + angle * i), Vector3D.AxisZ, referencePoint);
+
+
+
+                //Line newLine = (Line)out_drain_Line1.Offset(50, Vector3D.AxisZ);
+
+                outlinesList.AddRange(new Entity[]{
+                    out_drain_Line1, out_drain_Line2,
+                    inner_drain_Line1, inner_drain_Line2,
+                });
+
+
+            }
+
+
+
+            outlinesList.AddRange(new Entity[]{
+                    innerCircle_1, outCircle_1, innerCircle_2, outCircle_2,
+            });
+
+            centerlinesList.AddRange(new Entity[]{
+                    CenterLineV, CenterLineH
+            });
+
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+            styleService.SetLayerListEntity(ref centerlinesList, layerService.LayerCenterLine);
+
+            EntityList.AddRange(outlinesList);
+            EntityList.AddRange(centerlinesList);
+
+
+            return EntityList;
+        }
+
+        public List<Entity> GetCenterColumn_BB_Edit(Point3D refPoint, double scaleValue)
+        {
+            List<Entity> outlinesList = new List<Entity>();
+            Point3D referencePoint = CopyPoint(refPoint);
+            double startPoint_plus = 50;
+            double rectangle_Outer = 800;
+            double rectangle_inner = 700;
+
+            double gapAngle = 750;
+
+            double circle_Length_1 = 120;
+            double circle_Length_2 = 124;
+            double circle_Length_3 = 130;
+            double circle_Length_4 = 134;
+
+            double liner_Length = 485;
+            double liner_Offset_Length = 10;
+
+            double angle = 90;
+            double degrees360 = 360;
+
+            double angleLength = 75;
+            double angleThk = 6;
+            double angleRound = 5;
+
+
+            Point3D startPointPlus = GetSumPoint(referencePoint, startPoint_plus, startPoint_plus);
+            Point3D centerPoint = GetSumPoint(referencePoint, rectangle_Outer / 2, rectangle_Outer / 2);
+
+            Point3D filletPoint = GetSumPoint(centerPoint, -gapAngle / 2, gapAngle / 2);
+            Point3D filletPoint1 = GetSumPoint(centerPoint, -gapAngle / 2, -gapAngle / 2);
+            Point3D filletPoint2 = GetSumPoint(centerPoint, gapAngle / 2, -gapAngle / 2);
+            Point3D filletPoint3 = GetSumPoint(centerPoint, gapAngle / 2, gapAngle / 2);
+
+            List<Line> rectangleOuter = GetRectangle(referencePoint, rectangle_Outer, rectangle_Outer);
+            List<Line> rectangleInner = GetRectangle(startPointPlus, rectangle_inner, rectangle_inner);
+            Circle center_Circle_1 = new Circle(centerPoint, circle_Length_1);
+            Circle center_Circle_2 = new Circle(centerPoint, circle_Length_2);
+            Circle center_Circle_3 = new Circle(centerPoint, circle_Length_3);
+            Circle center_Circle_4 = new Circle(centerPoint, circle_Length_4);
+
+            /*Fillet참고*/
+            outlinesList.AddRange(GetAngleList(filletPoint, angleLength, angleLength, angleThk, SHAPEDIRECTION.RIGHTTOP, angleRound));
+            outlinesList.AddRange(GetAngleList(filletPoint1, angleLength, angleLength, angleThk, SHAPEDIRECTION.RIGHTBOTTOM, angleRound));
+            outlinesList.AddRange(GetAngleList(filletPoint2, angleLength, angleLength, angleThk, SHAPEDIRECTION.LEFTBOTTOM, angleRound));
+            outlinesList.AddRange(GetAngleList(filletPoint3, angleLength, angleLength, angleThk, SHAPEDIRECTION.LEFTTOP, angleRound));
+
+            //필렛 예시문 private List<Entity> GetAngleList(Point3D refPoint, double width, double length, double thk, SHAPEDIRECTION shapeDirection = SHAPEDIRECTION.LEFTTOP, double radius = 0)
+
+
+
+            for (int i = 0; i < degrees360; i++)
+            {
+
+
+                Line inner_Rotate_Line1 = new Line(GetSumPoint(centerPoint, circle_Length_4, liner_Offset_Length), GetSumPoint(centerPoint, liner_Length, liner_Offset_Length));
+                Line inner_Rotate_Line2 = (Line)inner_Rotate_Line1.Offset(liner_Offset_Length * 2, Vector3D.AxisZ);
+                inner_Rotate_Line1.Rotate(Utility.DegToRad((45) + angle * i), Vector3D.AxisZ, centerPoint);
+                inner_Rotate_Line2.Rotate(Utility.DegToRad((45) + angle * i), Vector3D.AxisZ, centerPoint);
+
+
+
+                outlinesList.AddRange(new Entity[]{
+                   //inner_Rotate_Line001, inner_Rotate_Line002, inner_Rotate_Line_Top,
+                   inner_Rotate_Line1, inner_Rotate_Line2,
+                });
+            };
+
+
+
+
+            outlinesList.AddRange(new Entity[]{
+
+                //바깥네모
+                rectangleOuter[0], rectangleOuter[1], rectangleOuter[2], rectangleOuter[3],
+                //안팎네모
+                rectangleInner[0], rectangleInner[1], rectangleInner[2], rectangleInner[3],
+                //중앙원
+                center_Circle_1, center_Circle_2, center_Circle_3, center_Circle_4,
+                //모서리앵글
+                /*
+                right_Angle_1[0], right_Angle_1[1], right_Angle_1[2], right_Angle_1[3],
+                right_Angle_2[0], right_Angle_2[1], right_Angle_2[2], right_Angle_2[3],
+                */
+
+            });
+
+            styleService.SetLayerListEntity(ref outlinesList, layerService.LayerOutLine);
+
+            return outlinesList;
+
+        }
+
+        /// <summary>  -----> 이대리님
+        /// /////////////////////////////////////
+        /// 
+
+
+        #endregion
+
+        private Point3D CopyPoint(Point3D selPoint)
+        {
+            return new Point3D(selPoint.X, selPoint.Y, selPoint.Z);
+        }
 
 
         private Point3D GetSumPoint(Point3D selPoint1, double X, double Y, double Z = 0)
@@ -1133,6 +2222,151 @@ namespace DrawWork.DrawDetailServices
 
             return outlineList;
 
+        }
+
+
+
+        public List<Entity> GetRepeatRotateEntity(Point3D refPoint, double radius, double count, List<Entity> entityList, double intersectCount, double Rotate = 360)
+        {
+            // Rotate : 0 - 무회전
+            //          360 - 시작각도가 좌우 대칭되도록 조정
+            //          그외 - 각도입력 회전
+
+            // intersectCount : index번호로 사용,
+            // intersect로 잘라내야할 entity 갯수(현재는 Line만 Cut)  (guideCircle 바깥쪽만 남기고 안쪽은 잘라냄)
+            // Line의 Start/EndPoint :  Start(원의 중심부터 먼곳에서)  End(Center쪽으로)
+
+            List<Entity> outLineList = new List<Entity>();
+            Point3D referencePoint = CopyPoint(refPoint);
+
+            // Data
+            double eachAngel = 360.0 / count;
+            double countLIst = entityList.Count;
+
+
+            Circle guideCircle = new Circle(referencePoint, radius);
+
+            List<Line> intersectLineLIst = new List<Line>();
+
+            // Intersect and Line Trim
+            for (int i = 0; i < intersectCount; i++)
+            {
+                intersectLineLIst.Add((Line)entityList[i].Clone());
+
+                Point3D[] intersectPoint = intersectLineLIst[i].IntersectWith(guideCircle);
+                intersectLineLIst[i].EndPoint = intersectPoint[0];
+
+                entityList[i] = intersectLineLIst[i];
+            }
+
+
+            // Rotate
+            for (int k = 0; k < count; k++)
+            {
+                for (int j = 0; j < countLIst; j++)
+                {
+                    // 시작각도는 좌우 대칭이 되도록 중앙이 아닌 반절 각도로 시작
+                    if (k == 0)
+                    {
+                        double radian = 0;
+
+                        if (Rotate == 0) { }
+                        else if (Rotate == 360) radian = Utility.DegToRad(eachAngel / 2);
+                        else radian = Utility.DegToRad(Rotate);
+
+                        entityList[j].Rotate(radian, Vector3D.AxisZ, referencePoint);
+                    }
+                    else { entityList[j].Rotate(Utility.DegToRad(eachAngel), Vector3D.AxisZ, referencePoint); }
+
+                    outLineList.Add((Entity)entityList[j].Clone());
+                }
+            }
+
+            return outLineList;
+        }
+
+        private Line GetChamferLine(Line HorizontalLine, Line VerticalLine, double ChamferLength, bool isTrim = false)
+        {
+            // HorizontalLine : Start(Left) End(Right)
+            // VerticalLine : Start(Top), End(Bottom)
+
+            // Return Line (HorizontalLinePoint, VerticalLinePoint)
+
+            Line ChamferLine = (Line)HorizontalLine.Clone(); // 임시값으로 넣어줌
+            double cornerIndex = 0; // 0 : BL, 1 BR, 2 TR, 3 TL
+
+            if (HorizontalLine.EndPoint == VerticalLine.EndPoint) cornerIndex = 1;
+            else if (HorizontalLine.EndPoint == VerticalLine.StartPoint) cornerIndex = 2;
+            else if (HorizontalLine.StartPoint == VerticalLine.StartPoint) cornerIndex = 3;
+
+
+            if (cornerIndex == 0 || cornerIndex == 3)
+            {
+                // Horizontal startPoint reSet 
+                ChamferLine.StartPoint = GetSumPoint(HorizontalLine.StartPoint, ChamferLength, 0);
+                // Trim
+                if (isTrim) HorizontalLine.StartPoint = CopyPoint(ChamferLine.StartPoint);
+
+                // Vertical EndPoint reSet
+                if (cornerIndex == 0)
+                {
+                    ChamferLine.EndPoint = GetSumPoint(VerticalLine.EndPoint, 0, ChamferLength);
+
+                    // Trim
+                    if (isTrim) VerticalLine.EndPoint = CopyPoint(ChamferLine.EndPoint);
+                }
+                else
+                {
+                    ChamferLine.EndPoint = GetSumPoint(VerticalLine.StartPoint, 0, -ChamferLength);
+
+                    // Trim
+                    if (isTrim) VerticalLine.StartPoint = CopyPoint(ChamferLine.EndPoint);
+                }
+            }
+            else
+            { // index 1, 2
+                // Horizontal startPoint reSet 
+                ChamferLine.StartPoint = GetSumPoint(HorizontalLine.EndPoint, -ChamferLength, 0);
+                // Trim
+                if (isTrim) HorizontalLine.EndPoint = CopyPoint(ChamferLine.StartPoint);
+
+                // Vertical EndPoint reSet
+                if (cornerIndex == 1)
+                {
+                    ChamferLine.EndPoint = GetSumPoint(VerticalLine.EndPoint, 0, ChamferLength);
+
+                    // Trim
+                    if (isTrim) VerticalLine.EndPoint = CopyPoint(ChamferLine.EndPoint);
+                }
+                else
+                {
+                    ChamferLine.EndPoint = GetSumPoint(VerticalLine.StartPoint, 0, -ChamferLength);
+
+                    // Trim
+                    if (isTrim) VerticalLine.StartPoint = CopyPoint(ChamferLine.EndPoint);
+                }
+            }
+
+
+
+            return ChamferLine;
+        }
+
+        public List<Line> GetRectangleLT(Point3D startPoint, double width, double length, RECTANGLUNVIEW unViewPosition = RECTANGLUNVIEW.NONE)
+        {
+            // startPoint = LeftTop point
+            List<Line> rectangleLineList = new List<Line>();
+
+            if (unViewPosition != RECTANGLUNVIEW.BOTTOM)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, 0, -width), GetSumPoint(startPoint, length, -width)));
+            if (unViewPosition != RECTANGLUNVIEW.RIGHT)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, length, 0), GetSumPoint(startPoint, length, -width)));
+            if (unViewPosition != RECTANGLUNVIEW.TOP)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, 0, 0), GetSumPoint(startPoint, length, 0)));
+            if (unViewPosition != RECTANGLUNVIEW.LEFT)
+                rectangleLineList.Add(new Line(GetSumPoint(startPoint, 0, 0), GetSumPoint(startPoint, 0, -width)));
+
+            return rectangleLineList;
         }
 
 

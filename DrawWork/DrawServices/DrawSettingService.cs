@@ -4352,6 +4352,65 @@ namespace DrawWork.DrawServices
 
                 DrawEntityModel structureOrin = DDSService.DrawDetailRoofStructureOrientation(refPoint, singleModel, scaleValue,null);
                 singleModel.Entities.AddRange(structureOrin.GetDrawEntity());
+
+                DrawEntityModel leeJu = DDSService.DrawDetailCenterColumn_BB(refPoint, singleModel, scaleValue, null);
+                singleModel.Entities.AddRange(leeJu.GetDrawEntity());
+
+                DDSService.CreateStructureCRTModel();
+
+                // Jange
+                DrawDetailStructureShareService DDSServiceShare =new DrawDetailStructureShareService(newTankData,singleModel);
+                #region 임시 데이터 배정
+                string colSize = "6";
+                string rafterSize = "C200x80x7.5x11";
+
+
+                NColumnBaseSupportModel baseModel = new NColumnBaseSupportModel();
+                foreach (NColumnBaseSupportModel eachModel in newTankData.NColumnBaseSupportList)
+                {
+                    if (eachModel.ColumnSize == colSize)
+                    {
+                        baseModel = eachModel;
+                        break;
+                    }
+                }
+
+                NColumnCenterTopSupportModel colCNTTopModel = new NColumnCenterTopSupportModel();
+                foreach (NColumnCenterTopSupportModel eachModel in newTankData.NColumnCenterTopSupportList)
+                {
+                    if (eachModel.ColumnSize == colSize)
+                    {
+                        if (eachModel.RafterSize == rafterSize)
+                        {
+                            colCNTTopModel = eachModel;
+                            break;
+                        }
+                    }
+                }
+
+
+                #endregion
+
+                double pipeHeight = 3000;
+                Point3D columnTopSupportWP = GetSumPoint(refPoint, 0, pipeHeight);
+
+                // pipe test GuideLine
+                Line guidePipeLine = new Line(GetSumPoint(refPoint, 0, 0), columnTopSupportWP);
+                List<Entity> outlineList = new List<Entity>();
+                outlineList.Add(guidePipeLine);
+                styleService.SetLayerListEntity(ref outlineList, layerService.LayerCenterLine);
+                DrawEntityModel newList = new DrawEntityModel();
+                newList.outlineList.AddRange(outlineList);
+                ////////////////////////////////////////////////
+
+
+                DrawEntityModel structureBaseDraw = DDSServiceShare.DrawColumnBaseSupport(refPoint, singleModel, scaleValue, baseModel);
+                DrawEntityModel structureColCNTTopDraw = DDSServiceShare.DrawColumnCenterTopSupport(columnTopSupportWP, singleModel, scaleValue, colCNTTopModel);
+
+
+                singleModel.Entities.AddRange(newList.GetDrawEntity());
+                singleModel.Entities.AddRange(structureBaseDraw.GetDrawEntity());
+                singleModel.Entities.AddRange(structureColCNTTopDraw.GetDrawEntity());
             }
 
             #endregion

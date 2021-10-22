@@ -97,11 +97,13 @@ namespace DrawWork.DrawDetailServices
                 // Structure
                 if (eachModel.SubName== PAPERSUB_TYPE.RoofStructureOrientation)               
                 {
-                    drawList.AddDrawEntity(DrawDetailRoofStructureOrientation(referencePoint, selModel, scaleValue, eachModel));
+                    //drawList.AddDrawEntity(DrawDetailRoofStructureOrientation(referencePoint, selModel, scaleValue, eachModel));
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
                 }
                 else if (eachModel.SubName == PAPERSUB_TYPE.RoofStructureAssembly)
                 {
-                    drawList.AddDrawEntity(DrawDetailRoofStructureAssembly(referencePoint, selModel, scaleValue));
+                    //drawList.AddDrawEntity(DrawDetailRoofStructureAssembly(referencePoint, selModel, scaleValue,eachModel));
+                    drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
                 }
                 else if (eachModel.SubName == PAPERSUB_TYPE.RafterDetail)
                 {
@@ -171,6 +173,7 @@ namespace DrawWork.DrawDetailServices
                 }
                 else if (eachModel.SubName == PAPERSUB_TYPE.SectionBB)
                 {
+                    //drawList.AddDrawEntity(DrawDetailCenterColumn_BB(referencePoint, selModel, scaleValue, eachModel));
                     drawList.AddDrawEntity(DrawDetailAssembly(referencePoint, selModel, scaleValue, eachModel));
                 }
                 else if (eachModel.SubName == PAPERSUB_TYPE.DetailC)
@@ -312,17 +315,8 @@ namespace DrawWork.DrawDetailServices
                 selAnnularInnerWidth = (selTankID - valueService.GetDoubleValue(assemblyData.BottomInput[0].OD)) / 2;
             
             // Tnak : Shell Reduce : k Type Shell  안쪽으로 들어 옴
-            double selShellReduce = 0;
-            if (drawCommon.GetCurrentTopAngleType() == TopAngle_Type.k)
-            {
-                if (assemblyData.ShellOutput.Count >= 2)
-                {
-                    int maxCourse = assemblyData.ShellOutput.Count - 1;
-                    double lastThk = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness);
-                    double lastThkBefore = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse - 1].Thickness);
-                    selShellReduce = (lastThk - lastThkBefore) / 2;
-                }
-            }
+            double selShellReduce = GetShellReduceByTopAngle();
+            
 
             // Create Structure
             structureCRTModel = structureService.CreateStructureCRTColumn(
@@ -344,6 +338,25 @@ namespace DrawWork.DrawDetailServices
 
 
         }
+
+
+        private double GetShellReduceByTopAngle()
+        {
+            double returnValue = 0;
+            if (drawCommon.GetCurrentTopAngleType() == TopAngle_Type.k)
+            {
+                if (assemblyData.ShellOutput.Count >= 2)
+                {
+                    int maxCourse = assemblyData.ShellOutput.Count - 1;
+                    double lastThk = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse].Thickness);
+                    double lastThkBefore = valueService.GetDoubleValue(assemblyData.ShellOutput[maxCourse - 1].Thickness);
+                    returnValue = (lastThk - lastThkBefore) / 2;
+                }
+            }
+
+            return returnValue;
+        }
+
 
         #region Detail Sample
         private double GetStructureCustomScale(PaperAreaModel selModel)
@@ -373,8 +386,8 @@ namespace DrawWork.DrawDetailServices
 
 
 
-            double testRecSize = 40 * scaleValue;
-            double textHeight = 2.5 * scaleValue;
+            double testRecSize = 80 * scaleValue;
+            double textHeight = 10 * scaleValue;
 
             Point3D recPoint = GetSumPoint(referencePoint, -testRecSize/2, -testRecSize/2);
             Line testLine01 = new Line(GetSumPoint(recPoint, 0, 0), GetSumPoint(recPoint, 0, testRecSize));
@@ -384,6 +397,7 @@ namespace DrawWork.DrawDetailServices
 
 
             Text text01 = new Text(GetSumPoint(referencePoint, 0, 0), selPaperModel.SubName.ToString(), textHeight);
+            text01.Alignment = Text.alignmentType.MiddleCenter;
 
 
             newList.Add(testLine01);
@@ -402,6 +416,31 @@ namespace DrawWork.DrawDetailServices
 
 
 
+
+
+        #region One Size
+        public DrawEntityModel DrawDetailCenterColumn_BB(Point3D refPoint, object selModel, double scaleValue, PaperAreaModel selPaperModel)
+        {
+            DrawEntityModel drawList = new DrawEntityModel();
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+            List<Entity> newList = new List<Entity>();
+
+
+            //newList.AddRange(drawShareService.GetCenterColumn_BB(referencePoint, scaleValue));
+
+            newList.AddRange(drawShareService.GetCenterColumn_Detail_C(GetSumPoint(referencePoint,1000,0), scaleValue));
+            newList.AddRange(drawShareService.GetCenterColumn_Detail_D(GetSumPoint(referencePoint, 2000, 0), scaleValue)); // 작성중
+            newList.AddRange(drawShareService.GetCenterColumn_EE(GetSumPoint(referencePoint, 3000, 0), scaleValue));
+            newList.AddRange(drawShareService.GetCenterColumn_Drain_Detail(GetSumPoint(referencePoint, 4000, 0), scaleValue));
+            newList.AddRange(drawShareService.GetCenterColumn_BB_Edit(GetSumPoint(referencePoint, 5000, 0), scaleValue));
+            
+
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+            drawList.outlineList.AddRange(newList);
+
+            return drawList;
+        }
+        #endregion
 
 
 
@@ -429,6 +468,9 @@ namespace DrawWork.DrawDetailServices
             List<Entity> bottomList = new List<Entity>();
             List<Entity> roofList = new List<Entity>();
 
+            List<Entity> clipList = new List<Entity>();
+            List<Entity> rafterList = new List<Entity>();
+
             List<Entity> centerLineList = new List<Entity>();
 
 
@@ -453,6 +495,12 @@ namespace DrawWork.DrawDetailServices
             Point3D bottomCenterUpperPoint = GetSumPoint(bottomCenterLowerPoint, 0, 0);
             Point3D bottomSideLowerPoint= GetSumPoint(shellBottomPoint, 0, 0);
             Point3D bottomSideUpperPoint = GetSumPoint(shellBottomPoint, 0, 0);
+
+
+
+
+
+            List<Point3D> rafterOutputPointList = new List<Point3D>();
 
             // CenterLine
             double exLength = 6;
@@ -498,7 +546,6 @@ namespace DrawWork.DrawDetailServices
             }
             #endregion
 
-
             #region 임시 데이터 배정 for rafter Support Clip Shell side
             string sizeName3 = "C200x80x7.5x11";
             NRafterSupportClipShellSideModel padModel3 = new NRafterSupportClipShellSideModel();
@@ -512,14 +559,17 @@ namespace DrawWork.DrawDetailServices
             }
             #endregion
 
+            // Clip
+            Point3D roofStartPoint=  workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftRoofDown, referencePoint);
+            Point3D clipShellSidePoint = GetClipShellSidePoint(referencePoint);
+            clipList.AddRange(drawShareService.RafterSideClipDetail(clipShellSidePoint, roofStartPoint, singleModel, scaleValue, padModel3).GetDrawEntity());
+
 
             // Rafter
-            etcList.AddRange(drawShareService.Rafter(GetSumPoint(referencePoint, 0, tankHeight), singleModel, scaleValue, padModel2).GetDrawEntity());
-
-
-            // Clip
-            etcList.AddRange(drawShareService.RafterSideClipDetail(GetSumPoint(referencePoint, 0, tankHeight), singleModel, scaleValue, padModel3).GetDrawEntity());
-
+            // Model Point
+            double rafterLength = tankIDHalf;
+            Point3D leftRafterShellSidePoint = GetRafterShellSidePoint(referencePoint);
+            rafterList.AddRange(GetRafterAssembly(out rafterOutputPointList, leftRafterShellSidePoint, rafterLength, roofSlope,0,0,null, padModel2,scaleValue));
 
             // 
             // 1
@@ -530,15 +580,21 @@ namespace DrawWork.DrawDetailServices
 
 
 
-            
+
 
             //etcList.AddRange(drawShareService.Rafter(GetSumPoint(referencePoint, 0, tankHeight), scaleValue,));
 
 
 
 
+            styleService.SetLayerListEntity(ref rafterList, layerService.LayerOutLine);
+            drawList.outlineList.AddRange(rafterList);
 
-            drawList.outlineList.AddRange(etcList);
+            styleService.SetLayerListEntity(ref clipList, layerService.LayerOutLine);
+            drawList.outlineList.AddRange(clipList);
+
+            styleService.SetLayerListEntity(ref topAngleList, layerService.LayerOutLine);
+            drawList.outlineList.AddRange(topAngleList);
 
             styleService.SetLayerListEntity(ref topAngleList, layerService.LayerVirtualLine);
             drawList.outlineList.AddRange(topAngleList);
@@ -554,6 +610,8 @@ namespace DrawWork.DrawDetailServices
 
             styleService.SetLayerListEntity(ref centerLineList, layerService.LayerCenterLine);
             drawList.outlineList.AddRange(centerLineList);
+
+            drawList.outlineList.AddRange(etcList);
 
             return drawList;
         }
@@ -807,6 +865,24 @@ namespace DrawWork.DrawDetailServices
 
 
 
+        // Model Point
+        public Point3D GetClipShellSidePoint(Point3D refPoint)
+        {
+            double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
+            double shellReduce = GetShellReduceByTopAngle();
+            Point3D returnPoint = GetSumPoint(refPoint, shellReduce,tankHeight);
+            return returnPoint;
+        }
+        public Point3D GetRafterShellSidePoint(Point3D refPoint)
+        {
+            double shellGap = 70;// 차후 값을 받아서 변환 해야 함
+            double shellReduce = GetShellReduceByTopAngle();
+            double roofSlope = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
+            Point3D returnPoint = GetSumPoint(GetClipShellSidePoint(refPoint), shellReduce + shellGap, valueService.GetOppositeByAdjacent(roofSlope, shellReduce +shellGap));
+            return returnPoint;
+        }
+
+
 
         public DrawEntityModel DrawDetailRoofStructureOrientation(Point3D refPoint, object selModel, double scaleValue, PaperAreaModel selPaperModel)
         {
@@ -854,6 +930,128 @@ namespace DrawWork.DrawDetailServices
             return drawList;
 
 
+
+        }
+
+
+
+
+
+        public List<Entity> GetRafterAssembly(out List<Point3D> selOutputPointList, Point3D refPoint, double selLength, double selRotate, double selRotateCenter, double selTranslateNumber, bool[] selVisibleLine = null,
+                            NColumnRafterModel padModel = null,double scaleValue=1)
+        {
+            selOutputPointList = new List<Point3D>();
+            List<Entity> newList = new List<Entity>();
+            List<Entity> slotHoleList = new List<Entity>();
+
+
+            // Model Data
+            double A = valueService.GetDoubleValue(padModel.A);    //rafter Lenth
+            double A1 = valueService.GetDoubleValue(padModel.A1);   //woking Point to rafter : NOT USED
+            double B = valueService.GetDoubleValue(padModel.B);    //rafter Width
+            double B1 = valueService.GetDoubleValue(padModel.B1);   //workingPoint부터 rafter까지의 x축 거리
+            double C = valueService.GetDoubleValue(padModel.C);    //centering Point to rafter : NOT USED  //rafter to hole : NOT USED
+            double C1 = valueService.GetDoubleValue(padModel.C1);   //hole to hole length gap
+            double D = valueService.GetDoubleValue(padModel.D);    //hole to hole width gap
+            double E = valueService.GetDoubleValue(padModel.E);    //SHELL ID/4 : NOT USED
+            double holeDia = valueService.GetDoubleValue(padModel.BoltHoleDia);
+
+            double selHeight = A;
+
+            double t = 6;   //Thk of doubleLine
+
+            // Reference Point : Top Left
+            Point3D pointA = GetSumPoint(refPoint, 0, 0);
+            Point3D pointB = GetSumPoint(refPoint, selLength, 0);
+            Point3D pointC = GetSumPoint(refPoint, selLength, -selHeight);
+            Point3D pointD = GetSumPoint(refPoint, 0, -selHeight);
+
+            // Line
+            Line lineA = new Line(GetSumPoint(pointA, 0, 0), GetSumPoint(pointB, 0, 0));
+            Line lineB = new Line(GetSumPoint(pointB, 0, 0), GetSumPoint(pointC, 0, 0));
+            Line lineC = new Line(GetSumPoint(pointC, 0, 0), GetSumPoint(pointD, 0, 0));
+            Line lineD = new Line(GetSumPoint(pointD, 0, 0), GetSumPoint(pointA, 0, 0));
+
+            // Inner Line : HBeam,Channel Tpye에 따라서 달라짐
+            Line lineAinner = (Line)lineA.Offset(t, Vector3D.AxisZ);
+            Line lineCinner = (Line)lineB.Offset(t, Vector3D.AxisZ);
+
+            newList.AddRange(new Line[] { lineA, lineB, lineC, lineD, lineAinner, lineCinner });
+
+            // Slot Hole : Center Line 처리 필요함
+            slotHoleList.AddRange(GetHoles(GetSumPoint(lineD.MidPoint, B1 + C1 / 2, 0), holeDia, C1, D));
+            slotHoleList.AddRange(GetHoles(GetSumPoint(lineB.MidPoint, -(B1 + C1 / 2), 0), holeDia, C1, D));
+
+            if (selRotate != 0)
+            {
+                Point3D WPRotate = GetSumPoint(pointA, 0, 0);
+                if (selRotateCenter == 1)
+                    WPRotate = GetSumPoint(pointB, 0, 0);
+                else if (selRotateCenter == 2)
+                    WPRotate = GetSumPoint(pointC, 0, 0);
+                else if (selRotateCenter == 3)
+                    WPRotate = GetSumPoint(pointD, 0, 0);
+
+                foreach (Entity eachEntity in newList)
+                    eachEntity.Rotate(selRotate, Vector3D.AxisZ, WPRotate);
+            }
+
+            // 나중에 맨 앞으로 옮겨야 함
+            if (selTranslateNumber > 0)
+            {
+                Point3D WPTranslate = new Point3D();
+                if (selTranslateNumber == 1)
+                    WPTranslate = GetSumPoint(pointB, 0, 0);
+                else if (selTranslateNumber == 2)
+                    WPTranslate = GetSumPoint(pointC, 0, 0);
+                else if (selTranslateNumber == 3)
+                    WPTranslate = GetSumPoint(pointD, 0, 0);
+                editingService.SetTranslate(ref newList, GetSumPoint(refPoint, 0, 0), WPTranslate);
+
+            }
+            if (selVisibleLine != null)
+            {
+                if (selVisibleLine[0] == false)
+                    newList.Remove(lineA);
+                if (selVisibleLine[1] == false)
+                    newList.Remove(lineB);
+                if (selVisibleLine[2] == false)
+                    newList.Remove(lineC);
+                if (selVisibleLine[3] == false)
+                    newList.Remove(lineD);
+            }
+
+            selOutputPointList.Add(lineA.StartPoint);
+            selOutputPointList.Add(lineA.EndPoint);
+            selOutputPointList.Add(lineC.StartPoint);
+            selOutputPointList.Add(lineC.EndPoint);
+
+            return newList;
+        }
+        private List<Entity> GetHoles(Point3D refPoint, double holeRadius, double lengthGap, double widthGap = 0)
+        {
+            //refPoint는 홀과 홀 사이의 중앙인 점을 입력해주시면됩니다
+            //lengthGap=0인경우는 2개, lengthGap에 값이 입력된 경우는 홀이 4개로 그려집니다 :)
+
+            List<Entity> holeList = new List<Entity>();
+            Point3D workingPoint = GetSumPoint(refPoint, 0, 0);
+
+
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    Point3D circleCenterPoint = GetSumPoint(workingPoint, lengthGap / 2 * (2 * i - 1), widthGap / 2 * (1 - 2 * j));
+
+                    Circle hole = new Circle(circleCenterPoint, holeRadius / 2);
+
+                    holeList.AddRange(new Entity[] { hole });
+                }
+            }
+
+            styleService.SetLayerListEntity(ref holeList, layerService.LayerOutLine);
+
+            return holeList;
 
         }
 
