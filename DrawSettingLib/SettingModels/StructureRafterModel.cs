@@ -16,6 +16,8 @@ namespace DrawSettingLib.SettingModels
             Length = 0;
             Height = 0;
 
+           
+
             Size = "";
         }
 
@@ -26,6 +28,9 @@ namespace DrawSettingLib.SettingModels
 
         public double Height { get; set; }
 
+
+        public double InnerRadiusFromCenter { get; set; }
+        public double OuterRadiusFromCenter { get; set; }
 
         // 형상정보
         public string Size { get; set; }

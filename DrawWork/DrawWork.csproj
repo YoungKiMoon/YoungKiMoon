@@ -75,6 +75,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AssemblyServices\AssemblyCommonDataService.cs" />
     <Compile Include="AssemblyServices\AssemblyDataService.cs" />
     <Compile Include="AssemblyServices\AssemblyModelService.cs" />
     <Compile Include="AssemblyServices\FieldService.cs" />

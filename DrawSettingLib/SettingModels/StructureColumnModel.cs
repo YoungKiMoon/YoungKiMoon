@@ -16,8 +16,7 @@ namespace DrawSettingLib.SettingModels
 
             Height = 0;
 
-
-            Size = 0;
+            Size = "";
         }
 
         public double Radius { get; set; }
@@ -28,8 +27,8 @@ namespace DrawSettingLib.SettingModels
 
         public double Height { get; set; }
 
-
+        public double PipeOD { get; set; }
         // 형상 정보
-        public double Size { get; set; }
+        public string Size { get; set; }
     }
 }

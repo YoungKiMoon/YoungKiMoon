@@ -11,11 +11,14 @@ namespace DrawSettingLib.SettingServices
 {
     public class StructureService
     {
-        public GeometryService geoService;
+        public GeometryService geoService { get; set; }
+
+        public StructureDataInputModel strData { get; set; }
 
         public StructureService()
         {
             geoService = new GeometryService();
+            strData = new StructureDataInputModel();
         }
 
 
@@ -25,8 +28,9 @@ namespace DrawSettingLib.SettingServices
 
 
                                                  List<HBeamModel> girderHbeamList,
-                                                 NColumnCenterTopSupportModel columnCenterTopSupport,
-                                                 PipeModel columnCenterPipe,
+                                                 List<NColumnCenterTopSupportModel> columnCenterTopSupportList,
+                                                 List<NColumnSideTopSupportModel> columnSideTopSupportList,
+                                                 List<PipeModel> columnPipeList,
 
                                                  List<NColumnRafterModel> rafterOutputList,
 
@@ -39,34 +43,43 @@ namespace DrawSettingLib.SettingServices
             // Layer 에 맞게끔 수정 작업
 
             // Input
+            strData = new StructureDataInputModel();
+            strData.newRafterInputList.Add(new StructureCRTRafterInputModel());
+            strData.newRafterInputList.AddRange(rafterInputList);
 
-            List<StructureCRTRafterInputModel> newRafterInputList = new List<StructureCRTRafterInputModel>();
-            newRafterInputList.Add(new StructureCRTRafterInputModel());
-            newRafterInputList.AddRange(rafterInputList);
 
-            List<StructureCRTColumnInputModel> newColumnInputList = new List<StructureCRTColumnInputModel>();
-            newColumnInputList.AddRange(columnInputList);
-            newColumnInputList.Add(new StructureCRTColumnInputModel());
+            strData.newColumnInputList.AddRange(columnInputList);
+            strData.newColumnInputList.Add(new StructureCRTColumnInputModel());
 
-            List<StructureCRTGirderInputModel> newGirderInputList = new List<StructureCRTGirderInputModel>();
-            newGirderInputList.Add(new StructureCRTGirderInputModel());
-            newGirderInputList.AddRange(girderInputList);
-            newGirderInputList.Add(new StructureCRTGirderInputModel());
 
-            List<HBeamModel> newGirderHBeamList = new List<HBeamModel>();
-            newGirderHBeamList.Add(new HBeamModel());
-            newGirderHBeamList.AddRange(girderHbeamList);
-            newGirderHBeamList.Add(new HBeamModel());
+            strData.newGirderInputList.Add(new StructureCRTGirderInputModel());
+            strData.newGirderInputList.AddRange(girderInputList);
+            strData.newGirderInputList.Add(new StructureCRTGirderInputModel());
+
+            strData.newGirderHBeamList.Add(new HBeamModel());
+            strData.newGirderHBeamList.AddRange(girderHbeamList);
+            strData.newGirderHBeamList.Add(new HBeamModel());
 
 
 
             // Output
-            List<NColumnRafterModel> newRafterOutputList = new List<NColumnRafterModel>();
-            newRafterOutputList.Add(new NColumnRafterModel());
-            newRafterOutputList.AddRange(rafterOutputList);
+            strData.newRafterOutputList.Add(new NColumnRafterModel());
+            strData.newRafterOutputList.AddRange(rafterOutputList);
+
+            strData.newColumnCenterTopSupportList.AddRange(columnCenterTopSupportList);
+            strData.newColumnCenterTopSupportList.Add(new NColumnCenterTopSupportModel());
+
+            strData.newColumnSideTopSupportList.AddRange(columnSideTopSupportList);
+            strData.newColumnSideTopSupportList.Add(new NColumnSideTopSupportModel());
 
 
+            strData.newColumnPipeList.AddRange(columnPipeList);
+            strData.newColumnPipeList.Add(new PipeModel());
 
+            // Column
+            //NColumnCenterTopSupportModel columnCenterTopSupport = new NColumnCenterTopSupportModel();
+            //if (newColumnCenterTopSupportList.Count > 0)
+            //    columnCenterTopSupport = newColumnCenterTopSupportList[0];
 
 
 
@@ -87,15 +100,14 @@ namespace DrawSettingLib.SettingServices
 
             // 고정 값
             double columnSpace = 25;
-            double RafterOffset = 85; //Clip Point로부터 늘어나는 길이
+            double RafterOffset = 75; //Clip Point로부터 늘어나는 길이
             double ShellReduce = 70 + selShellReduce; // Shell ID로부터 안쪽으로 줄어드는 길이 -> Angle Type 따라서 달라짐 : k Type에서 조금 안쪽으로 들어감
             double GirderReduce = 200; //Column Point로부터 줄어드는 길이
-
 
             StructureModel newStrModel = new StructureModel();
 
             // 1. Create Layer : Column, Rafter, Girder
-            for(int layerIndex = 0; layerIndex < newColumnInputList.Count; layerIndex++)
+            for(int layerIndex = 0; layerIndex < strData.newColumnInputList.Count; layerIndex++)
             {
                 // Layer
                 StructureLayerModel newLayer = new StructureLayerModel();
@@ -104,10 +116,10 @@ namespace DrawSettingLib.SettingServices
                 newLayer.StartAngle = 0;
 
                 // Column
-                StructureCRTColumnInputModel eachColumn = newColumnInputList[layerIndex];
+                StructureCRTColumnInputModel eachColumn = strData.newColumnInputList[layerIndex];
                 double columnQty = GetDoubleValue(eachColumn.Qty);
                 double columnRadius = GetDoubleValue(eachColumn.Radius);
-                double columnSize = GetDoubleValue(eachColumn.Size);
+                string columnSize = eachColumn.Size;
                 double columnAngleOne = 0;
                 if (columnQty > 0)
                     columnAngleOne = 360 / columnQty;
@@ -128,10 +140,10 @@ namespace DrawSettingLib.SettingServices
 
 
                 // Rafter
-                NColumnRafterModel eachOutputRafter = newRafterOutputList[layerIndex];
+                NColumnRafterModel eachOutputRafter = strData.newRafterOutputList[layerIndex];
                 double rafterHeight = GetDoubleValue(eachOutputRafter.A);
 
-                StructureCRTRafterInputModel eachRafter = newRafterInputList[layerIndex];
+                StructureCRTRafterInputModel eachRafter = strData.newRafterInputList[layerIndex];
                 double rafterQty = GetDoubleValue(eachRafter.Qty);
                 double rafterRadius = GetDoubleValue(eachRafter.Radius);
                 string rafterSize = eachRafter.Size;
@@ -150,11 +162,11 @@ namespace DrawSettingLib.SettingServices
 
 
                 // Girder + Clip
-                HBeamModel eachGriderHBeam = newGirderHBeamList[layerIndex];
+                HBeamModel eachGriderHBeam = strData.newGirderHBeamList[layerIndex];
                 double girderWidth = GetDoubleValue(eachGriderHBeam.B);
                 double girderHeight = GetDoubleValue(eachGriderHBeam.A);
 
-                StructureCRTGirderInputModel eachGirder = newGirderInputList[layerIndex];
+                StructureCRTGirderInputModel eachGirder = strData.newGirderInputList[layerIndex];
                 double girderQty = GetDoubleValue(eachGirder.Qty);
                 double girderRadius = GetDoubleValue(eachGirder.Radius);
                 string girderSize = eachGirder.Size;
@@ -182,28 +194,19 @@ namespace DrawSettingLib.SettingServices
             }
 
             // 2. Grider : Length
-            foreach(StructureLayerModel eachLayer in newStrModel.LayerList)
+            for (int layerIndex = 0; layerIndex < newStrModel.LayerList.Count; layerIndex++)
             {
+                StructureLayerModel eachLayer = newStrModel.LayerList[layerIndex];
                 double eachLayerRadius = eachLayer.Radius;
-                for(int girderIndex = 0; girderIndex < eachLayer.GirderList.Count; girderIndex++)
-                {
-                    StructureColumnModel eachColumn = eachLayer.ColumnList[girderIndex];
-
-                    StructureGirderModel eachGirder = eachLayer.GirderList[girderIndex];
-                    eachGirder.Length = geoService.GetStringLengthByArcAngle(eachLayerRadius, eachColumn.AngleOne) - ( GirderReduce * 2); //Radius와 Angle로 현의 길이 구한 후 - (200 * 2)
-                }
-            }
-
-            // 3. Rafter : Height
-            foreach (StructureLayerModel eachLayer in newStrModel.LayerList)
-            {
-                double eachLayerRadius = eachLayer.Radius;
+                NColumnSideTopSupportModel eachColumnSideTop = newColumnSideTopSupportList[layerIndex];
+                GirderReduce = GetDoubleValue(eachColumnSideTop.D);
                 for (int girderIndex = 0; girderIndex < eachLayer.GirderList.Count; girderIndex++)
                 {
                     StructureColumnModel eachColumn = eachLayer.ColumnList[girderIndex];
 
                     StructureGirderModel eachGirder = eachLayer.GirderList[girderIndex];
-                    eachGirder.Length = geoService.GetStringLengthByArcAngle(eachLayerRadius, eachColumn.AngleOne) - (GirderReduce * 2); //Radius와 Angle로 현의 길이 구한 후 - (200 * 2)
+                    eachGirder.Length = geoService.GetStringLengthByArcAngle(eachLayerRadius, eachColumn.AngleOne) - ( GirderReduce * 2); //Radius와 Angle로 현의 길이 구한 후 - (200 * 2)
+                    
                 }
             }
 
@@ -310,6 +313,9 @@ namespace DrawSettingLib.SettingServices
                 StructureLayerModel innerLayer = newStrModel.LayerList[layerIndex];
                 StructureLayerModel outerLayer = newStrModel.LayerList[layerIndex+1];
                 StructureRafterModel OuterRafterOne = outerLayer.RafterList[0];
+                NColumnCenterTopSupportModel eachColumnCenterTopSupport = strData.newColumnCenterTopSupportList[layerIndex];
+
+                PipeModel eachColumnPipe = strData.newColumnPipeList[layerIndex];
 
                 double eachLayerRadius = innerLayer.Radius;
                 for (int columnIndex = 0; columnIndex < innerLayer.ColumnList.Count; columnIndex++)
@@ -320,22 +326,23 @@ namespace DrawSettingLib.SettingServices
                     StructureColumnModel innerColumn = innerLayer.ColumnList[columnIndex];
                     if (layerIndex == 0)
                     {
-                        double centerColumnTopRadius = (GetDoubleValue(columnCenterPipe.OD) / 2) +
-                                GetDoubleValue(columnCenterTopSupport.G) +
-                                GetDoubleValue(columnCenterTopSupport.B1);
+                        double centerColumnTopRadius = (GetDoubleValue(eachColumnPipe.OD) / 2) +
+                                GetDoubleValue(eachColumnCenterTopSupport.G) +
+                                GetDoubleValue(eachColumnCenterTopSupport.A1);//B1->A1 으로 수정 2021-10-24
 
                         // Center : Height
-                        double RoofCenterHeight = geoService.GetOppositeByAdjacent(RoofSlopeDegree, RoofOD);
+                        double RoofCenterHeight = geoService.GetOppositeByAdjacent(RoofSlopeDegree, RoofOD/2);
                         double BottomHalfID = TankHalfID - AnnularInnerWidth;
                         double BottomCenterHeight = geoService.GetOppositeByAdjacent(BottomSlopDegree, BottomHalfID);
                         double BottomThicknessSlopeH = geoService.GetHypotenuseByWidth(BottomSlopDegree, BottomThickness);
                         double CenterColumnHalfOD = centerColumnTopRadius;
                         double CenterElevationPointLgH = geoService.GetOppositeByAdjacent(RoofSlopeDegree, CenterColumnHalfOD);
 
-                        double columnSpaceHeight = geoService.GetOppositeByAdjacent(RoofSlopeDegree, columnSpace);
-                        double RafterAA = geoService.GetOppositeByAdjacent(RoofSlopeDegree, OuterRafterOne.Height);
+                        double columnSpaceHeight = geoService.GetHypotenuseByWidth(RoofSlopeDegree, columnSpace);
+                        double RafterAA = geoService.GetHypotenuseByWidth(RoofSlopeDegree, OuterRafterOne.Height);
 
                         innerColumn.Height = RoofCenterHeight + (TankH - BottomCenterHeight - BottomThicknessSlopeH) - CenterElevationPointLgH - RafterAA - columnSpaceHeight;
+                        innerColumn.PipeOD = GetDoubleValue(eachColumnPipe.OD);
                     }
                     else
                     {
@@ -345,20 +352,21 @@ namespace DrawSettingLib.SettingServices
                             innerGirderClip = innerGirder.ClipList[0];
 
                         // Side : Height
-                        double ColumnPointHLg = TankID - eachLayerRadius;
+                        double ColumnPointHLg = TankHalfID - eachLayerRadius;
                         double BottomHalfID = TankHalfID - AnnularInnerWidth;
                         double BottomThicknessSlopeH = geoService.GetHypotenuseByWidth(BottomSlopDegree, BottomThickness);
                         double ColumnPointRoofH = geoService.GetOppositeByAdjacent(RoofSlopeDegree, ColumnPointHLg);
                         double ColumnPointBottomLg = BottomHalfID - eachLayerRadius;
-                        double ColumnPointBottomHeight = geoService.GetOppositeByAdjacent(BottomSlopDegree, BottomSlopDegree);
+                        double ColumnPointBottomHeight = geoService.GetOppositeByAdjacent(BottomSlopDegree, ColumnPointBottomLg);
 
                         double ElavationPointToClipPointLength = geoService.GetHypotenuseByWidth(innerGirderClip.GirderClipAngleABS, innerGirder.Width / 2);
                         double ElevationPointLgH = geoService.GetOppositeByAdjacent(RoofSlopeDegree, ElavationPointToClipPointLength);
 
-                        double columnSpaceHeight = geoService.GetOppositeByAdjacent(RoofSlopeDegree, columnSpace);
-                        double RafterAA = geoService.GetOppositeByAdjacent(RoofSlopeDegree, OuterRafterOne.Height);
+                        double columnSpaceHeight = geoService.GetHypotenuseByWidth(RoofSlopeDegree, columnSpace);
+                        double RafterAA = geoService.GetHypotenuseByWidth(RoofSlopeDegree, OuterRafterOne.Height);
 
-                        innerColumn.Height = ColumnPointRoofH + (TankH - ColumnPointBottomHeight - BottomThicknessSlopeH) + ElevationPointLgH - RafterAA - innerGirder.Height - columnSpaceHeight;
+                        innerColumn.Height = ColumnPointRoofH + (TankH - ColumnPointBottomHeight - BottomThicknessSlopeH) - ElevationPointLgH - RafterAA - innerGirder.Height - columnSpaceHeight;
+                         innerColumn.PipeOD = GetDoubleValue(eachColumnPipe.OD);
 
                     }
 
@@ -368,32 +376,47 @@ namespace DrawSettingLib.SettingServices
             }
 
             // 7. Rafter : Length
-            for (int layerIndex = 0; layerIndex < newStrModel.LayerList.Count - 1; layerIndex++)
+            for (int layerIndex = 0; layerIndex < newStrModel.LayerList.Count-1; layerIndex++)
             {
                 StructureLayerModel innerLayer = newStrModel.LayerList[layerIndex];
                 StructureLayerModel outerLayer = newStrModel.LayerList[layerIndex + 1];
+
+                NColumnCenterTopSupportModel eachColumnCenterTopSupport = strData.newColumnCenterTopSupportList[layerIndex];
 
                 double eachLayerRadius = innerLayer.Radius;
                 StructureRafterModel firstRafter = new StructureRafterModel();
                 if (outerLayer.RafterList.Count > 0)
                     firstRafter = outerLayer.RafterList[0];
 
-                if (newStrModel.LayerList.Count == 1) //CenterColumn만 있을 경우 계산
+                // 추가 : 2021-10-24
+                double rafterOffsetLengthByRoofSlopeMin = geoService.GetAdjacentByHypotenuse(RoofSlopeDegree, RafterOffset)
+                                                        - geoService.GetOppositeByHypotenuse(RoofSlopeDegree, firstRafter.Height / 2);
+                double rafterOffsetLengthByRoofSlopeMax = geoService.GetAdjacentByHypotenuse(RoofSlopeDegree, RafterOffset)
+                                                        + geoService.GetOppositeByHypotenuse(RoofSlopeDegree, firstRafter.Height / 2);
+
+
+
+
+                if (newStrModel.LayerList.Count == 2) //CenterColumn만 있을 경우 계산
                 {
 
-                    double centerColumnB = GetDoubleValue(columnCenterTopSupport.B);
+                    double centerColumnB = GetDoubleValue(eachColumnCenterTopSupport.B);
                     double RafterHLg = (TankHalfID - centerColumnB - ShellReduce);
                     double RafterLg = geoService.GetHypotenuseByWidth(RoofSlopeDegree, RafterHLg) - geoService.GetOppositeByAdjacent(RoofSlopeDegree, firstRafter.Height / 2);
 
                     // 1개 구해서 전체 배정
                     foreach (StructureRafterModel eachRafter in outerLayer.RafterList)
-                        eachRafter.Length = RafterLg;
+                    {
+                        eachRafter.Length = RafterLg + RafterOffset;                                    // 수정 완료 : 2021-10-24
+                        eachRafter.OuterRadiusFromCenter = TankHalfID-ShellReduce;                      // 추가 완료 : 2021-10-24
+                        eachRafter.InnerRadiusFromCenter = centerColumnB- rafterOffsetLengthByRoofSlopeMin; // 추가 완료 : 2021-10-24
+                    }
                 }
                 else if(newStrModel.LayerList.Count > 1) // Side Column이 있을 경우
                 {
-                    if (layerIndex == 1) // 첫단일 경우 계산
+                    if (layerIndex == 0) // 첫단일 경우 계산
                     {
-                        double centerColumnB = GetDoubleValue(columnCenterTopSupport.B);
+                        double centerColumnB = GetDoubleValue(eachColumnCenterTopSupport.B);
                         foreach (StructureRafterModel eachRafter in outerLayer.RafterList)
                         {
                             StructureGirderModel eachGirder = GetGirderByRafterAngle(outerLayer.GirderList, eachRafter.AngleFromCenter);
@@ -401,9 +424,11 @@ namespace DrawSettingLib.SettingServices
                             
                             double Layer1RafterHLg = eachClip.HorizontalLengthFromCenter - centerColumnB;
                             eachRafter.Length = geoService.GetHypotenuseByWidth(RoofSlopeDegree, Layer1RafterHLg) + RafterOffset*2;
+                            eachRafter.OuterRadiusFromCenter = eachClip.HorizontalLengthFromCenter + rafterOffsetLengthByRoofSlopeMax; // 추가 완료 : 2021-10-24
+                            eachRafter.InnerRadiusFromCenter = centerColumnB - rafterOffsetLengthByRoofSlopeMin;                       // 추가 완료 : 2021-10-24
                         }
                     }
-                    else if(layerIndex == newStrModel.LayerList.Count - 1) // 끝단일 경우 계산
+                    else if(layerIndex == newStrModel.LayerList.Count - 2) // 끝단일 경우 계산
                     {
                         foreach (StructureRafterModel eachRafter in outerLayer.RafterList)
                         {
@@ -411,7 +436,9 @@ namespace DrawSettingLib.SettingServices
                             StructureClipModel eachClip = GetClipByRafterAngle(eachGirder.ClipList, eachRafter.AngleFromCenter, 1); // Outer Clip
 
                             double tempEndHLg = TankHalfID - eachClip.HorizontalLengthFromCenter - ShellReduce;
-                            eachRafter.Length = geoService.GetHypotenuseByWidth(RoofSlopeDegree, tempEndHLg) - geoService.GetOppositeByAdjacent(RoofSlopeDegree, firstRafter.Height / 2);
+                            eachRafter.Length = geoService.GetHypotenuseByWidth(RoofSlopeDegree, tempEndHLg) - geoService.GetOppositeByAdjacent(RoofSlopeDegree, firstRafter.Height / 2) + RafterOffset;
+                            eachRafter.OuterRadiusFromCenter = TankHalfID - ShellReduce;                                            // 추가 완료 : 2021-10-24
+                            eachRafter.InnerRadiusFromCenter = eachClip.HorizontalLengthFromCenter - rafterOffsetLengthByRoofSlopeMin; // 추가 완료 : 2021-10-24
                         }
 
 
@@ -428,6 +455,8 @@ namespace DrawSettingLib.SettingServices
 
                             double RafterHLg = eachInnerClip.HorizontalLengthFromCenter - eachOuterClip.HorizontalLengthFromCenter;
                             eachRafter.Length = geoService.GetHypotenuseByWidth(RoofSlopeDegree, RafterHLg) + RafterOffset * 2;
+                            eachRafter.OuterRadiusFromCenter = eachInnerClip.HorizontalLengthFromCenter + rafterOffsetLengthByRoofSlopeMax;    // 추가 완료 : 2021-10-24
+                            eachRafter.InnerRadiusFromCenter = eachOuterClip.HorizontalLengthFromCenter - rafterOffsetLengthByRoofSlopeMin;    // 추가 완료 : 2021-10-24
 
                         }
 
@@ -452,21 +481,33 @@ namespace DrawSettingLib.SettingServices
                 if (outerLayer.RafterList.Count > 0)
                     firstRafter = outerLayer.RafterList[0];
 
-                double centerColumnTopRadius = (GetDoubleValue(columnCenterPipe.OD) / 2) +
-                                                GetDoubleValue(columnCenterTopSupport.G) +
-                                                GetDoubleValue(columnCenterTopSupport.B1);
-                double CenterClipE = GetDoubleValue(columnCenterTopSupport.E);          //ClipPoint에서 위로 길이
-                double CenterDistance = GetDoubleValue(columnCenterTopSupport.B);
-                double RafterHalfAA = geoService.GetOppositeByAdjacent(RoofSlopeDegree, firstRafter.Height / 2);
+
+                PipeModel eachColumnPipe = strData.newColumnPipeList[layerIndex];
+
+
+                NColumnCenterTopSupportModel eachColumnCenterTopSupport = strData.newColumnCenterTopSupportList[layerIndex];
+                double clipWidth = GetDoubleValue(eachColumnCenterTopSupport.C);
+
+                double centerColumnTopRadius = (GetDoubleValue(eachColumnPipe.OD) / 2) +
+                                                GetDoubleValue(eachColumnCenterTopSupport.G) +
+                                                GetDoubleValue(eachColumnCenterTopSupport.B1);
+                double CenterClipE = GetDoubleValue(eachColumnCenterTopSupport.E);          //ClipPoint에서 위로 길이
+                double CenterDistance = GetDoubleValue(eachColumnCenterTopSupport.B);
+                double RafterHalfAA = geoService.GetHypotenuseByWidth(RoofSlopeDegree, firstRafter.Height / 2);
                 double CenterAddClipLg = centerColumnTopRadius - CenterDistance;
                 double CenterAddClipH = geoService.GetOppositeByAdjacent(RoofSlopeDegree, CenterAddClipLg);
                 double columnSpaceHeight = geoService.GetOppositeByAdjacent(RoofSlopeDegree, columnSpace);
 
-
+                // Rafter 추가
+                NColumnRafterModel eachRafter = strData.newRafterOutputList[layerIndex];
+                double eachRafterG = GetDoubleValue(eachRafter.G)/2;
+                double eachRafterGLg = geoService.GetAdjacentByHypotenuse(RoofSlopeDegree, eachRafterG);
+                double eachRafterE = GetDoubleValue(eachRafter.E) / 2;
+                double eachRafterELg = geoService.GetAdjacentByHypotenuse(RoofSlopeDegree, eachRafterG);
 
                 if (layerIndex == 0) 
                 {
-                    double CenterClipHeight = CenterClipE + RafterHalfAA + columnSpaceHeight + CenterAddClipH;
+                    double CenterClipHeight = CenterClipE + RafterHalfAA + columnSpaceHeight + CenterAddClipH + eachRafterGLg; // Rafter G
 
                     StructureGirderModel newGirder = new StructureGirderModel();
                     
@@ -474,6 +515,7 @@ namespace DrawSettingLib.SettingServices
                     {
                         StructureClipModel newClip = new StructureClipModel();
                         newClip.ClipHeight = CenterClipHeight;
+                        newClip.ClipWidth = clipWidth; // Clip Width 추가 2021-10-25
                         newGirder.ClipList.Add(newClip);
                     }
                     innerLayer.GirderList.Add(newGirder);
@@ -499,9 +541,10 @@ namespace DrawSettingLib.SettingServices
                             double EachAddHeight = geoService.GetOppositeByAdjacent(RoofSlopeDegree, firstClip.HorizontalLengthFromCenter - eachClip.HorizontalLengthFromCenter);
 
                             //Side Clip Height
-                            double SideClipHeight = CenterClipE + RafterHalfAA + columnSpaceHeight + SideAddClipH; //SideColumn 첫번째 Clip의 높이
+                            double SideClipHeight = CenterClipE + RafterHalfAA + columnSpaceHeight + SideAddClipH + eachRafterGLg; //SideColumn 첫번째 Clip의 높이 // Rafter G
                             double EachClipHeight = SideClipHeight + EachAddHeight; // 나머지 Clip의 높이 = 첫번째  클립의 Horizental Length와 각 클립의 Horizental Length
                             eachClip.ClipHeight = EachClipHeight;
+                            eachClip.ClipWidth = clipWidth; // Clip Width 추가 2021-10-25
                         }
 
 
@@ -513,10 +556,6 @@ namespace DrawSettingLib.SettingServices
 
 
             }
-
-
-
-
 
 
             return newStrModel;
@@ -558,7 +597,7 @@ namespace DrawSettingLib.SettingServices
             StructureClipModel returnModel = new StructureClipModel();
             foreach (StructureClipModel eachClip in selClipList)
             {
-                if (eachClip.InOut == 0)
+                if (eachClip.InOut == inOut)
                 {
                     if (eachClip.AngleFromCenter == rafterAngle)
                     {
@@ -570,6 +609,38 @@ namespace DrawSettingLib.SettingServices
             return returnModel;
         }
 
+
+
+        public StructureRafterModel GetLongRafterInLayer(List<StructureRafterModel> selRafterList)
+        {
+            StructureRafterModel returnModel = new StructureRafterModel();
+            double beforeLength = 0;
+            foreach(StructureRafterModel eachModel in selRafterList)
+            {
+                if(eachModel.Length> beforeLength)
+                {
+                    returnModel = eachModel;
+                    beforeLength = eachModel.Length;
+                }
+            }
+
+            return returnModel;
+        }
+        public StructureRafterModel GetShortRafterInLayer(List<StructureRafterModel> selRafterList)
+        {
+            StructureRafterModel returnModel = new StructureRafterModel();
+            double beforeLength = 99999999999;
+            foreach (StructureRafterModel eachModel in selRafterList)
+            {
+                if (eachModel.Length < beforeLength)
+                {
+                    returnModel = eachModel;
+                    beforeLength = eachModel.Length;
+                }
+            }
+
+            return returnModel;
+        }
 
 
 
@@ -587,7 +658,7 @@ namespace DrawSettingLib.SettingServices
         private double DegreeToRadian(double angle) { return Math.PI * angle / 180.0; }
 
 
-       private double RadianToDegree(double angle) { return angle * (180.0 / Math.PI); }
+        private double RadianToDegree(double angle) { return angle * (180.0 / Math.PI); }
 
     }
 }

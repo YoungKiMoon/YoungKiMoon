@@ -52,6 +52,7 @@
     <Compile Include="SettingModels\PaperAreaModel.cs" />
     <Compile Include="SettingModels\PaperModel.cs" />
     <Compile Include="SettingModels\PointModel.cs" />
+    <Compile Include="SettingModels\StructureDataInputModel.cs" />
     <Compile Include="SettingModels\StructureModel.cs" />
     <Compile Include="SettingModels\StructureRafterModel.cs" />
     <Compile Include="SettingModels\SizeModel.cs" />

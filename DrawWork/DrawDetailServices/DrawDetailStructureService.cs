@@ -6,6 +6,7 @@ using DrawSettingLib.Commons;
 using DrawSettingLib.SettingModels;
 using DrawSettingLib.SettingServices;
 using DrawShapeLib.DrawServices;
+using DrawWork.AssemblyServices;
 using DrawWork.Commons;
 using DrawWork.DrawCommonServices;
 using DrawWork.DrawModels;
@@ -25,6 +26,7 @@ namespace DrawWork.DrawDetailServices
 
         private Model singleModel;
         private AssemblyModel assemblyData;
+        private AssemblyCommonDataService assemblyComData;
 
         private DrawPublicService drawCommon;
 
@@ -55,6 +57,7 @@ namespace DrawWork.DrawDetailServices
         {
             singleModel = selModel as Model;
             assemblyData = selAssembly;
+            assemblyComData = new AssemblyCommonDataService(selAssembly);
 
             drawCommon = new DrawPublicService(selAssembly);
             refBlockService = new DrawReferenceBlockService(selAssembly);
@@ -281,21 +284,28 @@ namespace DrawWork.DrawDetailServices
             }
 
             // Output : Column -> First Column = Cetner Top Support
-            NColumnCenterTopSupportModel columnCenterTopSupport = new NColumnCenterTopSupportModel();
-            if (rafterInputList.Count > 0)
+            List<NColumnCenterTopSupportModel> columnCenterTopSupportList = new List<NColumnCenterTopSupportModel>();
+            foreach (StructureCRTRafterInputModel eachRafter in rafterInputList)
             {
-                StructureCRTRafterInputModel rafter = rafterInputList[0];
-                columnCenterTopSupport = GetNewColumnCenterTopSupportModel(rafter.Size);
+                columnCenterTopSupportList.Add(GetNewColumnCenterTopSupportModel(eachRafter.Size));
             }
 
             // Output : Column -> First Column = Center Top Support : Pipe
-            PipeModel columnCenterPipe = new PipeModel();
-            if (columnInputList.Count > 0)
+            List<PipeModel> columnPipeList = new List<PipeModel>();
+            foreach (StructureCRTColumnInputModel eachColumn in columnInputList)
             {
-                StructureCRTColumnInputModel column = columnInputList[0];
-                columnCenterPipe = GetPipeModel(column.Size);
+                PipeModel newModel = GetPipeModel(eachColumn.Size);
+                columnPipeList.Add(newModel);
             }
+
             // Pipe Schedule 적용 안됨
+
+            List<NColumnSideTopSupportModel> columnSideTopSupportList = new List<NColumnSideTopSupportModel>();
+            foreach(StructureCRTColumnInputModel eachColumn in columnInputList)
+            {
+                NColumnSideTopSupportModel newModel=GetNewColumnSideTopSupportModel(eachColumn.Size);
+                columnSideTopSupportList.Add(newModel);
+            }
 
 
 
@@ -323,7 +333,8 @@ namespace DrawWork.DrawDetailServices
                 
                                     rafterInputList, columnInputList, girderInputList,
 
-                                    girderHbeamList, columnCenterTopSupport, columnCenterPipe,
+                                    girderHbeamList, columnCenterTopSupportList,
+                                    columnSideTopSupportList, columnPipeList,
 
                                     rafterOutputList,
 
@@ -460,7 +471,7 @@ namespace DrawWork.DrawDetailServices
             double tankHeight = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeTankHeight);
             double tankID = valueService.GetDoubleValue(assemblyData.GeneralDesignData[0].SizeNominalID);
             double tankIDHalf = tankID / 2;
-            double roofSlope= valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
+            //double roofSlope= valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
             double bottomSlope = valueService.GetDegreeOfSlope(assemblyData.BottomInput[0].BottomPlateSlope);
 
             List<Entity> topAngleList = new List<Entity>();
@@ -470,6 +481,7 @@ namespace DrawWork.DrawDetailServices
 
             List<Entity> clipList = new List<Entity>();
             List<Entity> rafterList = new List<Entity>();
+            List<Entity> columnList = new List<Entity>();
 
             List<Entity> centerLineList = new List<Entity>();
 
@@ -485,14 +497,14 @@ namespace DrawWork.DrawDetailServices
             double shellSideHeight = 0;
             double centerSideHeight = 0;
 
-            Point3D roofCenterLowerPoint = GetSumPoint(shellBottomPoint, 0, 0);
-            Point3D roofCenterUpperPoint = GetSumPoint(roofCenterLowerPoint, 0, 0);
-            Point3D roofSideLowerPoint= GetSumPoint(shellBottomPoint, 0, 0);
-            Point3D roofSideUpperPoint= GetSumPoint(shellBottomPoint, 0, 0);
+            Point3D roofCenterLowerPoint = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointCenterTopDown, referencePoint); 
+            Point3D roofCenterUpperPoint = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointCenterTopUp, referencePoint); 
+            Point3D roofSideLowerPoint= workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftRoofDown, referencePoint); 
+            Point3D roofSideUpperPoint= workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftRoofUp, referencePoint);
 
 
-            Point3D bottomCenterLowerPoint = GetSumPoint(shellBottomPoint, 0, 0);
-            Point3D bottomCenterUpperPoint = GetSumPoint(bottomCenterLowerPoint, 0, 0);
+            Point3D bottomCenterLowerPoint = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointCenterBottomDown, referencePoint);
+            Point3D bottomCenterUpperPoint = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointCenterBottomUp, referencePoint);
             Point3D bottomSideLowerPoint= GetSumPoint(shellBottomPoint, 0, 0);
             Point3D bottomSideUpperPoint = GetSumPoint(shellBottomPoint, 0, 0);
 
@@ -518,64 +530,111 @@ namespace DrawWork.DrawDetailServices
 
 
 
-            // Lee Test
-
-            #region 임시 데이터 배정
-            string sizeName = "C200x80x7.5x11";
-            NRafterSupportClipShellSideModel padModel = new NRafterSupportClipShellSideModel();
-            foreach (NRafterSupportClipShellSideModel eachModel in assemblyData.NRafterSupportClipShellSideList)
-            {
-                if (eachModel.RafterSize == sizeName)
-                {
-                    padModel = eachModel;
-                    break;
-                }
-            }
-            #endregion
-
-            #region 임시 데이터 배정 for Rafter
-            string sizeName2 = "C250x90x9x13";
-            NColumnRafterModel padModel2 = new NColumnRafterModel();
-            foreach (NColumnRafterModel eachModel in assemblyData.NColumnRafterList)
-            {
-                if (eachModel.Size == sizeName2)
-                {
-                    padModel2 = eachModel;
-                    break;
-                }
-            }
-            #endregion
-
-            #region 임시 데이터 배정 for rafter Support Clip Shell side
-            string sizeName3 = "C200x80x7.5x11";
-            NRafterSupportClipShellSideModel padModel3 = new NRafterSupportClipShellSideModel();
-            foreach (NRafterSupportClipShellSideModel eachModel in assemblyData.NRafterSupportClipShellSideList)
-            {
-                if (eachModel.RafterSize == sizeName3)
-                {
-                    padModel3 = eachModel;
-                    break;
-                }
-            }
-            #endregion
 
             // Clip
             Point3D roofStartPoint=  workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftRoofDown, referencePoint);
             Point3D clipShellSidePoint = GetClipShellSidePoint(referencePoint);
-            clipList.AddRange(drawShareService.RafterSideClipDetail(clipShellSidePoint, roofStartPoint, singleModel, scaleValue, padModel3).GetDrawEntity());
+            StructureRafterModel rafterLastModel = structureService.GetShortRafterInLayer(structureCRTModel.LayerList[structureCRTModel.LayerList.Count - 1].RafterList);
+            NRafterSupportClipShellSideModel rafterClipShellSide = GetNewRafterSupportClipShellSideModel(rafterLastModel.Size);
+            clipList.AddRange(drawShareService.RafterSideClipDetail(clipShellSidePoint, roofStartPoint, singleModel, scaleValue, rafterClipShellSide).GetDrawEntity());
 
 
-            // Rafter
-            // Model Point
-            double rafterLength = tankIDHalf;
-            Point3D leftRafterShellSidePoint = GetRafterShellSidePoint(referencePoint);
-            rafterList.AddRange(GetRafterAssembly(out rafterOutputPointList, leftRafterShellSidePoint, rafterLength, roofSlope,0,0,null, padModel2,scaleValue));
+            // Rafter, Column, Girder
+            double centerFromCL = 0;
+            
+
+
+            for (int layerIndex = 0; layerIndex < structureCRTModel.LayerList.Count; layerIndex++)
+            {
+                StructureLayerModel eachLayer = structureCRTModel.LayerList[layerIndex];
+                double columnRadius = eachLayer.Radius;
+                Point3D bottomUppderRadiusPoint= workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.AdjCenterBottomUp,columnRadius, referencePoint);
+
+                centerFromCL = eachLayer.Radius;
+                rafterList.Add(new Line(GetSumPoint(roofCenterLowerPoint, -centerFromCL, -3000), GetSumPoint(roofCenterLowerPoint, -centerFromCL, 1000))); // 검증 라인
+
+                // Center
+                if (layerIndex == 0)
+                {
+                    StructureColumnModel centerColumn = new StructureColumnModel();
+                    if (eachLayer.ColumnList.Count > 0) 
+                    {
+                        centerColumn = eachLayer.ColumnList[0];
+
+                        // Column : Center Top Support => ref : Rafter Size
+                        StructureLayerModel outerLayer = structureCRTModel.LayerList[layerIndex + 1];
+                        StructureRafterModel outerRafter = structureService.GetLongRafterInLayer(outerLayer.RafterList);
+                        NColumnCenterTopSupportModel nCenterColumn = GetNewColumnCenterTopSupportModel(outerRafter.Size);
+                        PipeModel eachPipe = GetPipeModel(nCenterColumn.ColumnSize);
+                        // Column
+                        Point3D columnCenterTopPoint = GetSumPoint(bottomUppderRadiusPoint, 0, centerColumn.Height);
+                        columnList.AddRange(drawShareService.DrawColumnCenterTopSupport(columnCenterTopPoint, singleModel, scaleValue, nCenterColumn, eachPipe).GetDrawEntity());
+
+                        // Column Clip
+                        StructureGirderModel eachGirder = new StructureGirderModel();
+                        if (eachLayer.GirderList.Count > 0)
+                        {
+                            eachGirder = eachLayer.GirderList[0];
+                            StructureClipModel eachClip = eachGirder.ClipList[0];
+                            double columnClipDistance = valueService.GetDoubleValue(nCenterColumn.B);
+                            Point3D columnCenterLeftClipPoint = GetSumPoint(bottomUppderRadiusPoint, -columnClipDistance, centerColumn.Height);
+                            Point3D columnCenterRightClipPoint = GetSumPoint(bottomUppderRadiusPoint, columnClipDistance, centerColumn.Height);
+                            columnList.AddRange(GetClipAssembly(GetSumPoint(columnCenterLeftClipPoint, 0, 0), eachClip.ClipWidth, eachClip.ClipHeight, scaleValue));
+                            columnList.AddRange(GetClipAssembly(GetSumPoint(columnCenterRightClipPoint, 0, 0), eachClip.ClipWidth, eachClip.ClipHeight, scaleValue));
+                        }
+
+                    }
+
+                }
+
+                // Side
+                else
+                {
+                    // Rafter : Current -> Inner
+                    if (eachLayer.RafterList.Count > 0)
+                    {
+
+                        StructureRafterModel eachRafter = structureService.GetShortRafterInLayer(eachLayer.RafterList);
+                        if(layerIndex==1)
+                            eachRafter = structureService.GetLongRafterInLayer(eachLayer.RafterList);
+
+                        NColumnRafterModel nColumnRafter = GetRafterModel(eachRafter.Size);
+                        double sideRafterStartX = -eachRafter.InnerRadiusFromCenter;
+                        double sideRafterStartY = -valueService.GetOppositeByAdjacent(assemblyComData.RoofSlopeRadian, eachRafter.InnerRadiusFromCenter);
+                        rafterList.AddRange(GetRafterAssembly(out rafterOutputPointList, 
+                                                GetSumPoint(roofCenterLowerPoint, sideRafterStartX, sideRafterStartY), 
+                                                eachRafter.Length, assemblyComData.RoofSlopeRadian, 1, 1, null, nColumnRafter, scaleValue));
+
+                        //rafterList.Add(new Line(GetSumPoint(roofCenterLowerPoint, sideRafterStartX, 0), GetSumPoint(roofCenterLowerPoint, sideRafterStartX, -1000))); // 검증 라인
+                    }
+
+                    // Column : Side Top Support
+                    if (eachLayer.ColumnList.Count > 0)
+                    {
+                        StructureColumnModel sidenColumn = eachLayer.ColumnList[0];
+
+                        StructureRafterModel eachRafter = structureService.GetShortRafterInLayer(eachLayer.RafterList);
+
+                        NColumnCenterTopSupportModel nCenterColumn = GetNewColumnCenterTopSupportModel(eachRafter.Size);
+                        NColumnSideTopSupportModel nSideColumn = GetNewColumnSideTopSupportModel(nCenterColumn.ColumnSize);
+                        PipeModel eachPipe = GetPipeModel(nCenterColumn.ColumnSize);
+
+                        // Column
+                        Point3D columnSideTopPoint = GetSumPoint(bottomUppderRadiusPoint, 0, sidenColumn.Height);
+                        columnList.AddRange(drawShareService.DrawColumnSideTopSupport(columnSideTopPoint, singleModel, scaleValue, nSideColumn, eachPipe).GetDrawEntity());
+                    }
+                }
+
+                // Column : Base
+                //DrawEntityModel structureBaseDraw = DDSServiceShare.DrawColumnBaseSupport(refPoint, singleModel, scaleValue, baseModel);
+
+            }
 
             // 
             // 1
-            etcList.AddRange(drawComService.GetColumnCenterTopSupport_TopView(GetSumPoint(referencePoint, 0, 0), scaleValue));
+            //etcList.AddRange(drawComService.GetColumnCenterTopSupport_TopView(GetSumPoint(referencePoint, 0, 0), scaleValue));
             // 2
-            etcList.AddRange(drawComService.GetColumnCenterTopSupport(GetSumPoint(referencePoint, 1000, 0), scaleValue));
+            //etcList.AddRange(drawComService.GetColumnCenterTopSupport(GetSumPoint(referencePoint, 1000, 0), scaleValue));
             // 3
 
 
@@ -586,6 +645,7 @@ namespace DrawWork.DrawDetailServices
 
 
 
+            drawList.outlineList.AddRange(columnList);
 
             styleService.SetLayerListEntity(ref rafterList, layerService.LayerOutLine);
             drawList.outlineList.AddRange(rafterList);
@@ -685,8 +745,8 @@ namespace DrawWork.DrawDetailServices
 
             Point3D leftRoofDown = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftRoofDown, referencePoint);
             Point3D leftRoofUp = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftRoofUp, referencePoint);
-            Point3D centerRoofDown = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointCenterTopUp, referencePoint);
-            Point3D centerRoofUp = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointCenterTopDown, referencePoint);
+            Point3D centerRoofUp = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointCenterTopUp, referencePoint);
+            Point3D centerRoofDown = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointCenterTopDown, referencePoint);
 
 
             Line plateLowerLine = new Line(GetSumPoint(leftRoofDown, 0, 0), GetSumPoint(centerRoofDown, 0, 0));
@@ -864,6 +924,30 @@ namespace DrawWork.DrawDetailServices
         }
 
 
+        public List<Entity> GetClipAssembly(Point3D refPoint,double selWidth, double selHeight, double scaleValue)
+        {
+            List<Entity> newList = new List<Entity>();
+            
+            // Cetner Lower
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+
+            double width = selWidth;
+            double widthHalf = width / 2;
+            double height = selHeight;
+
+            Line topLine = new Line(GetSumPoint(referencePoint, -widthHalf, height), GetSumPoint(referencePoint, widthHalf, height));
+            Line leftLine = new Line(GetSumPoint(referencePoint, -widthHalf, height), GetSumPoint(referencePoint, -widthHalf, 0));
+            Line rightLine = new Line(GetSumPoint(referencePoint, widthHalf, height), GetSumPoint(referencePoint, widthHalf, 0));
+
+            newList.Add(topLine);
+            newList.Add(leftLine);
+            newList.Add(rightLine);
+            styleService.SetLayerListEntity(ref newList, layerService.LayerOutLine);
+
+            return newList;
+        }
+
+
 
         // Model Point
         public Point3D GetClipShellSidePoint(Point3D refPoint)
@@ -876,9 +960,10 @@ namespace DrawWork.DrawDetailServices
         public Point3D GetRafterShellSidePoint(Point3D refPoint)
         {
             double shellGap = 70;// 차후 값을 받아서 변환 해야 함
-            double shellReduce = GetShellReduceByTopAngle();
             double roofSlope = valueService.GetDegreeOfSlope(assemblyData.RoofCompressionRing[0].RoofSlope);
-            Point3D returnPoint = GetSumPoint(GetClipShellSidePoint(refPoint), shellReduce + shellGap, valueService.GetOppositeByAdjacent(roofSlope, shellReduce +shellGap));
+            Point3D leftRoofDown = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.PointLeftRoofDown, refPoint);
+            leftRoofDown = workingPointService.WorkingPointNew(WORKINGPOINT_TYPE.AdjLeftRoofDown,shellGap, refPoint);
+            Point3D returnPoint = GetSumPoint(GetClipShellSidePoint(refPoint), shellGap, valueService.GetOppositeByAdjacent(roofSlope, shellGap));
             return returnPoint;
         }
 
@@ -909,12 +994,34 @@ namespace DrawWork.DrawDetailServices
 
 
 
+            for (int layerIndex = 0; layerIndex < structureCRTModel.LayerList.Count; layerIndex++)
+            {
+                StructureLayerModel eachLayer = structureCRTModel.LayerList[layerIndex];
+                double columnRadius = eachLayer.Radius;
+
+                // Center
+                if (layerIndex == 0)
+                {
+                    // Center : Pipe
+                    orientationList.AddRange(GetColumnCenterSideTopview(referencePoint,))
+                }
+
+                // Side
+                else
+                {
+                    
+                    
+                }
+
+                
+
+
+            }
 
 
 
 
 
-            
 
 
 
@@ -933,7 +1040,39 @@ namespace DrawWork.DrawDetailServices
 
         }
 
+        public List<Entity> GetColumnCenterSideTopview(Point3D refPoint, NColumnCenterTopSupportModel centerModel)
+        {
+            List<Entity> newList = new List<Entity>();
 
+            Point3D referencePoint = GetSumPoint(refPoint, 0, 0);
+
+            double B = valueService.GetDoubleValue(centerModel.B);
+            double G = valueService.GetDoubleValue(centerModel.G);
+            double A1 = valueService.GetDoubleValue(centerModel.A1);
+
+            PipeModel pipeModel = GetPipeModel(centerModel.ColumnSize);
+            double pipeRadius = valueService.GetDoubleValue(pipeModel.OD) / 2;
+
+            double centerSupportRadius = pipeRadius + G + A1;
+            double clipRadius = B;
+
+
+
+            Circle pipeCir = new Circle(GetSumPoint(referencePoint, 0, 0), pipeRadius);
+            Circle clipCir = new Circle(GetSumPoint(referencePoint, 0, 0), clipRadius);
+            Circle supportCir = new Circle(GetSumPoint(referencePoint, 0, 0), centerSupportRadius);
+
+            styleService.SetLayer(ref pipeCir, layerService.LayerOutLine);
+            styleService.SetLayer(ref clipCir, layerService.LayerCenterLine);
+            styleService.SetLayer(ref supportCir, layerService.LayerOutLine);
+            newList.Add(pipeCir);
+            newList.Add(clipCir);
+            newList.Add(supportCir);
+
+
+            return newList;
+        }
+        
 
 
 
@@ -974,13 +1113,19 @@ namespace DrawWork.DrawDetailServices
 
             // Inner Line : HBeam,Channel Tpye에 따라서 달라짐
             Line lineAinner = (Line)lineA.Offset(t, Vector3D.AxisZ);
-            Line lineCinner = (Line)lineB.Offset(t, Vector3D.AxisZ);
+            Line lineCinner = (Line)lineC.Offset(t, Vector3D.AxisZ);
 
             newList.AddRange(new Line[] { lineA, lineB, lineC, lineD, lineAinner, lineCinner });
 
             // Slot Hole : Center Line 처리 필요함
-            slotHoleList.AddRange(GetHoles(GetSumPoint(lineD.MidPoint, B1 + C1 / 2, 0), holeDia, C1, D));
-            slotHoleList.AddRange(GetHoles(GetSumPoint(lineB.MidPoint, -(B1 + C1 / 2), 0), holeDia, C1, D));
+            double holeQty = 2;
+            // hole Plan
+
+            double holePositionX = B1 + C1 / 2;
+
+            slotHoleList.AddRange(GetHolesQty(GetSumPoint(lineD.MidPoint, holePositionX, 0), holeDia, C1, holeQty, D));
+            slotHoleList.AddRange(GetHolesQty(GetSumPoint(lineB.MidPoint, -holePositionX, 0), holeDia, C1, holeQty, D));
+            newList.AddRange(slotHoleList);
 
             if (selRotate != 0)
             {
@@ -1055,21 +1200,56 @@ namespace DrawWork.DrawDetailServices
 
         }
 
-
-        // 형상 정보 가져오기
-        private NColumnRafterModel GetRafterModel(string rafterSize)
+        private List<Entity> GetHolesQty(Point3D refPoint, double holeRadius, double lengthGap, double holeQty, double widthGap = 0)
         {
-            NColumnRafterModel newModel = new NColumnRafterModel();
-            foreach (NColumnRafterModel eachModel in assemblyData.NColumnRafterList)
+            //refPoint는 홀과 홀 사이의 중앙인 점을 입력해주시면됩니다
+
+            List<Entity> holeList = new List<Entity>();
+            Point3D workingPoint = GetSumPoint(refPoint, 0, 0);
+
+
+            if (holeQty == 2)
             {
-                if (eachModel.Size == rafterSize)
-                {
-                    newModel = eachModel;
-                    break;
-                }
+                Point3D leftCircleCenterPoint = GetSumPoint(workingPoint, lengthGap / 2, 0, 0);
+                Point3D rightCircleCenterPoint = GetSumPoint(workingPoint, -lengthGap / 2, 0, 0);
+                Circle leftHole = new Circle(leftCircleCenterPoint, holeRadius / 2);
+                Circle rightHole = new Circle(rightCircleCenterPoint, holeRadius / 2);
+                holeList.AddRange(new Entity[] { leftHole, rightHole });
             }
-            return newModel;
+
+            else if (holeQty == 4)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    for (int j = 0; j < 2; j++)
+                    {
+                        Point3D circleCenterPoint = GetSumPoint(workingPoint, lengthGap / 2 * (2 * i - 1), widthGap / 2 * (1 - 2 * j));
+
+                        Circle hole = new Circle(circleCenterPoint, holeRadius / 2);
+
+                        holeList.AddRange(new Entity[] { hole });
+                    }
+                }
+                // hole 순서 : [0]좌측상단, [1]좌측하단, [2]우측상단, [3]우측하단
+            }
+
+            return holeList;
         }
+
+        #region Assembly Model : Structure
+        private NColumnRafterModel GetRafterModel(string rafterSize)
+    {
+        NColumnRafterModel newModel = new NColumnRafterModel();
+        foreach (NColumnRafterModel eachModel in assemblyData.NColumnRafterList)
+        {
+            if (eachModel.Size == rafterSize)
+            {
+                newModel = eachModel;
+                break;
+            }
+        }
+        return newModel;
+    }
 
         private NColumnCenterTopSupportModel GetNewColumnCenterTopSupportModel(string selSize)
         {
@@ -1084,6 +1264,36 @@ namespace DrawWork.DrawDetailServices
             }
             return newModel;
         }
+
+        private NColumnSideTopSupportModel GetNewColumnSideTopSupportModel(string selSize)
+        {
+            NColumnSideTopSupportModel newModel = new NColumnSideTopSupportModel();
+            foreach (NColumnSideTopSupportModel eachModel in assemblyData.NColumnSideTopSupportList)
+            {
+                if (eachModel.ColumnSize == selSize)
+                {
+                    newModel = eachModel;
+                    break;
+                }
+            }
+            return newModel;
+        }
+
+
+        private NRafterSupportClipShellSideModel GetNewRafterSupportClipShellSideModel(string selSize)
+        {
+            NRafterSupportClipShellSideModel newModel = new NRafterSupportClipShellSideModel();
+            foreach (NRafterSupportClipShellSideModel eachModel in assemblyData.NRafterSupportClipShellSideList)
+            {
+                if (eachModel.RafterSize == selSize)
+                {
+                    newModel = eachModel;
+                    break;
+                }
+            }
+            return newModel;
+        }
+
 
         private HBeamModel GetHBeamModel(string hBeamSize)
         {
@@ -1113,6 +1323,9 @@ namespace DrawWork.DrawDetailServices
             return newModel;
         }
 
+
+
+        #endregion
 
         private Point3D GetSumPoint(Point3D selPoint1, double X, double Y, double Z = 0)
         {

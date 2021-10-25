@@ -28,6 +28,7 @@ namespace DrawSettingLib.SettingModels
             GirderClipAngleABS = 0;
 
             ClipHeight = 0;
+            ClipWidth = 0;
         }
 
         public int InOut { get; set; }
@@ -56,6 +57,7 @@ namespace DrawSettingLib.SettingModels
 
 
         public double ClipHeight { get; set; }
+        public double ClipWidth { get; set; }
 
     }
 }
